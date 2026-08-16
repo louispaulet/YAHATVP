@@ -5,8 +5,9 @@ French Haute Autorité pour la Transparence de la Vie Publique (HATVP) open-data
 datasets.
 
 > Project status: the local end-to-end path is implemented and has been exercised
-> against the current public HATVP files. GCS, Cloud Run, Scheduler, and
-> BigQuery deployment still require a Google Cloud project and credentials.
+> against the current public HATVP files. The Cloud Run deployment is in place;
+> the weekly Scheduler trigger is being validated against a versioned no-op job
+> before it is pointed at the ingestion job.
 
 ## Goal
 
@@ -443,6 +444,58 @@ gcloud run jobs execute "$JOB_NAME" --region="$REGION" --wait
 ```
 
 ### 5. Create the weekly Scheduler trigger
+
+For trigger-only validation, use the versioned `hatvp.scheduler_smoke` entrypoint
+instead of the ingestion command. It emits one structured success event and
+exits zero without downloading HATVP data or writing GCS state. The current
+smoke task version is `1.0.0`.
+
+Create a separate Cloud Run Job for the smoke workload using the same image that
+contains the entrypoint:
+
+```bash
+export SMOKE_JOB_NAME="hatvp-scheduler-smoke"
+
+gcloud run jobs deploy "$SMOKE_JOB_NAME" \
+  --project="$PROJECT_ID" \
+  --region="$REGION" \
+  --image="$IMAGE" \
+  --command=python \
+  --args=-m,hatvp.scheduler_smoke \
+  --service-account="$RUNTIME_SA_EMAIL" \
+  --tasks=1 \
+  --max-retries=0 \
+  --task-timeout=1m
+```
+
+Grant the Scheduler identity access to this smoke job and create the weekly
+test trigger. Do not point this trigger at `hatvp-ingestion` until the smoke
+validation is complete:
+
+```bash
+gcloud run jobs add-iam-policy-binding "$SMOKE_JOB_NAME" \
+  --project="$PROJECT_ID" \
+  --region="$REGION" \
+  --member="serviceAccount:${SCHEDULER_SA_EMAIL}" \
+  --role="roles/run.invoker"
+
+gcloud scheduler jobs create http "${SMOKE_JOB_NAME}-weekly" \
+  --project="$PROJECT_ID" \
+  --location="$SCHEDULER_REGION" \
+  --schedule="0 7 * * 1" \
+  --time-zone="Europe/Paris" \
+  --uri="https://run.googleapis.com/v2/projects/${PROJECT_ID}/locations/${REGION}/jobs/${SMOKE_JOB_NAME}:run" \
+  --http-method=POST \
+  --oauth-service-account-email="$SCHEDULER_SA_EMAIL" \
+  --message-body='{}' \
+  --headers="Content-Type=application/json"
+```
+
+To validate delivery without waiting for Monday, temporarily update the smoke
+trigger to a Paris-local minute a few minutes in the future, wait for the Cloud
+Run execution to complete, and then restore `0 7 * * 1`. Confirm the execution
+and the `scheduler_smoke_task_version` field in Cloud Logging before considering
+the trigger validated.
 
 Grant the dedicated Scheduler identity permission to run this specific job:
 
