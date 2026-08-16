@@ -14,4 +14,4 @@ COPY src ./src
 RUN pip install --no-cache-dir uv \
     && uv sync --frozen --no-dev
 
-CMD ["python", "-m", "hatvp.main"]
+ENTRYPOINT ["python", "-m", "hatvp.main"]

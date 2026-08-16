@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-17 — Make Cloud Run force executions appendable
+
+### Changed
+
+- Switched the container application invocation from Docker `CMD` to an
+  explicit `ENTRYPOINT`, so Cloud Run execution-time arguments such as
+  `--force` append to `python -m hatvp.main` instead of replacing the
+  executable.
+
+### Follow-up
+
+- The deployed job's BigQuery flag remains `HATVP_ENABLE_BIGQUERY=false`; the
+  forced run will reprocess GCS/Parquet outputs but will not create BigQuery
+  tables until BigQuery is explicitly enabled and permission-validated.
+
 ## 2026-08-17 — Add `revenuMandatDto` income outlier report
 
 ### Added
