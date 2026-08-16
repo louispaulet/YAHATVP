@@ -47,6 +47,131 @@
     "source_snapshot_gcs": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-17/declarations.xml",
     "source_url": "https://www.hatvp.fr/livraison/merge/declarations.xml"
   },
+  "source_income": {
+    "category_slots": [
+      {
+        "has_source_value": true,
+        "income_category_index": 3,
+        "income_type": "Indemnités d'élu",
+        "income_year": "2025",
+        "normalized_value": 10431.0,
+        "raw_value": "10431",
+        "source_item_index": 0,
+        "spouse_normalized_value": null,
+        "spouse_raw_value": null
+      },
+      {
+        "has_source_value": true,
+        "income_category_index": 4,
+        "income_type": "Traitements salaires",
+        "income_year": "2025",
+        "normalized_value": 41571.0,
+        "raw_value": "41571",
+        "source_item_index": 0,
+        "spouse_normalized_value": null,
+        "spouse_raw_value": null
+      },
+      {
+        "has_source_value": true,
+        "income_category_index": 5,
+        "income_type": "Pensions retraites rentes",
+        "income_year": "2025",
+        "normalized_value": 14691.0,
+        "raw_value": "14691",
+        "source_item_index": 0,
+        "spouse_normalized_value": null,
+        "spouse_raw_value": null
+      },
+      {
+        "has_source_value": false,
+        "income_category_index": 6,
+        "income_type": "Revenus professionnels (BNC BIC BA)",
+        "income_year": "2025",
+        "normalized_value": null,
+        "raw_value": null,
+        "source_item_index": 0,
+        "spouse_normalized_value": null,
+        "spouse_raw_value": null
+      },
+      {
+        "has_source_value": true,
+        "income_category_index": 7,
+        "income_type": "Revenus capitaux mobiliers",
+        "income_year": "2025",
+        "normalized_value": 498.0,
+        "raw_value": "498",
+        "source_item_index": 0,
+        "spouse_normalized_value": null,
+        "spouse_raw_value": null
+      },
+      {
+        "has_source_value": true,
+        "income_category_index": 8,
+        "income_type": "Revenus fonciers",
+        "income_year": "2025",
+        "normalized_value": 4230.0,
+        "raw_value": "4230",
+        "source_item_index": 0,
+        "spouse_normalized_value": null,
+        "spouse_raw_value": null
+      },
+      {
+        "has_source_value": false,
+        "income_category_index": 9,
+        "income_type": "Autres revenus",
+        "income_year": "2025",
+        "normalized_value": null,
+        "raw_value": null,
+        "source_item_index": 0,
+        "spouse_normalized_value": null,
+        "spouse_raw_value": null
+      },
+      {
+        "has_source_value": true,
+        "income_category_index": 10,
+        "income_type": "Plus-values mobilières",
+        "income_year": "2025",
+        "normalized_value": 1584.0,
+        "raw_value": "1584",
+        "source_item_index": 0,
+        "spouse_normalized_value": null,
+        "spouse_raw_value": null
+      },
+      {
+        "has_source_value": false,
+        "income_category_index": 11,
+        "income_type": "Plus-values immobilières",
+        "income_year": "2025",
+        "normalized_value": null,
+        "raw_value": null,
+        "source_item_index": 0,
+        "spouse_normalized_value": null,
+        "spouse_raw_value": null
+      }
+    ],
+    "reconciliation": [
+      {
+        "difference": 0.0,
+        "income_year": "2025",
+        "matches": true,
+        "numeric_category_sum": 73005.0,
+        "source_total": 73005.0
+      }
+    ],
+    "section": "revenuMandatDto",
+    "totals": [
+      {
+        "income_type": "totalElu",
+        "income_year": "2025",
+        "is_aggregate": true,
+        "normalized_value": 73005.0,
+        "raw_value": "73005",
+        "source_item_index": 0,
+        "spouse_normalized_value": 0.0,
+        "spouse_raw_value": "0"
+      }
+    ]
+  },
   "table_counts": {
     "activities": 0,
     "assets": 19,

@@ -7,6 +7,9 @@ for manual parser review.
   `<declarations>` wrapper for easy XML inspection.
 - `parsed.json` contains the declaration summary and every normalized row whose
   `declaration_uuid` matches the source UUID, grouped by table.
+- `parsed.json` also contains `source_income.category_slots` with all nine raw
+  income categories, including empty slots, plus `source_income.totals` and a
+  category-to-total reconciliation.
 
 Selected declaration:
 
@@ -16,6 +19,10 @@ Selected declaration:
 - Deposit date: `2026-04-22`
 - Parsed rows: 1 declaration, 1 person, 1 mandate, 6 incomes, 19 assets, and
   0 liabilities
+
+The six populated category values sum to the source `totalElu` value of
+`73005`. The total is kept in the source-income view but is not emitted as a
+seventh normalized income row because it is an aggregate of the categories.
 
 `parsed.json` records the full source XML SHA-256, source URL, GCS raw snapshot
 path, snapshot date, and parser commit. `raw_record_json` fields retain the

@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-17 — Expand manual income trace
+
+### Changed
+
+- Extended the manual-review JSON bundle with all nine source income category
+  slots, the `totalElu` aggregate, and a numeric reconciliation between the
+  populated categories and the source total.
+
+### Verified
+
+- The six populated category values reconcile exactly to `totalElu=73005`; the
+  three empty source category slots remain visible for manual review.
+
 ## 2026-08-17 — Add live declaration manual-review bundle
 
 ### Added
