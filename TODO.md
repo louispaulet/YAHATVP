@@ -1,9 +1,10 @@
 # YAHATVP TODO
 
 This checklist turns the project requirements into an execution plan. The local
-pipeline and first Google Cloud deployment are implemented and tested; the main
-remaining work is Scheduler, optional BigQuery, quality triage, and operational
-hardening.
+pipeline and first Google Cloud deployment are implemented and tested; the
+weekly Scheduler path is validated against a versioned no-op job, while the
+production ingestion handoff, optional BigQuery, quality triage, and operational
+hardening remain.
 
 ## Current status
 
@@ -81,14 +82,14 @@ uv run python -m hatvp.main --local-output ./data --dry-run
 ## 2. Bootstrap Google Cloud resources
 
 - [x] Enable Artifact Registry, Cloud Build, IAM, IAM Credentials, Cloud Run, Cloud Storage, and STS APIs.
-- [ ] Enable Cloud Scheduler and confirm Cloud Logging/retention settings before scheduling.
+- [x] Enable Cloud Scheduler and confirm Cloud Logging is available for Scheduler smoke validation.
 - [x] Create the dedicated GCS bucket with uniform bucket-level access, public access prevention, and versioning.
 - [x] Create the Artifact Registry Docker repository `hatvp` in `europe-west1`.
 - [x] Create the Cloud Run runtime service account `hatvp-runtime`.
 - [x] Create the Cloud Scheduler invoker service account `hatvp-scheduler`.
 - [x] Grant the runtime account object access only to the dedicated HATVP bucket.
 - [ ] If BigQuery is enabled, grant only BigQuery job and dataset write permissions required by the loader.
-- [ ] Grant the Scheduler account `roles/run.invoker` on the specific Cloud Run Job.
+- [x] Grant the Scheduler account `roles/run.invoker` on the `hatvp-scheduler-smoke` Cloud Run Job; keep `hatvp-ingestion` unconnected until acceptance.
 - [ ] Confirm Cloud Audit Logs and Cloud Logging retention meet operational needs.
 
 The deployment commands are documented in the
@@ -132,13 +133,18 @@ open.
 
 ## 5. Configure the weekly Scheduler trigger
 
-- [ ] Create a Cloud Scheduler HTTP target for the Cloud Run Jobs `:run` endpoint.
-- [ ] Use Monday morning in the `Europe/Paris` timezone.
-- [ ] Use OAuth with the dedicated Scheduler service account.
-- [ ] Set retry behavior and an appropriate attempt deadline.
-- [ ] Trigger the Scheduler job manually once.
-- [ ] Confirm the resulting Cloud Run execution is visible in Cloud Logging.
-- [ ] Confirm duplicate Scheduler delivery is safe because the pipeline is idempotent.
+- [x] Add the versioned `hatvp.scheduler_smoke` no-op task (`1.0.0`) that emits a structured success event and exits zero without running ingestion.
+- [x] Deploy the `hatvp-scheduler-smoke` Cloud Run Job from image tag `baa27d8`.
+- [x] Create the `hatvp-scheduler-smoke-weekly` HTTP target for the Cloud Run Jobs `:run` endpoint.
+- [x] Use Monday morning in the `Europe/Paris` timezone: `0 7 * * 1`.
+- [x] Use OAuth with the dedicated `hatvp-scheduler` service account.
+- [x] Set a 180-second attempt deadline and retain the configured retry policy.
+- [x] Validate near-now schedule `2 0 * * *` (`00:02 Europe/Paris`): Scheduler attempt `2026-08-16T22:02:03Z` created execution `hatvp-scheduler-smoke-rrdwn`, which completed with `succeededCount=1`.
+- [x] Validate a second near-now schedule `4 0 * * *` (`00:04 Europe/Paris`): Scheduler attempt `2026-08-16T22:04:00Z` created execution `hatvp-scheduler-smoke-srwmc`, which completed with `succeededCount=1`.
+- [x] Confirm both executions emitted `scheduler_smoke_task_version=1.0.0` in Cloud Logging.
+- [x] Restore the final weekly schedule; next run is `2026-08-17T05:00:00Z` (`07:00 Europe/Paris`).
+- [ ] Point a production trigger at `hatvp-ingestion` after the smoke validation is accepted.
+- [ ] Confirm duplicate delivery safety for the real ingestion pipeline.
 
 Recommended initial schedule:
 
@@ -181,7 +187,8 @@ timezone: Europe/Paris
 - [x] Run one complete manual Cloud Run execution and review the quality report.
 - [ ] Review all flagged records from the first snapshot.
 - [x] Confirm raw data, Parquet outputs, quarantine, quality report, and state are all present.
-- [ ] Confirm the Scheduler-triggered execution succeeds.
+- [x] Confirm the Scheduler-triggered smoke execution succeeds; the production ingestion job remains unconnected.
+- [ ] Confirm the production Scheduler-triggered ingestion execution succeeds after handoff.
 - [ ] Confirm the `NO_CHANGE` path works on a repeat execution.
 - [ ] Confirm logs never contain credentials or access tokens.
 - [x] Confirm the runtime service account has no unnecessary project-wide roles.
