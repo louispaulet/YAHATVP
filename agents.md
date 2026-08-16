@@ -34,9 +34,23 @@ change is complete.
 ## Before editing
 
 - Check `git status --short --branch` and preserve unrelated user changes.
+- Read `agents.md`, `TODO.md`, and `CHANGELOG.md` before starting work. If
+  `CHANGELOG.md` is missing, create it as part of the repository documentation
+  update.
 - Read the relevant source, tests, and documentation before modifying them.
 - Prefer `rg` for repository searches.
 - Avoid destructive commands and broad rewrites.
+
+## Project tracking
+
+- Treat `TODO.md` as the current execution plan. Reconcile its checkboxes and
+  remaining work with the actual result of every repository, infrastructure,
+  CI/CD, or operational change.
+- Append a dated entry to `CHANGELOG.md` for completed user-visible,
+  infrastructure, CI/CD, and operational changes. Include the important
+  verification evidence and leave unresolved follow-up work in `TODO.md`.
+- Do not mark work complete based only on configuration; record a successful
+  test, deployment, or smoke-test result when one is required.
 
 ## Before committing
 

@@ -1,8 +1,9 @@
 # YAHATVP TODO
 
 This checklist turns the project requirements into an execution plan. The local
-pipeline is implemented and tested; the main remaining work is connecting it to
-Google Cloud and completing a production smoke test.
+pipeline and first Google Cloud deployment are implemented and tested; the main
+remaining work is Scheduler, optional BigQuery, quality triage, and operational
+hardening.
 
 ## Current status
 
@@ -23,15 +24,15 @@ Google Cloud and completing a production smoke test.
 - [x] Add Dockerfile and GitHub Actions deployment workflow using Workload Identity Federation.
 - [x] Run the test suite, Ruff, package build, and a live local run against the current HATVP files.
 
-## Next step: provide Google Cloud project details
+## Google Cloud project details (completed)
 
-This is the first step that requires your involvement. Decide or provide:
+The first deployment uses the following project configuration:
 
-- [ ] Google Cloud project ID with billing enabled.
-- [ ] Deployment region, recommended: `europe-west1`.
-- [ ] Dedicated bucket name for HATVP archives.
-- [ ] Whether BigQuery should be enabled for the first production deployment.
-- [ ] GitHub repository owner/name used by the Workload Identity Federation condition.
+- [x] Google Cloud project `yahatvp-pipeline-eu` with billing enabled.
+- [x] Deployment region: `europe-west1`.
+- [x] Dedicated archive bucket: `yahatvp-pipeline-eu-data`.
+- [x] BigQuery disabled for the first deployment: `HATVP_ENABLE_BIGQUERY=false`.
+- [x] GitHub repository condition: `louispaulet/YAHATVP`, branch `main`.
 
 No service-account JSON key is needed or wanted.
 
@@ -73,12 +74,13 @@ uv run python -m hatvp.main --local-output ./data --dry-run
 
 ## 2. Bootstrap Google Cloud resources
 
-- [ ] Enable Artifact Registry, Cloud Run, Cloud Scheduler, Cloud Storage, Cloud Logging, and BigQuery APIs if BigQuery is enabled.
-- [ ] Create the dedicated GCS bucket with uniform bucket-level access.
-- [ ] Create the Artifact Registry Docker repository.
-- [ ] Create the Cloud Run runtime service account.
-- [ ] Create the Cloud Scheduler invoker service account.
-- [ ] Grant the runtime account object access only to the dedicated HATVP bucket.
+- [x] Enable Artifact Registry, Cloud Build, IAM, IAM Credentials, Cloud Run, Cloud Storage, and STS APIs.
+- [ ] Enable Cloud Scheduler and confirm Cloud Logging/retention settings before scheduling.
+- [x] Create the dedicated GCS bucket with uniform bucket-level access, public access prevention, and versioning.
+- [x] Create the Artifact Registry Docker repository `hatvp` in `europe-west1`.
+- [x] Create the Cloud Run runtime service account `hatvp-runtime`.
+- [x] Create the Cloud Scheduler invoker service account `hatvp-scheduler`.
+- [x] Grant the runtime account object access only to the dedicated HATVP bucket.
 - [ ] If BigQuery is enabled, grant only BigQuery job and dataset write permissions required by the loader.
 - [ ] Grant the Scheduler account `roles/run.invoker` on the specific Cloud Run Job.
 - [ ] Confirm Cloud Audit Logs and Cloud Logging retention meet operational needs.
@@ -88,12 +90,12 @@ The deployment commands are documented in the
 
 ## 3. Build and deploy the first Cloud Run Job
 
-- [ ] Build and push the image to Artifact Registry.
-- [ ] Deploy the Cloud Run Job with one task, bounded retries, and a task timeout.
-- [ ] Configure `HATVP_BUCKET`, `HATVP_PREFIX`, source URLs, pipeline version, and Git SHA.
-- [ ] Start with `HATVP_ENABLE_BIGQUERY=false` unless BigQuery permissions have already been verified.
-- [ ] Execute the job manually with `--wait`.
-- [ ] Confirm the container exits with status 0 for a successful warning-bearing run.
+- [x] Build and push the image to Artifact Registry from GitHub Actions using the GitHub runner's Docker client.
+- [x] Deploy the Cloud Run Job `hatvp-ingestion` with one task, one retry, and a 30-minute task timeout.
+- [x] Configure `HATVP_BUCKET`, `HATVP_PREFIX`, source URLs, pipeline version, and Git SHA.
+- [x] Start with `HATVP_ENABLE_BIGQUERY=false` until BigQuery permissions are verified.
+- [x] Execute the job manually with `--wait`.
+- [x] Confirm the container exits with status 0 for a warning-bearing run (`hatvp-ingestion-q78jz`).
 - [ ] Confirm the container exits non-zero for malformed input or structural quality failure.
 - [ ] Confirm Cloud Logging contains structured events for downloads, hashes, quality, and final status.
 
@@ -108,15 +110,19 @@ gcloud run jobs executions list --job=<JOB_NAME> --region=<REGION>
 
 After the first successful Cloud Run execution:
 
-- [ ] Confirm both exact raw files exist under `raw/snapshot_date=.../`.
-- [ ] Confirm `metadata.json` contains URL, size, SHA-256, timing, Git SHA, and pipeline version.
+- [x] Confirm both exact raw files exist under `raw/snapshot_date=.../`.
+- [x] Confirm `metadata.json` contains URL, size, SHA-256, timing, Git SHA, and pipeline version.
 - [ ] Confirm raw objects cannot be overwritten by a retry with different bytes.
-- [ ] Confirm every normalized table is written below `silver/<table>/snapshot_date=.../`.
-- [ ] Confirm anomaly rows are present below `quarantine/snapshot_date=.../`.
-- [ ] Confirm the machine-readable quality report is present below `quality/snapshot_date=.../`.
-- [ ] Confirm `state/latest.json` is written only after all required outputs succeed.
+- [x] Confirm every normalized table is written below `silver/<table>/snapshot_date=.../`.
+- [x] Confirm anomaly rows are present below `quarantine/snapshot_date=.../`.
+- [x] Confirm the machine-readable quality report is present below `quality/snapshot_date=.../`.
+- [x] Confirm `state/latest.json` is written only after all required outputs succeed.
 - [ ] Confirm a second run with unchanged inputs returns `NO_CHANGE` and does not create a new derived snapshot.
 - [ ] Confirm a failed transformation leaves the previous `state/latest.json` unchanged.
+
+The first smoke-test snapshot was `2026-08-16`. Its quality report contained
+zero errors, 3,510 warnings, and 5,763 flagged records; quality triage remains
+open.
 
 ## 5. Configure the weekly Scheduler trigger
 
@@ -137,22 +143,22 @@ timezone: Europe/Paris
 
 ## 6. Configure GitHub Actions CI/CD
 
-- [ ] Create a Workload Identity Pool and GitHub OIDC provider.
-- [ ] Restrict the provider attribute condition to this repository and the intended branch/event claims.
-- [ ] Create a deployment service account separate from the Cloud Run runtime account.
-- [ ] Grant the deployment account only Artifact Registry push, Cloud Run deployment, and required service-account impersonation permissions.
-- [ ] Configure repository variables used by `.github/workflows/deploy.yml`:
-  - [ ] `GCP_PROJECT_ID`
-  - [ ] `GCP_REGION`
-  - [ ] `ARTIFACT_REPOSITORY`
-  - [ ] `CLOUD_RUN_JOB`
-  - [ ] `HATVP_BUCKET`
-  - [ ] `HATVP_RUNTIME_SERVICE_ACCOUNT`
-  - [ ] `GCP_WIF_PROVIDER`
-  - [ ] `GCP_DEPLOY_SERVICE_ACCOUNT`
-- [ ] Push a small change to `main` and confirm tests run before deployment.
-- [ ] Confirm the workflow builds, pushes, and deploys without any JSON credential secret.
-- [ ] Confirm the deployed job uses the intended image SHA rather than a floating `latest` tag.
+- [x] Create a Workload Identity Pool and GitHub OIDC provider.
+- [x] Restrict the provider attribute condition to `louispaulet/YAHATVP` on `main`.
+- [x] Create the deployment service account `hatvp-deployer` separately from the Cloud Run runtime account.
+- [x] Grant the deployment account Artifact Registry push, Cloud Run deployment, Service Usage Consumer, and required service-account impersonation permissions.
+- [x] Configure all repository variables used by `.github/workflows/deploy.yml`:
+  - [x] `GCP_PROJECT_ID`
+  - [x] `GCP_REGION`
+  - [x] `ARTIFACT_REPOSITORY`
+  - [x] `CLOUD_RUN_JOB`
+  - [x] `HATVP_BUCKET`
+  - [x] `HATVP_RUNTIME_SERVICE_ACCOUNT`
+  - [x] `GCP_WIF_PROVIDER`
+  - [x] `GCP_DEPLOY_SERVICE_ACCOUNT`
+- [x] Push a change to `main` and confirm tests run before deployment.
+- [x] Confirm the workflow builds, pushes, and deploys without any JSON credential secret.
+- [x] Confirm the deployed job uses the commit SHA image tag rather than a floating `latest` tag.
 
 ## 7. Enable and validate BigQuery, if wanted
 
@@ -166,15 +172,15 @@ timezone: Europe/Paris
 
 ## 8. Production go-live checklist
 
-- [ ] Run one complete manual Cloud Run execution and review the quality report.
+- [x] Run one complete manual Cloud Run execution and review the quality report.
 - [ ] Review all flagged records from the first snapshot.
-- [ ] Confirm raw data, Parquet outputs, quarantine, quality report, and state are all present.
+- [x] Confirm raw data, Parquet outputs, quarantine, quality report, and state are all present.
 - [ ] Confirm the Scheduler-triggered execution succeeds.
 - [ ] Confirm the `NO_CHANGE` path works on a repeat execution.
 - [ ] Confirm logs never contain credentials or access tokens.
-- [ ] Confirm the runtime service account has no unnecessary project-wide roles.
-- [ ] Confirm the repository branch is clean and CI is green.
-- [ ] Record the first production snapshot date and pipeline Git SHA.
+- [x] Confirm the runtime service account has no unnecessary project-wide roles.
+- [x] Confirm the repository branch is clean and CI is green.
+- [x] Record the first production snapshot date (`2026-08-16`) and pipeline Git SHA (`f21853d`).
 
 ## 9. Ongoing operations
 
