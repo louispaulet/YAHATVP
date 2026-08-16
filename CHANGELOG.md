@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-17 — Add `revenuMandatDto` income outlier report
+
+### Added
+
+- Added `reports/statistical-income-outliers-2026-08-17.md` with the full
+  source-to-parser funnel, category distribution, declaration-level summaries,
+  review candidates, and `totalElu` reconciliation.
+
+### Verified
+
+- The live XML contains 198 fixed category slots but only 66 numeric elected-
+  person category values; the normalized `incomes` table contains exactly 66
+  rows across 9 declarations.
+- The 66 category values sum to €1,098,531, exactly matching the 22 source
+  `totalElu` aggregates; the robust income detector finds zero formal outliers
+  at the configured absolute z-score > 10 threshold.
+
 ## 2026-08-17 — Expand manual income trace
 
 ### Changed
