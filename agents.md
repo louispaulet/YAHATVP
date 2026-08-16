@@ -1,0 +1,55 @@
+# Agent instructions
+
+Read this file before making changes in this repository.
+
+## Required workflow
+
+After every change, always:
+
+1. inspect the diff and run the relevant tests/checks;
+2. stage the intentional files;
+3. create a focused commit;
+4. push the commit to the current remote branch.
+
+This rule applies even when the current branch is `main`. Do not leave completed
+changes uncommitted or unpushed. Never force-push or rewrite history unless the
+user explicitly asks for it. If authentication, branch protection, or a remote
+failure prevents the push, report the exact blocker instead of pretending the
+change is complete.
+
+## Project direction
+
+- Follow `README.md` as the architecture and operational contract.
+- Keep the pipeline small and HATVP-specific; do not introduce an orchestrator.
+- Inspect the current HATVP CSV/XML schema before inventing normalized fields.
+- Preserve immutable raw bytes, source identifiers, and provenance.
+- Update `state/latest.json` only after every required processing stage succeeds.
+- Flag suspicious records for review; do not silently delete or “correct” them.
+- Use fixtures for normal tests. Tests must not require live HATVP, GCS, or
+  BigQuery access.
+- Use Application Default Credentials locally, the Cloud Run runtime service
+  account in production, and GitHub Workload Identity Federation in CI/CD.
+- Never create, commit, or request long-lived service-account JSON keys.
+
+## Before editing
+
+- Check `git status --short --branch` and preserve unrelated user changes.
+- Read the relevant source, tests, and documentation before modifying them.
+- Prefer `rg` for repository searches.
+- Avoid destructive commands and broad rewrites.
+
+## Before committing
+
+- Review `git diff` and confirm no secrets or generated data are included.
+- Run the narrowest relevant tests first, then the full project checks when the
+  implementation supports them.
+- Use a concise commit message describing the change.
+- Push to the current branch, including `main`, as required above.
+
+## Google Cloud access
+
+No GCloud login is needed for documentation changes, fixture-only tests, or
+local-output mode. ADC login is needed for local GCS/BigQuery integration, and
+Google Cloud permissions are needed for deployment. Ask the user for access or
+configuration details only when an operation genuinely requires them; never ask
+for service-account JSON credentials.

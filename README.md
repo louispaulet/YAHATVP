@@ -1,2 +1,560 @@
 # YAHATVP
-Yet Another HATVProject. 
+
+Yet Another HATVP Project: a small, auditable weekly ingestion pipeline for the
+French Haute Autorité pour la Transparence de la Vie Publique (HATVP) open-data
+datasets.
+
+> Project status: bootstrap documentation. The implementation should be added
+> incrementally, beginning with source-schema inspection and a local end-to-end
+> path before enabling Google Cloud services.
+
+## Goal
+
+Once implemented, the pipeline will download the two public HATVP datasets,
+detect changes using SHA-256 hashes, preserve immutable raw snapshots, produce
+normalized Parquet datasets, report data-quality issues, and optionally publish
+curated tables to BigQuery.
+
+The pipeline is deliberately small. It runs once per week as a Cloud Run Job;
+Cloud Scheduler is only the trigger. GitHub Actions is used for CI/CD and
+deployment, never as the weekly execution engine.
+
+## Architecture
+
+```text
+                         weekly, Europe/Paris
+  Cloud Scheduler ───────────────────────────────────┐
+                                                       │ authenticated POST
+                                                       ▼
+                                                Cloud Run Job
+                                                       │
+                         ┌─────────────────────────────┼─────────────────────────────┐
+                         │                             │                             │
+                         ▼                             ▼                             ▼
+                 Download HATVP files          Compare SHA-256                 Emit status
+                         │                             │                 NO_CHANGE / SUCCESS /
+                         ▼                             ▼                 SUCCESS_WITH_WARNINGS /
+                Immutable raw archive             No change? ── yes ──► exit 0
+                         │
+                         ▼
+                 Parse and normalize
+                         │
+                         ▼
+                  Data-quality checks
+                    │             │
+                    ▼             ▼
+              Parquet to GCS   anomalies to GCS
+                    │             │
+                    └──────┬──────┘
+                           ▼
+                  quality report to GCS
+                           │
+                           ▼
+                optional curated BigQuery tables
+                           │
+                           ▼
+                 update state/latest.json last
+
+  GitHub ── GitHub Actions + Workload Identity Federation ──► Artifact Registry
+                                                               │
+                                                               ▼
+                                                        deploy Cloud Run Job
+```
+
+### Why Cloud Run Jobs?
+
+This workload is a finite batch process that downloads files, transforms them,
+writes artifacts, and exits. Cloud Run Jobs provide a managed container runtime,
+retries, execution history, logs, and a clean non-zero exit status without
+introducing an HTTP server or a workflow orchestrator. Cloud Scheduler supplies
+the weekly trigger, so the application remains independently runnable locally.
+
+The design intentionally does not use Airflow, Cloud Composer, Dataflow,
+Kubernetes, Spark, Prefect, Dagster, or another orchestrator.
+
+## Source datasets
+
+The default source URLs are:
+
+| Dataset | URL | Purpose |
+| --- | --- | --- |
+| CSV list | `https://www.hatvp.fr/livraison/opendata/liste.csv` | HATVP open-data list |
+| XML declarations | `https://www.hatvp.fr/livraison/merge/declarations.xml` | Declaration data |
+
+The implementation must inspect the current CSV header and XML structure before
+finalizing normalized models. Do not invent fields based on a presumed schema.
+Keep parsing separate from normalization, and use streaming XML parsing such as
+`lxml.etree.iterparse` so the whole XML document is not loaded into memory.
+
+## Repository layout
+
+The target layout is intentionally conventional:
+
+```text
+hatvp-pipeline/
+├── pyproject.toml
+├── uv.lock
+├── Dockerfile
+├── README.md
+├── agents.md
+├── .gitignore
+├── src/hatvp/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── config.py
+│   ├── download.py
+│   ├── hashing.py
+│   ├── storage.py
+│   ├── parser.py
+│   ├── normalize.py
+│   ├── quality.py
+│   ├── models.py
+│   └── bigquery.py
+├── tests/
+│   ├── test_hashing.py
+│   ├── test_normalize.py
+│   ├── test_quality.py
+│   └── fixtures/
+└── .github/workflows/deploy.yml
+```
+
+Use Python 3.12 or newer and `uv`. Prefer a small dependency set:
+
+- `httpx` for downloads
+- `google-cloud-storage` for GCS
+- `google-cloud-bigquery` for the optional analytical layer
+- `lxml` for streaming XML parsing
+- `polars` and `pyarrow` for tabular transformation and Parquet
+- `pandera` for dataframe-level validation where useful
+- `pydantic-settings` for configuration
+
+## Data and state contract
+
+### Change detection
+
+For each downloaded file, compute SHA-256 over the exact downloaded bytes. Keep
+separate XML and CSV hashes. If both match the latest successful state, return
+success with `NO_CHANGE` and do not write derived outputs. Use `--force` to
+reprocess unchanged inputs intentionally.
+
+The implementation may later add semantic/content hashes, but should not add
+that complexity until it is needed.
+
+### GCS layout
+
+Configure one bucket and keep the HATVP prefix stable:
+
+```text
+gs://<bucket>/hatvp/
+├── raw/snapshot_date=YYYY-MM-DD/
+│   ├── declarations.xml
+│   ├── liste.csv
+│   └── metadata.json
+├── silver/declarations/snapshot_date=YYYY-MM-DD/data.parquet
+├── silver/incomes/snapshot_date=YYYY-MM-DD/data.parquet
+├── silver/assets/snapshot_date=YYYY-MM-DD/data.parquet
+├── quarantine/snapshot_date=YYYY-MM-DD/anomalies.parquet
+├── quality/snapshot_date=YYYY-MM-DD/report.json
+└── state/latest.json
+```
+
+Raw objects are immutable. Never overwrite a historical snapshot. Derived files
+may be deterministically rewritten when retrying the same snapshot after a
+partial failure.
+
+`state/latest.json` is advanced only after every required stage succeeds:
+
+```json
+{
+  "snapshot_date": "2026-08-17",
+  "fetched_at": "2026-08-17T08:00:00+02:00",
+  "xml_sha256": "...",
+  "csv_sha256": "...",
+  "pipeline_git_sha": "...",
+  "pipeline_version": "..."
+}
+```
+
+A failed download, parse, normalization, quality check, Parquet write, or
+BigQuery load must never advance this state.
+
+### Normalized data
+
+Start with entities supported by the observed HATVP source schema. Likely
+logical tables include declarations, people, incomes, assets, mandates/functions,
+and companies/participations, but the source data is authoritative.
+
+Preserve source values and provenance. For fields that are normalized, keep the
+equivalent of:
+
+```text
+raw_value | normalized_value | quality_status | quality_reason
+```
+
+Deterministic formatting transformations are `FIX` operations: trimming
+whitespace, normalizing empty strings, parsing known date formats, and converting
+French numbers such as `"50 000,00"` to `50000.00`. Suspicious but plausible
+source values are `FLAG` operations. Structural failures that make safe
+processing impossible are `FAIL` operations.
+
+Do not silently discard or rewrite suspicious declarations. Quarantine keeps
+flagged records available for review; it is not a delete path.
+
+## Data-quality philosophy
+
+Quality checks should be reusable and should produce both machine-readable
+results and concise structured logs.
+
+Checks should cover:
+
+- expected columns and data types;
+- required identifiers and uniqueness where appropriate;
+- declaration, people, income, and asset row counts;
+- null rates and drastic changes from the previous snapshot;
+- duplicate stable identifiers;
+- negative values where a value is semantically impossible;
+- implausibly large incomes or assets;
+- robust statistical outliers, preferably using median/MAD where useful;
+- referential integrity between normalized tables where IDs exist.
+
+Never deduplicate people solely by first name and surname. Names can legitimately
+collide. Name-based duplicates should only create a quality flag; stable HATVP
+declaration identifiers, source IDs, URLs, or mandate metadata should drive
+identity decisions.
+
+Every changed snapshot should produce a report shaped like:
+
+```json
+{
+  "snapshot_date": "2026-08-17",
+  "status": "warning",
+  "counts": {
+    "declarations": 12345,
+    "people": 4567,
+    "incomes": 7890
+  },
+  "quality": {
+    "errors": 0,
+    "warnings": 31,
+    "flagged_records": 28
+  },
+  "checks": {
+    "duplicate_declaration_ids": 0,
+    "huge_income": 3,
+    "huge_assets": 2
+  }
+}
+```
+
+Use the execution statuses `NO_CHANGE`, `SUCCESS`,
+`SUCCESS_WITH_WARNINGS`, and `FAILED`. Warnings may complete the pipeline;
+structural errors must fail it.
+
+## Configuration
+
+Configuration belongs in environment variables, not source code or committed
+credentials:
+
+```text
+HATVP_BUCKET=<required for GCS mode>
+HATVP_PREFIX=hatvp
+HATVP_ENABLE_BIGQUERY=false
+HATVP_BIGQUERY_PROJECT=<optional>
+HATVP_BIGQUERY_DATASET=hatvp
+HATVP_XML_URL=https://www.hatvp.fr/livraison/merge/declarations.xml
+HATVP_CSV_URL=https://www.hatvp.fr/livraison/opendata/liste.csv
+```
+
+The downloader should use connect/read timeouts, bounded retries, a descriptive
+user agent, HTTP status validation, and elapsed-time/size/hash logging. Never
+accept an HTTP error page as a dataset and never log secrets.
+
+## Local development
+
+### No Google Cloud required
+
+Local output mode is the fastest path for parser and quality work:
+
+```bash
+uv sync
+uv run python -m hatvp.main --local-output ./data
+uv run python -m hatvp.main --local-output ./data --dry-run
+uv run python -m hatvp.main --local-output ./data --force
+```
+
+`--dry-run` must not mutate GCS, BigQuery, or state. `--force` reprocesses even
+when hashes are unchanged. Normal unit tests must use small fixtures and must
+not require live HATVP or Google Cloud access.
+
+Before implementing models, inspect representative source data locally. Keep
+fixtures small and sanitized:
+
+```bash
+curl --fail --location --retry 3 \
+  --output /tmp/hatvp-liste.csv \
+  https://www.hatvp.fr/livraison/opendata/liste.csv
+
+curl --fail --location --retry 3 \
+  --output /tmp/hatvp-declarations.xml \
+  https://www.hatvp.fr/livraison/merge/declarations.xml
+
+head -n 3 /tmp/hatvp-liste.csv
+xmllint --noout /tmp/hatvp-declarations.xml
+```
+
+### Local Google Cloud access
+
+You do not need to log in to GCloud just to read or edit this repository, run
+fixture-based unit tests, or use `--local-output`.
+
+You do need Google Cloud access before running a real GCS/BigQuery integration or
+deploying the job. For local client-library access, use Application Default
+Credentials (ADC):
+
+```bash
+gcloud auth login
+gcloud config set project <PROJECT_ID>
+gcloud auth application-default login
+gcloud auth application-default set-quota-project <PROJECT_ID>
+```
+
+Do not create or commit service-account JSON keys. Cloud Run should use its
+runtime service account; GitHub Actions should use Workload Identity Federation.
+
+### Tests
+
+Once the implementation exists, the expected checks are:
+
+```bash
+uv run pytest
+uv run ruff check .
+uv run ruff format --check .
+```
+
+At minimum, tests must cover SHA-256 behavior, unchanged-snapshot detection,
+French numeric normalization, missing values, implausible-value flags,
+duplicate-name behavior, duplicate stable identifiers, and state remaining
+unchanged after a failed pipeline.
+
+## BigQuery
+
+BigQuery is optional and is the curated/gold analytical layer. GCS remains the
+archive and source of truth. The application must work with
+`HATVP_ENABLE_BIGQUERY=false`.
+
+When enabled, load normalized tables such as `declarations`, `people`,
+`incomes`, and `assets`, with a `snapshot_date` column. Partition tables by
+`snapshot_date` where appropriate. BigQuery loading is part of the success gate:
+if a required load fails, do not advance `state/latest.json`.
+
+## Google Cloud deployment
+
+The commands below are a deployment checklist. Replace every placeholder before
+running them. Choose a region close to the data consumers; the schedule itself
+uses `Europe/Paris` and is not tied to UTC.
+
+### 1. Set variables and enable APIs
+
+```bash
+export PROJECT_ID="<PROJECT_ID>"
+export REGION="europe-west1"
+export SCHEDULER_REGION="europe-west1"
+export REPOSITORY="hatvp"
+export JOB_NAME="hatvp-ingestion"
+export BUCKET_NAME="${PROJECT_ID}-hatvp"
+export RUNTIME_SA="hatvp-runtime"
+export SCHEDULER_SA="hatvp-scheduler"
+export RUNTIME_SA_EMAIL="${RUNTIME_SA}@${PROJECT_ID}.iam.gserviceaccount.com"
+export SCHEDULER_SA_EMAIL="${SCHEDULER_SA}@${PROJECT_ID}.iam.gserviceaccount.com"
+export PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
+export IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/hatvp:latest"
+
+gcloud config set project "$PROJECT_ID"
+gcloud services enable \
+  artifactregistry.googleapis.com \
+  bigquery.googleapis.com \
+  cloudscheduler.googleapis.com \
+  logging.googleapis.com \
+  run.googleapis.com \
+  storage.googleapis.com
+```
+
+### 2. Create storage, Artifact Registry, and service accounts
+
+```bash
+gcloud storage buckets create "gs://${BUCKET_NAME}" \
+  --location="$REGION" \
+  --uniform-bucket-level-access
+
+gcloud artifacts repositories create "$REPOSITORY" \
+  --repository-format=docker \
+  --location="$REGION" \
+  --description="HATVP pipeline images"
+
+gcloud iam service-accounts create "$RUNTIME_SA" \
+  --display-name="HATVP Cloud Run runtime"
+
+gcloud iam service-accounts create "$SCHEDULER_SA" \
+  --display-name="HATVP Cloud Scheduler invoker"
+
+gcloud storage buckets add-iam-policy-binding "gs://${BUCKET_NAME}" \
+  --member="serviceAccount:${RUNTIME_SA_EMAIL}" \
+  --role="roles/storage.objectAdmin"
+```
+
+`roles/storage.objectAdmin` is scoped to the dedicated HATVP bucket in this
+example. Tighten it further with organization-specific IAM conditions if your
+environment requires prefix-level controls. If BigQuery is enabled, grant the
+runtime identity only the required BigQuery job and dataset write permissions.
+
+### 3. Build and publish the image
+
+For a one-off manual deployment, Cloud Build can build and push the image:
+
+```bash
+gcloud builds submit --tag "$IMAGE" .
+```
+
+Normal deployments should be performed by the GitHub Actions workflow after
+linting and tests pass. The weekly execution never runs from GitHub Actions.
+
+### 4. Create or update the Cloud Run Job
+
+```bash
+gcloud run jobs deploy "$JOB_NAME" \
+  --region="$REGION" \
+  --image="$IMAGE" \
+  --service-account="$RUNTIME_SA_EMAIL" \
+  --tasks=1 \
+  --max-retries=1 \
+  --task-timeout=30m \
+  --set-env-vars="HATVP_BUCKET=${BUCKET_NAME},HATVP_PREFIX=hatvp,HATVP_ENABLE_BIGQUERY=false,HATVP_BIGQUERY_PROJECT=${PROJECT_ID},HATVP_BIGQUERY_DATASET=hatvp"
+```
+
+Run a manual smoke test and wait for the result:
+
+```bash
+gcloud run jobs execute "$JOB_NAME" --region="$REGION" --wait
+```
+
+### 5. Create the weekly Scheduler trigger
+
+Grant the dedicated Scheduler identity permission to run this specific job:
+
+```bash
+gcloud run jobs add-iam-policy-binding "$JOB_NAME" \
+  --region="$REGION" \
+  --member="serviceAccount:${SCHEDULER_SA_EMAIL}" \
+  --role="roles/run.invoker"
+```
+
+Create a Monday morning schedule in Paris time. Adjust the hour to the desired
+operational window:
+
+```bash
+gcloud scheduler jobs create http "${JOB_NAME}-weekly" \
+  --project="$PROJECT_ID" \
+  --location="$SCHEDULER_REGION" \
+  --schedule="0 7 * * 1" \
+  --time-zone="Europe/Paris" \
+  --uri="https://run.googleapis.com/v2/projects/${PROJECT_ID}/locations/${REGION}/jobs/${JOB_NAME}:run" \
+  --http-method=POST \
+  --oauth-service-account-email="$SCHEDULER_SA_EMAIL" \
+  --message-body='{}' \
+  --headers="Content-Type=application/json"
+```
+
+The Cloud Run Jobs API endpoint is authenticated with OAuth, and the Scheduler
+service account needs the Cloud Run Invoker role on the job. See Google’s
+[Cloud Run Jobs scheduling guide](https://cloud.google.com/run/docs/execute/jobs-on-schedule)
+for the current command and permission details.
+
+### 6. GitHub Actions and Workload Identity Federation
+
+The deployment workflow should run on pushes to `main` and:
+
+1. check out the repository;
+2. install Python and `uv`;
+3. run linting and tests;
+4. authenticate with `google-github-actions/auth` using GitHub OIDC;
+5. build and push the image to Artifact Registry;
+6. deploy/update the Cloud Run Job.
+
+The workflow must grant only `id-token: write` and `contents: read` as required,
+and must not use a long-lived GCP JSON credential. Restrict the workload identity
+provider condition to this repository, then grant the deploy identity only the
+Artifact Registry and Cloud Run permissions it needs. If the deploy identity
+uses the runtime service account, grant the narrow `roles/iam.serviceAccountUser`
+permission on that service account.
+
+The official Google setup guide is
+[Configure Workload Identity Federation with deployment pipelines](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines).
+
+## Operations and troubleshooting
+
+List recent executions:
+
+```bash
+gcloud run jobs executions list \
+  --job="$JOB_NAME" \
+  --region="$REGION"
+```
+
+Read recent Cloud Run Job logs:
+
+```bash
+gcloud logging read \
+  'resource.type="cloud_run_job" AND resource.labels.job_name="hatvp-ingestion"' \
+  --limit=50 \
+  --format=json
+```
+
+Run the Scheduler job immediately:
+
+```bash
+gcloud scheduler jobs run "${JOB_NAME}-weekly" \
+  --location="$SCHEDULER_REGION"
+```
+
+Common diagnoses:
+
+- `NO_CHANGE`: both raw hashes match `state/latest.json`; this is a successful,
+  intentionally short execution.
+- `FAILED` before raw archival: inspect the source URL, timeout, status code,
+  and response size; an HTML error page must not be archived as a dataset.
+- `FAILED` during parsing: preserve the previous state, inspect the source
+  schema change, and add a focused fixture before changing normalization.
+- `SUCCESS_WITH_WARNINGS`: the snapshot is current, but the quality report and
+  quarantine output require review.
+- Scheduler returns permission errors: confirm the Scheduler service account
+  has `roles/run.invoker` on the Cloud Run Job and that the OAuth target is the
+  Cloud Run Jobs `:run` endpoint for the correct project and region.
+- BigQuery-only failures: disable BigQuery for local development or repair the
+  dataset/table permissions; do not bypass the state-update gate in production.
+
+## Security and data handling
+
+- Use Application Default Credentials locally and the Cloud Run service account
+  in production.
+- Use GitHub OIDC Workload Identity Federation for CI/CD.
+- Never store service-account JSON keys in the repository, GitHub Secrets, the
+  container image, or GCS.
+- Never log access tokens, credentials, or sensitive environment values.
+- Keep raw data immutable and preserve source identifiers and provenance.
+- Treat anomalies as reviewable data, not as a reason to silently delete rows.
+
+## Engineering guardrails
+
+Keep the implementation specific to HATVP, with clear boundaries between:
+
+1. downloading and hashing;
+2. raw storage and state;
+3. parsing;
+4. normalization;
+5. quality checks;
+6. Parquet and optional BigQuery output.
+
+Prefer deterministic, testable functions over a generic data-engineering
+framework. The first milestone is a minimal end-to-end local run backed by
+fixtures. The next milestone is a GCS-backed run. Enable BigQuery only after the
+source-to-Parquet path and quality report are stable.
