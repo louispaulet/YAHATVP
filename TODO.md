@@ -194,4 +194,3 @@ timezone: Europe/Paris
 - [ ] Add a small operational dashboard from Cloud Logging and quality reports.
 - [ ] Add partition-aware BigQuery retention and cost controls.
 - [ ] Add data catalog/documentation for the normalized tables.
-
