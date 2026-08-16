@@ -21,44 +21,43 @@ deployment, never as the weekly execution engine.
 
 ## Architecture
 
-```text
-                         weekly, Europe/Paris
-  Cloud Scheduler ───────────────────────────────────┐
-                                                       │ authenticated POST
-                                                       ▼
-                                                Cloud Run Job
-                                                       │
-                         ┌─────────────────────────────┼─────────────────────────────┐
-                         │                             │                             │
-                         ▼                             ▼                             ▼
-                 Download HATVP files          Compare SHA-256                 Emit status
-                         │                             │                 NO_CHANGE / SUCCESS /
-                         ▼                             ▼                 SUCCESS_WITH_WARNINGS /
-                Immutable raw archive             No change? ── yes ──► exit 0
-                         │
-                         ▼
-                 Parse and normalize
-                         │
-                         ▼
-                  Data-quality checks
-                    │             │
-                    ▼             ▼
-              Parquet to GCS   anomalies to GCS
-                    │             │
-                    └──────┬──────┘
-                           ▼
-                  quality report to GCS
-                           │
-                           ▼
-                optional curated BigQuery tables
-                           │
-                           ▼
-                 update state/latest.json last
+```mermaid
+flowchart TB
+    scheduler["Cloud Scheduler<br/>weekly, Europe/Paris"]
+    job["Cloud Run Job"]
+    download["Download HATVP files"]
+    raw["Immutable raw archive"]
+    hashes["Compare SHA-256"]
+    unchanged{"No change?"}
+    exit["exit 0"]
+    parse["Parse and normalize"]
+    quality["Data-quality checks"]
+    parquet["Parquet to GCS"]
+    anomalies["Anomalies to GCS"]
+    report["Quality report to GCS"]
+    bigquery["Optional curated BigQuery tables"]
+    state["Update state/latest.json last"]
+    status["Emit status<br/>NO_CHANGE / SUCCESS /<br/>SUCCESS_WITH_WARNINGS / FAILED"]
+    github["GitHub Actions +<br/>Workload Identity Federation"]
+    registry["Artifact Registry"]
+    deploy["Deploy Cloud Run Job"]
 
-  GitHub ── GitHub Actions + Workload Identity Federation ──► Artifact Registry
-                                                               │
-                                                               ▼
-                                                        deploy Cloud Run Job
+    scheduler -->|authenticated POST| job
+    job --> download
+    job --> status
+    download --> raw
+    download --> hashes
+    hashes --> unchanged
+    unchanged -->|yes| exit
+    unchanged -->|no| parse
+    parse --> quality
+    quality --> parquet
+    quality --> anomalies
+    parquet --> report
+    anomalies --> report
+    report --> bigquery
+    bigquery --> state
+    github --> registry --> deploy
 ```
 
 ### Why Cloud Run Jobs?

@@ -20,6 +20,7 @@
 
 ### Changed
 
+- Replaced the README architecture ASCII diagram with a Mermaid flowchart.
 - Updated GitHub Actions to build and push the container directly from the
   GitHub runner, avoiding the failing Cloud Build source-staging path.
 - Kept the deployer separate from the runtime identity and removed the
