@@ -250,6 +250,36 @@ Use the execution statuses `NO_CHANGE`, `SUCCESS`,
 `SUCCESS_WITH_WARNINGS`, and `FAILED`. Warnings may complete the pipeline;
 structural errors must fail it.
 
+### Normalized table reference
+
+Every normalized table keeps `snapshot_date` and source provenance. XML-derived
+child tables also keep `declaration_uuid`; repeated or suspicious source rows
+remain available with `quality_status`, `quality_reason`, and, where applicable,
+`raw_record_json`. `raw_value` is the source text and `normalized_value` is the
+parsed numeric value; parsing does not imply that a value is valid.
+
+| Table | Grain and purpose | Important fields |
+| --- | --- | --- |
+| `liste` | One row per CSV source listing record. | Source CSV columns, `snapshot_date`, `source_file` |
+| `declarations` | One row per XML declaration. | `declaration_uuid`, deposit and mandate dates, declaration type, mandate and organ labels |
+| `people` | One declarant row per declaration. | Name, contact, birth date, and address fields |
+| `mandates` | One row per general or elected-mandate section item. | `source_section`, description, dates, employer, remuneration |
+| `activities` | One row per professional, consulting, spouse, volunteer, or collaborator activity. | `source_section`, description, employer, dates, remuneration |
+| `participations` | One row per financial or management participation. | Company, valuation, capital held, number of shares, raw record |
+| `incomes` | One row per declared income category and year. | `income_year`, `income_type`, `raw_value`, `normalized_value`, spouse value |
+| `assets` | One row per observed asset DTO item, including bank accounts, insurance, securities, vehicles, and foreign assets. | `source_section`, asset name, `raw_value`, `normalized_value`, quality fields |
+| `liabilities` | One row per declared debt or liability item. | `source_section`, description, `raw_value`, `normalized_value`, raw record |
+
+### First production snapshot quality triage
+
+The 2026-08-16 report had zero errors, 3,510 warnings, and 5,763 flagged
+records. Repeated names are expected identity-collision flags and must not be
+deduplicated. The 143 robust asset outliers are retained for review because
+asset values are skewed. The nine negative asset values are small negative
+bank-account balances consistent with overdrafts; they are source-valid for
+retention but remain flagged. The six duplicate declaration UUID groups are
+actionable source-quality issues and require investigation if they recur.
+
 ## Configuration
 
 Configuration belongs in environment variables, not source code or committed
@@ -337,9 +367,11 @@ uv run ruff format --check .
 ```
 
 At minimum, tests must cover SHA-256 behavior, unchanged-snapshot detection,
-French numeric normalization, missing values, implausible-value flags,
-duplicate-name behavior, duplicate stable identifiers, and state remaining
-unchanged after a failed pipeline.
+changed XML and CSV hashes, French numeric normalization, missing values,
+implausible-value flags, duplicate-name behavior, duplicate stable identifiers,
+catastrophic row-count reductions, immutable raw snapshots, BigQuery failure
+gating, required XML structure, and state remaining unchanged after a failed
+pipeline.
 
 ## BigQuery
 

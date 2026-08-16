@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from hatvp.parser import parse_sources, parse_xml
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -30,3 +32,74 @@ def test_single_real_declaration_fixture_is_the_first_acceptance_case() -> None:
     assert tables["people"][0]["nom"] == "ABAD"
     assert len(tables["mandates"]) >= 6
     assert len(tables["participations"]) >= 2
+
+
+def test_parser_covers_observed_asset_and_liability_dtos() -> None:
+    tables = parse_xml(FIXTURES / "asset_sections.xml", "2026-08-16")
+
+    asset_sections = {row["source_section"] for row in tables["assets"]}
+    assert asset_sections == {
+        "immeubleDto",
+        "sciDto",
+        "valeursNonEnBourseDto",
+        "valeursEnBourseDto",
+        "assuranceVieDto",
+        "comptesBancaireDto",
+        "bienDiverDto",
+        "vehiculeDto",
+        "fondDto",
+        "autreBienDto",
+        "bienEtrangerDto",
+    }
+    assert len(tables["assets"]) == 11
+    assert tables["assets"][0]["normalized_value"] == 250000.0
+    assert tables["liabilities"][0]["normalized_value"] == 10000.0
+
+
+def test_parser_handles_empty_optional_declaration_sections() -> None:
+    tables = parse_xml(FIXTURES / "edge_case_declarations.xml", "2026-08-16")
+
+    by_declaration = {
+        declaration["declaration_uuid"]: declaration for declaration in tables["declarations"]
+    }
+    assert set(by_declaration) == {
+        "fixture-no-assets",
+        "fixture-no-income",
+        "fixture-no-mandate",
+        "fixture-no-general",
+    }
+    assert not [row for row in tables["assets"] if row["declaration_uuid"] == "fixture-no-assets"]
+    assert not [row for row in tables["incomes"] if row["declaration_uuid"] == "fixture-no-income"]
+    assert not [
+        row for row in tables["mandates"] if row["declaration_uuid"] == "fixture-no-mandate"
+    ]
+
+    missing_general_person = next(
+        row for row in tables["people"] if row["declaration_uuid"] == "fixture-no-general"
+    )
+    assert missing_general_person["nom"] is None
+    assert missing_general_person["prenom"] is None
+
+
+def test_parser_rejects_invalid_top_level_structure_before_normalization(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "hatvp.parser._declaration_row",
+        lambda *_args: pytest.fail("invalid XML was normalized"),
+    )
+
+    with pytest.raises(ValueError, match="unexpected root element"):
+        parse_xml(FIXTURES / "invalid_top_level.xml", "2026-08-16")
+
+
+def test_parser_rejects_invalid_top_level_child_before_normalization(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "hatvp.parser._declaration_row",
+        lambda *_args: pytest.fail("invalid XML was normalized"),
+    )
+
+    with pytest.raises(ValueError, match="invalid top-level element"):
+        parse_xml(FIXTURES / "invalid_top_level_child.xml", "2026-08-16")

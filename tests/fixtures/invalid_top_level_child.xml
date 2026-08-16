@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<declarations>
+  <unexpected>
+    <declaration><uuid>should-not-be-normalized</uuid></declaration>
+  </unexpected>
+</declarations>

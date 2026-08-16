@@ -46,3 +46,46 @@ def test_duplicate_stable_identifier_is_reported() -> None:
 
     assert result.report["checks"]["duplicate_declaration_ids"] == 1
     assert result.report["quality"]["warnings"] > 0
+
+
+def test_catastrophic_row_count_reduction_is_explicitly_reported() -> None:
+    result = run_quality_checks(
+        _tables(),
+        previous_report={
+            "status": "warning",
+            "counts": {"declarations": 100, "people": 100},
+        },
+        snapshot_date="2026-08-16",
+    )
+
+    assert result.report["checks"]["catastrophic_row_count_reductions"] == 2
+    assert result.report["checks"]["catastrophic_row_count_reduction_declarations"] == 1
+    assert result.report["checks"]["catastrophic_row_count_reduction_people"] == 1
+
+    failed_previous_report = run_quality_checks(
+        _tables(),
+        previous_report={
+            "status": "error",
+            "counts": {"declarations": 100, "people": 100},
+        },
+        snapshot_date="2026-08-16",
+    )
+    assert failed_previous_report.report["checks"]["catastrophic_row_count_reductions"] == 0
+
+
+def test_negative_asset_values_are_retained_and_flagged() -> None:
+    tables = _tables()
+    negative_asset = {
+        "declaration_uuid": "a",
+        "asset_name": "Compte courant",
+        "raw_value": "-260",
+        "normalized_value": -260.0,
+    }
+    tables["assets"].append(negative_asset)
+
+    result = run_quality_checks(tables, snapshot_date="2026-08-16")
+
+    assert negative_asset["normalized_value"] == -260.0
+    assert negative_asset["quality_status"] == "FLAG"
+    assert negative_asset["quality_reason"] == "negative asset value"
+    assert result.report["checks"]["negative_assets"] == 1

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<declarations>
+  <declaration>
+    <dateDepot>01/08/2026 08:30:00</dateDepot>
+    <uuid>fixture-assets-1</uuid>
+    <general>
+      <declarant>
+        <nom>ASSET</nom>
+        <prenom>Fixture</prenom>
+      </declarant>
+    </general>
+    <immeubleDto>
+      <items><items><nature>Maison</nature><valeurVenale>250 000,00</valeurVenale></items></items>
+    </immeubleDto>
+    <sciDto>
+      <items><items><denomination>SCI Exemple</denomination><valeur>45 000,00</valeur></items></items>
+    </sciDto>
+    <valeursNonEnBourseDto>
+      <items><items><nomSociete>Entreprise privée</nomSociete><evaluation>10 000,00</evaluation></items></items>
+    </valeursNonEnBourseDto>
+    <valeursEnBourseDto>
+      <items><items><nomSociete>Société cotée</nomSociete><valeurActuelle>15 000,00</valeurActuelle></items></items>
+    </valeursEnBourseDto>
+    <assuranceVieDto>
+      <items><items><souscripteur>Fixture</souscripteur><valeurRachat>5 000,00</valeurRachat></items></items>
+    </assuranceVieDto>
+    <comptesBancaireDto>
+      <items><items><typeCompte>Compte courant</typeCompte><etablissement>Banque</etablissement><valeur>12 000,00</valeur></items></items>
+    </comptesBancaireDto>
+    <bienDiverDto>
+      <items><items><description>Objet de valeur</description><valeur>75 000,00</valeur></items></items>
+    </bienDiverDto>
+    <vehiculeDto>
+      <items><items><marque>Constructeur</marque><valeurAchat>18 000,00</valeurAchat></items></items>
+    </vehiculeDto>
+    <fondDto>
+      <items><items><denomination>Fonds Exemple</denomination><valeur>30 000,00</valeur></items></items>
+    </fondDto>
+    <autreBienDto>
+      <items><items><description>Autre bien</description><valeur>7 000,00</valeur></items></items>
+    </autreBienDto>
+    <bienEtrangerDto>
+      <items><items><localisation>Espagne</localisation><valeur>60 000,00</valeur></items></items>
+    </bienEtrangerDto>
+    <passifDto>
+      <items><items><objetDette>Prêt immobilier</objetDette><restantDu>10 000,00</restantDu></items></items>
+    </passifDto>
+  </declaration>
+</declarations>
