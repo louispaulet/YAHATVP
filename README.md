@@ -6,8 +6,8 @@ datasets.
 
 > Project status: the local end-to-end path is implemented and has been exercised
 > against the current public HATVP files. The Cloud Run deployment is in place;
-> the weekly Scheduler trigger is being validated against a versioned no-op job
-> before it is pointed at the ingestion job.
+> the weekly Scheduler trigger is validated against a versioned no-op job and is
+> intentionally not yet connected to the ingestion job.
 
 ## Goal
 

@@ -42,3 +42,34 @@
 - Decide whether to enable and validate BigQuery.
 - Run the remaining local hardening tests, including `NO_CHANGE`, failure-state
   preservation, immutable snapshot conflicts, and row-count regression checks.
+
+## 2026-08-17
+
+### Added
+
+- Added the versioned `hatvp.scheduler_smoke` task (`1.0.0`) for trigger-only
+  validation. It emits one structured success event and does not download HATVP
+  data or write pipeline state.
+- Enabled Cloud Scheduler in `yahatvp-pipeline-eu` and deployed the separate
+  `hatvp-scheduler-smoke` Cloud Run Job from image tag `baa27d8`.
+- Created `hatvp-scheduler-smoke-weekly` with an authenticated Cloud Run Jobs
+  `:run` target using the dedicated `hatvp-scheduler` service account.
+
+### Verified
+
+- Confirmed the weekly trigger configuration is `0 7 * * 1` with timezone
+  `Europe/Paris`, a 180-second attempt deadline, and the expected smoke-job URI.
+- Temporarily scheduled two nearby Paris-local test times (`00:02` and
+  `00:04`). Scheduler attempts at `2026-08-16T22:02:03Z` and
+  `2026-08-16T22:04:00Z` created executions `hatvp-scheduler-smoke-rrdwn` and
+  `hatvp-scheduler-smoke-srwmc`; both completed with `succeededCount=1`.
+- Confirmed Cloud Logging emitted `scheduler_smoke_task_version=1.0.0` and
+  `status=success` for both scheduled executions. The final weekly schedule was
+  restored with next run `2026-08-17T05:00:00Z`.
+
+### Pending
+
+- Keep the tested Scheduler trigger on the dummy task until acceptance; point a
+  production trigger at `hatvp-ingestion` only in a separate handoff.
+- Confirm duplicate-delivery safety and a successful Scheduler-triggered
+  ingestion execution after that handoff.
