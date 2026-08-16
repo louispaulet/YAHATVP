@@ -1,0 +1,2299 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "Statistical asset outliers",
+    "description": "Technical HATVP fact-checking report for statistical asset outliers in snapshot 2026-08-17.",
+    "generatedAt": "2026-08-17T00:00:00Z",
+    "sources": [
+      {
+        "id": "assets_table",
+        "label": "HATVP normalized assets table",
+        "path": "gs://yahatvp-pipeline-eu-data/hatvp/silver/assets/snapshot_date=2026-08-17/data.parquet"
+      },
+      {
+        "id": "people_table",
+        "label": "HATVP normalized people table",
+        "path": "gs://yahatvp-pipeline-eu-data/hatvp/silver/people/snapshot_date=2026-08-17/data.parquet"
+      },
+      {
+        "id": "declarations_table",
+        "label": "HATVP normalized declarations table",
+        "path": "gs://yahatvp-pipeline-eu-data/hatvp/silver/declarations/snapshot_date=2026-08-17/data.parquet"
+      },
+      {
+        "id": "anomalies_table",
+        "label": "HATVP quarantine anomalies",
+        "path": "gs://yahatvp-pipeline-eu-data/hatvp/quarantine/snapshot_date=2026-08-17/anomalies.parquet"
+      },
+      {
+        "id": "outlier_analysis",
+        "label": "Joined statistical outlier analysis",
+        "query": {
+          "engine": "duckdb",
+          "description": "Joins assets, quarantine anomalies, people, and declarations on declaration_uuid; selects robust statistical asset outliers for snapshot 2026-08-17.",
+          "sql": "WITH flagged_assets AS (SELECT declaration_uuid, source_section, source_item_index, asset_name, raw_value, normalized_value FROM read_parquet('gs://yahatvp-pipeline-eu-data/hatvp/silver/assets/snapshot_date=2026-08-17/data.parquet') WHERE quality_reason LIKE 'robust statistical asset outlier%') SELECT a.*, p.civilite, p.prenom, p.nom, d.date_depot AS publication_date FROM flagged_assets a LEFT JOIN read_parquet('gs://yahatvp-pipeline-eu-data/hatvp/silver/people/snapshot_date=2026-08-17/data.parquet') p USING (declaration_uuid) LEFT JOIN read_parquet('gs://yahatvp-pipeline-eu-data/hatvp/silver/declarations/snapshot_date=2026-08-17/data.parquet') d USING (declaration_uuid) ORDER BY a.normalized_value DESC",
+          "language": "sql",
+          "executed_at": "2026-08-17T00:00:00Z",
+          "tables_used": [
+            "gs://yahatvp-pipeline-eu-data/hatvp/silver/assets/snapshot_date=2026-08-17/data.parquet",
+            "gs://yahatvp-pipeline-eu-data/hatvp/silver/people/snapshot_date=2026-08-17/data.parquet",
+            "gs://yahatvp-pipeline-eu-data/hatvp/silver/declarations/snapshot_date=2026-08-17/data.parquet",
+            "gs://yahatvp-pipeline-eu-data/hatvp/quarantine/snapshot_date=2026-08-17/anomalies.parquet"
+          ],
+          "filters": [
+            "snapshot_date = 2026-08-17",
+            "quality_reason = robust statistical asset outlier; retained for review",
+            "absolute robust z-score > 10"
+          ],
+          "metric_definitions": [
+            "Robust scale = 1.4826 × median absolute deviation over numeric assets.normalized_value.",
+            "Outlier share = flagged euro-denominated row-value sum divided by numeric euro-denominated asset row-value sum.",
+            "All monetary values are euro-denominated; publication_date is normalized declarations.date_depot."
+          ]
+        }
+      }
+    ],
+    "cards": [
+      {
+        "id": "flagged_rows_card",
+        "dataset": "summary",
+        "sourceId": "outlier_analysis",
+        "description": "Asset rows flagged by the robust median/MAD detector.",
+        "metrics": [
+          {
+            "label": "Flagged asset rows",
+            "field": "flagged_asset_rows",
+            "format": "number"
+          }
+        ]
+      },
+      {
+        "id": "declarations_card",
+        "dataset": "summary",
+        "sourceId": "outlier_analysis",
+        "description": "Distinct declaration UUIDs represented in the flagged rows.",
+        "metrics": [
+          {
+            "label": "Distinct declarations",
+            "field": "distinct_declarations",
+            "format": "number"
+          }
+        ]
+      },
+      {
+        "id": "flagged_value_card",
+        "dataset": "summary",
+        "sourceId": "outlier_analysis",
+        "description": "Sum of flagged euro-denominated normalized asset row values.",
+        "metrics": [
+          {
+            "label": "Flagged value (€)",
+            "field": "outlier_value_display_eur"
+          }
+        ]
+      },
+      {
+        "id": "maximum_value_card",
+        "dataset": "summary",
+        "sourceId": "outlier_analysis",
+        "description": "Largest flagged euro-denominated normalized asset value.",
+        "metrics": [
+          {
+            "label": "Maximum flagged value (€)",
+            "field": "maximum_flagged_value_display_eur"
+          }
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "id": "section_breakdown_chart",
+        "title": "Statistical asset outlier rows by section",
+        "subtitle": "143 flagged euro-denominated rows; real estate contributes 86 rows.",
+        "type": "horizontalBar",
+        "dataset": "section_breakdown",
+        "sourceId": "outlier_analysis",
+            "encodings": {
+                "x": {
+                    "field": "asset_section",
+                    "type": "nominal",
+                    "label": "Asset section"
+                },
+                "y": {
+                    "field": "flagged_rows",
+                    "type": "quantitative",
+                    "format": "number",
+                    "label": "Flagged rows"
+                },
+          "tooltip": [
+            {
+              "field": "flagged_rows",
+              "type": "quantitative",
+              "format": "number",
+              "label": "Flagged rows"
+            },
+            {
+              "field": "flagged_value_sum_eur",
+              "type": "quantitative",
+              "format": "number",
+              "unit": "€",
+              "label": "Flagged value (€)"
+            }
+          ]
+        },
+            "xAxisTitle": "Asset section",
+            "yAxisTitle": "Flagged rows",
+        "valueFormat": "number",
+        "maxRows": 8
+      },
+      {
+        "id": "value_band_chart",
+        "title": "Statistical asset outliers by euro value band",
+        "subtitle": "143 flagged rows grouped by normalized euro-denominated asset value.",
+        "type": "bar",
+        "dataset": "value_bands",
+        "sourceId": "outlier_analysis",
+        "encodings": {
+          "x": {
+            "field": "value_band",
+            "type": "nominal",
+            "label": "Value band (€)"
+          },
+          "y": {
+            "field": "flagged_rows",
+            "type": "quantitative",
+            "format": "number",
+            "label": "Flagged rows"
+          },
+          "tooltip": [
+            {
+              "field": "flagged_rows",
+              "type": "quantitative",
+              "format": "number",
+              "label": "Flagged rows"
+            },
+            {
+              "field": "flagged_value_sum_eur",
+              "type": "quantitative",
+              "format": "number",
+              "unit": "€",
+              "label": "Flagged value (€)"
+            }
+          ]
+        },
+        "xAxisTitle": "Normalized value band (€)",
+        "yAxisTitle": "Flagged rows",
+        "valueFormat": "number"
+      },
+      {
+        "id": "top_declarations_chart",
+        "title": "Highest-value flagged declarations",
+        "subtitle": "Top 10 declaration groups ranked by flagged euro-denominated value sum.",
+        "type": "horizontalBar",
+        "dataset": "top_declarations",
+        "sourceId": "outlier_analysis",
+            "encodings": {
+                "x": {
+                    "field": "declarant_label",
+                    "type": "nominal",
+                    "label": "Declarant and publication date"
+                },
+                "y": {
+                    "field": "flagged_value_sum_eur",
+                    "type": "quantitative",
+                    "format": "number",
+                    "unit": "€",
+                    "label": "Flagged value (€)"
+                },
+          "tooltip": [
+            {
+              "field": "flagged_value_sum_eur",
+              "type": "quantitative",
+              "format": "number",
+              "unit": "€",
+              "label": "Flagged value (€)"
+            },
+            {
+              "field": "flagged_rows",
+              "type": "quantitative",
+              "format": "number",
+              "label": "Flagged rows"
+            },
+            {
+              "field": "maximum_flagged_value_eur",
+              "type": "quantitative",
+              "format": "number",
+              "unit": "€",
+              "label": "Maximum flagged value (€)"
+            }
+          ]
+        },
+            "xAxisTitle": "Declarant and publication date",
+            "yAxisTitle": "Flagged value (€)",
+        "valueFormat": "number",
+        "unit": "€",
+        "maxRows": 10
+      }
+    ],
+    "tables": [
+      {
+        "id": "section_breakdown_table",
+        "title": "Outliers by asset section",
+        "subtitle": "All 143 flagged rows in snapshot 2026-08-17; monetary values are euros.",
+        "dataset": "section_breakdown",
+        "sourceId": "outlier_analysis",
+        "density": "comfortable",
+        "defaultSort": {
+          "field": "flagged_rows",
+          "direction": "desc"
+        },
+        "columns": [
+          {
+            "field": "asset_section",
+            "label": "Asset section",
+            "type": "text"
+          },
+          {
+            "field": "flagged_rows",
+            "label": "Flagged rows",
+            "type": "number"
+          },
+          {
+            "field": "outlier_share",
+            "label": "Share of outliers",
+            "type": "percent",
+            "format": "percent"
+          },
+          {
+            "field": "flagged_value_sum_eur",
+            "label": "Flagged value (€)",
+            "type": "number",
+            "unit": "€"
+          }
+        ]
+      },
+      {
+        "id": "value_band_table",
+        "title": "Outliers by euro value band",
+        "subtitle": "Normalized euro-denominated asset value bands and flagged row counts.",
+        "dataset": "value_bands",
+        "sourceId": "outlier_analysis",
+        "density": "comfortable",
+        "defaultSort": {
+          "field": "flagged_rows",
+          "direction": "desc"
+        },
+        "columns": [
+          {
+            "field": "value_band",
+            "label": "Value band (€)",
+            "type": "text"
+          },
+          {
+            "field": "flagged_rows",
+            "label": "Flagged rows",
+            "type": "number"
+          },
+          {
+            "field": "flagged_value_sum_eur",
+            "label": "Flagged value (€)",
+            "type": "number",
+            "unit": "€"
+          }
+        ]
+      },
+      {
+        "id": "top_declarations_table",
+        "title": "Highest-value declarations",
+        "subtitle": "Grouped by declarant, normalized publication date, and declaration UUID; monetary values are euros.",
+        "dataset": "top_declarations",
+        "sourceId": "outlier_analysis",
+        "density": "comfortable",
+        "defaultSort": {
+          "field": "flagged_value_sum_eur",
+          "direction": "desc"
+        },
+        "columns": [
+          {
+            "field": "declarant",
+            "label": "Declarant",
+            "type": "text"
+          },
+          {
+            "field": "publication_date",
+            "label": "Publication date",
+            "type": "date"
+          },
+          {
+            "field": "declaration_uuid",
+            "label": "Declaration UUID",
+            "type": "text"
+          },
+          {
+            "field": "flagged_rows",
+            "label": "Flagged rows",
+            "type": "number"
+          },
+          {
+            "field": "flagged_value_sum_eur",
+            "label": "Flagged value (€)",
+            "type": "number",
+            "unit": "€"
+          },
+          {
+            "field": "maximum_flagged_value_eur",
+            "label": "Maximum flagged value (€)",
+            "type": "number",
+            "unit": "€"
+          }
+        ]
+      },
+      {
+        "id": "outlier_register_table",
+        "title": "Full outlier register",
+        "subtitle": "All 143 flagged rows with declarant, normalized publication date, UUID, source section, and euro-denominated values.",
+        "dataset": "outliers",
+        "sourceId": "outlier_analysis",
+        "density": "compact",
+        "defaultSort": {
+          "field": "normalized_value_eur",
+          "direction": "desc"
+        },
+        "columns": [
+          {
+            "field": "declarant",
+            "label": "Declarant",
+            "type": "text"
+          },
+          {
+            "field": "publication_date",
+            "label": "Publication date",
+            "type": "date"
+          },
+          {
+            "field": "declaration_uuid",
+            "label": "Declaration UUID",
+            "type": "text"
+          },
+          {
+            "field": "asset_section",
+            "label": "Asset section",
+            "type": "text"
+          },
+          {
+            "field": "asset_name",
+            "label": "Asset name",
+            "type": "text"
+          },
+          {
+            "field": "normalized_value_eur",
+            "label": "Normalized value (€)",
+            "type": "number",
+            "unit": "€"
+          },
+          {
+            "field": "raw_source_value",
+            "label": "Raw source value (€)",
+            "type": "number",
+            "unit": "€"
+          },
+          {
+            "field": "source_item_index",
+            "label": "Source item index",
+            "type": "number"
+          }
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "id": "technical_summary",
+        "type": "markdown",
+        "sourceId": "outlier_analysis",
+        "body": "# Statistical asset outliers\n\n## Technical summary\n\nThe pipeline flagged 143 asset rows as statistical outliers among 1,156 numeric euro-denominated asset rows (12.4%). All 143 are high-side outliers, ranging from €192,252 to €6,719,662.\n\nThe flagged rows sum to €99,617,179, compared with €124,440,950 across all numeric euro-denominated asset values. Every flagged row matched a declarant name and normalized publication date through declaration_uuid, so the register supports source-level fact checking. This is not a share of household wealth: rows may represent partial interests, overlapping declarations, or different valuation concepts."
+      },
+      {
+        "id": "headline_metrics",
+        "type": "metric-strip",
+        "cardIds": [
+          "flagged_rows_card",
+          "declarations_card",
+          "flagged_value_card",
+          "maximum_value_card"
+        ]
+      },
+      {
+        "id": "scope_definitions",
+        "type": "markdown",
+        "sourceId": "outlier_analysis",
+        "body": "## Scope and metric definitions\n\nThe report covers the successful HATVP snapshot dated 2026-08-17. The asset table contains 1,376 rows, of which 1,156 have numeric normalized values. Monetary values are euros. The detector uses median absolute deviation (MAD): robust scale = 1.4826 × MAD, and rows with an absolute robust z-score above 10 are retained as review flags. Publication date means normalized declarations.date_depot from the source XML; the raw source deposit timestamp remains available in date_depot_raw."
+      },
+      {
+        "id": "section_findings",
+        "type": "markdown",
+        "sourceId": "outlier_analysis",
+        "body": "## Real estate contributes most flagged rows\n\nReal estate contributes 86 of the 143 flagged rows (60.1%) and €57,222,895 of flagged euro-denominated row value. Life insurance contributes 30 rows (21.0%). The distribution is a review prioritization signal, not evidence that any category or declarant is incorrect."
+      },
+      {
+        "id": "section_chart_block",
+        "type": "chart",
+        "chartId": "section_breakdown_chart"
+      },
+      {
+        "id": "section_table_block",
+        "type": "table",
+        "tableId": "section_breakdown_table"
+      },
+      {
+        "id": "value_findings",
+        "type": "markdown",
+        "sourceId": "outlier_analysis",
+        "body": "## Most flagged rows fall below €1 million\n\nThe €250k–€500k band contains 52 rows, while 25 rows are at or above €1 million. The two values above €5 million are the duplicated FINAPA entries associated with M. Serge Papin; both should be checked against the source declaration and ownership context."
+      },
+      {
+        "id": "value_chart_block",
+        "type": "chart",
+        "chartId": "value_band_chart"
+      },
+      {
+        "id": "value_table_block",
+        "type": "table",
+        "tableId": "value_band_table"
+      },
+      {
+        "id": "declaration_findings",
+        "type": "markdown",
+        "sourceId": "outlier_analysis",
+        "body": "## Highest-value declaration groups are the best fact-check starting points\n\nThe highest-value groups are M. Serge Papin on 2025-12-05 and 2026-02-17, Mme Rachida Dati on 2026-04-22, M. Jean-Noel Barrot on 2025-12-05 and 2026-02-25, and Mme Monique BARBUT on 2025-11-13 and 2026-03-22. Use the declarant, normalized publication date, and declaration UUID together when locating the corresponding source declaration or PDF."
+      },
+      {
+        "id": "declaration_chart_block",
+        "type": "chart",
+        "chartId": "top_declarations_chart"
+      },
+      {
+        "id": "declaration_table_block",
+        "type": "table",
+        "tableId": "top_declarations_table"
+      },
+      {
+        "id": "register_intro",
+        "type": "markdown",
+        "sourceId": "outlier_analysis",
+        "body": "## Full outlier register\n\nThe register below keeps the exact declaration UUID, declarant, normalized publication date, source section, asset name, normalized euro value, raw source value, and source item index. Names are joined by declaration_uuid; repeated names are not treated as unique identities."
+      },
+      {
+        "id": "register_table_block",
+        "type": "table",
+        "tableId": "outlier_register_table"
+      },
+      {
+        "id": "methodology",
+        "type": "markdown",
+        "sourceId": "outlier_analysis",
+        "body": "## Methodology\n\nThe robust outlier check is descriptive, not inferential. It compares each numeric assets.normalized_value against the snapshot median and MAD. Suspicious rows are retained for review; they are not silently removed or corrected. The 143 rows represent 69 distinct declaration UUIDs, and five flagged rows have no asset name."
+      },
+      {
+        "id": "limitations",
+        "type": "markdown",
+        "sourceId": "outlier_analysis",
+        "body": "## Limitations and uncertainty\n\nA statistical flag does not establish that a value is wrong, illicit, duplicated, or misparsed. High values may reflect partial ownership, valuation conventions, source duplication, or legitimate wealth. The report does not independently verify an external public-web publication timestamp; it uses the normalized declaration deposit date from the XML."
+      },
+      {
+        "id": "next_steps",
+        "type": "markdown",
+        "sourceId": "outlier_analysis",
+        "body": "## Recommended next steps\n\n1. Start with the highest-value rows and grouped declarations above.\n2. Use declarant name, normalized publication date, and declaration UUID to locate the HATVP source declaration or PDF.\n3. Compare the displayed euro value with the source field and inspect ownership share, valuation date, asset type, and related declarations.\n4. Record confirmed source issues as fixtures or normalization fixes; retain plausible high values as review flags."
+      },
+      {
+        "id": "further_questions",
+        "type": "markdown",
+        "sourceId": "outlier_analysis",
+        "body": "## Further questions\n\nThe next useful review cuts are whether the same UUIDs recur across declaration versions, whether large values are concentrated in particular asset DTO fields, and whether source-level ownership percentages explain repeated or apparently duplicated euro values."
+      },
+      {
+        "id": "source_artifacts",
+        "type": "markdown",
+        "body": "## Source artifacts\n\nThe report is based on the normalized assets, people, and declarations Parquet tables plus the quarantine anomalies Parquet for snapshot 2026-08-17. The pipeline quality report is stored alongside the snapshot in GCS."
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-17T00:00:00Z",
+    "status": "ready",
+    "datasets": {
+      "summary": [
+        {
+          "flagged_asset_rows": 143,
+          "numeric_asset_rows": 1156,
+          "total_asset_rows": 1376,
+          "distinct_declarations": 69,
+          "matched_declarant_names": 143,
+          "matched_publication_dates": 143,
+          "outlier_value_sum_eur": 99617179.0,
+          "outlier_value_display_eur": "€99.6M",
+          "total_numeric_asset_value_eur": 124440950.0,
+          "outlier_value_share": 0.8005176672148517,
+          "median_asset_value_eur": 12000.0,
+          "mad_eur": 11878.0,
+          "robust_scale_eur": 17610.322799999998,
+          "high_side_cutoff_eur": 188103.22799999997,
+          "low_side_cutoff_eur": -164103.22799999997,
+          "minimum_flagged_value_eur": 192252.0,
+          "median_flagged_value_eur": 410000.0,
+          "maximum_flagged_value_eur": 6719662.0,
+          "maximum_flagged_value_display_eur": "€6.72M",
+          "missing_asset_names": 5
+        }
+      ],
+      "section_breakdown": [
+        {
+          "asset_section": "Real estate",
+          "flagged_rows": 86,
+          "outlier_share": 0.6013986013986014,
+          "flagged_value_sum_eur": 57222895.0
+        },
+        {
+          "asset_section": "Life insurance",
+          "flagged_rows": 30,
+          "outlier_share": 0.2097902097902098,
+          "flagged_value_sum_eur": 16934782.0
+        },
+        {
+          "asset_section": "Other assets",
+          "flagged_rows": 9,
+          "outlier_share": 0.06293706293706294,
+          "flagged_value_sum_eur": 2969706.0
+        },
+        {
+          "asset_section": "Bank accounts",
+          "flagged_rows": 4,
+          "outlier_share": 0.027972027972027972,
+          "flagged_value_sum_eur": 1076068.0
+        },
+        {
+          "asset_section": "SCI / property company",
+          "flagged_rows": 4,
+          "outlier_share": 0.027972027972027972,
+          "flagged_value_sum_eur": 1649802.0
+        },
+        {
+          "asset_section": "Unlisted securities",
+          "flagged_rows": 4,
+          "outlier_share": 0.027972027972027972,
+          "flagged_value_sum_eur": 14379268.0
+        },
+        {
+          "asset_section": "Foreign assets",
+          "flagged_rows": 3,
+          "outlier_share": 0.02097902097902098,
+          "flagged_value_sum_eur": 1790363.0
+        },
+        {
+          "asset_section": "Listed securities",
+          "flagged_rows": 3,
+          "outlier_share": 0.02097902097902098,
+          "flagged_value_sum_eur": 3594295.0
+        }
+      ],
+      "value_bands": [
+        {
+          "value_band": "€188k–€250k",
+          "flagged_rows": 29,
+          "flagged_value_sum_eur": 6280554.0
+        },
+        {
+          "value_band": "€250k–€500k",
+          "flagged_rows": 52,
+          "flagged_value_sum_eur": 18337276.0
+        },
+        {
+          "value_band": "€500k–€1m",
+          "flagged_rows": 37,
+          "flagged_value_sum_eur": 25802776.0
+        },
+        {
+          "value_band": "€1m–€2m",
+          "flagged_rows": 18,
+          "flagged_value_sum_eur": 23485226.0
+        },
+        {
+          "value_band": "€2m–€5m",
+          "flagged_rows": 5,
+          "flagged_value_sum_eur": 12272023.0
+        },
+        {
+          "value_band": ">€5m",
+          "flagged_rows": 2,
+          "flagged_value_sum_eur": 13439324.0
+        }
+      ],
+      "top_declarations": [
+        {
+          "declarant": "M. Serge Papin",
+          "declarant_label": "M. Serge Papin · 2025-12-05",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "bd19a0d5-eb22-4649-bb6b-e8d77ff89118",
+          "flagged_rows": 4,
+          "flagged_value_sum_eur": 9007307.0,
+          "maximum_flagged_value_eur": 6719662.0
+        },
+        {
+          "declarant": "M. Serge Papin",
+          "declarant_label": "M. Serge Papin · 2026-02-17",
+          "publication_date": "2026-02-17",
+          "declaration_uuid": "307a6524-c8a6-4e5c-92b0-731029d15b19",
+          "flagged_rows": 4,
+          "flagged_value_sum_eur": 8382307.0,
+          "maximum_flagged_value_eur": 6719662.0
+        },
+        {
+          "declarant": "Mme Rachida Dati",
+          "declarant_label": "Mme Rachida Dati · 2026-04-22",
+          "publication_date": "2026-04-22",
+          "declaration_uuid": "6dcd326d-e076-4d7a-a428-15075a15dddd",
+          "flagged_rows": 3,
+          "flagged_value_sum_eur": 5785673.0,
+          "maximum_flagged_value_eur": 3133135.0
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "declarant_label": "M. Jean-Noel Barrot · 2025-12-05",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "302d9e1f-7835-4269-b775-261e0a04fc8a",
+          "flagged_rows": 7,
+          "flagged_value_sum_eur": 4262487.0,
+          "maximum_flagged_value_eur": 1634267.0
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "declarant_label": "Mme Monique BARBUT · 2025-11-13",
+          "publication_date": "2025-11-13",
+          "declaration_uuid": "b9c1be04-63ac-4f31-a7c2-4f9edcfc52b3",
+          "flagged_rows": 5,
+          "flagged_value_sum_eur": 4202897.0,
+          "maximum_flagged_value_eur": 2250000.0
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "declarant_label": "Mme Monique BARBUT · 2026-03-22",
+          "publication_date": "2026-03-22",
+          "declaration_uuid": "0e8fdc5f-1425-4a4f-9243-8ed3e1f3fb0b",
+          "flagged_rows": 5,
+          "flagged_value_sum_eur": 4153061.0,
+          "maximum_flagged_value_eur": 2250000.0
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "declarant_label": "M. Jean-Noel Barrot · 2026-02-25",
+          "publication_date": "2026-02-25",
+          "declaration_uuid": "c0ed614c-26a5-4531-ad13-f826e37cba6c",
+          "flagged_rows": 6,
+          "flagged_value_sum_eur": 4006021.0,
+          "maximum_flagged_value_eur": 1623013.0
+        },
+        {
+          "declarant": "M. Roland Lescure",
+          "declarant_label": "M. Roland Lescure · 2025-10-19",
+          "publication_date": "2025-10-19",
+          "declaration_uuid": "2bd08f0f-8aba-4e87-b2f4-d564a963a79a",
+          "flagged_rows": 3,
+          "flagged_value_sum_eur": 3646000.0,
+          "maximum_flagged_value_eur": 2225000.0
+        },
+        {
+          "declarant": "Mme alice rufo",
+          "declarant_label": "Mme alice rufo · 2025-10-20",
+          "publication_date": "2025-10-20",
+          "declaration_uuid": "6ca782ee-be24-42c2-976c-57d78c8988cc",
+          "flagged_rows": 2,
+          "flagged_value_sum_eur": 2636000.0,
+          "maximum_flagged_value_eur": 1700000.0
+        },
+        {
+          "declarant": "M. jean-pierre farandou",
+          "declarant_label": "M. jean-pierre farandou · 2026-02-28",
+          "publication_date": "2026-02-28",
+          "declaration_uuid": "cee1589c-81bd-4dcc-9431-58dd9d72f2c0",
+          "flagged_rows": 3,
+          "flagged_value_sum_eur": 2381011.0,
+          "maximum_flagged_value_eur": 1000000.0
+        },
+        {
+          "declarant": "M. jean-pierre farandou",
+          "declarant_label": "M. jean-pierre farandou · 2025-11-13",
+          "publication_date": "2025-11-13",
+          "declaration_uuid": "f327ee29-29a8-43a9-ad66-ba2cf59e9c86",
+          "flagged_rows": 3,
+          "flagged_value_sum_eur": 2381011.0,
+          "maximum_flagged_value_eur": 1000000.0
+        },
+        {
+          "declarant": "M. Rémi Bouchez",
+          "declarant_label": "M. Rémi Bouchez · 2024-01-23",
+          "publication_date": "2024-01-23",
+          "declaration_uuid": "6e136e04-b5b7-4087-93c2-ae8dba947e9f",
+          "flagged_rows": 2,
+          "flagged_value_sum_eur": 1982935.0,
+          "maximum_flagged_value_eur": 1764000.0
+        },
+        {
+          "declarant": "M. Rémi Bouchez",
+          "declarant_label": "M. Rémi Bouchez · 2024-02-28",
+          "publication_date": "2024-02-28",
+          "declaration_uuid": "8947c42d-6ed0-4c5c-b2d0-6d34399230ca",
+          "flagged_rows": 2,
+          "flagged_value_sum_eur": 1982935.0,
+          "maximum_flagged_value_eur": 1764000.0
+        },
+        {
+          "declarant": "Mme francine levon-guerin",
+          "declarant_label": "Mme francine levon-guerin · 2026-01-27",
+          "publication_date": "2026-01-27",
+          "declaration_uuid": "9a3fd717-92d6-4dcb-8bcc-877aaa95dec3",
+          "flagged_rows": 2,
+          "flagged_value_sum_eur": 1870000.0,
+          "maximum_flagged_value_eur": 1400000.0
+        },
+        {
+          "declarant": "Mme Aurore Bergé",
+          "declarant_label": "Mme Aurore Bergé · 2025-12-04",
+          "publication_date": "2025-12-04",
+          "declaration_uuid": "52ff5cc4-e4ad-41be-9368-fa09f9885101",
+          "flagged_rows": 3,
+          "flagged_value_sum_eur": 1675010.0,
+          "maximum_flagged_value_eur": 750000.0
+        },
+        {
+          "declarant": "M. Fabrice MELLERAY",
+          "declarant_label": "M. Fabrice MELLERAY · 2023-10-28",
+          "publication_date": "2023-10-28",
+          "declaration_uuid": "00ccc47c-9a67-4b79-a0ed-d3d2cc584d2b",
+          "flagged_rows": 1,
+          "flagged_value_sum_eur": 1600000.0,
+          "maximum_flagged_value_eur": 1600000.0
+        },
+        {
+          "declarant": "Mme Amélie de Montchalin",
+          "declarant_label": "Mme Amélie de Montchalin · 2026-03-14",
+          "publication_date": "2026-03-14",
+          "declaration_uuid": "3261cb23-f5cd-4d7f-9622-732629e474b2",
+          "flagged_rows": 2,
+          "flagged_value_sum_eur": 1510000.0,
+          "maximum_flagged_value_eur": 1160000.0
+        },
+        {
+          "declarant": "Mme Florence Ribard",
+          "declarant_label": "Mme Florence Ribard · 2026-04-14",
+          "publication_date": "2026-04-14",
+          "declaration_uuid": "0a10a606-2318-43cf-8fa8-22d392559ff5",
+          "flagged_rows": 2,
+          "flagged_value_sum_eur": 1504631.0,
+          "maximum_flagged_value_eur": 904631.0
+        },
+        {
+          "declarant": "Mme Aurore Bergé",
+          "declarant_label": "Mme Aurore Bergé · 2026-05-13",
+          "publication_date": "2026-05-13",
+          "declaration_uuid": "ec589d51-7664-4638-bef7-809b1e318273",
+          "flagged_rows": 3,
+          "flagged_value_sum_eur": 1444459.0,
+          "maximum_flagged_value_eur": 695000.0
+        },
+        {
+          "declarant": "Mme Catherine Brouard-Gallet",
+          "declarant_label": "Mme Catherine Brouard-Gallet · 2024-05-20",
+          "publication_date": "2024-05-20",
+          "declaration_uuid": "324849c0-3a42-4a8f-b470-c27f5fe33cfa",
+          "flagged_rows": 2,
+          "flagged_value_sum_eur": 1348111.0,
+          "maximum_flagged_value_eur": 1000000.0
+        }
+      ],
+      "outliers": [
+        {
+          "declarant": "M. Serge Papin",
+          "publication_date": "2026-02-17",
+          "declaration_uuid": "307a6524-c8a6-4e5c-92b0-731029d15b19",
+          "asset_section": "Unlisted securities",
+          "asset_name": "FINAPA",
+          "normalized_value_eur": 6719662.0,
+          "raw_source_value": "6719662",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Serge Papin",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "bd19a0d5-eb22-4649-bb6b-e8d77ff89118",
+          "asset_section": "Unlisted securities",
+          "asset_name": "FINAPA",
+          "normalized_value_eur": 6719662.0,
+          "raw_source_value": "6719662",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Rachida Dati",
+          "publication_date": "2026-04-22",
+          "declaration_uuid": "6dcd326d-e076-4d7a-a428-15075a15dddd",
+          "asset_section": "Listed securities",
+          "asset_name": "CIC Market Solution",
+          "normalized_value_eur": 3133135.0,
+          "raw_source_value": "3133135",
+          "source_item_index": 2
+        },
+        {
+          "declarant": "Mme Rachida Dati",
+          "publication_date": "2026-04-22",
+          "declaration_uuid": "6dcd326d-e076-4d7a-a428-15075a15dddd",
+          "asset_section": "Life insurance",
+          "asset_name": "Dati Rachida",
+          "normalized_value_eur": 2413888.0,
+          "raw_source_value": "2413888",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "publication_date": "2026-03-22",
+          "declaration_uuid": "0e8fdc5f-1425-4a4f-9243-8ed3e1f3fb0b",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 2250000.0,
+          "raw_source_value": "2250000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "publication_date": "2025-11-13",
+          "declaration_uuid": "b9c1be04-63ac-4f31-a7c2-4f9edcfc52b3",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 2250000.0,
+          "raw_source_value": "2250000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Roland Lescure",
+          "publication_date": "2025-10-19",
+          "declaration_uuid": "2bd08f0f-8aba-4e87-b2f4-d564a963a79a",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 2225000.0,
+          "raw_source_value": "2225000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Rémi Bouchez",
+          "publication_date": "2024-01-23",
+          "declaration_uuid": "6e136e04-b5b7-4087-93c2-ae8dba947e9f",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 1764000.0,
+          "raw_source_value": "1764000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Rémi Bouchez",
+          "publication_date": "2024-02-28",
+          "declaration_uuid": "8947c42d-6ed0-4c5c-b2d0-6d34399230ca",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 1764000.0,
+          "raw_source_value": "1764000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme alice rufo",
+          "publication_date": "2025-10-20",
+          "declaration_uuid": "6ca782ee-be24-42c2-976c-57d78c8988cc",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 1700000.0,
+          "raw_source_value": "1700000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "302d9e1f-7835-4269-b775-261e0a04fc8a",
+          "asset_section": "Life insurance",
+          "asset_name": "Jean-Noël Barrot",
+          "normalized_value_eur": 1634267.0,
+          "raw_source_value": "1634267",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2026-02-25",
+          "declaration_uuid": "c0ed614c-26a5-4531-ad13-f826e37cba6c",
+          "asset_section": "Life insurance",
+          "asset_name": "Jean-Noël Barrot",
+          "normalized_value_eur": 1623013.0,
+          "raw_source_value": "1623013",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Fabrice MELLERAY",
+          "publication_date": "2023-10-28",
+          "declaration_uuid": "00ccc47c-9a67-4b79-a0ed-d3d2cc584d2b",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 1600000.0,
+          "raw_source_value": "1600000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme francine levon-guerin",
+          "publication_date": "2026-01-27",
+          "declaration_uuid": "9a3fd717-92d6-4dcb-8bcc-877aaa95dec3",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 1400000.0,
+          "raw_source_value": "1400000",
+          "source_item_index": 2
+        },
+        {
+          "declarant": "M. Serge Papin",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "bd19a0d5-eb22-4649-bb6b-e8d77ff89118",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 1250000.0,
+          "raw_source_value": "1250000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Dominique Dujols",
+          "publication_date": "2022-02-04",
+          "declaration_uuid": "06572e52-2668-484b-8b44-c3ab52ccc447",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 1210000.0,
+          "raw_source_value": "1210000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Philippe Baptiste",
+          "publication_date": "2025-11-04",
+          "declaration_uuid": "6c96dc98-91e8-4a0a-98c2-1a9111932600",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 1180000.0,
+          "raw_source_value": "1180000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Amélie de Montchalin",
+          "publication_date": "2026-03-14",
+          "declaration_uuid": "3261cb23-f5cd-4d7f-9622-732629e474b2",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 1160000.0,
+          "raw_source_value": "1160000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Catherine Pégard",
+          "publication_date": "2026-07-03",
+          "declaration_uuid": "30a4d227-58b7-4272-bb02-7b184261a28f",
+          "asset_section": "Life insurance",
+          "asset_name": "PEGARD Catherine",
+          "normalized_value_eur": 1086077.0,
+          "raw_source_value": "1086077",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Catherine Pégard",
+          "publication_date": "2026-02-12",
+          "declaration_uuid": "bcc2575f-b226-44ae-865f-964fd60f129e",
+          "asset_section": "Life insurance",
+          "asset_name": "PEGARD Catherine",
+          "normalized_value_eur": 1086077.0,
+          "raw_source_value": "1086077",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "302d9e1f-7835-4269-b775-261e0a04fc8a",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 1027792.0,
+          "raw_source_value": "1027792",
+          "source_item_index": 4
+        },
+        {
+          "declarant": "M. jean-pierre farandou",
+          "publication_date": "2026-02-28",
+          "declaration_uuid": "cee1589c-81bd-4dcc-9431-58dd9d72f2c0",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 1000000.0,
+          "raw_source_value": "1000000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. jean-pierre farandou",
+          "publication_date": "2025-11-13",
+          "declaration_uuid": "f327ee29-29a8-43a9-ad66-ba2cf59e9c86",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 1000000.0,
+          "raw_source_value": "1000000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Catherine Brouard-Gallet",
+          "publication_date": "2024-05-20",
+          "declaration_uuid": "324849c0-3a42-4a8f-b470-c27f5fe33cfa",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 1000000.0,
+          "raw_source_value": "1000000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Catherine Brouard-Gallet",
+          "publication_date": "2024-06-14",
+          "declaration_uuid": "4d231832-72b6-460a-8485-c073ba7bf767",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 1000000.0,
+          "raw_source_value": "1000000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. benjamin haddad",
+          "publication_date": "2025-12-15",
+          "declaration_uuid": "4a26227d-f73c-42af-9fd5-fcb2f1d01192",
+          "asset_section": "Foreign assets",
+          "asset_name": "Bien immobilier",
+          "normalized_value_eur": 970363.0,
+          "raw_source_value": "970363",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Rémi Bouchez",
+          "publication_date": "2025-03-11",
+          "declaration_uuid": "31e7cefd-5945-415f-a881-6244f95ff7b9",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 970200.0,
+          "raw_source_value": "970200",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Rémi Bouchez",
+          "publication_date": "2024-09-07",
+          "declaration_uuid": "4cbb3f5d-bed9-4870-b22b-4f3f76450a03",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 970200.0,
+          "raw_source_value": "970200",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme alice rufo",
+          "publication_date": "2025-10-20",
+          "declaration_uuid": "6ca782ee-be24-42c2-976c-57d78c8988cc",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 936000.0,
+          "raw_source_value": "936000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2026-02-25",
+          "declaration_uuid": "c0ed614c-26a5-4531-ad13-f826e37cba6c",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 922400.0,
+          "raw_source_value": "922400",
+          "source_item_index": 4
+        },
+        {
+          "declarant": "Mme Florence Ribard",
+          "publication_date": "2026-04-14",
+          "declaration_uuid": "0a10a606-2318-43cf-8fa8-22d392559ff5",
+          "asset_section": "Life insurance",
+          "asset_name": "Ribard Florence",
+          "normalized_value_eur": 904631.0,
+          "raw_source_value": "904631",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. PHILIPPE TABAROT",
+          "publication_date": "2025-12-03",
+          "declaration_uuid": "2fd25bf5-de0b-473e-8613-0f0f4adb5027",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 830000.0,
+          "raw_source_value": "830000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. jean-pierre farandou",
+          "publication_date": "2026-02-28",
+          "declaration_uuid": "cee1589c-81bd-4dcc-9431-58dd9d72f2c0",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 790000.0,
+          "raw_source_value": "790000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. jean-pierre farandou",
+          "publication_date": "2025-11-13",
+          "declaration_uuid": "f327ee29-29a8-43a9-ad66-ba2cf59e9c86",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 790000.0,
+          "raw_source_value": "790000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Roland Lescure",
+          "publication_date": "2025-10-19",
+          "declaration_uuid": "2bd08f0f-8aba-4e87-b2f4-d564a963a79a",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 771000.0,
+          "raw_source_value": "771000",
+          "source_item_index": 3
+        },
+        {
+          "declarant": "M. Sebastien LECORNU",
+          "publication_date": "2025-11-13",
+          "declaration_uuid": "b6ff5941-142a-4075-9c06-482c2eaccbfb",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 770000.0,
+          "raw_source_value": "770000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Sebastien LECORNU",
+          "publication_date": "2026-02-27",
+          "declaration_uuid": "c9a75061-21bc-44ee-8589-e07899a1e4d8",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 770000.0,
+          "raw_source_value": "770000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Sebastien LECORNU",
+          "publication_date": "2026-06-04",
+          "declaration_uuid": "d832921b-f94c-4e3e-8a4a-34418517b4ac",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 770000.0,
+          "raw_source_value": "770000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Aurore Bergé",
+          "publication_date": "2025-12-04",
+          "declaration_uuid": "52ff5cc4-e4ad-41be-9368-fa09f9885101",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 750000.0,
+          "raw_source_value": "750000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Jean-Didier Berger",
+          "publication_date": "2026-04-02",
+          "declaration_uuid": "45e264fc-64a8-4d13-9ad7-102fcb15e667",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 742500.0,
+          "raw_source_value": "742500",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Jean-Didier Berger",
+          "publication_date": "2026-04-02",
+          "declaration_uuid": "b2afdbfb-63b1-444f-b3c2-7f48f42033b9",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 742500.0,
+          "raw_source_value": "742500",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Aurore Bergé",
+          "publication_date": "2025-12-04",
+          "declaration_uuid": "52ff5cc4-e4ad-41be-9368-fa09f9885101",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 695000.0,
+          "raw_source_value": "695000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "Mme Aurore Bergé",
+          "publication_date": "2026-05-13",
+          "declaration_uuid": "ec589d51-7664-4638-bef7-809b1e318273",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 695000.0,
+          "raw_source_value": "695000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Roland Lescure",
+          "publication_date": "2025-10-19",
+          "declaration_uuid": "2bd08f0f-8aba-4e87-b2f4-d564a963a79a",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 650000.0,
+          "raw_source_value": "650000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Serge Papin",
+          "publication_date": "2026-02-17",
+          "declaration_uuid": "307a6524-c8a6-4e5c-92b0-731029d15b19",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 625000.0,
+          "raw_source_value": "625000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "publication_date": "2025-11-13",
+          "declaration_uuid": "b9c1be04-63ac-4f31-a7c2-4f9edcfc52b3",
+          "asset_section": "Other assets",
+          "asset_name": "SC [Données non publiées]",
+          "normalized_value_eur": 604000.0,
+          "raw_source_value": "604000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Catherine Chabaud",
+          "publication_date": "2026-02-24",
+          "declaration_uuid": "b28ed874-b615-41e0-85a0-e968dd6f452b",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 600000.0,
+          "raw_source_value": "600000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Catherine Chabaud",
+          "publication_date": "2025-11-08",
+          "declaration_uuid": "f1b39514-b457-4a13-be34-49e87d297d20",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 600000.0,
+          "raw_source_value": "600000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Florence Ribard",
+          "publication_date": "2026-04-14",
+          "declaration_uuid": "0a10a606-2318-43cf-8fa8-22d392559ff5",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 600000.0,
+          "raw_source_value": "600000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. jean-pierre farandou",
+          "publication_date": "2026-02-28",
+          "declaration_uuid": "cee1589c-81bd-4dcc-9431-58dd9d72f2c0",
+          "asset_section": "Life insurance",
+          "asset_name": "CNP ONE",
+          "normalized_value_eur": 591011.0,
+          "raw_source_value": "591011",
+          "source_item_index": 7
+        },
+        {
+          "declarant": "M. jean-pierre farandou",
+          "publication_date": "2025-11-13",
+          "declaration_uuid": "f327ee29-29a8-43a9-ad66-ba2cf59e9c86",
+          "asset_section": "Life insurance",
+          "asset_name": "CNP ONE",
+          "normalized_value_eur": 591011.0,
+          "raw_source_value": "591011",
+          "source_item_index": 7
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "publication_date": "2026-03-22",
+          "declaration_uuid": "0e8fdc5f-1425-4a4f-9243-8ed3e1f3fb0b",
+          "asset_section": "SCI / property company",
+          "asset_name": "—",
+          "normalized_value_eur": 583000.0,
+          "raw_source_value": "583000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "publication_date": "2025-11-13",
+          "declaration_uuid": "b9c1be04-63ac-4f31-a7c2-4f9edcfc52b3",
+          "asset_section": "SCI / property company",
+          "asset_name": "—",
+          "normalized_value_eur": 583000.0,
+          "raw_source_value": "583000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Mathieu LEFEVRE",
+          "publication_date": "2026-02-19",
+          "declaration_uuid": "0d112243-6618-4335-9fa0-872c27194b23",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 573000.0,
+          "raw_source_value": "573000",
+          "source_item_index": 2
+        },
+        {
+          "declarant": "M. Mathieu LEFEVRE",
+          "publication_date": "2025-10-29",
+          "declaration_uuid": "5382331f-88ab-4089-99e3-e2f1e9a7289f",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 573000.0,
+          "raw_source_value": "573000",
+          "source_item_index": 2
+        },
+        {
+          "declarant": "M. Serge Papin",
+          "publication_date": "2026-02-17",
+          "declaration_uuid": "307a6524-c8a6-4e5c-92b0-731029d15b19",
+          "asset_section": "Life insurance",
+          "asset_name": "SERGE PAPIN",
+          "normalized_value_eur": 567673.0,
+          "raw_source_value": "567673",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Serge Papin",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "bd19a0d5-eb22-4649-bb6b-e8d77ff89118",
+          "asset_section": "Life insurance",
+          "asset_name": "SERGE PAPIN",
+          "normalized_value_eur": 567673.0,
+          "raw_source_value": "567673",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "publication_date": "2026-03-22",
+          "declaration_uuid": "0e8fdc5f-1425-4a4f-9243-8ed3e1f3fb0b",
+          "asset_section": "Other assets",
+          "asset_name": "SC [Données non publiées]",
+          "normalized_value_eur": 554164.0,
+          "raw_source_value": "554164",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme catherine vautrin",
+          "publication_date": "2025-11-02",
+          "declaration_uuid": "443aca59-8b1d-4cd0-a38e-ddaac448d82a",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 545450.0,
+          "raw_source_value": "545450",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Sabrina ROUBACHE",
+          "publication_date": "2026-05-10",
+          "declaration_uuid": "56492a1d-8aab-4423-9593-11be3baeb4ef",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 540000.0,
+          "raw_source_value": "540000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Sabrina ROUBACHE",
+          "publication_date": "2026-03-24",
+          "declaration_uuid": "a3f9180d-82df-470e-a281-d6fe8543dd15",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 540000.0,
+          "raw_source_value": "540000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Aurore Bergé",
+          "publication_date": "2026-05-13",
+          "declaration_uuid": "ec589d51-7664-4638-bef7-809b1e318273",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 525000.0,
+          "raw_source_value": "525000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Anne Le Hénanff",
+          "publication_date": "2025-11-16",
+          "declaration_uuid": "69f2d720-c3de-4a9e-9cae-970b0bceee66",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 470000.0,
+          "raw_source_value": "470000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "Mme francine levon-guerin",
+          "publication_date": "2026-01-27",
+          "declaration_uuid": "9a3fd717-92d6-4dcb-8bcc-877aaa95dec3",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 470000.0,
+          "raw_source_value": "470000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Serge Papin",
+          "publication_date": "2026-02-17",
+          "declaration_uuid": "307a6524-c8a6-4e5c-92b0-731029d15b19",
+          "asset_section": "Unlisted securities",
+          "asset_name": "FINAPA",
+          "normalized_value_eur": 469972.0,
+          "raw_source_value": "469972",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Serge Papin",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "bd19a0d5-eb22-4649-bb6b-e8d77ff89118",
+          "asset_section": "Unlisted securities",
+          "asset_name": "FINAPA",
+          "normalized_value_eur": 469972.0,
+          "raw_source_value": "469972",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "publication_date": "2026-03-22",
+          "declaration_uuid": "0e8fdc5f-1425-4a4f-9243-8ed3e1f3fb0b",
+          "asset_section": "Life insurance",
+          "asset_name": "BARBUT MONIQUE",
+          "normalized_value_eur": 459082.0,
+          "raw_source_value": "459082",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "publication_date": "2025-11-13",
+          "declaration_uuid": "b9c1be04-63ac-4f31-a7c2-4f9edcfc52b3",
+          "asset_section": "Life insurance",
+          "asset_name": "BARBUT MONIQUE",
+          "normalized_value_eur": 459082.0,
+          "raw_source_value": "459082",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Edouard GEFFRAY",
+          "publication_date": "2025-12-08",
+          "declaration_uuid": "1155d9b2-782c-4670-aed4-d0aff6f6aeef",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 450000.0,
+          "raw_source_value": "450000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2026-02-25",
+          "declaration_uuid": "c0ed614c-26a5-4531-ad13-f826e37cba6c",
+          "asset_section": "Bank accounts",
+          "asset_name": "Compte courant",
+          "normalized_value_eur": 429347.0,
+          "raw_source_value": "429347",
+          "source_item_index": 7
+        },
+        {
+          "declarant": "Mme Anne Le Hénanff",
+          "publication_date": "2025-11-16",
+          "declaration_uuid": "69f2d720-c3de-4a9e-9cae-970b0bceee66",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 420000.0,
+          "raw_source_value": "420000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Naima Moutchou",
+          "publication_date": "2026-03-05",
+          "declaration_uuid": "5784dc94-12d6-4aa5-a44e-12dd229c18ae",
+          "asset_section": "Foreign assets",
+          "asset_name": "Créance à l'égard de la société [Données non publiées] pour acquérir une maison",
+          "normalized_value_eur": 410000.0,
+          "raw_source_value": "410000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Naima Moutchou",
+          "publication_date": "2025-11-24",
+          "declaration_uuid": "d042bdf0-9e69-4520-b67e-5f1ebae99ab2",
+          "asset_section": "Foreign assets",
+          "asset_name": "Créance à l'égard de la société [Données non publiées] pour acquérir une maison",
+          "normalized_value_eur": 410000.0,
+          "raw_source_value": "410000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Nicolas Forissier",
+          "publication_date": "2025-11-16",
+          "declaration_uuid": "1ef45579-254a-48ad-a43b-f16677371fc5",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 400000.0,
+          "raw_source_value": "400000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Nicolas Forissier",
+          "publication_date": "2026-02-27",
+          "declaration_uuid": "32bdb365-b2a2-48ce-b18b-e7fb202cb4c4",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 400000.0,
+          "raw_source_value": "400000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Charlotte LECOCQ",
+          "publication_date": "2026-03-03",
+          "declaration_uuid": "3ae51772-5b1b-4d15-afe8-4f018589442e",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 400000.0,
+          "raw_source_value": "400000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Françoise Gatel",
+          "publication_date": "2025-11-21",
+          "declaration_uuid": "47ead3d6-257b-4dff-a359-7cf480189c35",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 400000.0,
+          "raw_source_value": "400000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "Mme Françoise Gatel",
+          "publication_date": "2026-02-13",
+          "declaration_uuid": "54b3975d-2daa-4587-82fb-0814860d6f01",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 400000.0,
+          "raw_source_value": "400000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "302d9e1f-7835-4269-b775-261e0a04fc8a",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 368021.0,
+          "raw_source_value": "368021",
+          "source_item_index": 2
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2026-02-25",
+          "declaration_uuid": "c0ed614c-26a5-4531-ad13-f826e37cba6c",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 368021.0,
+          "raw_source_value": "368021",
+          "source_item_index": 2
+        },
+        {
+          "declarant": "M. Gérard TERRIEN",
+          "publication_date": "2025-12-20",
+          "declaration_uuid": "0f874fb8-0e5a-4f5a-bdc9-870ab282f0c6",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 357500.0,
+          "raw_source_value": "357500",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Gérard TERRIEN",
+          "publication_date": "2024-01-12",
+          "declaration_uuid": "bc435e56-4dcc-4d94-a319-d412b607aeb2",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 357500.0,
+          "raw_source_value": "357500",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Gérard TERRIEN",
+          "publication_date": "2022-01-21",
+          "declaration_uuid": "d00d89a4-a201-455f-9993-d0f40a052c37",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 357500.0,
+          "raw_source_value": "357500",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. LAURENT NUNEZ",
+          "publication_date": "2026-02-09",
+          "declaration_uuid": "323781a6-bd3b-4134-bf7e-30a963bfa27b",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 354000.0,
+          "raw_source_value": "354000",
+          "source_item_index": 2
+        },
+        {
+          "declarant": "M. LAURENT NUNEZ",
+          "publication_date": "2025-11-23",
+          "declaration_uuid": "e4e3a7c0-bed2-4549-81f5-35eaa9ce17e9",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 354000.0,
+          "raw_source_value": "354000",
+          "source_item_index": 2
+        },
+        {
+          "declarant": "M. Laurent PANIFOUS",
+          "publication_date": "2025-11-07",
+          "declaration_uuid": "07ba839d-dfed-4db1-9f46-72f129fe42ec",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 350000.0,
+          "raw_source_value": "350000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "Mme Amélie de Montchalin",
+          "publication_date": "2026-03-14",
+          "declaration_uuid": "3261cb23-f5cd-4d7f-9622-732629e474b2",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 350000.0,
+          "raw_source_value": "350000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "302d9e1f-7835-4269-b775-261e0a04fc8a",
+          "asset_section": "Real estate",
+          "asset_name": "Garage",
+          "normalized_value_eur": 349667.0,
+          "raw_source_value": "349667",
+          "source_item_index": 7
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2026-02-25",
+          "declaration_uuid": "c0ed614c-26a5-4531-ad13-f826e37cba6c",
+          "asset_section": "Real estate",
+          "asset_name": "Garage",
+          "normalized_value_eur": 349667.0,
+          "raw_source_value": "349667",
+          "source_item_index": 7
+        },
+        {
+          "declarant": "Mme Catherine Brouard-Gallet",
+          "publication_date": "2024-05-20",
+          "declaration_uuid": "324849c0-3a42-4a8f-b470-c27f5fe33cfa",
+          "asset_section": "Life insurance",
+          "asset_name": "Catherine Gallet",
+          "normalized_value_eur": 348111.0,
+          "raw_source_value": "348111",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Catherine Brouard-Gallet",
+          "publication_date": "2024-06-14",
+          "declaration_uuid": "4d231832-72b6-460a-8485-c073ba7bf767",
+          "asset_section": "Life insurance",
+          "asset_name": "Catherine Gallet",
+          "normalized_value_eur": 348111.0,
+          "raw_source_value": "348111",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Sébastien Martin",
+          "publication_date": "2025-10-19",
+          "declaration_uuid": "91ad3e7d-9aa9-43f3-83d0-de69725c053f",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 340000.0,
+          "raw_source_value": "340000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Rémi Bouchez",
+          "publication_date": "2025-03-11",
+          "declaration_uuid": "31e7cefd-5945-415f-a881-6244f95ff7b9",
+          "asset_section": "Life insurance",
+          "asset_name": "Rémi Bouchez",
+          "normalized_value_eur": 328511.0,
+          "raw_source_value": "328511",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Stephanie Rist",
+          "publication_date": "2026-02-21",
+          "declaration_uuid": "d87a341b-68e4-4fcd-9b2e-0adb201efdf8",
+          "asset_section": "Life insurance",
+          "asset_name": "—",
+          "normalized_value_eur": 326050.0,
+          "raw_source_value": "326050",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Jean Maïa",
+          "publication_date": "2026-04-09",
+          "declaration_uuid": "50d46461-b2a5-4668-a3ba-75a13f29c0c3",
+          "asset_section": "Life insurance",
+          "asset_name": "Maïa Jean",
+          "normalized_value_eur": 320123.0,
+          "raw_source_value": "320123",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Jean Maïa",
+          "publication_date": "2026-04-09",
+          "declaration_uuid": "50d46461-b2a5-4668-a3ba-75a13f29c0c3",
+          "asset_section": "Life insurance",
+          "asset_name": "Maïa Jean",
+          "normalized_value_eur": 315190.0,
+          "raw_source_value": "315190",
+          "source_item_index": 2
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "302d9e1f-7835-4269-b775-261e0a04fc8a",
+          "asset_section": "Other assets",
+          "asset_name": "Caisse des Règlements Pécuniaires des Avocats [Données non publiées]",
+          "normalized_value_eur": 313573.0,
+          "raw_source_value": "313573",
+          "source_item_index": 2
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2026-02-25",
+          "declaration_uuid": "c0ed614c-26a5-4531-ad13-f826e37cba6c",
+          "asset_section": "Other assets",
+          "asset_name": "Caisse des Règlements Pécuniaires des Avocats [Données non publiées]",
+          "normalized_value_eur": 313573.0,
+          "raw_source_value": "313573",
+          "source_item_index": 2
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "publication_date": "2026-03-22",
+          "declaration_uuid": "0e8fdc5f-1425-4a4f-9243-8ed3e1f3fb0b",
+          "asset_section": "Life insurance",
+          "asset_name": "BARBUT MONIQUE",
+          "normalized_value_eur": 306815.0,
+          "raw_source_value": "306815",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Monique BARBUT",
+          "publication_date": "2025-11-13",
+          "declaration_uuid": "b9c1be04-63ac-4f31-a7c2-4f9edcfc52b3",
+          "asset_section": "Life insurance",
+          "asset_name": "BARBUT MONIQUE",
+          "normalized_value_eur": 306815.0,
+          "raw_source_value": "306815",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Catherine Chabaud",
+          "publication_date": "2026-02-24",
+          "declaration_uuid": "b28ed874-b615-41e0-85a0-e968dd6f452b",
+          "asset_section": "Life insurance",
+          "asset_name": "Chabaud Catherine",
+          "normalized_value_eur": 305408.0,
+          "raw_source_value": "305408",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "Mme Catherine Chabaud",
+          "publication_date": "2025-11-08",
+          "declaration_uuid": "f1b39514-b457-4a13-be34-49e87d297d20",
+          "asset_section": "Life insurance",
+          "asset_name": "Chabaud Catherine",
+          "normalized_value_eur": 305408.0,
+          "raw_source_value": "305408",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "302d9e1f-7835-4269-b775-261e0a04fc8a",
+          "asset_section": "Other assets",
+          "asset_name": "Quote-part estimative du capital figurant sur les contrats d'assurance-vie [Données non publiées]",
+          "normalized_value_eur": 300000.0,
+          "raw_source_value": "300000",
+          "source_item_index": 6
+        },
+        {
+          "declarant": "Mme Naima Moutchou",
+          "publication_date": "2026-03-05",
+          "declaration_uuid": "5784dc94-12d6-4aa5-a44e-12dd229c18ae",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 300000.0,
+          "raw_source_value": "300000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "Mme Naima Moutchou",
+          "publication_date": "2025-11-24",
+          "declaration_uuid": "d042bdf0-9e69-4520-b67e-5f1ebae99ab2",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 300000.0,
+          "raw_source_value": "300000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. VINCENT JEANBRUN",
+          "publication_date": "2025-10-22",
+          "declaration_uuid": "b016ad28-4c76-4fbb-9cd4-c78a5268763b",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 294000.0,
+          "raw_source_value": "294000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Camille Galliard-Minier",
+          "publication_date": "2026-04-09",
+          "declaration_uuid": "adca1851-ccc6-4068-a652-b1e879b543f4",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 292500.0,
+          "raw_source_value": "292500",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. PHILIPPE TABAROT",
+          "publication_date": "2025-12-03",
+          "declaration_uuid": "2fd25bf5-de0b-473e-8613-0f0f4adb5027",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 270660.0,
+          "raw_source_value": "270660",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme MARINA FERRARI",
+          "publication_date": "2025-11-30",
+          "declaration_uuid": "e0b95884-0d64-4b4a-b280-f1b6f34a38eb",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 270000.0,
+          "raw_source_value": "270000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Jean-Noel Barrot",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "302d9e1f-7835-4269-b775-261e0a04fc8a",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 269167.0,
+          "raw_source_value": "269167",
+          "source_item_index": 8
+        },
+        {
+          "declarant": "Mme Naima Moutchou",
+          "publication_date": "2026-03-05",
+          "declaration_uuid": "5784dc94-12d6-4aa5-a44e-12dd229c18ae",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 260000.0,
+          "raw_source_value": "260000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Naima Moutchou",
+          "publication_date": "2025-11-24",
+          "declaration_uuid": "d042bdf0-9e69-4520-b67e-5f1ebae99ab2",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 260000.0,
+          "raw_source_value": "260000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Nicolas Forissier",
+          "publication_date": "2025-11-16",
+          "declaration_uuid": "1ef45579-254a-48ad-a43b-f16677371fc5",
+          "asset_section": "SCI / property company",
+          "asset_name": "—",
+          "normalized_value_eur": 256747.0,
+          "raw_source_value": "256747",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Annie GENEVARD",
+          "publication_date": "2025-11-07",
+          "declaration_uuid": "697577ec-9c79-44f3-be24-137c680316ff",
+          "asset_section": "Life insurance",
+          "asset_name": "Annie GENEVARD",
+          "normalized_value_eur": 253183.0,
+          "raw_source_value": "253183",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "Mme Annie GENEVARD",
+          "publication_date": "2025-11-07",
+          "declaration_uuid": "697577ec-9c79-44f3-be24-137c680316ff",
+          "asset_section": "Real estate",
+          "asset_name": "maison individuelle",
+          "normalized_value_eur": 240000.0,
+          "raw_source_value": "240000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Rachida Dati",
+          "publication_date": "2026-04-22",
+          "declaration_uuid": "6dcd326d-e076-4d7a-a428-15075a15dddd",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 238650.0,
+          "raw_source_value": "238650",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Nicolas Forissier",
+          "publication_date": "2025-11-16",
+          "declaration_uuid": "1ef45579-254a-48ad-a43b-f16677371fc5",
+          "asset_section": "Other assets",
+          "asset_name": "SCI [Données non publiées]",
+          "normalized_value_eur": 234817.0,
+          "raw_source_value": "234817",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Nicolas Forissier",
+          "publication_date": "2026-02-27",
+          "declaration_uuid": "32bdb365-b2a2-48ce-b18b-e7fb202cb4c4",
+          "asset_section": "Other assets",
+          "asset_name": "SCI [Données non publiées]",
+          "normalized_value_eur": 234817.0,
+          "raw_source_value": "234817",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Catherine Pégard",
+          "publication_date": "2026-07-03",
+          "declaration_uuid": "30a4d227-58b7-4272-bb02-7b184261a28f",
+          "asset_section": "Listed securities",
+          "asset_name": "BNP Paribas",
+          "normalized_value_eur": 230580.0,
+          "raw_source_value": "230580",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Catherine Pégard",
+          "publication_date": "2026-02-12",
+          "declaration_uuid": "bcc2575f-b226-44ae-865f-964fd60f129e",
+          "asset_section": "Listed securities",
+          "asset_name": "BNP Paribas",
+          "normalized_value_eur": 230580.0,
+          "raw_source_value": "230580",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Aurore Bergé",
+          "publication_date": "2025-12-04",
+          "declaration_uuid": "52ff5cc4-e4ad-41be-9368-fa09f9885101",
+          "asset_section": "Bank accounts",
+          "asset_name": "Compte d'épargne",
+          "normalized_value_eur": 230010.0,
+          "raw_source_value": "230010",
+          "source_item_index": 5
+        },
+        {
+          "declarant": "M. Jean Maïa",
+          "publication_date": "2026-04-09",
+          "declaration_uuid": "50d46461-b2a5-4668-a3ba-75a13f29c0c3",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 230000.0,
+          "raw_source_value": "230000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme catherine vautrin",
+          "publication_date": "2025-11-02",
+          "declaration_uuid": "443aca59-8b1d-4cd0-a38e-ddaac448d82a",
+          "asset_section": "SCI / property company",
+          "asset_name": "—",
+          "normalized_value_eur": 227055.0,
+          "raw_source_value": "227055",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Gérald Darmanin",
+          "publication_date": "2025-12-05",
+          "declaration_uuid": "d4449adc-cdf1-4752-8981-ab9925f6a7f2",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 225000.0,
+          "raw_source_value": "225000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Aurore Bergé",
+          "publication_date": "2026-05-13",
+          "declaration_uuid": "ec589d51-7664-4638-bef7-809b1e318273",
+          "asset_section": "Bank accounts",
+          "asset_name": "Compte d'épargne",
+          "normalized_value_eur": 224459.0,
+          "raw_source_value": "224459",
+          "source_item_index": 5
+        },
+        {
+          "declarant": "Mme Maud BREGEON",
+          "publication_date": "2026-07-27",
+          "declaration_uuid": "f2b84cea-cbba-4e05-a6a6-cb656fb4a80e",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 220000.0,
+          "raw_source_value": "220000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Maud BREGEON",
+          "publication_date": "2026-04-30",
+          "declaration_uuid": "f9e780b3-8763-442c-ba34-50e31f6206e7",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 220000.0,
+          "raw_source_value": "220000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Rémi Bouchez",
+          "publication_date": "2024-09-07",
+          "declaration_uuid": "4cbb3f5d-bed9-4870-b22b-4f3f76450a03",
+          "asset_section": "Life insurance",
+          "asset_name": "Rémi Bouchez",
+          "normalized_value_eur": 218935.0,
+          "raw_source_value": "218935",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Rémi Bouchez",
+          "publication_date": "2024-01-23",
+          "declaration_uuid": "6e136e04-b5b7-4087-93c2-ae8dba947e9f",
+          "asset_section": "Life insurance",
+          "asset_name": "Rémi Bouchez",
+          "normalized_value_eur": 218935.0,
+          "raw_source_value": "218935",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Rémi Bouchez",
+          "publication_date": "2024-02-28",
+          "declaration_uuid": "8947c42d-6ed0-4c5c-b2d0-6d34399230ca",
+          "asset_section": "Life insurance",
+          "asset_name": "Rémi Bouchez",
+          "normalized_value_eur": 218935.0,
+          "raw_source_value": "218935",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Laurent PANIFOUS",
+          "publication_date": "2025-11-07",
+          "declaration_uuid": "07ba839d-dfed-4db1-9f46-72f129fe42ec",
+          "asset_section": "Life insurance",
+          "asset_name": "PANIFOUS LAURENT",
+          "normalized_value_eur": 218615.0,
+          "raw_source_value": "218615",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Gérard TERRIEN",
+          "publication_date": "2022-01-21",
+          "declaration_uuid": "d00d89a4-a201-455f-9993-d0f40a052c37",
+          "asset_section": "Life insurance",
+          "asset_name": "Gérard Terrien",
+          "normalized_value_eur": 210748.0,
+          "raw_source_value": "210748",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. MICHEL FOURNIER",
+          "publication_date": "2025-11-17",
+          "declaration_uuid": "acb6b55c-bacb-40f5-8cd0-1cdfe7699a17",
+          "asset_section": "Other assets",
+          "asset_name": "SCI [Données non publiées]",
+          "normalized_value_eur": 207381.0,
+          "raw_source_value": "207381",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. MICHEL FOURNIER",
+          "publication_date": "2026-03-20",
+          "declaration_uuid": "f7127e0a-c19a-4081-968f-bfa5e6a832dc",
+          "asset_section": "Other assets",
+          "asset_name": "SCI [Données non publiées]",
+          "normalized_value_eur": 207381.0,
+          "raw_source_value": "207381",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Sabrina ROUBACHE",
+          "publication_date": "2026-05-10",
+          "declaration_uuid": "56492a1d-8aab-4423-9593-11be3baeb4ef",
+          "asset_section": "Life insurance",
+          "asset_name": "Sabrina Agresti Roubache",
+          "normalized_value_eur": 200702.0,
+          "raw_source_value": "200702",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Sabrina ROUBACHE",
+          "publication_date": "2026-03-24",
+          "declaration_uuid": "a3f9180d-82df-470e-a281-d6fe8543dd15",
+          "asset_section": "Life insurance",
+          "asset_name": "Sabrina Agresti Roubache",
+          "normalized_value_eur": 200702.0,
+          "raw_source_value": "200702",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. LAURENT NUNEZ",
+          "publication_date": "2026-02-09",
+          "declaration_uuid": "323781a6-bd3b-4134-bf7e-30a963bfa27b",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 200000.0,
+          "raw_source_value": "200000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. LAURENT NUNEZ",
+          "publication_date": "2025-11-23",
+          "declaration_uuid": "e4e3a7c0-bed2-4549-81f5-35eaa9ce17e9",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 200000.0,
+          "raw_source_value": "200000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. MICHEL FOURNIER",
+          "publication_date": "2025-11-17",
+          "declaration_uuid": "acb6b55c-bacb-40f5-8cd0-1cdfe7699a17",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 200000.0,
+          "raw_source_value": "200000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. MICHEL FOURNIER",
+          "publication_date": "2026-03-20",
+          "declaration_uuid": "f7127e0a-c19a-4081-968f-bfa5e6a832dc",
+          "asset_section": "Real estate",
+          "asset_name": "Maison individuelle",
+          "normalized_value_eur": 200000.0,
+          "raw_source_value": "200000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "M. Patrick Wyon",
+          "publication_date": "2026-02-13",
+          "declaration_uuid": "792d05d3-70c2-444e-98e4-9b37ff6a75dc",
+          "asset_section": "Real estate",
+          "asset_name": "Appartement",
+          "normalized_value_eur": 200000.0,
+          "raw_source_value": "200000",
+          "source_item_index": 0
+        },
+        {
+          "declarant": "Mme Annie GENEVARD",
+          "publication_date": "2025-11-07",
+          "declaration_uuid": "697577ec-9c79-44f3-be24-137c680316ff",
+          "asset_section": "Real estate",
+          "asset_name": "maison secondaire chalet",
+          "normalized_value_eur": 200000.0,
+          "raw_source_value": "200000",
+          "source_item_index": 1
+        },
+        {
+          "declarant": "M. Gérard TERRIEN",
+          "publication_date": "2022-01-21",
+          "declaration_uuid": "d00d89a4-a201-455f-9993-d0f40a052c37",
+          "asset_section": "Bank accounts",
+          "asset_name": "COMPTE SUR LIVRET BFM",
+          "normalized_value_eur": 192252.0,
+          "raw_source_value": "192252",
+          "source_item_index": 3
+        }
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "assets_table",
+      "label": "HATVP normalized assets table",
+      "path": "gs://yahatvp-pipeline-eu-data/hatvp/silver/assets/snapshot_date=2026-08-17/data.parquet"
+    },
+    {
+      "id": "people_table",
+      "label": "HATVP normalized people table",
+      "path": "gs://yahatvp-pipeline-eu-data/hatvp/silver/people/snapshot_date=2026-08-17/data.parquet"
+    },
+    {
+      "id": "declarations_table",
+      "label": "HATVP normalized declarations table",
+      "path": "gs://yahatvp-pipeline-eu-data/hatvp/silver/declarations/snapshot_date=2026-08-17/data.parquet"
+    },
+    {
+      "id": "anomalies_table",
+      "label": "HATVP quarantine anomalies",
+      "path": "gs://yahatvp-pipeline-eu-data/hatvp/quarantine/snapshot_date=2026-08-17/anomalies.parquet"
+    },
+    {
+      "id": "outlier_analysis",
+      "label": "Joined statistical outlier analysis",
+      "query": {
+        "engine": "duckdb",
+        "description": "Joins assets, quarantine anomalies, people, and declarations on declaration_uuid; selects robust statistical asset outliers for snapshot 2026-08-17.",
+        "sql": "WITH flagged_assets AS (SELECT declaration_uuid, source_section, source_item_index, asset_name, raw_value, normalized_value FROM read_parquet('gs://yahatvp-pipeline-eu-data/hatvp/silver/assets/snapshot_date=2026-08-17/data.parquet') WHERE quality_reason LIKE 'robust statistical asset outlier%') SELECT a.*, p.civilite, p.prenom, p.nom, d.date_depot AS publication_date FROM flagged_assets a LEFT JOIN read_parquet('gs://yahatvp-pipeline-eu-data/hatvp/silver/people/snapshot_date=2026-08-17/data.parquet') p USING (declaration_uuid) LEFT JOIN read_parquet('gs://yahatvp-pipeline-eu-data/hatvp/silver/declarations/snapshot_date=2026-08-17/data.parquet') d USING (declaration_uuid) ORDER BY a.normalized_value DESC",
+        "language": "sql",
+        "executed_at": "2026-08-17T00:00:00Z",
+        "tables_used": [
+          "gs://yahatvp-pipeline-eu-data/hatvp/silver/assets/snapshot_date=2026-08-17/data.parquet",
+          "gs://yahatvp-pipeline-eu-data/hatvp/silver/people/snapshot_date=2026-08-17/data.parquet",
+          "gs://yahatvp-pipeline-eu-data/hatvp/silver/declarations/snapshot_date=2026-08-17/data.parquet",
+          "gs://yahatvp-pipeline-eu-data/hatvp/quarantine/snapshot_date=2026-08-17/anomalies.parquet"
+        ],
+        "filters": [
+          "snapshot_date = 2026-08-17",
+          "quality_reason = robust statistical asset outlier; retained for review",
+          "absolute robust z-score > 10"
+        ],
+        "metric_definitions": [
+          "Robust scale = 1.4826 × median absolute deviation over numeric assets.normalized_value.",
+          "Outlier share = flagged euro-denominated row-value sum divided by numeric euro-denominated asset row-value sum.",
+          "All monetary values are euro-denominated; publication_date is normalized declarations.date_depot."
+        ]
+      }
+    }
+  ]
+}

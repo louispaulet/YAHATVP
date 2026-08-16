@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-08-17 — Portable HTML outlier report
+
+### Added
+
+- Added the canonical report artifact and self-contained HTML version at
+  `reports/statistical-asset-outliers-2026-08-17.artifact.json` and
+  `reports/statistical-asset-outliers-2026-08-17.html`.
+- Added native charts for outliers by asset section, euro value band, and
+  highest-value declaration groups.
+- Marked monetary fields and table/chart axes as euro-denominated while
+  preserving raw source numeric text for fact checking.
+
+### Verified
+
+- Artifact validation passed with 22 blocks, 3 charts, 4 tables, and 4 metric
+  cards.
+- Portable builder verification passed at 1,440px and 390px viewports,
+  including source-dialog interaction and responsive checks.
+
+## 2026-08-17 — Statistical outlier report
+
+### Added
+
+- Added `reports/statistical-asset-outliers-2026-08-17.md`, a fact-checking
+  report for the 143 statistical asset outliers in the successful
+  `2026-08-17` snapshot.
+- Included declarant names, normalized publication dates, declaration UUIDs,
+  source sections, raw values, normalized values, and the full outlier register.
+
+### Verified
+
+- Confirmed all 143 flagged rows join to a declarant name and publication date
+  through `declaration_uuid`.
+
 ## 2026-08-16
 
 ### Added
