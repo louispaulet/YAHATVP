@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-17 — Statistical outlier report
+
+### Added
+
+- Added `reports/statistical-asset-outliers-2026-08-17.md`, a fact-checking
+  report for the 143 statistical asset outliers in the successful
+  `2026-08-17` snapshot.
+- Included declarant names, normalized publication dates, declaration UUIDs,
+  source sections, raw values, normalized values, and the full outlier register.
+
+### Verified
+
+- Confirmed all 143 flagged rows join to a declarant name and publication date
+  through `declaration_uuid`.
+
 ## 2026-08-16
 
 ### Added
