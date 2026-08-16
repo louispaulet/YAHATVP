@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<declarations>
+  <declaration>
+    <dateDepot>01/08/2026 08:30:00</dateDepot>
+    <uuid>fixture-no-assets</uuid>
+    <general><declarant><nom>NONE</nom><prenom>Assets</prenom></declarant></general>
+  </declaration>
+  <declaration>
+    <dateDepot>02/08/2026 08:30:00</dateDepot>
+    <uuid>fixture-no-income</uuid>
+    <general><declarant><nom>NONE</nom><prenom>Income</prenom></declarant></general>
+    <comptesBancaireDto>
+      <items><items><typeCompte>Compte courant</typeCompte><valeur>1 000,00</valeur></items></items>
+    </comptesBancaireDto>
+  </declaration>
+  <declaration>
+    <dateDepot>03/08/2026 08:30:00</dateDepot>
+    <uuid>fixture-no-mandate</uuid>
+    <general><declarant><nom>NONE</nom><prenom>Mandate</prenom></declarant></general>
+    <revenuMandatDto>
+      <items>
+        <items>
+          <annee>2025</annee>
+          <revenuMandatItem0><typeRevenu>Traitement</typeRevenu><revenuElu>2 000,00</revenuElu></revenuMandatItem0>
+        </items>
+      </items>
+    </revenuMandatDto>
+  </declaration>
+  <declaration>
+    <dateDepot>04/08/2026 08:30:00</dateDepot>
+    <uuid>fixture-no-general</uuid>
+  </declaration>
+</declarations>

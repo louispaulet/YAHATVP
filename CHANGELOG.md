@@ -41,5 +41,29 @@
 - Configure and manually validate the weekly Europe/Paris Cloud Scheduler
   trigger.
 - Decide whether to enable and validate BigQuery.
-- Run the remaining local hardening tests, including `NO_CHANGE`, failure-state
-  preservation, immutable snapshot conflicts, and row-count regression checks.
+
+## 2026-08-16 — Local hardening
+
+### Added
+
+- Added fixtures covering all observed asset DTO sections, liabilities, empty
+  optional declaration sections, and missing `general` blocks.
+- Added regression tests for changed XML/CSV hashes, BigQuery state-update
+  gating, immutable same-date raw snapshots, catastrophic row-count reductions,
+  negative asset flags, and required XML top-level structure.
+
+### Changed
+
+- Added streaming checks for the required XML root and top-level declaration
+  container before declaration normalization.
+- Made row-count checks explicit and limited them to the previous successful
+  quality report.
+- Documented normalized table grains, important fields, and first-snapshot
+  quality triage in the README.
+
+### Verified
+
+- Focused parser, quality, and pipeline tests pass: 17 tests.
+- Live quality report review classified repeated names and asset outliers as
+  retained review flags, negative bank balances as source-valid-but-flagged,
+  and duplicate declaration UUIDs as actionable.

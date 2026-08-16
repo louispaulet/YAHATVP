@@ -9,6 +9,9 @@ from lxml import etree
 
 from .normalize import normalize_text, parse_date, parse_french_number, raw_text
 
+XML_ROOT_NAME = "declarations"
+ALLOWED_TOP_LEVEL_CHILDREN = {"declaration", "declarations"}
+
 
 def _local_name(tag: str) -> str:
     return tag.rsplit("}", 1)[-1]
@@ -451,7 +454,7 @@ def parse_xml(path: Path, snapshot_date: str) -> dict[str, list[dict[str, Any]]]
     tables = _empty_tables()
     context = etree.iterparse(
         str(path),
-        events=("end",),
+        events=("start", "end"),
         recover=False,
         huge_tree=True,
         load_dtd=False,
@@ -459,8 +462,25 @@ def parse_xml(path: Path, snapshot_date: str) -> dict[str, list[dict[str, Any]]]
         resolve_entities=False,
     )
     declaration_count = 0
+    root: etree._Element | None = None
+    top_level_child_count = 0
     try:
-        for _, element in context:
+        for event, element in context:
+            if event == "start":
+                if root is None:
+                    root = element
+                    if _local_name(element.tag) != XML_ROOT_NAME:
+                        raise ValueError(
+                            f"HATVP XML has unexpected root element: {_local_name(element.tag)}"
+                        )
+                    continue
+                if element.getparent() is root:
+                    top_level_child_count += 1
+                    child_name = _local_name(element.tag)
+                    if child_name not in ALLOWED_TOP_LEVEL_CHILDREN:
+                        raise ValueError(f"HATVP XML has invalid top-level element: {child_name}")
+                continue
+
             if _local_name(element.tag) != "declaration":
                 continue
             declaration_count += 1
@@ -480,6 +500,10 @@ def parse_xml(path: Path, snapshot_date: str) -> dict[str, list[dict[str, Any]]]
                     del parent[0]
     except etree.XMLSyntaxError as exc:
         raise ValueError(f"HATVP XML is malformed: {exc}") from exc
+    if root is None:
+        raise ValueError("HATVP XML is empty")
+    if top_level_child_count == 0:
+        raise ValueError("HATVP XML has no top-level declaration container")
     if declaration_count == 0:
         raise ValueError("HATVP XML contains no declaration records")
     return tables

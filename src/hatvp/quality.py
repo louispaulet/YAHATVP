@@ -9,6 +9,9 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+CATASTROPHIC_ROW_COUNT_THRESHOLD = 0.5
+MINIMUM_PREVIOUS_ROWS_FOR_COUNT_CHECK = 20
+
 
 @dataclass
 class QualityResult:
@@ -51,8 +54,12 @@ def _duplicate_count(rows: list[dict[str, Any]], key: str) -> int:
     return sum(count - 1 for count in Counter(values).values() if count > 1)
 
 
-def _count_changes(current: int, previous: int | None) -> bool:
-    return previous is not None and previous > 20 and current < previous * 0.5
+def _has_catastrophic_row_count_reduction(current: int, previous: int | None) -> bool:
+    return (
+        previous is not None
+        and previous >= MINIMUM_PREVIOUS_ROWS_FOR_COUNT_CHECK
+        and current < previous * CATASTROPHIC_ROW_COUNT_THRESHOLD
+    )
 
 
 def _robust_outliers(
@@ -232,13 +239,16 @@ def run_quality_checks(
                 field: round(sum(row.get(field) is None for row in rows) / len(rows), 6)
                 for field in fields
             }
-    previous_counts = (previous_report or {}).get("counts", {})
-    drastic_changes = 0
+    previous_counts = {}
+    if previous_report and previous_report.get("status") in {"ok", "warning"}:
+        previous_counts = previous_report.get("counts", {})
+    catastrophic_reductions = 0
     for name, count in counts.items():
-        if _count_changes(count, previous_counts.get(name)):
-            drastic_changes += 1
-            checks[f"drastic_reduction_{name}"] = 1
-    warnings += drastic_changes
+        if _has_catastrophic_row_count_reduction(count, previous_counts.get(name)):
+            catastrophic_reductions += 1
+            checks[f"catastrophic_row_count_reduction_{name}"] = 1
+    checks["catastrophic_row_count_reductions"] = catastrophic_reductions
+    warnings += catastrophic_reductions
 
     status = "error" if errors else "warning" if warnings else "ok"
     report = {

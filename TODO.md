@@ -50,16 +50,22 @@ Workload Identity Federation, not a stored key.
 
 ## 1. Harden the local implementation before cloud deployment
 
-- [ ] Review the current live quality report and decide which warnings are expected versus actionable.
-- [ ] Add fixtures for each observed asset DTO: real estate, bank accounts, insurance, securities, vehicles, liabilities, and foreign assets.
-- [ ] Add fixtures for declarations with no assets, no income, no mandate, and missing optional `general` sections.
-- [ ] Add tests proving a changed XML hash triggers processing and a changed CSV hash triggers processing.
-- [ ] Add a test proving BigQuery failure cannot advance `state/latest.json`.
-- [ ] Add a test proving an immutable raw snapshot rejects different bytes for the same snapshot date.
-- [ ] Add explicit catastrophic row-count reduction checks against the previous successful report.
-- [ ] Add explicit required top-level XML structure checks before normalization.
-- [ ] Decide whether any current negative asset values are source-valid or should remain flagged.
-- [ ] Document the meaning of each normalized table and important field in the README.
+- [x] Review the current live quality report and decide which warnings are expected versus actionable.
+- [x] Add fixtures for each observed asset DTO: real estate, bank accounts, insurance, securities, vehicles, liabilities, and foreign assets.
+- [x] Add fixtures for declarations with no assets, no income, no mandate, and missing optional `general` sections.
+- [x] Add tests proving a changed XML hash triggers processing and a changed CSV hash triggers processing.
+- [x] Add a test proving BigQuery failure cannot advance `state/latest.json`.
+- [x] Add a test proving an immutable raw snapshot rejects different bytes for the same snapshot date.
+- [x] Add explicit catastrophic row-count reduction checks against the previous successful report.
+- [x] Add explicit required top-level XML structure checks before normalization.
+- [x] Decide whether any current negative asset values are source-valid or should remain flagged.
+- [x] Document the meaning of each normalized table and important field in the README.
+
+Quality triage for the first production snapshot (`2026-08-16`): repeated names
+and robust asset outliers remain review flags because they are plausible source
+patterns; the nine negative bank-account balances are consistent with
+overdrafts, so they remain flagged and retained; six duplicate declaration UUID
+groups are actionable source-quality issues.
 
 Required local checks:
 
