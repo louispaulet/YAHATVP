@@ -81,6 +81,23 @@ def test_parser_handles_empty_optional_declaration_sections() -> None:
     assert missing_general_person["prenom"] is None
 
 
+def test_parser_excludes_empty_income_slots_and_uses_total_fallback() -> None:
+    tables = parse_xml(FIXTURES / "income_slots.xml", "2026-08-16")
+
+    assert len(tables["incomes"]) == 2
+    assert [row["income_type"] for row in tables["incomes"]] == [
+        "Traitements, salaires",
+        "totalElu",
+    ]
+    assert [row["normalized_value"] for row in tables["incomes"]] == [10000.0, 12000.0]
+
+    by_uuid = {row["declaration_uuid"]: row for row in tables["declarations"]}
+    assert by_uuid["fixture-income-slots"]["income_section_present"] is True
+    assert by_uuid["fixture-income-slots"]["income_section_populated_item_count"] == 2
+    assert by_uuid["fixture-empty-income-section"]["income_section_present"] is True
+    assert by_uuid["fixture-empty-income-section"]["income_section_populated_item_count"] == 0
+
+
 def test_parser_rejects_invalid_top_level_structure_before_normalization(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -48,6 +48,27 @@ def test_duplicate_stable_identifier_is_reported() -> None:
     assert result.report["quality"]["warnings"] > 0
 
 
+def test_income_coverage_is_reported_separately_from_row_count() -> None:
+    tables = _tables()
+    tables["declarations"][0].update(
+        {"income_section_present": True, "income_section_populated_item_count": 0}
+    )
+    tables["declarations"][1].update(
+        {"income_section_present": True, "income_section_populated_item_count": 1}
+    )
+    tables["incomes"][0].update({"raw_value": "20 000 001", "spouse_raw_value": None})
+
+    result = run_quality_checks(tables, snapshot_date="2026-08-16")
+
+    assert result.report["counts"]["incomes"] == 1
+    assert result.report["checks"]["income_section_declarations"] == 2
+    assert result.report["checks"]["income_declarations"] == 1
+    assert result.report["checks"]["income_rows_with_source_value"] == 1
+    assert result.report["checks"]["income_rows_with_numeric_value"] == 1
+    assert result.report["checks"]["income_sections_without_rows"] == 1
+    assert result.report["quality"]["warnings"] > 0
+
+
 def test_catastrophic_row_count_reduction_is_explicitly_reported() -> None:
     result = run_quality_checks(
         _tables(),

@@ -74,6 +74,21 @@ def _first_key_containing(values: dict[str, str | None], *parts: str) -> str | N
     return None
 
 
+def _income_item_has_value(item: etree._Element) -> bool:
+    values = _flatten_leaf_values(item)
+    category_nodes = [
+        child for child in item if _local_name(child.tag).startswith("revenuMandatItem")
+    ]
+    for category in category_nodes:
+        category_values = _flatten_leaf_values(category)
+        if (
+            category_values.get("revenuElu") is not None
+            or category_values.get("revenuConjoint") is not None
+        ):
+            return True
+    return values.get("totalElu") is not None or values.get("totalConjoint") is not None
+
+
 def _raw_record(values: dict[str, str | None]) -> str:
     return json.dumps(values, ensure_ascii=False, sort_keys=True)
 
@@ -89,6 +104,7 @@ def _declaration_row(declaration: etree._Element, snapshot_date: str) -> dict[st
     mandate = _child(general, "mandat")
     quality_mandate = _child(general, "qualiteMandat")
     organ = _child(general, "organe")
+    income_section = _child(declaration, "revenuMandatDto")
 
     date_depot_raw = _raw_child_text(declaration, "dateDepot")
     date_debut_raw = _raw_child_text(general, "dateDebutMandat")
@@ -104,6 +120,10 @@ def _declaration_row(declaration: etree._Element, snapshot_date: str) -> dict[st
         "declaration_version": _normalized_child_text(declaration, "declarationVersion"),
         "declaration_type_id": _normalized_child_text(declaration_type, "id"),
         "declaration_type_label": _normalized_child_text(declaration_type, "label"),
+        "income_section_present": income_section is not None,
+        "income_section_populated_item_count": sum(
+            _income_item_has_value(item) for item in _item_groups(income_section)
+        ),
         "mandat_label": _normalized_child_text(mandate, "label")
         or _normalized_child_text(general, "mandat"),
         "mandat_type": _normalized_child_text(quality_mandate, "typeMandat"),
@@ -373,10 +393,14 @@ def _income_rows(declaration: etree._Element, snapshot_date: str) -> list[dict[s
         category_nodes = [
             child for child in item if _local_name(child.tag).startswith("revenuMandatItem")
         ]
+        populated_category_count = 0
         for category_index, category in enumerate(category_nodes):
             category_values = _flatten_leaf_values(category)
             raw_value = category_values.get("revenuElu")
             spouse_raw = category_values.get("revenuConjoint")
+            if raw_value is None and spouse_raw is None:
+                continue
+            populated_category_count += 1
             rows.append(
                 {
                     "declaration_uuid": declaration_uuid,
@@ -395,8 +419,13 @@ def _income_rows(declaration: etree._Element, snapshot_date: str) -> list[dict[s
                     "raw_record_json": _raw_record(category_values),
                 }
             )
-        if not category_nodes and values.get("totalElu") is not None:
+        if populated_category_count == 0:
             raw_value = values.get("totalElu")
+            spouse_raw = values.get("totalConjoint")
+        else:
+            raw_value = None
+            spouse_raw = None
+        if raw_value is not None or spouse_raw is not None:
             rows.append(
                 {
                     "declaration_uuid": declaration_uuid,
@@ -408,8 +437,8 @@ def _income_rows(declaration: etree._Element, snapshot_date: str) -> list[dict[s
                     "income_type": "totalElu",
                     "raw_value": raw_value,
                     "normalized_value": parse_french_number(raw_value),
-                    "spouse_raw_value": values.get("totalConjoint"),
-                    "spouse_normalized_value": parse_french_number(values.get("totalConjoint")),
+                    "spouse_raw_value": spouse_raw,
+                    "spouse_normalized_value": parse_french_number(spouse_raw),
                     "quality_status": "OK",
                     "quality_reason": None,
                     "raw_record_json": _raw_record(values),

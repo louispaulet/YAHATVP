@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<declarations>
+  <declaration>
+    <dateDepot>01/08/2026 08:30:00</dateDepot>
+    <uuid>fixture-income-slots</uuid>
+    <general>
+      <typeDeclaration><id>DSPFM</id><label>Situation patrimoniale de fin de mandat</label></typeDeclaration>
+      <declarant><nom>INCOME</nom><prenom>Slots</prenom></declarant>
+    </general>
+    <revenuMandatDto>
+      <items>
+        <items>
+          <annee>2025</annee>
+          <revenuMandatItem0>
+            <typeRevenu>Indemnités d'élu</typeRevenu>
+            <revenuElu/>
+            <revenuConjoint/>
+          </revenuMandatItem0>
+          <revenuMandatItem1>
+            <typeRevenu>Traitements, salaires</typeRevenu>
+            <revenuElu>10 000,00</revenuElu>
+            <revenuConjoint/>
+          </revenuMandatItem1>
+        </items>
+        <items>
+          <annee>2026</annee>
+          <revenuMandatItem0>
+            <typeRevenu>Indemnités d'élu</typeRevenu>
+            <revenuElu/>
+            <revenuConjoint/>
+          </revenuMandatItem0>
+          <totalElu>12 000,00</totalElu>
+        </items>
+      </items>
+      <neant>false</neant>
+    </revenuMandatDto>
+  </declaration>
+  <declaration>
+    <dateDepot>02/08/2026 08:30:00</dateDepot>
+    <uuid>fixture-empty-income-section</uuid>
+    <general>
+      <typeDeclaration><id>DSP</id><label>Situation patrimoniale</label></typeDeclaration>
+      <declarant><nom>INCOME</nom><prenom>Empty</prenom></declarant>
+    </general>
+    <revenuMandatDto>
+      <items><items/></items>
+      <neant>false</neant>
+    </revenuMandatDto>
+  </declaration>
+</declarations>

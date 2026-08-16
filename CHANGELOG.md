@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-17 — Correct income row counting and coverage reporting
+
+### Changed
+
+- Excluded empty fixed income category slots from the normalized `incomes`
+  table while retaining source values and the `totalElu` fallback.
+- Added declaration-level income-section presence and populated-item metadata.
+- Added quality checks for income sections, distinct income declarations, source
+  values, numeric values, and empty income sections.
+
+### Verified
+
+- The live 2026-08-17 XML replay changed the income table from 198 category
+  slots to 66 populated rows, across 9 declarations; 55 declarations contain
+  the income section and 46 of those sections have no populated rows.
+- Focused parser and quality tests pass: 12 tests.
+
 ## 2026-08-17 — Portable HTML outlier report
 
 ### Added

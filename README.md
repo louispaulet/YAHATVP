@@ -210,6 +210,9 @@ Checks should cover:
 - expected columns and data types;
 - required identifiers and uniqueness where appropriate;
 - declaration, people, income, and asset row counts;
+- source-aware income coverage: declarations with an income section, declarations
+  with populated income rows, populated numeric income rows, and empty income
+  sections;
 - null rates and drastic changes from the previous snapshot;
 - duplicate stable identifiers;
 - negative values where a value is semantically impossible;
@@ -266,7 +269,7 @@ parsed numeric value; parsing does not imply that a value is valid.
 | `mandates` | One row per general or elected-mandate section item. | `source_section`, description, dates, employer, remuneration |
 | `activities` | One row per professional, consulting, spouse, volunteer, or collaborator activity. | `source_section`, description, employer, dates, remuneration |
 | `participations` | One row per financial or management participation. | Company, valuation, capital held, number of shares, raw record |
-| `incomes` | One row per declared income category and year. | `income_year`, `income_type`, `raw_value`, `normalized_value`, spouse value |
+| `incomes` | One row per declared income category and year that has a source value; empty category slots are excluded. | `income_year`, `income_type`, `raw_value`, `normalized_value`, spouse value |
 | `assets` | One row per observed asset DTO item, including bank accounts, insurance, securities, vehicles, and foreign assets. | `source_section`, asset name, `raw_value`, `normalized_value`, quality fields |
 | `liabilities` | One row per declared debt or liability item. | `source_section`, description, `raw_value`, `normalized_value`, raw record |
 
@@ -279,6 +282,15 @@ asset values are skewed. The nine negative asset values are small negative
 bank-account balances consistent with overdrafts; they are source-valid for
 retention but remain flagged. The six duplicate declaration UUID groups are
 actionable source-quality issues and require investigation if they recur.
+
+Income coverage is source-dependent. The `incomes` table is derived only from
+the XML `revenuMandatDto` section, not from every declaration or from
+remuneration fields in the mandates and activities tables. Empty fixed category
+slots are not counted as income rows. The quality report separately records
+`income_section_declarations`, `income_declarations`,
+`income_rows_with_numeric_value`, and `income_sections_without_rows` so a low
+source population is visible without treating interest-only declarations as
+parser failures.
 
 ## Configuration
 

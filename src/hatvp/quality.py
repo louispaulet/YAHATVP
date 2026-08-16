@@ -182,6 +182,33 @@ def run_quality_checks(
             checks[f"orphan_{table_name}"] = missing_refs
             errors += missing_refs
 
+    income_section_declarations = sum(
+        row.get("income_section_present") is True for row in declarations
+    )
+    income_declarations = len(
+        {row.get("declaration_uuid") for row in incomes if row.get("declaration_uuid")}
+    )
+    income_rows_with_source_value = sum(
+        row.get("raw_value") is not None or row.get("spouse_raw_value") is not None
+        for row in incomes
+    )
+    income_rows_with_numeric_value = sum(
+        isinstance(row.get("normalized_value"), (int, float))
+        or isinstance(row.get("spouse_normalized_value"), (int, float))
+        for row in incomes
+    )
+    income_sections_without_rows = sum(
+        row.get("income_section_present") is True
+        and row.get("income_section_populated_item_count") == 0
+        for row in declarations
+    )
+    checks["income_section_declarations"] = income_section_declarations
+    checks["income_declarations"] = income_declarations
+    checks["income_rows_with_source_value"] = income_rows_with_source_value
+    checks["income_rows_with_numeric_value"] = income_rows_with_numeric_value
+    checks["income_sections_without_rows"] = income_sections_without_rows
+    warnings += income_sections_without_rows
+
     huge_income = 0
     negative_income = 0
     for row in incomes:

@@ -59,6 +59,7 @@ Workload Identity Federation, not a stored key.
 - [x] Add a test proving an immutable raw snapshot rejects different bytes for the same snapshot date.
 - [x] Add explicit catastrophic row-count reduction checks against the previous successful report.
 - [x] Add explicit required top-level XML structure checks before normalization.
+- [x] Exclude empty income category slots and report source-aware income coverage.
 - [x] Decide whether any current negative asset values are source-valid or should remain flagged.
 - [x] Document the meaning of each normalized table and important field in the README.
 
