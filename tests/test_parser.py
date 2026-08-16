@@ -69,6 +69,9 @@ def test_parser_handles_empty_optional_declaration_sections() -> None:
         "fixture-no-general",
     }
     assert not [row for row in tables["assets"] if row["declaration_uuid"] == "fixture-no-assets"]
+    assert not [
+        row for row in tables["liabilities"] if row["declaration_uuid"] == "fixture-no-assets"
+    ]
     assert not [row for row in tables["incomes"] if row["declaration_uuid"] == "fixture-no-income"]
     assert not [
         row for row in tables["mandates"] if row["declaration_uuid"] == "fixture-no-mandate"

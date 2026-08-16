@@ -4,6 +4,8 @@
     <dateDepot>01/08/2026 08:30:00</dateDepot>
     <uuid>fixture-no-assets</uuid>
     <general><declarant><nom>NONE</nom><prenom>Assets</prenom></declarant></general>
+    <sciDto><items/><neant>true</neant></sciDto>
+    <passifDto><items><items/></items><neant>true</neant></passifDto>
   </declaration>
   <declaration>
     <dateDepot>02/08/2026 08:30:00</dateDepot>

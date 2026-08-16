@@ -44,7 +44,9 @@ def _item_groups(section: etree._Element | None) -> list[etree._Element]:
     if container is None:
         return []
     nested = _children(container, "items")
-    return nested or [container]
+    if nested:
+        return [item for item in nested if len(item) or raw_text(item.text) is not None]
+    return [container] if len(container) or raw_text(container.text) is not None else []
 
 
 def _flatten_leaf_values(element: etree._Element, prefix: str = "") -> dict[str, str | None]:
