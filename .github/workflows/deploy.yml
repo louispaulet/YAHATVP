@@ -36,8 +36,55 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run pytest
 
-  deploy:
+  deployment-config:
     needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check deployment configuration
+        env:
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}
+          ARTIFACT_REPOSITORY: ${{ vars.ARTIFACT_REPOSITORY }}
+          CLOUD_RUN_JOB: ${{ vars.CLOUD_RUN_JOB }}
+          HATVP_BUCKET: ${{ vars.HATVP_BUCKET }}
+          HATVP_RUNTIME_SERVICE_ACCOUNT: ${{ vars.HATVP_RUNTIME_SERVICE_ACCOUNT }}
+          WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+          DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+        run: |
+          missing=()
+          for variable in \
+            GCP_PROJECT_ID \
+            GCP_REGION \
+            ARTIFACT_REPOSITORY \
+            CLOUD_RUN_JOB \
+            HATVP_BUCKET \
+            HATVP_RUNTIME_SERVICE_ACCOUNT \
+            WIF_PROVIDER \
+            DEPLOY_SERVICE_ACCOUNT; do
+            if [ -z "${!variable}" ]; then
+              missing+=("$variable")
+            fi
+          done
+
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::notice title=Cloud deployment skipped::Configure the missing repository variables before enabling deployment: ${missing[*]}"
+          else
+            echo "All Cloud deployment variables are configured."
+          fi
+
+  deploy:
+    needs: [test, deployment-config]
+    if: >-
+      ${{
+        vars.GCP_PROJECT_ID != '' &&
+        vars.GCP_REGION != '' &&
+        vars.ARTIFACT_REPOSITORY != '' &&
+        vars.CLOUD_RUN_JOB != '' &&
+        vars.HATVP_BUCKET != '' &&
+        vars.HATVP_RUNTIME_SERVICE_ACCOUNT != '' &&
+        vars.GCP_WIF_PROVIDER != '' &&
+        vars.GCP_DEPLOY_SERVICE_ACCOUNT != ''
+      }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
