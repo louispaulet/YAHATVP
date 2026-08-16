@@ -108,7 +108,8 @@ jobs:
         env:
           IMAGE: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/hatvp:${{ github.sha }}
         run: |
-          gcloud builds submit --tag "$IMAGE" .
+          docker build --tag "$IMAGE" .
+          docker push "$IMAGE"
 
       - name: Deploy Cloud Run Job
         env:
