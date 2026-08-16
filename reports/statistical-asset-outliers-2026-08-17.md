@@ -14,9 +14,9 @@
 
 ## Executive summary
 
-The pipeline flagged **143 asset rows** as statistical outliers among **1,156 numeric asset rows** (12.4%). All 143 are high-side outliers: the smallest flagged value is €192 252 and the largest is €6 719 662.
+The pipeline flagged **143 asset rows** as statistical outliers among **1,156 numeric euro-denominated asset rows** (12.4%). All 143 are high-side outliers: the smallest flagged value is €192 252 and the largest is €6 719 662.
 
-The flagged rows sum to **€99 617 179**, compared with €124 440 950 across all numeric asset values. This is 80.1% of numeric row-value total; it is **not** a share of household wealth because rows may represent partial interests, overlapping declarations, or different valuation concepts.
+The flagged rows sum to **€99 617 179**, compared with €124 440 950 across all numeric euro-denominated asset values. This is 80.1% of numeric row-value total; it is **not** a share of household wealth because rows may represent partial interests, overlapping declarations, or different valuation concepts.
 
 Every flagged row was joined to the normalized `people` and `declarations` tables using `declaration_uuid`, so the register below includes the declarant and publication date for fact-checking.
 
@@ -26,19 +26,19 @@ Every flagged row was joined to the normalized `people` and `declarations` table
 | --- | ---: |
 | Total asset rows | 1,376 |
 | Numeric asset rows | 1,156 |
-| Median asset value | €12 000 |
-| Median absolute deviation (MAD) | €11 878 |
-| Robust scale (1.4826 × MAD) | €17 610 |
-| High-side cutoff | €188 103 |
-| Low-side cutoff | €-164 103 |
-| Minimum flagged value | €192 252 |
-| Median flagged value | €410 000 |
-| Maximum flagged value | €6 719 662 |
+| Median asset value (€) | €12 000 |
+| Median absolute deviation (MAD, €) | €11 878 |
+| Robust scale (1.4826 × MAD, €) | €17 610 |
+| High-side cutoff (€) | €188 103 |
+| Low-side cutoff (€) | €-164 103 |
+| Minimum flagged value (€) | €192 252 |
+| Median flagged value (€) | €410 000 |
+| Maximum flagged value (€) | €6 719 662 |
 | Missing asset names | 5 |
 
 ## Outliers by asset section
 
-| Asset section | Flagged rows | Share of outliers | Flagged value sum |
+| Asset section | Flagged rows | Share of outliers | Flagged value sum (€) |
 | --- | ---: | ---: | ---: |
 | Real estate | 86 | 60.1% | €57 222 895 |
 | Life insurance | 30 | 21.0% | €16 934 782 |
@@ -53,7 +53,7 @@ Real estate dominates the count and value of the flags. The detector is distribu
 
 ## Outliers by value band
 
-| Value band | Flagged rows | Flagged value sum |
+| Value band | Flagged rows | Flagged value sum (€) |
 | --- | ---: | ---: |
 | €188k–€250k | 29 | €6 280 554 |
 | €250k–€500k | 52 | €18 337 276 |
@@ -66,7 +66,7 @@ Real estate dominates the count and value of the flags. The detector is distribu
 
 Grouped by declarant, normalized publication date, and declaration UUID. These are useful starting points for source-level fact checks.
 
-| Declarant | Publication date | Declaration UUID | Flagged rows | Flagged value sum | Maximum flagged value |
+| Declarant | Publication date | Declaration UUID | Flagged rows | Flagged value sum (€) | Maximum flagged value (€) |
 | --- | --- | --- | ---: | ---: | ---: |
 | M. Serge Papin | 2025-12-05 | `bd19a0d5-eb22-4649-bb6b-e8d77ff89118` | 4 | €9 007 307 | €6 719 662 |
 | M. Serge Papin | 2026-02-17 | `307a6524-c8a6-4e5c-92b0-731029d15b19` | 4 | €8 382 307 | €6 719 662 |
@@ -91,7 +91,7 @@ Grouped by declarant, normalized publication date, and declaration UUID. These a
 
 ## Highest-value individual rows
 
-| Declarant | Publication date | Asset section | Asset name | Value | Declaration UUID |
+| Declarant | Publication date | Asset section | Asset name | Value (€) | Declaration UUID |
 | --- | --- | --- | --- | ---: | --- |
 | M. Serge Papin | 2026-02-17 | Unlisted securities | FINAPA | €6 719 662 | `307a6524-c8a6-4e5c-92b0-731029d15b19` |
 | M. Serge Papin | 2025-12-05 | Unlisted securities | FINAPA | €6 719 662 | `bd19a0d5-eb22-4649-bb6b-e8d77ff89118` |
@@ -116,9 +116,9 @@ Grouped by declarant, normalized publication date, and declaration UUID. These a
 
 ## Full outlier register
 
-The publication date is the normalized `declarations.date_depot` value. The raw source deposit timestamp remains available in `date_depot_raw` in the declarations table. `Source item index` identifies the item position within its source XML section.
+All monetary values in this report are euros. The raw source values preserve the source numeric text and are euro-denominated asset values. The publication date is the normalized `declarations.date_depot` value. The raw source deposit timestamp remains available in `date_depot_raw` in the declarations table. `Source item index` identifies the item position within its source XML section.
 
-| # | Declarant | Publication date | Declaration UUID | Asset section | Asset name | Normalized value | Raw source value | Source item index |
+| # | Declarant | Publication date | Declaration UUID | Asset section | Asset name | Normalized value (€) | Raw source value (€) | Source item index |
 | ---: | --- | --- | --- | --- | --- | ---: | --- | ---: |
 | 1 | M. Serge Papin | 2026-02-17 | `307a6524-c8a6-4e5c-92b0-731029d15b19` | Unlisted securities | FINAPA | €6 719 662 | `6719662` | 0 |
 | 2 | M. Serge Papin | 2025-12-05 | `bd19a0d5-eb22-4649-bb6b-e8d77ff89118` | Unlisted securities | FINAPA | €6 719 662 | `6719662` | 0 |
