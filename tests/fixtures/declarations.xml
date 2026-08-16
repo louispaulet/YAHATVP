@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<declarations>
+  <declarations>
+    <declaration>
+      <dateDepot>01/12/2025 08:30:00</dateDepot>
+      <uuid>fixture-uuid-1</uuid>
+      <origine>ADEL</origine>
+      <complete>true</complete>
+      <declarationVersion>20171221</declarationVersion>
+      <mandatElectifDto>
+        <items>
+          <items>
+            <descriptionMandat>Maire</descriptionMandat>
+            <commentaire/>
+            <dateDebut>01/2020</dateDebut>
+            <dateFin/>
+            <remuneration>
+              <brutNet>brut</brutNet>
+              <montant>50 000,00</montant>
+              <annee>2025</annee>
+            </remuneration>
+          </items>
+        </items>
+        <neant>false</neant>
+      </mandatElectifDto>
+      <participationFinanciereDto>
+        <items>
+          <items>
+            <nomSociete>ACME</nomSociete>
+            <evaluation>1 200,50</evaluation>
+            <nombreParts>10</nombreParts>
+          </items>
+        </items>
+        <neant>false</neant>
+      </participationFinanciereDto>
+      <comptesBancaireDto>
+        <items>
+          <items>
+            <typeCompte>Compte courant</typeCompte>
+            <etablissement>Banque</etablissement>
+            <valeur>12 345,67</valeur>
+          </items>
+        </items>
+        <neant>false</neant>
+      </comptesBancaireDto>
+      <revenuMandatDto>
+        <items>
+          <items>
+            <annee>2025</annee>
+            <revenuMandatItem0>
+              <typeRevenu>Traitements, salaires</typeRevenu>
+              <revenuElu>12 000,00</revenuElu>
+              <revenuConjoint/>
+            </revenuMandatItem0>
+          </items>
+        </items>
+        <neant>false</neant>
+      </revenuMandatDto>
+      <general>
+        <typeDeclaration>
+          <id>DI</id>
+          <label>Déclaration d'intérêts</label>
+        </typeDeclaration>
+        <mandat>
+          <label>Élu local</label>
+        </mandat>
+        <qualiteMandat>
+          <typeMandat>Élu municipal</typeMandat>
+          <codCategorieMandat>LOC</codCategorieMandat>
+        </qualiteMandat>
+        <organe>
+          <codeOrgane>75</codeOrgane>
+          <labelOrgane>Paris</labelOrgane>
+        </organe>
+        <qualiteDeclarant>Maire</qualiteDeclarant>
+        <dateDebutMandat>01/01/2020</dateDebutMandat>
+        <declarationModificative>false</declarationModificative>
+        <declarant>
+          <civilite>M.</civilite>
+          <nom>DUPONT</nom>
+          <prenom>Alice</prenom>
+          <email>[Données non publiées]</email>
+          <dateNaissance>02/03/1980</dateNaissance>
+          <adresseDec>
+            <voie>[Données non publiées]</voie>
+            <codePostal>75000</codePostal>
+            <ville>Paris</ville>
+            <pays>France</pays>
+          </adresseDec>
+        </declarant>
+      </general>
+    </declaration>
+    <declaration>
+      <dateDepot>02/12/2025 08:30:00</dateDepot>
+      <uuid>fixture-uuid-2</uuid>
+      <origine>ADEL</origine>
+      <complete>true</complete>
+      <declarationVersion>20171221</declarationVersion>
+      <general>
+        <typeDeclaration><id>DI</id><label>Déclaration d'intérêts</label></typeDeclaration>
+        <mandat><label>Élu local</label></mandat>
+        <declarant>
+          <civilite>Mme</civilite>
+          <nom>DUPONT</nom>
+          <prenom>Alice</prenom>
+          <dateNaissance>03/04/1981</dateNaissance>
+        </declarant>
+      </general>
+    </declaration>
+  </declarations>
+</declarations>

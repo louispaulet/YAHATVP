@@ -4,16 +4,16 @@ Yet Another HATVP Project: a small, auditable weekly ingestion pipeline for the
 French Haute Autorité pour la Transparence de la Vie Publique (HATVP) open-data
 datasets.
 
-> Project status: bootstrap documentation. The implementation should be added
-> incrementally, beginning with source-schema inspection and a local end-to-end
-> path before enabling Google Cloud services.
+> Project status: the local end-to-end path is implemented and has been exercised
+> against the current public HATVP files. GCS, Cloud Run, Scheduler, and
+> BigQuery deployment still require a Google Cloud project and credentials.
 
 ## Goal
 
-Once implemented, the pipeline will download the two public HATVP datasets,
-detect changes using SHA-256 hashes, preserve immutable raw snapshots, produce
-normalized Parquet datasets, report data-quality issues, and optionally publish
-curated tables to BigQuery.
+The pipeline downloads the two public HATVP datasets, detects changes using
+SHA-256 hashes, preserves immutable raw snapshots, produces normalized Parquet
+datasets, reports data-quality issues, and optionally publishes curated tables
+to BigQuery.
 
 The pipeline is deliberately small. It runs once per week as a Cloud Run Job;
 Cloud Scheduler is only the trigger. GitHub Actions is used for CI/CD and
@@ -88,7 +88,7 @@ Keep parsing separate from normalization, and use streaming XML parsing such as
 
 ## Repository layout
 
-The target layout is intentionally conventional:
+The implemented layout is intentionally conventional:
 
 ```text
 hatvp-pipeline/
@@ -302,6 +302,11 @@ head -n 3 /tmp/hatvp-liste.csv
 xmllint --noout /tmp/hatvp-declarations.xml
 ```
 
+The first acceptance fixture is a single declaration extracted from the
+observed live XML at `tests/fixtures/declaration_single_real.xml`. The broader
+fixture adds a second declaration with the same name so identity and
+duplicate-name handling can be tested without deduplicating people.
+
 ### Local Google Cloud access
 
 You do not need to log in to GCloud just to read or edit this repository, run
@@ -323,7 +328,7 @@ runtime service account; GitHub Actions should use Workload Identity Federation.
 
 ### Tests
 
-Once the implementation exists, the expected checks are:
+Run the project checks with:
 
 ```bash
 uv run pytest

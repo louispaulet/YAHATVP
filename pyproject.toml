@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hatvp-pipeline"
+version = "0.1.0"
+description = "Small, auditable weekly ingestion pipeline for HATVP open data"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "google-cloud-bigquery>=3.30,<4",
+  "google-cloud-storage>=2.19,<3",
+  "httpx>=0.28,<1",
+  "lxml>=5.3,<6",
+  "polars>=1.25,<2",
+  "pydantic-settings>=2.8,<3",
+]
+
+[project.scripts]
+hatvp-ingest = "hatvp.main:cli"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3,<9",
+  "ruff>=0.11,<1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hatvp"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

@@ -1,0 +1,78 @@
+name: Test and deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  GCP_REGION: ${{ vars.GCP_REGION }}
+  ARTIFACT_REPOSITORY: ${{ vars.ARTIFACT_REPOSITORY }}
+  CLOUD_RUN_JOB: ${{ vars.CLOUD_RUN_JOB }}
+  HATVP_BUCKET: ${{ vars.HATVP_BUCKET }}
+  HATVP_RUNTIME_SERVICE_ACCOUNT: ${{ vars.HATVP_RUNTIME_SERVICE_ACCOUNT }}
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+  DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Authenticate Docker
+        run: gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+
+      - name: Build and push image
+        env:
+          IMAGE: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/hatvp:${{ github.sha }}
+        run: |
+          gcloud builds submit --tag "$IMAGE" .
+
+      - name: Deploy Cloud Run Job
+        env:
+          IMAGE: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/hatvp:${{ github.sha }}
+        run: |
+          gcloud run jobs deploy "$CLOUD_RUN_JOB" \
+            --project="$GCP_PROJECT_ID" \
+            --region="$GCP_REGION" \
+            --image="$IMAGE" \
+            --service-account="$HATVP_RUNTIME_SERVICE_ACCOUNT" \
+            --tasks=1 \
+            --max-retries=1 \
+            --task-timeout=30m \
+            --set-env-vars="HATVP_BUCKET=${HATVP_BUCKET},HATVP_PREFIX=hatvp,HATVP_ENABLE_BIGQUERY=false,HATVP_BIGQUERY_PROJECT=${GCP_PROJECT_ID},HATVP_BIGQUERY_DATASET=hatvp,PIPELINE_GIT_SHA=${GITHUB_SHA},PIPELINE_VERSION=${GITHUB_SHA}"
