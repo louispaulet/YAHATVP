@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-17 — Add live declaration manual-review bundle
+
+### Added
+
+- Added a representative live declaration XML and associated normalized JSON
+  bundle under
+  `reports/manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/`.
+- Included source SHA-256, GCS snapshot path, parser commit, table counts, and
+  all normalized rows for the selected declaration UUID.
+
+### Changed
+
+- Empty DTO item containers no longer create synthetic rows such as
+  `{"items": null}` in assets, activities, participations, or liabilities.
+
+### Verified
+
+- The selected review bundle contains 1 declaration, 1 person, 1 mandate, 6
+  incomes, 19 assets, and 0 liabilities.
+- Focused parser and quality tests pass: 12 tests.
+
 ## 2026-08-17 — Correct income row counting and coverage reporting
 
 ### Changed

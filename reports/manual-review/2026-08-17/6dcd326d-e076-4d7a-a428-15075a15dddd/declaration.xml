@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="utf-8"?>
+<declarations>
+<declaration>
+		<dateDepot>22/04/2026 14:21:26</dateDepot>
+		<uuid>6dcd326d-e076-4d7a-a428-15075a15dddd</uuid>
+		<origine>ADEL</origine>
+		<complete>true</complete>
+		<attachedFiles>
+			<attachedFiles>
+				<fileName>VUE_PDF_DU_RECEPISSE_DU_DEPOT_XML</fileName>
+				<serverFileName/>
+				<base64EncodedContent/>
+			</attachedFiles>
+		</attachedFiles>
+		<declarationVersion>0</declarationVersion>
+		<immeubleDto>
+			<items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire>
+        [Données non publiées]
+    </commentaire>
+					<nature>Appartement</nature>
+					<adresse>
+            [Données non publiées]
+        </adresse>
+					<codePostal>
+            [Données non publiées] (Département : 92)
+        </codePostal>
+					<localite>
+            [Données non publiées]
+        </localite>
+					<superficieBati>37</superficieBati>
+					<superficieNonBati>0.0</superficieNonBati>
+					<dateAcquisition>2007</dateAcquisition>
+					<origine>Acquisition</origine>
+					<droitReel>Pleine propriété</droitReel>
+					<quotePart>100.0</quotePart>
+					<prixAcquisition>164500</prixAcquisition>
+					<prixTravaux/>
+					<valeurVenale>238650</valeurVenale>
+					<regimeJuridique>Bien propre</regimeJuridique>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire>
+        [Données non publiées]
+    </commentaire>
+					<nature>Maison individuelle</nature>
+					<adresse>
+            [Données non publiées]
+        </adresse>
+					<codePostal>
+            [Données non publiées] (Département : 71)
+        </codePostal>
+					<localite>
+            [Données non publiées]
+        </localite>
+					<superficieBati>88</superficieBati>
+					<superficieNonBati>0.0</superficieNonBati>
+					<dateAcquisition>1991</dateAcquisition>
+					<origine>Succession</origine>
+					<droitReel>Usufruit</droitReel>
+					<quotePart>50.0</quotePart>
+					<prixAcquisition>45000</prixAcquisition>
+					<prixTravaux/>
+					<valeurVenale>88000</valeurVenale>
+					<regimeJuridique>Bien indivis</regimeJuridique>
+				</items>
+			</items>
+			<neant>false</neant>
+		</immeubleDto>
+		<sciDto>
+			<items/>
+			<neant>true</neant>
+		</sciDto>
+		<valeursNonEnBourseDto>
+			<items/>
+			<neant>true</neant>
+		</valeursNonEnBourseDto>
+		<valeursEnBourseDto>
+			<items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire>
+        [Données non publiées]
+    </commentaire>
+					<titulaire>Dati Rachida</titulaire>
+					<etablissement>BRED</etablissement>
+					<numeroCompte>
+            [Données non publiées]
+        </numeroCompte>
+					<naturePlacement>Compte titre</naturePlacement>
+					<valeur>43</valeur>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire>
+        [Données non publiées]
+    </commentaire>
+					<titulaire>Dati Rachida</titulaire>
+					<etablissement>BRED</etablissement>
+					<numeroCompte>
+            [Données non publiées]
+        </numeroCompte>
+					<naturePlacement>PEA</naturePlacement>
+					<valeur>139564</valeur>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire>
+        [Données non publiées]
+    </commentaire>
+					<titulaire>Dati Rachida</titulaire>
+					<etablissement>CIC Market Solution</etablissement>
+					<numeroCompte>
+            [Données non publiées]
+        </numeroCompte>
+					<naturePlacement>Compte titre</naturePlacement>
+					<valeur>3133135</valeur>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire>
+        [Données non publiées]
+    </commentaire>
+					<titulaire>Dati Rachida</titulaire>
+					<etablissement>Nextstage</etablissement>
+					<numeroCompte>
+            [Données non publiées]
+        </numeroCompte>
+					<naturePlacement>Détention directe</naturePlacement>
+					<valeur>194</valeur>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire>
+        [Données non publiées]
+    </commentaire>
+					<titulaire>Dati Rachida</titulaire>
+					<etablissement>Nextstage</etablissement>
+					<numeroCompte>
+            [Données non publiées]
+        </numeroCompte>
+					<naturePlacement>Détention directe</naturePlacement>
+					<valeur>0</valeur>
+				</items>
+			</items>
+			<neant>false</neant>
+		</valeursEnBourseDto>
+		<assuranceVieDto>
+			<items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<souscripteur>Dati Rachida</souscripteur>
+					<etablissement>AG2R La Mondiale</etablissement>
+					<reference>
+            [Données non publiées]
+        </reference>
+					<dateSouscription>21/05/2012</dateSouscription>
+					<valeurRachat>2413888</valeurRachat>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<souscripteur>Dati Rachida</souscripteur>
+					<etablissement>Mutavie</etablissement>
+					<reference>
+            [Données non publiées]
+        </reference>
+					<dateSouscription>08/12/1997</dateSouscription>
+					<valeurRachat>2127</valeurRachat>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<souscripteur>Dati Rachida</souscripteur>
+					<etablissement>MMA</etablissement>
+					<reference>
+            [Données non publiées]
+        </reference>
+					<dateSouscription>08/09/2021</dateSouscription>
+					<valeurRachat>164855</valeurRachat>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<souscripteur>Dati Rachida Epargne retraite</souscripteur>
+					<etablissement>Carel Mutex Union</etablissement>
+					<reference>
+            [Données non publiées]
+        </reference>
+					<dateSouscription>31/07/2018</dateSouscription>
+					<valeurRachat>8870</valeurRachat>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<souscripteur>Dati Rachida Epargne retraite</souscripteur>
+					<etablissement>Carel Mutex Union</etablissement>
+					<reference>
+            [Données non publiées]
+        </reference>
+					<dateSouscription>31/07/2018</dateSouscription>
+					<valeurRachat>69385</valeurRachat>
+				</items>
+			</items>
+			<neant>false</neant>
+		</assuranceVieDto>
+		<comptesBancaireDto>
+			<items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<typeCompte>Compte courant</typeCompte>
+					<etablissement>BRED</etablissement>
+					<numeroCompte>
+            [Données non publiées]
+        </numeroCompte>
+					<titulaire>Dati Rachida</titulaire>
+					<valeur>4993</valeur>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<typeCompte>Compte courant</typeCompte>
+					<etablissement>BRED</etablissement>
+					<numeroCompte>
+            [Données non publiées]
+        </numeroCompte>
+					<titulaire>Dati Rachida</titulaire>
+					<valeur>89831</valeur>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<typeCompte>Compte courant</typeCompte>
+					<etablissement>BRED</etablissement>
+					<numeroCompte>
+            [Données non publiées]
+        </numeroCompte>
+					<titulaire>Dati Rachida</titulaire>
+					<valeur>61267</valeur>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<typeCompte>LDD</typeCompte>
+					<etablissement>BRED</etablissement>
+					<numeroCompte>
+            [Données non publiées]
+        </numeroCompte>
+					<titulaire>Dati Rachida</titulaire>
+					<valeur>8078</valeur>
+				</items>
+			</items>
+			<neant>false</neant>
+		</comptesBancaireDto>
+		<bienDiverDto>
+			<items/>
+			<neant>true</neant>
+		</bienDiverDto>
+		<vehiculeDto>
+			<items/>
+			<neant>true</neant>
+		</vehiculeDto>
+		<fondDto>
+			<items/>
+			<neant>true</neant>
+		</fondDto>
+		<autreBienDto>
+			<items/>
+			<neant>true</neant>
+		</autreBienDto>
+		<bienEtrangerDto>
+			<items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<nature>Banque Centrale Populaire Maroc</nature>
+					<localisation>
+            [Données non publiées]
+        </localisation>
+					<valeur>35402</valeur>
+					<description>
+        [Données non publiées]
+    </description>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire>
+        [Données non publiées]
+    </commentaire>
+					<nature>Maison et terrain</nature>
+					<localisation>
+            [Données non publiées]
+        </localisation>
+					<valeur>10732</valeur>
+					<description>Bien en indivision
+        [Données non publiées]
+    </description>
+				</items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire>
+        [Données non publiées]
+    </commentaire>
+					<nature>Appartement</nature>
+					<localisation>
+            [Données non publiées]
+        </localisation>
+					<valeur>6709</valeur>
+					<description>Bien en indivision
+        [Données non publiées]
+    </description>
+				</items>
+			</items>
+			<neant>false</neant>
+		</bienEtrangerDto>
+		<passifDto>
+			<items/>
+			<neant>true</neant>
+		</passifDto>
+		<revenuMandatDto>
+			<items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<annee>2025</annee>
+					<revenuMandatItem0>
+						<typeRevenu>Indemnités d'élu</typeRevenu>
+						<revenuElu>10431</revenuElu>
+						<revenuConjoint/>
+					</revenuMandatItem0>
+					<revenuMandatItem1>
+						<typeRevenu>Traitements salaires</typeRevenu>
+						<revenuElu>41571</revenuElu>
+						<revenuConjoint/>
+					</revenuMandatItem1>
+					<revenuMandatItem2>
+						<typeRevenu>Pensions retraites rentes</typeRevenu>
+						<revenuElu>14691</revenuElu>
+						<revenuConjoint/>
+					</revenuMandatItem2>
+					<revenuMandatItem3>
+						<typeRevenu>Revenus professionnels (BNC BIC BA)</typeRevenu>
+						<revenuElu/>
+						<revenuConjoint/>
+					</revenuMandatItem3>
+					<revenuMandatItem4>
+						<typeRevenu>Revenus capitaux mobiliers</typeRevenu>
+						<revenuElu>498</revenuElu>
+						<revenuConjoint/>
+					</revenuMandatItem4>
+					<revenuMandatItem5>
+						<typeRevenu>Revenus fonciers</typeRevenu>
+						<revenuElu>4230</revenuElu>
+						<revenuConjoint/>
+					</revenuMandatItem5>
+					<revenuMandatItem6>
+						<typeRevenu>Autres revenus</typeRevenu>
+						<revenuElu/>
+						<revenuConjoint/>
+					</revenuMandatItem6>
+					<revenuMandatItem7>
+						<typeRevenu>Plus-values mobilières</typeRevenu>
+						<revenuElu>1584</revenuElu>
+						<revenuConjoint/>
+					</revenuMandatItem7>
+					<revenuMandatItem8>
+						<typeRevenu>Plus-values immobilières</typeRevenu>
+						<revenuElu/>
+						<revenuConjoint/>
+					</revenuMandatItem8>
+					<totalElu>73005</totalElu>
+					<totalConjoint>0</totalConjoint>
+				</items>
+			</items>
+			<neant>false</neant>
+		</revenuMandatDto>
+		<evenementMajeurDto>
+			<items/>
+			<neant>true</neant>
+		</evenementMajeurDto>
+		<observationPatrimoineDto>
+			<items>
+				<items>
+					<motif>
+						<id>CREATION</id>
+						<label/>
+					</motif>
+					<commentaire/>
+					<contenu>Les revenus reportés dans la colonne 2025 page 8 correspondent, comme demandé, à la période octobre 2025 à février 2026.</contenu>
+				</items>
+			</items>
+			<neant>false</neant>
+		</observationPatrimoineDto>
+		<general>
+			<typeDeclaration>
+				<id>DSPFM</id>
+				<label>Déclaration de situation patrimoniale de fin de mandat</label>
+			</typeDeclaration>
+			<mandat>
+				<label>Membre du Gouvernement</label>
+			</mandat>
+			<qualiteMandat>
+				<typeMandat> Membre</typeMandat>
+				<codCategorieMandat>GVT</codCategorieMandat>
+				<nomCategorieMandat>Membre du Gouvernement</nomCategorieMandat>
+				<codTypeMandatFichier>gouvernement</codTypeMandatFichier>
+				<labelTypeMandat/>
+				<labelOrgane>Intitulé du ministère</labelOrgane>
+				<codeListeOrgane>MIN</codeListeOrgane>
+			</qualiteMandat>
+			<organe>
+				<codeOrgane>mcult23</codeOrgane>
+				<codeListeOrgane>MIN</codeListeOrgane>
+				<nomListeOrgane>Ministères</nomListeOrgane>
+				<labelOrgane>Ministère de la culture</labelOrgane>
+				<labelDeclaration>Ministre de la culture</labelDeclaration>
+				<organeParent/>
+				<horsLoi3DS>false</horsLoi3DS>
+			</organe>
+			<qualiteDeclarant/>
+			<qualiteDeclarantForPDF>Ministre de la culture</qualiteDeclarantForPDF>
+			<dateDebutMandat/>
+			<dateFinMandat>25/02/2026</dateFinMandat>
+			<dateDernDeclar/>
+			<regimeMatrimonial>Néant</regimeMatrimonial>
+			<regimeMatrimonialComments/>
+			<nomSociete/>
+			<nomSocieteMere/>
+			<chiffreAffaire/>
+			<nbLogements/>
+			<declarationModificative>false</declarationModificative>
+			<etablissement/>
+			<declarant>
+				<civilite>Mme</civilite>
+				<nom>Dati</nom>
+				<prenom>Rachida</prenom>
+				<email>
+            [Données non publiées]
+        </email>
+				<dateNaissance>27/11/1965</dateNaissance>
+				<pieceIdentite/>
+				<telephoneDec>
+            [Données non publiées]
+        </telephoneDec>
+				<adresseDec>
+					<voie>
+            [Données non publiées]
+        </voie>
+					<complement>
+            [Données non publiées]
+        </complement>
+					<codePostal>
+            [Données non publiées]
+        </codePostal>
+					<ville>
+            [Données non publiées]
+        </ville>
+					<pays>
+            [Données non publiées]
+        </pays>
+				</adresseDec>
+			</declarant>
+		</general>
+	</declaration>
+
+</declarations>

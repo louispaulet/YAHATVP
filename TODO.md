@@ -60,6 +60,7 @@ Workload Identity Federation, not a stored key.
 - [x] Add explicit catastrophic row-count reduction checks against the previous successful report.
 - [x] Add explicit required top-level XML structure checks before normalization.
 - [x] Exclude empty income category slots and report source-aware income coverage.
+- [x] Add a live declaration XML/parsed-data bundle for manual review and exclude placeholder-only DTO rows.
 - [x] Decide whether any current negative asset values are source-valid or should remain flagged.
 - [x] Document the meaning of each normalized table and important field in the README.
 

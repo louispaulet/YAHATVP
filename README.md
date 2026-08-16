@@ -349,6 +349,11 @@ observed live XML at `tests/fixtures/declaration_single_real.xml`. The broader
 fixture adds a second declaration with the same name so identity and
 duplicate-name handling can be tested without deduplicating people.
 
+For manual review of a live declaration, see
+[`reports/manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/`](reports/manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/).
+It contains the selected XML declaration and the associated normalized rows
+with source hashes and parser provenance.
+
 ### Local Google Cloud access
 
 You do not need to log in to GCloud just to read or edit this repository, run
