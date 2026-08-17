@@ -254,6 +254,18 @@ Post-merge image `d2b4a9b` deployed successfully. Forced executions
 second emitted `quality_warning_streak` with `warning_streak=2`, 5,818 flagged
 records, and zero quality errors.
 
+## 10. Transparency dashboard
+
+- [x] Add an isolated Vite/React/Tailwind frontend with HashRouter under `website/hatvp-transparency-dashboard/frontend`.
+- [x] Add a Cloudflare Worker API under `website/hatvp-transparency-dashboard/backend/worker`.
+- [x] Add a read-only BigQuery Cloud Run bridge under `website/hatvp-transparency-dashboard/backend/bigquery-bridge`.
+- [x] Keep the public API aggregate-only and exclude raw rows and personal contact fields.
+- [x] Add Worker, bridge, and frontend fixture/unit tests plus Makefile targets.
+- [x] Document local development, secret handling, Cloudflare deployment, and GitHub Pages deployment.
+- [ ] Configure the production bridge token and deploy the Cloudflare Worker.
+- [ ] Configure the repository GitHub Pages source and publish the frontend `gh-pages` branch.
+- [ ] Run a live dashboard smoke test against the deployed Worker and review the public aggregate output.
+
 ## Later, only if needed
 
 - [ ] Add semantic/content hashes after the exact-byte hash path is stable.

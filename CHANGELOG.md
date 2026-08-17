@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-08-18 — Add HATVP transparency dashboard foundation
+
+### Added
+
+- Added the isolated `website/hatvp-transparency-dashboard/` workspace with a
+  tested Cloudflare Worker proxy, read-only BigQuery Cloud Run bridge, and
+  Vite/React/Tailwind HashRouter frontend.
+- Added aggregate-only dashboard data for the latest curated snapshot,
+  including table counts, income streams, asset sections, and declaration
+  types; raw rows and contact fields are not exposed.
+- Added Makefile targets for installation, local development, fixture tests,
+  bridge/Worker deployment, and GitHub Pages publication through `gh-pages`.
+
+### Verified
+
+- Dashboard backend: 26 fixture/unit tests pass, Worker typechecking passes,
+  Ruff lint/format passes, and the frontend tests plus production build pass.
+- Repository checks: 127 existing project tests pass, Ruff lint/format passes,
+  and `uv build` succeeds.
+
+### Follow-up
+
+- Configure production secrets and deploy the read-only bridge and Worker.
+- Configure the repository GitHub Pages source, publish `gh-pages`, and run a
+  live dashboard smoke test.
+
 ## 2026-08-18 — Reorganize the report catalog
 
 ### Changed

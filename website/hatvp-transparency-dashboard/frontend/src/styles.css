@@ -1,0 +1,49 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #f6f7f2;
+  --color-ink: #17231f;
+  --color-emerald: #1f9d75;
+  --color-lime: #d9f99d;
+  --color-sky: #8ed7e8;
+  --color-violet: #b8a5e8;
+  --shadow-soft: 0 24px 70px rgba(23, 35, 31, 0.16);
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  color: #17231f;
+  background: #f6f7f2;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+
+.dashboard-card {
+  border: 1px solid rgb(226 232 240 / 0.9);
+  border-radius: 1.5rem;
+  background: rgb(255 255 255 / 0.86);
+  box-shadow: 0 10px 30px rgb(23 35 31 / 0.04);
+}
+
+.hero-grid {
+  background-image: radial-gradient(circle at 80% 20%, rgb(217 249 157 / 0.17), transparent 28%), radial-gradient(circle at 96% 90%, rgb(142 215 232 / 0.16), transparent 25%);
+}
