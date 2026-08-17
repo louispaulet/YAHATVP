@@ -32,7 +32,8 @@ def test_settings_environment_overrides_packaged_yaml(monkeypatch) -> None:
     assert settings.hatvp_enable_bigquery is True
 
 
-def test_cli_style_model_copy_has_highest_precedence() -> None:
+def test_cli_style_model_copy_has_highest_precedence(monkeypatch) -> None:
+    monkeypatch.delenv("HATVP_BUCKET", raising=False)
     settings = Settings(hatvp_prefix="yaml-or-env")
     overridden = settings.model_copy(update={"hatvp_prefix": "cli-prefix"})
 
@@ -61,7 +62,8 @@ def test_custom_yaml_requires_version_and_identity_configuration(tmp_path: Path)
         load_pipeline_config(invalid_parser)
 
 
-def test_storage_validation_requires_bucket_or_local_output() -> None:
+def test_storage_validation_requires_bucket_or_local_output(monkeypatch) -> None:
+    monkeypatch.delenv("HATVP_BUCKET", raising=False)
     with pytest.raises(ValueError, match="HATVP_BUCKET"):
         Settings().validate_storage()
     Settings(local_output=Path("/tmp/hatvp-fixture")).validate_storage()
