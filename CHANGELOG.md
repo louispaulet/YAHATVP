@@ -6,8 +6,8 @@
 
 - Added the source-linked triage generator in `src/hatvp/quality_triage.py`,
   with fixture coverage for repeated names, duplicate declaration UUIDs,
-  negative bank-account values, source-linked asset outliers, and exact count
-  reconciliation.
+  whitespace-semantic duplicate handling, negative bank-account values,
+  source-linked asset outliers, and exact count reconciliation.
 - Added the complete Markdown review report and machine-readable register for
   the `2026-08-16` production snapshot under `reports/`.
 
@@ -18,18 +18,18 @@
   outliers, 9 source-valid overdraft-style values, and 12 duplicate-UUID rows
   across 6 groups.
 - Matched every flagged row to the immutable raw XML and persisted normalized
-  record. Five duplicate UUID groups contain canonical-identical XML; one
-  group contains conflicting XML under the same UUID.
+  record. All six duplicate UUID groups contain semantically identical XML;
+  one pair differs only by trailing whitespace in the source.
 - Recorded raw XML SHA-256
   `865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf` and
   pipeline revision `f21853de13c236400d3fc9f9b8da34ce16ad7bb2` in the register.
-- Fixture triage tests pass: 2 tests. The production report has zero
+- Fixture triage tests pass: 3 tests. The production report has zero
   unresolved or parser/source-mismatch records.
 
 ### Follow-up
 
-- Investigate recurrence and source correction for the six duplicate declaration
-  UUID groups, especially the group with conflicting canonical XML content.
+- Monitor recurrence and pursue source correction for the six duplicate
+  declaration UUID groups; the canonical-byte difference is whitespace-only.
 
 ## 2026-08-17 — Validate production pipeline contracts and Scheduler handoff
 

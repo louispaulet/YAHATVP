@@ -15,6 +15,22 @@
     </general>
   </declaration>
   <declaration>
+    <dateDepot>05/01/2026 08:30:00</dateDepot>
+    <uuid>triage-whitespace</uuid>
+    <general>
+      <declarant><nom>WHITESPACE</nom><prenom>Source</prenom></declarant>
+      <commentaire>same source text </commentaire>
+    </general>
+  </declaration>
+  <declaration>
+    <dateDepot>05/01/2026 08:30:00</dateDepot>
+    <uuid>triage-whitespace</uuid>
+    <general>
+      <declarant><nom>WHITESPACE</nom><prenom>Source</prenom></declarant>
+      <commentaire>same source text</commentaire>
+    </general>
+  </declaration>
+  <declaration>
     <dateDepot>03/01/2026 08:30:00</dateDepot>
     <uuid>triage-negative</uuid>
     <general>

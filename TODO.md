@@ -74,8 +74,8 @@ patterns; the nine negative bank-account balances are consistent with
 overdrafts, so they remain flagged and retained; six duplicate declaration UUID
 groups are actionable source-quality issues. The source-linked register contains
 all 5,763 flagged rows with zero unresolved or parser/source-mismatch records;
-five duplicate UUID groups contain identical XML and one contains conflicting
-XML content.
+all six duplicate UUID groups are semantically identical, with one pair
+differing only by trailing whitespace.
 
 Required local checks:
 
@@ -139,8 +139,8 @@ After the first successful Cloud Run execution:
 - [x] Confirm a failed transformation leaves the previous `state/latest.json` unchanged (fixture coverage includes structural-quality and BigQuery failures).
 
 The first smoke-test snapshot was `2026-08-16`. Its quality report contained
-zero errors, 3,510 warnings, and 5,763 flagged records; quality triage remains
-open.
+zero errors, 3,510 warnings, and 5,763 flagged records; every flagged row is
+accounted for in the completed source-linked register.
 
 ## 5. Configure the weekly Scheduler trigger
 
@@ -211,7 +211,7 @@ timezone: Europe/Paris
 - [ ] Add an alert for failed Cloud Run Job executions.
 - [ ] Add an alert for repeated `SUCCESS_WITH_WARNINGS` or an unusual increase in flagged records.
 - [ ] Review quality reports after each weekly run.
-- [ ] Investigate recurrence or source correction for the six duplicate declaration UUID groups, including the one conflicting XML group.
+- [ ] Monitor recurrence and pursue source correction for the six duplicate declaration UUID groups; one pair differs only by trailing whitespace.
 - [ ] Monitor row counts and null rates for sudden changes.
 - [ ] Review HATVP schema changes before changing normalization logic.
 - [ ] Add a new fixture before fixing any newly observed source edge case.

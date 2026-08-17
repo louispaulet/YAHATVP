@@ -46,8 +46,31 @@ def _direct_child_text(element: etree._Element, name: str) -> str | None:
     return value or None
 
 
+def _semantic_xml_bytes(element: etree._Element) -> bytes:
+    """Return canonical XML after applying the parser's whitespace semantics."""
+
+    canonical = etree.tostring(
+        element,
+        method="c14n",
+        exclusive=True,
+        with_comments=False,
+    )
+    normalized = etree.fromstring(canonical)
+    for node in normalized.iter():
+        if node.text is not None:
+            node.text = " ".join(node.text.split())
+        if node.tail is not None:
+            node.tail = " ".join(node.tail.split())
+    return etree.tostring(
+        normalized,
+        method="c14n",
+        exclusive=True,
+        with_comments=False,
+    )
+
+
 def declaration_xml_fingerprints(path: Path) -> dict[str, list[dict[str, Any]]]:
-    """Return canonical source fingerprints for each declaration UUID."""
+    """Return exact and parser-semantic source fingerprints by declaration UUID."""
 
     fingerprints: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
     context = etree.iterparse(
@@ -71,11 +94,13 @@ def declaration_xml_fingerprints(path: Path) -> dict[str, list[dict[str, Any]]]:
                     exclusive=True,
                     with_comments=False,
                 )
+                semantic = _semantic_xml_bytes(element)
                 fingerprints[declaration_uuid].append(
                     {
                         "occurrence_index": len(fingerprints[declaration_uuid]),
                         "canonical_xml_sha256": hashlib.sha256(canonical).hexdigest(),
                         "canonical_xml_bytes": len(canonical),
+                        "semantic_xml_sha256": hashlib.sha256(semantic).hexdigest(),
                         "date_depot_raw": _direct_child_text(element, "dateDepot"),
                     }
                 )
@@ -206,6 +231,9 @@ def _source_evidence(
         evidence["canonical_xml_sha256"] = [
             item["canonical_xml_sha256"] for item in fingerprints.get(declaration_uuid or "", [])
         ]
+        evidence["semantic_xml_sha256"] = [
+            item["semantic_xml_sha256"] for item in fingerprints.get(declaration_uuid or "", [])
+        ]
 
     evidence["source_record_found"] = bool(source_candidates)
     evidence["normalized_record_match"] = bool(persisted_candidates)
@@ -260,15 +288,15 @@ def _disposition_for(
         )
     if quality_reason.startswith("duplicate declaration_uuid"):
         if source_match and evidence.get("source_occurrence_count", 0) > 1:
-            hashes = evidence.get("canonical_xml_sha256", [])
-            content = "identical" if len(set(hashes)) == 1 else "conflicting"
+            hashes = evidence.get("semantic_xml_sha256", [])
+            content = "identical semantic" if len(set(hashes)) == 1 else "conflicting semantic"
             return (
                 "duplicate_source_identifier",
                 "reviewed",
                 "action_required",
                 (
                     f"The source contains this declaration UUID more than once with {content} "
-                    "canonical XML content; retain both rows and investigate recurrence."
+                    "content; retain both rows and investigate recurrence."
                 ),
             )
         return (
@@ -446,10 +474,11 @@ def build_review_register(
                 "occurrence_count": len(occurrences),
                 "content_classification": (
                     "identical"
-                    if len({item["canonical_xml_sha256"] for item in occurrences}) == 1
+                    if len({item["semantic_xml_sha256"] for item in occurrences}) == 1
                     else "conflicting"
                 ),
                 "canonical_xml_sha256": [item["canonical_xml_sha256"] for item in occurrences],
+                "semantic_xml_sha256": [item["semantic_xml_sha256"] for item in occurrences],
                 "date_depot_raw": [item["date_depot_raw"] for item in occurrences],
             }
         )

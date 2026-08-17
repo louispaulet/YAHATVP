@@ -290,9 +290,9 @@ normalized records: 5,599 repeated-name rows are expected identity-collision
 flags and are not deduplicated; 143 robust asset outliers remain retained
 statistical review flags; and nine small negative bank-account values are
 source-valid overdraft-style values that remain flagged. The six duplicate
-declaration UUID groups are source-quality follow-ups: five groups contain
-identical duplicate XML and one group contains conflicting XML under the same
-UUID.
+declaration UUID groups are source-quality follow-ups: all six groups are
+semantically identical source duplicates, with one pair differing only by
+trailing whitespace.
 
 The report can be regenerated from a read-only artifact store with ADC:
 

@@ -11,7 +11,11 @@
         "16/08/2021 11:48:11"
       ],
       "declaration_uuid": "23a569db-f01d-406b-9d49-d77062d16c0b",
-      "occurrence_count": 2
+      "occurrence_count": 2,
+      "semantic_xml_sha256": [
+        "efee790e5c0b3c999cb5eb14f82b0e4842788920313e501069b3ac3e5965b958",
+        "efee790e5c0b3c999cb5eb14f82b0e4842788920313e501069b3ac3e5965b958"
+      ]
     },
     {
       "canonical_xml_sha256": [
@@ -24,7 +28,11 @@
         "09/09/2019 06:16:57"
       ],
       "declaration_uuid": "3cc80dd4-5497-4119-ae82-bf748f3cf34e",
-      "occurrence_count": 2
+      "occurrence_count": 2,
+      "semantic_xml_sha256": [
+        "3e82c74fad74697318b744f536aa6d05f6438b1a7f85adec04eb5049498d5b3e",
+        "3e82c74fad74697318b744f536aa6d05f6438b1a7f85adec04eb5049498d5b3e"
+      ]
     },
     {
       "canonical_xml_sha256": [
@@ -37,7 +45,11 @@
         "18/06/2019 23:03:45"
       ],
       "declaration_uuid": "64076b58-0b72-43ed-9d06-3421ed2ad7cf",
-      "occurrence_count": 2
+      "occurrence_count": 2,
+      "semantic_xml_sha256": [
+        "91902b398e3aa9e753dbf9ca7e59daf22f562fe7dcf96338df9fe42532735e2f",
+        "91902b398e3aa9e753dbf9ca7e59daf22f562fe7dcf96338df9fe42532735e2f"
+      ]
     },
     {
       "canonical_xml_sha256": [
@@ -50,20 +62,28 @@
         "11/10/2019 12:41:12"
       ],
       "declaration_uuid": "918bed9f-21cc-46fd-a13a-0f3e07b4b9ce",
-      "occurrence_count": 2
+      "occurrence_count": 2,
+      "semantic_xml_sha256": [
+        "e80df913ef38e16ac27db73a841b32f049ec3815bd2e847f13bc281c06b2f7d4",
+        "e80df913ef38e16ac27db73a841b32f049ec3815bd2e847f13bc281c06b2f7d4"
+      ]
     },
     {
       "canonical_xml_sha256": [
         "3d461dee73181875849b81f7f10547641fb2bfc97da40ed79a987609896c3ed2",
         "0f958233efe72196454e8d7744829e46a4a318acb4e19be4dd8e29e401068b14"
       ],
-      "content_classification": "conflicting",
+      "content_classification": "identical",
       "date_depot_raw": [
         "14/10/2023 05:01:38",
         "14/10/2023 05:01:38"
       ],
       "declaration_uuid": "9ccaaa4b-93bd-4ac3-b99c-e8e5835be9f3",
-      "occurrence_count": 2
+      "occurrence_count": 2,
+      "semantic_xml_sha256": [
+        "9ceaa37380386bfb449e1f5398d1ddab80a4cc70d673a5bdfcffd92c06e5319d",
+        "9ceaa37380386bfb449e1f5398d1ddab80a4cc70d673a5bdfcffd92c06e5319d"
+      ]
     },
     {
       "canonical_xml_sha256": [
@@ -76,7 +96,11 @@
         "13/06/2019 12:54:01"
       ],
       "declaration_uuid": "fe395431-4550-4b8d-9251-50bd4cfd5eb0",
-      "occurrence_count": 2
+      "occurrence_count": 2,
+      "semantic_xml_sha256": [
+        "f0a6dc74105c4b68b7fb273497e36e2c618f74b8169c28b2f65adb72f22d8667",
+        "f0a6dc74105c4b68b7fb273497e36e2c618f74b8169c28b2f65adb72f22d8667"
+      ]
     }
   ],
   "evidence": {
@@ -5080,7 +5104,7 @@
       "record_key": 1,
       "review_key": "declarations:23a569db-f01d-406b-9d49-d77062d16c0b:duplicate declaration_uuid: 23a569db-f01d-406b-9d49-d77062d16c0b:1",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with identical canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "3b7664f4e5a29144a0a8f23d3090865a8fde66dd7a30b8133fffc5001318d6f8",
@@ -5089,6 +5113,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "efee790e5c0b3c999cb5eb14f82b0e4842788920313e501069b3ac3e5965b958",
+          "efee790e5c0b3c999cb5eb14f82b0e4842788920313e501069b3ac3e5965b958"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true
@@ -5108,7 +5136,7 @@
       "record_key": 2,
       "review_key": "declarations:23a569db-f01d-406b-9d49-d77062d16c0b:duplicate declaration_uuid: 23a569db-f01d-406b-9d49-d77062d16c0b:2",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with identical canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "3b7664f4e5a29144a0a8f23d3090865a8fde66dd7a30b8133fffc5001318d6f8",
@@ -5117,6 +5145,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "efee790e5c0b3c999cb5eb14f82b0e4842788920313e501069b3ac3e5965b958",
+          "efee790e5c0b3c999cb5eb14f82b0e4842788920313e501069b3ac3e5965b958"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true
@@ -5136,7 +5168,7 @@
       "record_key": 1,
       "review_key": "declarations:3cc80dd4-5497-4119-ae82-bf748f3cf34e:duplicate declaration_uuid: 3cc80dd4-5497-4119-ae82-bf748f3cf34e:1",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with identical canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "b062cbf26974654277e04561e1a36137740c5fb9449dd6228627fc4e7375db22",
@@ -5145,6 +5177,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "3e82c74fad74697318b744f536aa6d05f6438b1a7f85adec04eb5049498d5b3e",
+          "3e82c74fad74697318b744f536aa6d05f6438b1a7f85adec04eb5049498d5b3e"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true
@@ -5164,7 +5200,7 @@
       "record_key": 2,
       "review_key": "declarations:3cc80dd4-5497-4119-ae82-bf748f3cf34e:duplicate declaration_uuid: 3cc80dd4-5497-4119-ae82-bf748f3cf34e:2",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with identical canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "b062cbf26974654277e04561e1a36137740c5fb9449dd6228627fc4e7375db22",
@@ -5173,6 +5209,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "3e82c74fad74697318b744f536aa6d05f6438b1a7f85adec04eb5049498d5b3e",
+          "3e82c74fad74697318b744f536aa6d05f6438b1a7f85adec04eb5049498d5b3e"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true
@@ -5192,7 +5232,7 @@
       "record_key": 1,
       "review_key": "declarations:64076b58-0b72-43ed-9d06-3421ed2ad7cf:duplicate declaration_uuid: 64076b58-0b72-43ed-9d06-3421ed2ad7cf:1",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with identical canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "a1c9c7057da83df1fcb003be11b4e2d3d2ccd5e132500df31cb525e5a76ba1d3",
@@ -5201,6 +5241,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "91902b398e3aa9e753dbf9ca7e59daf22f562fe7dcf96338df9fe42532735e2f",
+          "91902b398e3aa9e753dbf9ca7e59daf22f562fe7dcf96338df9fe42532735e2f"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true
@@ -5220,7 +5264,7 @@
       "record_key": 2,
       "review_key": "declarations:64076b58-0b72-43ed-9d06-3421ed2ad7cf:duplicate declaration_uuid: 64076b58-0b72-43ed-9d06-3421ed2ad7cf:2",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with identical canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "a1c9c7057da83df1fcb003be11b4e2d3d2ccd5e132500df31cb525e5a76ba1d3",
@@ -5229,6 +5273,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "91902b398e3aa9e753dbf9ca7e59daf22f562fe7dcf96338df9fe42532735e2f",
+          "91902b398e3aa9e753dbf9ca7e59daf22f562fe7dcf96338df9fe42532735e2f"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true
@@ -5248,7 +5296,7 @@
       "record_key": 1,
       "review_key": "declarations:918bed9f-21cc-46fd-a13a-0f3e07b4b9ce:duplicate declaration_uuid: 918bed9f-21cc-46fd-a13a-0f3e07b4b9ce:1",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with identical canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "3ae0cc7395914374805d4f83bd2c68c279d1a342337ef449ffeec7fbf11639b9",
@@ -5257,6 +5305,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "e80df913ef38e16ac27db73a841b32f049ec3815bd2e847f13bc281c06b2f7d4",
+          "e80df913ef38e16ac27db73a841b32f049ec3815bd2e847f13bc281c06b2f7d4"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true
@@ -5276,7 +5328,7 @@
       "record_key": 2,
       "review_key": "declarations:918bed9f-21cc-46fd-a13a-0f3e07b4b9ce:duplicate declaration_uuid: 918bed9f-21cc-46fd-a13a-0f3e07b4b9ce:2",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with identical canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "3ae0cc7395914374805d4f83bd2c68c279d1a342337ef449ffeec7fbf11639b9",
@@ -5285,6 +5337,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "e80df913ef38e16ac27db73a841b32f049ec3815bd2e847f13bc281c06b2f7d4",
+          "e80df913ef38e16ac27db73a841b32f049ec3815bd2e847f13bc281c06b2f7d4"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true
@@ -5304,7 +5360,7 @@
       "record_key": 1,
       "review_key": "declarations:9ccaaa4b-93bd-4ac3-b99c-e8e5835be9f3:duplicate declaration_uuid: 9ccaaa4b-93bd-4ac3-b99c-e8e5835be9f3:1",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with conflicting canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "3d461dee73181875849b81f7f10547641fb2bfc97da40ed79a987609896c3ed2",
@@ -5313,6 +5369,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "9ceaa37380386bfb449e1f5398d1ddab80a4cc70d673a5bdfcffd92c06e5319d",
+          "9ceaa37380386bfb449e1f5398d1ddab80a4cc70d673a5bdfcffd92c06e5319d"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true
@@ -5332,7 +5392,7 @@
       "record_key": 2,
       "review_key": "declarations:9ccaaa4b-93bd-4ac3-b99c-e8e5835be9f3:duplicate declaration_uuid: 9ccaaa4b-93bd-4ac3-b99c-e8e5835be9f3:2",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with conflicting canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "3d461dee73181875849b81f7f10547641fb2bfc97da40ed79a987609896c3ed2",
@@ -5341,6 +5401,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "9ceaa37380386bfb449e1f5398d1ddab80a4cc70d673a5bdfcffd92c06e5319d",
+          "9ceaa37380386bfb449e1f5398d1ddab80a4cc70d673a5bdfcffd92c06e5319d"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true
@@ -5360,7 +5424,7 @@
       "record_key": 1,
       "review_key": "declarations:fe395431-4550-4b8d-9251-50bd4cfd5eb0:duplicate declaration_uuid: fe395431-4550-4b8d-9251-50bd4cfd5eb0:1",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with identical canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "28dbe67e5f85da63db41e0657dc75e7e7c4008be2c469c41a01f7fa6d12626b6",
@@ -5369,6 +5433,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "f0a6dc74105c4b68b7fb273497e36e2c618f74b8169c28b2f65adb72f22d8667",
+          "f0a6dc74105c4b68b7fb273497e36e2c618f74b8169c28b2f65adb72f22d8667"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true
@@ -5388,7 +5456,7 @@
       "record_key": 2,
       "review_key": "declarations:fe395431-4550-4b8d-9251-50bd4cfd5eb0:duplicate declaration_uuid: fe395431-4550-4b8d-9251-50bd4cfd5eb0:2",
       "review_status": "reviewed",
-      "reviewer_notes": "The source contains this declaration UUID more than once with identical canonical XML content; retain both rows and investigate recurrence.",
+      "reviewer_notes": "The source contains this declaration UUID more than once with identical semantic content; retain both rows and investigate recurrence.",
       "source_evidence": {
         "canonical_xml_sha256": [
           "28dbe67e5f85da63db41e0657dc75e7e7c4008be2c469c41a01f7fa6d12626b6",
@@ -5397,6 +5465,10 @@
         "normalized_record_match": true,
         "raw_xml_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
         "raw_xml_uri": "gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-16/declarations.xml",
+        "semantic_xml_sha256": [
+          "f0a6dc74105c4b68b7fb273497e36e2c618f74b8169c28b2f65adb72f22d8667",
+          "f0a6dc74105c4b68b7fb273497e36e2c618f74b8169c28b2f65adb72f22d8667"
+        ],
         "source_match": true,
         "source_occurrence_count": 2,
         "source_record_found": true

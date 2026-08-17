@@ -63,6 +63,7 @@ def test_duplicate_uuid_fingerprints_and_asset_flags_are_source_linked() -> None
 
     assert len(fingerprints["triage-duplicate"]) == 2
     assert len({item["canonical_xml_sha256"] for item in fingerprints["triage-duplicate"]}) == 2
+    assert len({item["semantic_xml_sha256"] for item in fingerprints["triage-duplicate"]}) == 2
 
     review = build_review_register(
         anomalies=anomalies,
@@ -82,6 +83,15 @@ def test_duplicate_uuid_fingerprints_and_asset_flags_are_source_linked() -> None
     }
     assert review["duplicate_uuid_groups"][0]["content_classification"] == "conflicting"
     assert all(row["source_evidence"]["source_match"] for row in review["records"])
+
+
+def test_duplicate_uuid_whitespace_is_semantically_identical() -> None:
+    fingerprints = declaration_xml_fingerprints(FIXTURES / "quality_triage.xml")
+
+    occurrences = fingerprints["triage-whitespace"]
+
+    assert len({item["canonical_xml_sha256"] for item in occurrences}) == 2
+    assert len({item["semantic_xml_sha256"] for item in occurrences}) == 1
 
 
 def test_repeated_names_are_grouped_without_deduplication() -> None:
