@@ -275,7 +275,7 @@ parsed numeric value; parsing does not imply that a value is valid.
 | `mandate_remunerations` | One row per annual remuneration value nested in an elected mandate item. | `source_item_index`, description, remuneration basis, `remuneration_year`, `raw_value`, `normalized_value` |
 | `activities` | One row per professional, consulting, spouse, volunteer, or collaborator activity. | `source_section`, description, employer, dates, remuneration |
 | `participations` | One row per financial or management participation. | Company, valuation, capital held, number of shares, raw record |
-| `incomes` | One row per declared income category and year that has a source value; empty category slots are excluded. | `income_year`, `income_type`, `raw_value`, `normalized_value`, spouse value |
+| `incomes` | One row per populated declared income category or annual elected-mandate remuneration value. Empty category slots are excluded; `income_stream` distinguishes the source stream. | `income_stream`, `income_year`, `income_type`, `raw_value`, `normalized_value`, spouse value |
 | `assets` | One row per observed asset DTO item, including bank accounts, insurance, securities, vehicles, and foreign assets. | `source_section`, asset name, `raw_value`, `normalized_value`, quality fields |
 | `liabilities` | One row per declared debt or liability item. | `source_section`, description, `raw_value`, `normalized_value`, raw record |
 
@@ -305,18 +305,23 @@ uv run python -m hatvp.quality_triage \
   --output-dir reports
 ```
 
-Income coverage is source-dependent. The `incomes` table is derived only from
-the XML `revenuMandatDto` section, not from every declaration or from
-remuneration fields in the mandates and activities tables. Elected-mandate
-remuneration comes from the separate `mandatElectifDto` section and is emitted
-to `mandate_remunerations` at one row per source year/value; repeated annual
-values are never collapsed to the final value. Empty fixed category slots are
-not counted as income rows. The quality report separately records
-`income_section_declarations`, `income_declarations`,
-`income_rows_with_numeric_value`, `income_sections_without_rows`,
-`mandate_remuneration_declarations`, and
-`mandate_remuneration_rows_with_numeric_value`, so the sparse `revenuMandatDto`
-population is not mistaken for total remuneration coverage.
+Income coverage is source-dependent but the curated `incomes` table now
+combines both observed revenue streams. Rows from `revenuMandatDto` use
+`income_stream=revenu_mandat` and contain populated elected-person or fallback
+total values; empty fixed category slots are excluded. Rows from
+`mandatElectifDto` use `income_stream=mandate_remuneration` and preserve one
+row per annual source year/value, including explicit zeroes. The detailed
+`mandate_remunerations` table remains available with the remuneration-specific
+fields and the same raw source record, so this is an additional curated view,
+not a lossy replacement or silent deduplication.
+
+The quality report records `income_rows_by_stream` and
+`income_declarations_by_stream` alongside `income_section_declarations`,
+`income_declarations`, `income_rows_with_numeric_value`,
+`income_sections_without_rows`, `mandate_remuneration_declarations`, and
+`mandate_remuneration_rows_with_numeric_value`. This keeps the sparse
+`revenuMandatDto` population visible while making annual elected-mandate
+remuneration available to standard income queries.
 
 ## Configuration
 

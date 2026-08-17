@@ -193,6 +193,8 @@ timezone: Europe/Paris
 - [x] Confirm BigQuery remains optional when `HATVP_ENABLE_BIGQUERY=false`.
 - [x] Confirm a BigQuery failure prevents the latest state hash from advancing.
 - [x] Document the analytical table schemas and example queries.
+- [ ] Rebuild the curated `incomes` partition from both observed revenue
+  streams and verify the annual `mandatElectifDto` rows in BigQuery.
 
 BigQuery validation evidence for snapshot `2026-08-17`: dataset
 `yahatvp-pipeline-eu:hatvp` was created in `europe-west1`; deployment

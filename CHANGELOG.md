@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-08-17 — Include annual mandate remuneration in curated incomes
+
+### Changed
+
+- Extended the unified `incomes` parser output to include every annual numeric
+  value nested in `mandatElectifDto`, while retaining the detailed
+  `mandate_remunerations` table and immutable source record.
+- Added `income_stream` tags for `revenuMandatDto` versus
+  `mandatElectifDto`, preserving explicit zero values and source years in the
+  normalized Parquet schema.
+- Added stream-level quality coverage metrics and fixture regressions for
+  multi-year and zero-value remuneration series.
+- Updated the README and TODO to document the curated income contract and the
+  pending BigQuery replay.
+
+### Verified
+
+- Full local checks pass: 38 tests, Ruff lint, and parser/quality regressions.
+- Live local-output run against the current HATVP files completed with zero
+  quality errors and `SUCCESS_WITH_WARNINGS`.
+- The resulting snapshot contains 74,791 numeric `incomes` rows: 74,725
+  `mandate_remuneration` rows across 5,850 declarations and 66
+  `revenu_mandat` rows across 9 declarations.
+
+### Follow-up
+
+- Deploy the parser revision and refresh the curated BigQuery `incomes`
+  partition, then record row counts and repeat-load evidence.
+
 ## 2026-08-17 — Enable and validate the initial BigQuery curated layer
 
 ### Changed

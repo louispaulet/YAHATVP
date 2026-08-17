@@ -20,6 +20,11 @@ def test_parser_uses_observed_xml_structure() -> None:
     assert tables["declarations"][0]["mandat_label"] == "Élu local"
     assert tables["people"][0]["email"] is None
     assert tables["incomes"][0]["normalized_value"] == 12000.0
+    mandate_income = tables["incomes"][1]
+    assert mandate_income["income_stream"] == "mandate_remuneration"
+    assert mandate_income["income_year"] == "2025"
+    assert mandate_income["income_type"] == "Maire"
+    assert mandate_income["normalized_value"] == 50000.0
     mandate_remuneration = tables["mandate_remunerations"][0]
     assert mandate_remuneration["description"] == "Maire"
     assert mandate_remuneration["remuneration_year"] == 2025
@@ -69,6 +74,27 @@ def test_single_real_declaration_fixture_is_the_first_acceptance_case() -> None:
         0.0,
         0.0,
         0.0,
+    ]
+    income_remuneration_rows = [
+        row
+        for row in tables["incomes"]
+        if row["income_stream"] == "mandate_remuneration" and row["source_item_index"] == 0
+    ]
+    assert [row["income_year"] for row in income_remuneration_rows] == [
+        "2019",
+        "2020",
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+    ]
+    assert [row["normalized_value"] for row in income_remuneration_rows] == [
+        71105.0,
+        70773.0,
+        70676.0,
+        63050.0,
+        73698.0,
+        43491.0,
     ]
     mandate_item = next(
         row
@@ -152,6 +178,18 @@ def test_parser_excludes_empty_income_slots_and_uses_total_fallback() -> None:
     assert by_uuid["fixture-income-slots"]["income_section_populated_item_count"] == 2
     assert by_uuid["fixture-empty-income-section"]["income_section_present"] is True
     assert by_uuid["fixture-empty-income-section"]["income_section_populated_item_count"] == 0
+
+
+def test_parser_preserves_zero_annual_remunerations_in_unified_income_table() -> None:
+    tables = parse_xml(FIXTURES / "declaration_single_real.xml", "2026-08-16")
+
+    zero_rows = [
+        row
+        for row in tables["incomes"]
+        if row["income_stream"] == "mandate_remuneration" and row["source_item_index"] == 2
+    ]
+    assert len(zero_rows) == 4
+    assert [row["normalized_value"] for row in zero_rows] == [0.0, 0.0, 0.0, 0.0]
 
 
 def test_parser_rejects_invalid_top_level_structure_before_normalization(

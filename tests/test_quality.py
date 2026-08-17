@@ -97,6 +97,32 @@ def test_mandate_remuneration_coverage_is_reported_separately() -> None:
     assert result.report["checks"]["mandate_remuneration_rows_with_numeric_value"] == 2
 
 
+def test_unified_income_coverage_reports_each_source_stream() -> None:
+    tables = _tables()
+    tables["incomes"].append(
+        {
+            "declaration_uuid": "b",
+            "source_section": "mandatElectifDto",
+            "income_stream": "mandate_remuneration",
+            "income_year": "2025",
+            "raw_value": "50 000",
+            "normalized_value": 50_000.0,
+            "spouse_raw_value": None,
+        }
+    )
+
+    result = run_quality_checks(tables, snapshot_date="2026-08-16")
+
+    assert result.report["checks"]["income_rows_by_stream"] == {
+        "mandate_remuneration": 1,
+        "unknown": 1,
+    }
+    assert result.report["checks"]["income_declarations_by_stream"] == {
+        "mandate_remuneration": 1,
+        "unknown": 1,
+    }
+
+
 def test_catastrophic_row_count_reduction_is_explicitly_reported() -> None:
     result = run_quality_checks(
         _tables(),

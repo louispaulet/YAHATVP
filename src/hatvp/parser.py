@@ -529,6 +529,7 @@ def _income_rows(declaration: etree._Element, snapshot_date: str) -> list[dict[s
                     "declaration_uuid": declaration_uuid,
                     "snapshot_date": snapshot_date,
                     "source_section": "revenuMandatDto",
+                    "income_stream": "revenu_mandat",
                     "source_item_index": item_index,
                     "income_category_index": category_index,
                     "income_year": year,
@@ -554,6 +555,7 @@ def _income_rows(declaration: etree._Element, snapshot_date: str) -> list[dict[s
                     "declaration_uuid": declaration_uuid,
                     "snapshot_date": snapshot_date,
                     "source_section": "revenuMandatDto",
+                    "income_stream": "revenu_mandat",
                     "source_item_index": item_index,
                     "income_category_index": None,
                     "income_year": year,
@@ -565,6 +567,50 @@ def _income_rows(declaration: etree._Element, snapshot_date: str) -> list[dict[s
                     "quality_status": "OK",
                     "quality_reason": None,
                     "raw_record_json": _raw_record(values),
+                }
+            )
+    return rows
+
+
+def _mandate_remuneration_income_rows(
+    declaration: etree._Element, snapshot_date: str
+) -> list[dict[str, Any]]:
+    """Expose annual elected-mandate remuneration in the unified income table.
+
+    The dedicated ``mandate_remunerations`` table remains the detailed source
+    table. These rows make the curated ``incomes`` table useful for total
+    revenue analysis without collapsing a multi-year source series or hiding
+    the originating XML section.
+    """
+
+    declaration_uuid = _normalized_child_text(declaration, "uuid")
+    rows: list[dict[str, Any]] = []
+    section = _child(declaration, "mandatElectifDto")
+    for item_index, item in enumerate(_item_groups(section)):
+        fields = _mandate_item_fields(item)
+        entries = _mandate_remuneration_entries(item)
+        raw_record_json = _mandate_item_raw_record(item, entries)
+        for remuneration_index, entry in enumerate(entries):
+            rows.append(
+                {
+                    "declaration_uuid": declaration_uuid,
+                    "snapshot_date": snapshot_date,
+                    "source_section": "mandatElectifDto",
+                    "income_stream": "mandate_remuneration",
+                    "source_item_index": item_index,
+                    "income_category_index": None,
+                    "income_year": entry["remuneration_year_raw"],
+                    "income_type": fields["description"]
+                    or entry["remuneration_basis"]
+                    or "mandate_remuneration",
+                    "raw_value": entry["raw_value"],
+                    "normalized_value": entry["normalized_value"],
+                    "spouse_raw_value": None,
+                    "spouse_normalized_value": None,
+                    "quality_status": "OK",
+                    "quality_reason": None,
+                    "raw_record_json": raw_record_json,
+                    "remuneration_index": remuneration_index,
                 }
             )
     return rows
@@ -646,6 +692,7 @@ def parse_xml(path: Path, snapshot_date: str) -> dict[str, list[dict[str, Any]]]
             tables["activities"].extend(_activity_rows(element, snapshot_date))
             tables["participations"].extend(_participation_rows(element, snapshot_date))
             tables["incomes"].extend(_income_rows(element, snapshot_date))
+            tables["incomes"].extend(_mandate_remuneration_income_rows(element, snapshot_date))
             tables["assets"].extend(_asset_rows(element, snapshot_date))
             tables["liabilities"].extend(_liability_rows(element, snapshot_date))
 

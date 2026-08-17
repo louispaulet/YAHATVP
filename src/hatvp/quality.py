@@ -212,6 +212,29 @@ def run_quality_checks(
     checks["income_sections_without_rows"] = income_sections_without_rows
     warnings += income_sections_without_rows
 
+    def income_stream(row: dict[str, Any]) -> str:
+        explicit_stream = row.get("income_stream")
+        if explicit_stream:
+            return explicit_stream
+        return {
+            "revenuMandatDto": "revenu_mandat",
+            "mandatElectifDto": "mandate_remuneration",
+        }.get(row.get("source_section"), "unknown")
+
+    income_rows_by_stream = Counter(income_stream(row) for row in incomes)
+    income_declarations_by_stream = {
+        stream: len(
+            {
+                row.get("declaration_uuid")
+                for row in incomes
+                if income_stream(row) == stream and row.get("declaration_uuid")
+            }
+        )
+        for stream in income_rows_by_stream
+    }
+    checks["income_rows_by_stream"] = dict(sorted(income_rows_by_stream.items()))
+    checks["income_declarations_by_stream"] = dict(sorted(income_declarations_by_stream.items()))
+
     mandate_remuneration_declarations = len(
         {
             row.get("declaration_uuid")
