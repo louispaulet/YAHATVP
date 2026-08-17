@@ -4,25 +4,32 @@
 
 ### Added
 
-- Added `reports/quality-triage-2026-08-16.md`, a source-linked technical
-  review covering every flagged anomaly from the first production snapshot.
-- Added `reports/quality-triage-2026-08-16.json`, preserving the complete
-  repeated-name group register and row-level duplicate-UUID, negative-balance,
-  and asset-outlier classifications.
+- Added the source-linked triage generator in `src/hatvp/quality_triage.py`,
+  with fixture coverage for repeated names, duplicate declaration UUIDs,
+  whitespace-semantic duplicate handling, negative bank-account values,
+  source-linked asset outliers, and exact count reconciliation.
+- Added the complete Markdown review report and machine-readable register for
+  the `2026-08-16` production snapshot under `reports/`.
 
 ### Verified
 
-- Reconciled all 5,763 quarantine anomaly rows: 5,599 repeated-name rows across
-  2,247 groups, 12 rows across six duplicate UUID groups, nine negative bank
-  balances, and 143 asset outliers.
-- Matched all 152 negative/outlier asset records to their serialized source
-  records in the immutable 2026-08-16 XML snapshot.
-- Confirmed all six duplicate UUID groups are semantically identical source
-  duplicates; one pair differs only by trailing whitespace. No parser or
-  normalization issue was confirmed, and no historical artifact or state was
-  changed.
-- Updated the README and TODO checklist with the completed review and the
-  remaining recurrence-monitoring follow-up.
+- Reconciled all 5,763 quarantine anomaly rows to the canonical GCS quality
+  report: 5,599 expected identity collisions, 143 source-consistent asset
+  outliers, 9 source-valid overdraft-style values, and 12 duplicate-UUID rows
+  across 6 groups.
+- Matched every flagged row to the immutable raw XML and persisted normalized
+  record. All six duplicate UUID groups contain semantically identical XML;
+  one pair differs only by trailing whitespace in the source.
+- Recorded raw XML SHA-256
+  `865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf` and
+  pipeline revision `f21853de13c236400d3fc9f9b8da34ce16ad7bb2` in the register.
+- Fixture triage tests pass: 3 tests. The production report has zero
+  unresolved or parser/source-mismatch records.
+
+### Follow-up
+
+- Monitor recurrence and pursue source correction for the six duplicate
+  declaration UUID groups; the canonical-byte difference is whitespace-only.
 
 ## 2026-08-17 — Validate production pipeline contracts and Scheduler handoff
 

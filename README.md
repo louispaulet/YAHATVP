@@ -109,6 +109,7 @@ hatvp-pipeline/
 │   ├── parser.py
 │   ├── normalize.py
 │   ├── quality.py
+│   ├── quality_triage.py
 │   ├── models.py
 │   └── bigquery.py
 ├── tests/
@@ -280,20 +281,28 @@ parsed numeric value; parsing does not imply that a value is valid.
 ### First production snapshot quality triage
 
 The 2026-08-16 report had zero errors, 3,510 warnings, and 5,763 flagged
-records. Repeated names are expected identity-collision flags and must not be
-deduplicated. The 143 robust asset outliers are retained for review because
-asset values are skewed. The nine negative asset values are small negative
-bank-account balances consistent with overdrafts; they are source-valid for
-retention but remain flagged. The six duplicate declaration UUID groups were
-source-verified as semantically identical duplicates, including one pair that
-differs only by trailing whitespace; they remain flagged for investigation if
-they recur. All 152 negative/outlier asset rows match their serialized source
-records in the immutable XML, and no parser or normalization issue was found.
+records. The complete source-linked review is recorded in the
+[`quality-triage-2026-08-16.md`](reports/quality-triage-2026-08-16.md) report and
+the row-level
+[`quality-triage-2026-08-16.json`](reports/quality-triage-2026-08-16.json)
+register. All 5,763 flagged rows matched the immutable raw XML and persisted
+normalized records: 5,599 repeated-name rows are expected identity-collision
+flags and are not deduplicated; 143 robust asset outliers remain retained
+statistical review flags; and nine small negative bank-account values are
+source-valid overdraft-style values that remain flagged. The six duplicate
+declaration UUID groups are source-quality follow-ups: all six groups are
+semantically identical source duplicates, with one pair differing only by
+trailing whitespace.
 
-The complete source-linked review is documented in
-[`reports/quality-triage-2026-08-16.md`](reports/quality-triage-2026-08-16.md),
-with the complete group- and row-level register in
-[`reports/quality-triage-2026-08-16.json`](reports/quality-triage-2026-08-16.json).
+The report can be regenerated from a read-only artifact store with ADC:
+
+```bash
+uv run python -m hatvp.quality_triage \
+  --bucket yahatvp-pipeline-eu-data \
+  --prefix hatvp \
+  --snapshot-date 2026-08-16 \
+  --output-dir reports
+```
 
 Income coverage is source-dependent. The `incomes` table is derived only from
 the XML `revenuMandatDto` section, not from every declaration or from

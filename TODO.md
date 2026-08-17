@@ -4,7 +4,7 @@ This checklist turns the project requirements into an execution plan. The local
 pipeline and first Google Cloud deployment are implemented and tested; the
 weekly Scheduler trigger is connected to the production ingestion job and has
 completed repeat live deliveries. Optional BigQuery and remaining operational
-hardening remain.
+hardening remain; first-snapshot quality triage is documented and complete.
 
 ## Current status
 
@@ -72,11 +72,10 @@ Quality triage for the first production snapshot (`2026-08-16`): repeated names
 and robust asset outliers remain review flags because they are plausible source
 patterns; the nine negative bank-account balances are consistent with
 overdrafts, so they remain flagged and retained; six duplicate declaration UUID
-groups were source-verified as semantically identical duplicates and remain
-flagged for recurrence monitoring. The complete source-linked review is in
-[`reports/quality-triage-2026-08-16.md`](reports/quality-triage-2026-08-16.md),
-with the machine-readable register in
-[`reports/quality-triage-2026-08-16.json`](reports/quality-triage-2026-08-16.json).
+groups are actionable source-quality issues. The source-linked register contains
+all 5,763 flagged rows with zero unresolved or parser/source-mismatch records;
+all six duplicate UUID groups are semantically identical, with one pair
+differing only by trailing whitespace.
 
 Required local checks:
 
@@ -140,8 +139,8 @@ After the first successful Cloud Run execution:
 - [x] Confirm a failed transformation leaves the previous `state/latest.json` unchanged (fixture coverage includes structural-quality and BigQuery failures).
 
 The first smoke-test snapshot was `2026-08-16`. Its quality report contained
-zero errors, 3,510 warnings, and 5,763 flagged records; quality triage remains
-open.
+zero errors, 3,510 warnings, and 5,763 flagged records; every flagged row is
+accounted for in the completed source-linked register.
 
 ## 5. Configure the weekly Scheduler trigger
 
@@ -197,7 +196,7 @@ timezone: Europe/Paris
 ## 8. Production go-live checklist
 
 - [x] Run one complete manual Cloud Run execution and review the quality report.
-- [x] Review all flagged records from the first snapshot.
+- [x] Review all flagged records from the first snapshot and publish the source-linked triage register.
 - [x] Confirm raw data, Parquet outputs, quarantine, quality report, and state are all present.
 - [x] Confirm the Scheduler-triggered smoke execution succeeds; the smoke trigger is now paused after handoff.
 - [x] Confirm the production Scheduler-triggered ingestion execution succeeds after handoff (`hatvp-ingestion-c96k4` and `hatvp-ingestion-bbpbj`).
@@ -212,6 +211,7 @@ timezone: Europe/Paris
 - [ ] Add an alert for failed Cloud Run Job executions.
 - [ ] Add an alert for repeated `SUCCESS_WITH_WARNINGS` or an unusual increase in flagged records.
 - [ ] Review quality reports after each weekly run.
+- [ ] Monitor recurrence and pursue source correction for the six duplicate declaration UUID groups; one pair differs only by trailing whitespace.
 - [ ] Monitor row counts and null rates for sudden changes.
 - [ ] Review HATVP schema changes before changing normalization logic.
 - [ ] Add a new fixture before fixing any newly observed source edge case.
