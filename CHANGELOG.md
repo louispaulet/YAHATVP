@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-08-17 — Reconcile a superseded annual-remuneration outlier
+
+### Changed
+
+- Updated `reports/revenue-stream-outliers-2026-08-17.md` to use an explicit
+  effective-declaration view for the outlier register.
+- Excluded superseded declaration
+  `27c770d6-0e1f-4f7f-bb21-d4c0e003e935` after checking the latest
+  modificative declaration `d9b0bda2-d97b-4983-bf09-ea61c759b7b3` in the raw
+  XML. The 2025 `députée` value changes from `5 919 820` to `62 730`.
+
+### Verified
+
+- The effective register now contains 54 outliers across 31 declarations;
+  the raw normalized snapshot remains unchanged at 74,725 rows.
+- Recomputed the effective median/MAD statistics and refreshed the candidate
+  table. No raw or normalized source rows were deleted.
+
 ## 2026-08-17 — Add combined revenue-stream outlier report
 
 ### Added

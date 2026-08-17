@@ -64,6 +64,7 @@ Workload Identity Federation, not a stored key.
 - [x] Add a live declaration XML/parsed-data bundle for manual review and exclude placeholder-only DTO rows.
 - [x] Add a `revenuMandatDto` income outlier report with source-to-parser reconciliation.
 - [x] Add a combined outlier report for `revenuMandatDto` and annual `mandatElectifDto` remuneration values.
+- [x] Reconcile superseded declaration versions in the revenue-stream outlier report.
 - [x] Decide whether any current negative asset values are source-valid or should remain flagged.
 - [x] Document the meaning of each normalized table and important field in the README.
 
