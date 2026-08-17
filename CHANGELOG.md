@@ -26,6 +26,16 @@
 - Ruff check and format check pass; `uv build` packages `pipeline.yml`; the
   staged line-budget test passes for all tracked Python files; and the local
   fixture pipeline returns `SUCCESS_WITH_WARNINGS` followed by `NO_CHANGE`.
+- PR #10 CI is green: test and deployment-config pass, while deployment is
+  skipped for the pull-request event as intended. A read-only BigQuery baseline
+  for `2026-08-17` confirms partitioned curated tables and counts/fingerprints
+  of declarations 6,611/`-5383795550778946119`, people 6,611/
+  `-2019889874151548892`, incomes 74,791/`-2929076836325473210`, and assets
+  1,157/`-5142282871526498847`.
+- The requested live replay is blocked before mutation: ADC is unavailable
+  (`google.auth.exceptions.DefaultCredentialsError: Your default credentials
+  were not found`) and the local HATVP GCS/BigQuery environment variables are
+  unset. PR #10 remains open and unmerged pending ADC/resource access.
 
 ## 2026-08-17 — Add operational retention verification and alerting
 
