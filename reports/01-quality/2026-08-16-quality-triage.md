@@ -113,5 +113,5 @@ The complete row-level register is in the JSON artifact. The table below provide
 
 ## Artifacts
 
-- Machine-readable register: `reports/quality-triage-2026-08-16.json`
+- Machine-readable register: `reports/01-quality/2026-08-16-quality-triage.json`
 - Immutable source evidence: the GCS objects listed above

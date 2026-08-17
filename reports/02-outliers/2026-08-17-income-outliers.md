@@ -126,7 +126,7 @@ The sums below add the populated category rows within each declaration UUID. The
 | Sum of source `totalElu` values (€) | €1,098,531 |
 | Aggregate reconciliation difference (€) | €0 |
 
-The manual review bundle contains one raw declaration and its parsed output: [`reports/manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/README.md`](manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/README.md). It is the Rachida Dati example described above.
+The manual review bundle contains one raw declaration and its parsed output: [`Rachida Dati manual-review bundle`](../04-manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/00-summary.md). It is the Rachida Dati example described above.
 
 ## Method and limitations
 

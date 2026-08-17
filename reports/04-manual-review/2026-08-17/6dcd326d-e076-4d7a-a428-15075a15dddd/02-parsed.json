@@ -40,7 +40,7 @@
   },
   "snapshot_date": "2026-08-17",
   "source": {
-    "extraction_note": "declaration.xml is a human-readable XML serialization of the source declaration element; source_sha256 identifies the immutable full XML bytes.",
+    "extraction_note": "01-declaration.xml is a human-readable XML serialization of the source declaration element; source_sha256 identifies the immutable full XML bytes.",
     "source_file": "declarations.xml",
     "source_sha256": "865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf",
     "source_size_bytes": 88825812,

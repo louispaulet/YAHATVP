@@ -213,7 +213,7 @@ BigQuery validation evidence for snapshot `2026-08-17`: dataset
 `incomes=74,791`; the four partition counts and row fingerprints were identical
 across runs; and unchanged execution `hatvp-ingestion-rmclb` emitted
 `NO_CHANGE`. The source-linked report is
-[`reports/bigquery-early-findings-2026-08-17.md`](reports/bigquery-early-findings-2026-08-17.md).
+[`reports/03-validation/2026-08-17-bigquery-and-income-validation.md`](reports/03-validation/2026-08-17-bigquery-and-income-validation.md).
 
 ## 8. Production go-live checklist
 
@@ -230,6 +230,8 @@ across runs; and unchanged execution `hatvp-ingestion-rmclb` emitted
 
 ## 9. Ongoing operations
 
+- [x] Keep the report catalog organized by numbered topic folders, consolidate
+  overlapping validation notes, and preserve source/provenance links.
 - [x] Add an alert for failed Cloud Run Job executions.
 - [x] Add an alert for repeated `SUCCESS_WITH_WARNINGS` or an unusual increase in flagged records.
 - [ ] Confirm the monitoring email channel delivers a test notification.

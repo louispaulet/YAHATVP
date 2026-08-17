@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-18 — Reorganize the report catalog
+
+### Changed
+
+- Grouped reports into numbered quality, outlier, validation, and manual-review
+  folders with date-first filenames and a new [`reports/00-index.md`](reports/00-index.md)
+  navigation page.
+- Consolidated the overlapping BigQuery findings and income-coverage recovery
+  notes into [`reports/03-validation/2026-08-17-bigquery-and-income-validation.md`](reports/03-validation/2026-08-17-bigquery-and-income-validation.md).
+- Kept the asset outlier Markdown, portable HTML, and artifact JSON together as
+  format variants of one analysis, and updated the triage CLI default output
+  directory to `reports/01-quality`.
+- Updated repository links and manual-review bundle filenames without changing
+  raw values, source hashes, declaration identifiers, or review dispositions.
+
+### Verified
+
+- Report inventory contains no root-level report files other than the index;
+  all report links resolve to the reorganized paths.
+
 ## 2026-08-18 — Deploy refactored packages and replay production
 
 ### Verified
@@ -110,7 +130,7 @@
 
 ### Added
 
-- Added [`reports/income-coverage-recovery-2026-08-17.md`](reports/income-coverage-recovery-2026-08-17.md), documenting the root cause, unified stream counts, production BigQuery validation, source hashes, and remaining interpretation limits.
+- Added the income-coverage recovery findings, now consolidated in [`reports/03-validation/2026-08-17-bigquery-and-income-validation.md`](reports/03-validation/2026-08-17-bigquery-and-income-validation.md), documenting the root cause, unified stream counts, production BigQuery validation, source hashes, and remaining interpretation limits.
 
 ### Verified
 
@@ -217,8 +237,8 @@
 - The replay produced identical `BIT_XOR(FARM_FINGERPRINT(...))` row
   fingerprints, and unchanged execution `hatvp-ingestion-bzqvw` emitted
   `NO_CHANGE`. The weekly Scheduler trigger was restored to `ENABLED`.
-- Published the technical findings report at
-  `reports/bigquery-early-findings-2026-08-17.md`.
+- Published the consolidated technical findings report at
+  `reports/03-validation/2026-08-17-bigquery-and-income-validation.md`.
 
 ### Follow-up
 
@@ -293,7 +313,7 @@
 
 ### Changed
 
-- Updated `reports/revenue-stream-outliers-2026-08-17.md` after checking all
+- Updated `reports/02-outliers/2026-08-17-revenue-stream-outliers.md` after checking all
   55 raw annual-remuneration outlier rows against later same-person,
   same-context declaration versions.
 - Excluded 11 older declaration UUIDs covering 13 corrected outlier rows and
@@ -315,7 +335,7 @@
 
 ### Added
 
-- Added `reports/revenue-stream-outliers-2026-08-17.md`, covering both sparse
+- Added `reports/02-outliers/2026-08-17-revenue-stream-outliers.md`, covering both sparse
   `revenuMandatDto` income categories and annual `mandatElectifDto`
   remuneration values.
 
@@ -399,7 +419,7 @@
 
 ### Added
 
-- Added `reports/statistical-income-outliers-2026-08-17.md` with the full
+- Added `reports/02-outliers/2026-08-17-income-outliers.md` with the full
   source-to-parser funnel, category distribution, declaration-level summaries,
   review candidates, and `totalElu` reconciliation.
 
@@ -431,7 +451,7 @@
 
 - Added a representative live declaration XML and associated normalized JSON
   bundle under
-  `reports/manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/`.
+  `reports/04-manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/`.
 - Included source SHA-256, GCS snapshot path, parser commit, table counts, and
   all normalized rows for the selected declaration UUID.
 
@@ -468,8 +488,8 @@
 ### Added
 
 - Added the canonical report artifact and self-contained HTML version at
-  `reports/statistical-asset-outliers-2026-08-17.artifact.json` and
-  `reports/statistical-asset-outliers-2026-08-17.html`.
+  `reports/02-outliers/2026-08-17-asset-outliers.artifact.json` and
+  `reports/02-outliers/2026-08-17-asset-outliers.html`.
 - Added native charts for outliers by asset section, euro value band, and
   highest-value declaration groups.
 - Marked monetary fields and table/chart axes as euro-denominated while
@@ -486,7 +506,7 @@
 
 ### Added
 
-- Added `reports/statistical-asset-outliers-2026-08-17.md`, a fact-checking
+- Added `reports/02-outliers/2026-08-17-asset-outliers.md`, a fact-checking
   report for the 143 statistical asset outliers in the successful
   `2026-08-17` snapshot.
 - Included declarant names, normalized publication dates, declaration UUIDs,

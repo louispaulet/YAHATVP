@@ -356,11 +356,15 @@ parsed numeric value; parsing does not imply that a value is valid.
 
 ### First production snapshot quality triage
 
+The complete report catalog is [`reports/00-index.md`](reports/00-index.md).
+It groups quality review, outlier analysis, validation, and manual-review
+bundles under numbered topic folders.
+
 The 2026-08-16 report had zero errors, 3,510 warnings, and 5,763 flagged
 records. The complete source-linked review is recorded in the
-[`quality-triage-2026-08-16.md`](reports/quality-triage-2026-08-16.md) report and
+[`2026-08-16-quality-triage.md`](reports/01-quality/2026-08-16-quality-triage.md) report and
 the row-level
-[`quality-triage-2026-08-16.json`](reports/quality-triage-2026-08-16.json)
+[`2026-08-16-quality-triage.json`](reports/01-quality/2026-08-16-quality-triage.json)
 register. All 5,763 flagged rows matched the immutable raw XML and persisted
 normalized records: 5,599 repeated-name rows are expected identity-collision
 flags and are not deduplicated; 143 robust asset outliers remain retained
@@ -377,7 +381,7 @@ uv run python -m hatvp.triage \
   --bucket yahatvp-pipeline-eu-data \
   --prefix hatvp \
   --snapshot-date 2026-08-16 \
-  --output-dir reports
+  --output-dir reports/01-quality
 ```
 
 Income coverage is source-dependent but the curated `incomes` table now
@@ -463,7 +467,7 @@ fixture adds a second declaration with the same name so identity and
 duplicate-name handling can be tested without deduplicating people.
 
 For manual review of a live declaration, see
-[`reports/manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/`](reports/manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/).
+[`reports/04-manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/`](reports/04-manual-review/2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/).
 It contains the selected XML declaration and the associated normalized rows
 with source hashes and parser provenance.
 

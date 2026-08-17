@@ -45,7 +45,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--prefix", default="hatvp")
     parser.add_argument("--snapshot-date", default=SNAPSHOT_DATE)
     parser.add_argument("--source-uri-prefix")
-    parser.add_argument("--output-dir", type=Path, default=Path("reports"))
+    parser.add_argument("--output-dir", type=Path, default=Path("reports/01-quality"))
     return parser
 
 

@@ -1,4 +1,4 @@
-# BigQuery Early Findings — 2026-08-17
+# BigQuery and income validation — 2026-08-17
 
 ## Technical summary
 
@@ -12,6 +12,10 @@ fingerprints, and a post-refresh unchanged-input execution returned
 
 The load completed with zero quality errors. The source still contains known
 review flags, so the operational status remains `SUCCESS_WITH_WARNINGS`.
+
+This is the consolidated validation report for the refreshed curated layer.
+It replaces the former standalone income-coverage note; the detailed
+source-to-parser and outlier analyses remain in `../02-outliers/`.
 
 ## Curated tables validated idempotently per snapshot
 
@@ -59,6 +63,33 @@ have no populated category rows. Empty fixed category slots are still excluded
 from the curated table, while annual `mandatElectifDto` values are preserved
 with their source years and explicit zeroes.
 
+### Income coverage recovery
+
+The initial curated `incomes` result contained only 66 rows because it read
+the populated `revenuMandatDto` categories. The XML also contains annual
+remuneration values nested under `mandatElectifDto`; those values were already
+preserved in the dedicated `mandate_remunerations` table but were not included
+in the unified income view.
+
+The parser and loader now:
+
+- emit one unified income row per annual `mandatElectifDto` remuneration;
+- tag rows as `mandate_remuneration` or `revenu_mandat`;
+- preserve source years, raw French-formatted values, normalized values,
+  source item indexes, remuneration indexes, and raw record JSON;
+- retain empty category slots as non-observations and explicit zero-valued
+  annual remuneration rows as valid source records; and
+- add staged BigQuery columns before inserting by explicit column names, so
+  schema evolution cannot break a repeat load through positional alignment.
+
+The successful production verification used deployment revision
+`1000d0b03a6fdcebef75b467fca1cf7a95860d84` and GitHub Actions run
+`32049058688`. The forced replay `hatvp-ingestion-f6mdg`, repeat forced replay
+`hatvp-ingestion-ts6jb`, and unchanged-input execution
+`hatvp-ingestion-rmclb` provide the row-count, fingerprint, and `NO_CHANGE`
+evidence summarized above. The new curated columns are `income_stream`
+(`STRING`) and `remuneration_index` (`INT64`).
+
 ### Asset anomalies are review flags, not deletions
 
 The `assets` table contains 1,157 rows. Quality checks retain 143 robust
@@ -104,6 +135,18 @@ report and state record were read from:
 - `gs://yahatvp-pipeline-eu-data/hatvp/quality/snapshot_date=2026-08-17/report.json`
 - `gs://yahatvp-pipeline-eu-data/hatvp/state/latest.json`
 
+The exact source hashes for this validation are:
+
+- XML SHA-256: `865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf`
+- CSV SHA-256: `156463f08b88dd884dcbb0721d9295869c8df7595cf98696162030123938dd29`
+- Unified income Parquet:
+  `gs://yahatvp-pipeline-eu-data/hatvp/silver/incomes/snapshot_date=2026-08-17/data.parquet`
+
+The failed first replay stopped at the old 14-column BigQuery insert and did
+not advance `state/latest.json`; the schema migration above resolved that
+failure. Local checks and a live local-output run also completed with zero
+quality errors.
+
 ## Limitations and robustness
 
 - This is one snapshot, so it establishes correctness and idempotency but not
@@ -114,6 +157,10 @@ report and state record were read from:
   digest. Exact source hashes remain the authoritative snapshot identity.
 - The warning-bearing quality status is expected and does not indicate a
   failed load; zero structural quality errors were reported.
+- The two income streams have different semantics and should not be summed
+  without an explicit analytical definition: `revenuMandatDto` is a sparse
+  declaration-level category stream, while `mandatElectifDto` is an annual
+  remuneration stream.
 
 ## Recommended next steps
 
