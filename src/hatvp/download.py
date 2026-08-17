@@ -1,3 +1,5 @@
+"""Reliable source download with exact-byte hashing and bounded retries."""
+
 from __future__ import annotations
 
 import logging
@@ -7,6 +9,7 @@ from pathlib import Path
 
 import httpx
 
+from .download_validation import validate_dataset_prefix
 from .hashing import sha256_file
 
 logger = logging.getLogger(__name__)
@@ -22,19 +25,6 @@ class DownloadedFile:
     elapsed_seconds: float
 
 
-def _validate_dataset_prefix(path: Path, name: str) -> None:
-    with path.open("rb") as source:
-        prefix = source.read(4096).lstrip().lower()
-    if not prefix:
-        raise ValueError(f"Downloaded {name} is empty")
-    if name.endswith(".xml") and not (
-        prefix.startswith(b"<?xml") or prefix.startswith(b"<declarations")
-    ):
-        raise ValueError(f"Downloaded {name} does not look like an XML document")
-    if name.endswith(".csv") and b";" not in prefix.splitlines()[0]:
-        raise ValueError(f"Downloaded {name} does not look like a semicolon-delimited CSV")
-
-
 def download_to_path(
     url: str,
     name: str,
@@ -45,36 +35,25 @@ def download_to_path(
     read_timeout_seconds: float,
     retries: int,
 ) -> DownloadedFile:
-    """Download exact response bytes to a temporary file, then atomically publish them."""
+    """Download exact response bytes to a temporary file, then publish atomically."""
 
     timeout = httpx.Timeout(read_timeout_seconds, connect=connect_timeout_seconds)
     last_error: Exception | None = None
     destination.parent.mkdir(parents=True, exist_ok=True)
-
     for attempt in range(1, retries + 1):
         started = time.perf_counter()
         temporary = destination.with_name(f".{destination.name}.part")
         try:
-            with httpx.Client(
-                follow_redirects=True,
-                timeout=timeout,
-                headers={"User-Agent": user_agent},
-            ) as client:
-                with client.stream("GET", url) as response:
-                    response.raise_for_status()
-                    with temporary.open("wb") as output:
-                        for chunk in response.iter_bytes():
-                            output.write(chunk)
-            _validate_dataset_prefix(temporary, name)
+            _download_once(url, temporary, user_agent, timeout)
+            validate_dataset_prefix(temporary, name)
             temporary.replace(destination)
-            size_bytes = destination.stat().st_size
             result = DownloadedFile(
-                name=name,
-                url=url,
-                path=destination,
-                size_bytes=size_bytes,
-                sha256=sha256_file(destination),
-                elapsed_seconds=time.perf_counter() - started,
+                name,
+                url,
+                destination,
+                destination.stat().st_size,
+                sha256_file(destination),
+                time.perf_counter() - started,
             )
             logger.info(
                 "download_complete",
@@ -92,18 +71,30 @@ def download_to_path(
         except (httpx.HTTPError, OSError, ValueError) as exc:
             last_error = exc
             temporary.unlink(missing_ok=True)
-            if attempt == retries:
-                break
-            logger.warning(
-                "download_retry",
-                extra={
-                    "event": "download_retry",
-                    "file_name": name,
-                    "attempt": attempt,
-                    "error": str(exc),
-                },
-            )
-
+            if attempt < retries:
+                logger.warning(
+                    "download_retry",
+                    extra={
+                        "event": "download_retry",
+                        "file_name": name,
+                        "attempt": attempt,
+                        "error": str(exc),
+                    },
+                )
     raise RuntimeError(
         f"Unable to download {url} after {retries} attempts: {last_error}"
     ) from last_error
+
+
+def _download_once(url: str, destination: Path, user_agent: str, timeout: httpx.Timeout) -> None:
+    with httpx.Client(
+        follow_redirects=True, timeout=timeout, headers={"User-Agent": user_agent}
+    ) as client:
+        with client.stream("GET", url) as response:
+            response.raise_for_status()
+            with destination.open("wb") as output:
+                for chunk in response.iter_bytes():
+                    output.write(chunk)
+
+
+__all__ = ["DownloadedFile", "download_to_path"]

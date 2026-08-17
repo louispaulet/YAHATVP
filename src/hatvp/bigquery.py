@@ -4,6 +4,15 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
+from .bigquery_sql import (
+    create_partitioned_sql,
+    delete_sql,
+    field_type_sql,
+    insert_sql,
+    staging_table_name,
+    table_id,
+)
+
 CURATED_TABLES = ("declarations", "people", "incomes", "assets")
 
 
@@ -39,7 +48,7 @@ def load_parquet_tables(
 
     for table_name in selected_tables:
         parquet_path = table_files[table_name]
-        staging_ref = dataset_ref.table(f"_hatvp_staging_{table_name}")
+        staging_ref = dataset_ref.table(staging_table_name(table_name))
         job_config = bigquery.LoadJobConfig(
             source_format=bigquery.SourceFormat.PARQUET,
             write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
@@ -63,15 +72,14 @@ def load_parquet_tables(
                     )
             load_job.result()
 
-            table_id = f"`{project}.{dataset}.{table_name}`"
-            staging_id = f"`{project}.{dataset}._hatvp_staging_{table_name}`"
+            target_id = table_id(project, dataset, table_name)
+            staging_id = table_id(project, dataset, staging_table_name(table_name))
             target_ref = dataset_ref.table(table_name)
             try:
                 target_table = client.get_table(target_ref)
             except NotFound:
                 client.query(
-                    f"CREATE TABLE {table_id} PARTITION BY snapshot_date "
-                    f"AS SELECT * FROM {staging_id} WHERE FALSE",
+                    create_partitioned_sql(target_id, staging_id),
                     location=location,
                 ).result()
                 target_table = client.get_table(target_ref)
@@ -79,15 +87,11 @@ def load_parquet_tables(
             staging_table = client.get_table(staging_ref)
             target_fields = {field.name: field for field in target_table.schema}
 
-            def field_type_sql(field: Any) -> str:
-                field_type = field.field_type
-                return f"ARRAY<{field_type}>" if field.mode == "REPEATED" else field_type
-
             for field in staging_table.schema:
                 if field.name in target_fields:
                     continue
                 client.query(
-                    f"ALTER TABLE {table_id} ADD COLUMN IF NOT EXISTS `{field.name}` "
+                    f"ALTER TABLE {target_id} ADD COLUMN IF NOT EXISTS `{field.name}` "
                     f"{field_type_sql(field)}",
                     location=location,
                 ).result()
@@ -108,13 +112,12 @@ def load_parquet_tables(
                 ]
             )
             client.query(
-                f"DELETE FROM {table_id} WHERE snapshot_date = @snapshot_date",
+                delete_sql(target_id),
                 job_config=delete_config,
                 location=location,
             ).result()
             client.query(
-                f"INSERT INTO {table_id} ({', '.join(f'`{name}`' for name in insert_columns)}) "
-                f"SELECT {', '.join(select_expressions)} FROM {staging_id}",
+                insert_sql(target_id, staging_id, insert_columns, select_expressions),
                 location=location,
             ).result()
         finally:
