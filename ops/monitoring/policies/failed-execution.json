@@ -1,0 +1,37 @@
+{
+  "displayName": "HATVP ingestion failed execution",
+  "documentation": {
+    "content": "A hatvp-ingestion Cloud Run Job execution failed. Inspect the execution details and pipeline_failed logs before retrying.",
+    "mimeType": "text/markdown"
+  },
+  "conditions": [
+    {
+      "displayName": "hatvp-ingestion has a failed execution",
+      "conditionThreshold": {
+        "filter": "resource.type = \"cloud_run_job\" AND resource.labels.project_id = \"yahatvp-pipeline-eu\" AND resource.labels.location = \"europe-west1\" AND resource.labels.job_name = \"hatvp-ingestion\" AND metric.type = \"run.googleapis.com/job/completed_execution_count\" AND metric.labels.result = \"failed\"",
+        "aggregations": [
+          {
+            "alignmentPeriod": "300s",
+            "perSeriesAligner": "ALIGN_SUM"
+          }
+        ],
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 0,
+        "duration": "120s",
+        "trigger": {
+          "count": 1
+        },
+        "evaluationMissingData": "EVALUATION_MISSING_DATA_INACTIVE"
+      }
+    }
+  ],
+  "combiner": "OR",
+  "enabled": true,
+  "userLabels": {
+    "service": "hatvp",
+    "managed-by": "runbook"
+  },
+  "alertStrategy": {
+    "autoClose": "86400s"
+  }
+}

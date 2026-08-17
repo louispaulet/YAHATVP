@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 CATASTROPHIC_ROW_COUNT_THRESHOLD = 0.5
 MINIMUM_PREVIOUS_ROWS_FOR_COUNT_CHECK = 20
+FLAGGED_RECORDS_INCREASE_THRESHOLD = 0.10
 
 
 @dataclass
@@ -60,6 +61,15 @@ def _has_catastrophic_row_count_reduction(current: int, previous: int | None) ->
         and previous >= MINIMUM_PREVIOUS_ROWS_FOR_COUNT_CHECK
         and current < previous * CATASTROPHIC_ROW_COUNT_THRESHOLD
     )
+
+
+def _previous_quality_summary(
+    previous_report: dict[str, Any] | None,
+) -> dict[str, Any]:
+    if not previous_report or previous_report.get("status") not in {"ok", "warning"}:
+        return {}
+    quality = previous_report.get("quality")
+    return quality if isinstance(quality, dict) else {}
 
 
 def _robust_outliers(
@@ -325,6 +335,36 @@ def run_quality_checks(
     warnings += catastrophic_reductions
 
     status = "error" if errors else "warning" if warnings else "ok"
+    previous_quality = _previous_quality_summary(previous_report)
+    previous_flagged_records = previous_quality.get("flagged_records")
+    if not isinstance(previous_flagged_records, int) or previous_flagged_records < 0:
+        previous_flagged_records = None
+
+    previous_warning_streak = previous_quality.get("warning_streak", 0)
+    if not isinstance(previous_warning_streak, int) or previous_warning_streak < 0:
+        previous_warning_streak = 0
+    warning_streak = (
+        previous_warning_streak + 1
+        if status == "warning" and previous_report and previous_report.get("status") == "warning"
+        else 1
+        if status == "warning"
+        else 0
+    )
+
+    flagged_records = len(anomalies)
+    flagged_records_increase_ratio = None
+    quality_regression = False
+    if previous_flagged_records is not None:
+        if previous_flagged_records == 0:
+            quality_regression = flagged_records > 0
+        else:
+            flagged_records_increase_ratio = round(
+                (flagged_records - previous_flagged_records) / previous_flagged_records,
+                6,
+            )
+            quality_regression = flagged_records_increase_ratio > FLAGGED_RECORDS_INCREASE_THRESHOLD
+    quality_regression = quality_regression and status in {"ok", "warning"}
+
     report = {
         "snapshot_date": snapshot_date,
         "status": status,
@@ -333,7 +373,11 @@ def run_quality_checks(
         "quality": {
             "errors": errors,
             "warnings": warnings,
-            "flagged_records": len(anomalies),
+            "flagged_records": flagged_records,
+            "previous_flagged_records": previous_flagged_records,
+            "flagged_records_increase_ratio": flagged_records_increase_ratio,
+            "quality_regression": quality_regression,
+            "warning_streak": warning_streak,
         },
         "checks": checks,
     }
@@ -345,7 +389,36 @@ def run_quality_checks(
             "counts": counts,
             "errors": errors,
             "warnings": warnings,
-            "flagged_records": len(anomalies),
+            "flagged_records": flagged_records,
+            "previous_flagged_records": previous_flagged_records,
+            "flagged_records_increase_ratio": flagged_records_increase_ratio,
+            "quality_regression": quality_regression,
+            "warning_streak": warning_streak,
         },
     )
+    if warning_streak >= 2:
+        logger.warning(
+            "quality_warning_streak",
+            extra={
+                "event": "quality_warning_streak",
+                "status": status,
+                "snapshot_date": snapshot_date,
+                "warning_streak": warning_streak,
+                "flagged_records": flagged_records,
+            },
+        )
+    if quality_regression:
+        logger.warning(
+            "quality_regression",
+            extra={
+                "event": "quality_regression",
+                "status": status,
+                "snapshot_date": snapshot_date,
+                "metric": "flagged_records",
+                "previous_flagged_records": previous_flagged_records,
+                "flagged_records": flagged_records,
+                "relative_increase": flagged_records_increase_ratio,
+                "threshold": FLAGGED_RECORDS_INCREASE_THRESHOLD,
+            },
+        )
     return QualityResult(report=report, anomalies=anomalies)
