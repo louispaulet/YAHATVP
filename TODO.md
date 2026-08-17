@@ -2,9 +2,9 @@
 
 This checklist turns the project requirements into an execution plan. The local
 pipeline and first Google Cloud deployment are implemented and tested; the
-weekly Scheduler path is validated against a versioned no-op job, while the
-production ingestion handoff, optional BigQuery, quality triage, and operational
-hardening remain.
+weekly Scheduler trigger is connected to the production ingestion job and has
+completed repeat live deliveries. Optional BigQuery, quality triage, and
+remaining operational hardening remain.
 
 ## Current status
 
@@ -150,8 +150,8 @@ open.
 - [x] Validate a second near-now schedule `4 0 * * *` (`00:04 Europe/Paris`): Scheduler attempt `2026-08-16T22:04:00Z` created execution `hatvp-scheduler-smoke-srwmc`, which completed with `succeededCount=1`.
 - [x] Confirm both executions emitted `scheduler_smoke_task_version=1.0.0` in Cloud Logging.
 - [x] Restore the final weekly schedule; next run is `2026-08-17T05:00:00Z` (`07:00 Europe/Paris`).
-- [ ] Point a production trigger at `hatvp-ingestion` after the smoke validation is accepted.
-- [ ] Confirm duplicate delivery safety for the real ingestion pipeline.
+- [x] Point the production trigger at `hatvp-ingestion` after the smoke validation is accepted; enable `hatvp-ingestion-weekly` and pause the smoke trigger.
+- [x] Confirm repeat delivery safety for the real ingestion pipeline: executions `hatvp-ingestion-jzr2b` and `hatvp-ingestion-sf668` both completed with `NO_CHANGE` and exit 0.
 
 Recommended initial schedule:
 
@@ -194,9 +194,9 @@ timezone: Europe/Paris
 - [x] Run one complete manual Cloud Run execution and review the quality report.
 - [ ] Review all flagged records from the first snapshot.
 - [x] Confirm raw data, Parquet outputs, quarantine, quality report, and state are all present.
-- [x] Confirm the Scheduler-triggered smoke execution succeeds; the production ingestion job remains unconnected.
-- [ ] Confirm the production Scheduler-triggered ingestion execution succeeds after handoff.
-- [ ] Confirm the `NO_CHANGE` path works on a repeat execution.
+- [x] Confirm the Scheduler-triggered smoke execution succeeds; the smoke trigger is now paused after handoff.
+- [x] Confirm the production Scheduler-triggered ingestion execution succeeds after handoff (`hatvp-ingestion-jzr2b`).
+- [x] Confirm the `NO_CHANGE` path works on a repeat execution (`hatvp-ingestion-sf668`).
 - [ ] Confirm logs never contain credentials or access tokens.
 - [x] Confirm the runtime service account has no unnecessary project-wide roles.
 - [x] Confirm the repository branch is clean and CI is green.

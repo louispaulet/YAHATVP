@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-17 — Connect weekly Scheduler to production ingestion
+
+### Changed
+
+- Granted `hatvp-scheduler` `roles/run.invoker` on the production
+  `hatvp-ingestion` Cloud Run Job.
+- Created and enabled `hatvp-ingestion-weekly` for `0 7 * * 1` in
+  `Europe/Paris`, targeting the Cloud Run Jobs `hatvp-ingestion:run` endpoint.
+- Paused `hatvp-scheduler-smoke-weekly` after the authenticated smoke path was
+  accepted, keeping the smoke job and execution history available for reference.
+
+### Verified
+
+- Scheduler-triggered production execution `hatvp-ingestion-jzr2b` ran with
+  `hatvp-scheduler`, downloaded both HATVP sources with HTTP 200, exited 0, and
+  reported `NO_CHANGE`.
+- Repeat delivery `hatvp-ingestion-sf668` also completed with
+  `succeededCount=1`, exit 0, and `NO_CHANGE`, confirming unchanged-input
+  delivery does not create a new derived snapshot.
+- `HATVP_ENABLE_BIGQUERY=false` remains unchanged for this handoff.
+
 ## 2026-08-17 — Add combined revenue-stream outlier report
 
 ### Added

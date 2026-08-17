@@ -5,9 +5,10 @@ French Haute Autorité pour la Transparence de la Vie Publique (HATVP) open-data
 datasets.
 
 > Project status: the local end-to-end path is implemented and has been exercised
-> against the current public HATVP files. The Cloud Run deployment is in place;
-> the weekly Scheduler trigger is validated against a versioned no-op job and is
-> intentionally not yet connected to the ingestion job.
+> against the current public HATVP files. The Cloud Run deployment is in place,
+> and the weekly `hatvp-ingestion-weekly` Scheduler trigger now runs the real
+> ingestion job at 07:00 Europe/Paris. The earlier smoke trigger is paused;
+> BigQuery remains disabled for the first production handoff.
 
 ## Goal
 
@@ -498,7 +499,7 @@ Run a manual smoke test and wait for the result:
 gcloud run jobs execute "$JOB_NAME" --region="$REGION" --wait
 ```
 
-### 5. Create the weekly Scheduler trigger
+### 5. Validate and connect the weekly Scheduler trigger
 
 For trigger-only validation, use the versioned `hatvp.scheduler_smoke` entrypoint
 instead of the ingestion command. It emits one structured success event and
@@ -524,8 +525,8 @@ gcloud run jobs deploy "$SMOKE_JOB_NAME" \
 ```
 
 Grant the Scheduler identity access to this smoke job and create the weekly
-test trigger. Do not point this trigger at `hatvp-ingestion` until the smoke
-validation is complete:
+test trigger. The smoke trigger was used to validate authenticated Scheduler
+delivery before the production handoff:
 
 ```bash
 gcloud run jobs add-iam-policy-binding "$SMOKE_JOB_NAME" \
@@ -551,6 +552,10 @@ trigger to a Paris-local minute a few minutes in the future, wait for the Cloud
 Run execution to complete, and then restore `0 7 * * 1`. Confirm the execution
 and the `scheduler_smoke_task_version` field in Cloud Logging before considering
 the trigger validated.
+
+After smoke validation, grant the same dedicated Scheduler identity access to
+the production ingestion job and create a separate production trigger. Keep
+the smoke trigger paused so the weekly window cannot launch two jobs:
 
 Grant the dedicated Scheduler identity permission to run this specific job:
 
@@ -581,6 +586,13 @@ The Cloud Run Jobs API endpoint is authenticated with OAuth, and the Scheduler
 service account needs the Cloud Run Invoker role on the job. See Google’s
 [Cloud Run Jobs scheduling guide](https://cloud.google.com/run/docs/execute/jobs-on-schedule)
 for the current command and permission details.
+
+The current production trigger is `hatvp-ingestion-weekly` (`0 7 * * 1`,
+`Europe/Paris`) and targets the `hatvp-ingestion:run` endpoint. The validated
+`hatvp-scheduler-smoke-weekly` trigger is paused after the handoff. A
+Scheduler-triggered production run completed successfully on 2026-08-17 with
+`NO_CHANGE`, and a repeat delivery also completed successfully with
+`NO_CHANGE`.
 
 ### 6. GitHub Actions and Workload Identity Federation
 
