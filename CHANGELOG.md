@@ -30,6 +30,10 @@
 - Increased the Cloud Run Job memory limit to `2Gi` after the first deployed
   force replay reached the previous `512Mi` limit while writing the expanded
   normalized outputs.
+- Redeployed through GitHub Actions run `31982811358` and force-ran execution
+  `hatvp-ingestion-4479p` successfully. The resulting GCS snapshot contains
+  74,725 `mandate_remunerations` rows, zero quality errors, and
+  `state/latest.json` records pipeline commit `94d04a4`.
 
 ## 2026-08-17 — Deploy and replay the income coverage fix
 
