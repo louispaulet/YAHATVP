@@ -90,7 +90,9 @@ Keep parsing separate from normalization, and use streaming XML parsing such as
 
 ## Repository layout
 
-The implemented layout is intentionally conventional:
+The implementation is organized by responsibility. The public `parser.py`,
+`pipeline.py`, and `quality.py` modules remain small compatibility façades;
+their focused implementations live beside them.
 
 ```text
 hatvp-pipeline/
@@ -104,22 +106,81 @@ hatvp-pipeline/
 │   ├── __init__.py
 │   ├── main.py
 │   ├── config.py
-│   ├── download.py
-│   ├── hashing.py
-│   ├── storage.py
-│   ├── parser.py
-│   ├── normalize.py
-│   ├── quality.py
-│   ├── quality_triage.py
+│   ├── pipeline.yml
 │   ├── models.py
-│   └── bigquery.py
+│   ├── normalize.py
+│   ├── download.py
+│   ├── download_validation.py
+│   ├── hashing.py
+│   ├── json_logging.py
+│   ├── parquet_io.py
+│   ├── storage.py
+│   ├── local_storage.py
+│   ├── gcs_storage.py
+│   ├── xml_support.py
+│   ├── parser.py                 # stable parsing façade
+│   ├── parser_csv.py
+│   ├── parser_stream.py
+│   ├── parser_dispatch.py
+│   ├── parser_activities.py
+│   ├── parser_declarations.py
+│   ├── parser_declaration_support.py
+│   ├── parser_finance.py
+│   ├── parser_income.py
+│   ├── parser_income_fields.py
+│   ├── parser_mandates.py
+│   ├── parser_mandate_fields.py
+│   ├── parser_mandate_general.py
+│   ├── parser_mandate_income.py
+│   ├── pipeline.py                # orchestration façade
+│   ├── pipeline_artifacts.py
+│   ├── pipeline_bigquery.py
+│   ├── pipeline_result.py
+│   ├── pipeline_state.py
+│   ├── pipeline_steps.py
+│   ├── quality.py                 # stable quality façade
+│   ├── quality_checks.py
+│   ├── quality_coverage.py
+│   ├── quality_helpers.py
+│   ├── quality_numeric.py
+│   ├── quality_telemetry.py
+│   ├── quality_triage.py
+│   ├── triage_evidence.py
+│   ├── triage_evidence_helpers.py
+│   ├── triage_fingerprints.py
+│   ├── triage_matching.py
+│   ├── triage_register.py
+│   ├── triage_report.py
+│   ├── triage_snapshot.py
+│   ├── triage_summary.py
+│   ├── bigquery.py
+│   ├── bigquery_loader.py
+│   ├── bigquery_sql.py
+│   ├── bigquery_stage.py
+│   ├── table_columns.py
+│   ├── table_schema.py
+│   └── scheduler_smoke.py
 ├── tests/
-│   ├── test_hashing.py
-│   ├── test_normalize.py
-│   ├── test_quality.py
+│   ├── test_*.py
+│   ├── *_support.py
 │   └── fixtures/
 └── .github/workflows/deploy.yml
 ```
+
+Parser navigation, streaming, CSV, declaration/person, mandate/remuneration,
+income, finance, and activity components live in focused `parser_*.py` modules.
+Pipeline orchestration, state, artifacts, quality checks, triage, storage, and
+BigQuery staging follow the same component boundary. Every tracked Python file,
+including tests and package initializers, is intentionally kept between 70 and
+100 physical lines; `tests/test_module_line_budget.py` enforces this contract.
+
+### Configuration
+
+The packaged [`src/hatvp/pipeline.yml`](src/hatvp/pipeline.yml) contains the
+non-secret runtime defaults and the observed HATVP XML/CSV schema rules. Typed
+settings resolve values in this order: YAML defaults, environment variables,
+then CLI overrides. Use environment variables for deployment configuration and
+`--local-output` for local fixture runs; never put credentials in YAML.
 
 Use Python 3.12 or newer and `uv`. Prefer a small dependency set:
 
@@ -325,8 +386,10 @@ remuneration available to standard income queries.
 
 ## Configuration
 
-Configuration belongs in environment variables, not source code or committed
-credentials:
+The packaged `src/hatvp/pipeline.yml` supplies non-secret runtime and observed
+schema defaults. Typed settings apply environment variables over those defaults;
+CLI arguments such as `--local-output` are applied last. Credentials remain in
+runtime identity configuration and never belong in YAML or source code:
 
 ```text
 HATVP_BUCKET=<required for GCS mode>
@@ -338,6 +401,10 @@ HATVP_BIGQUERY_LOCATION=europe-west1
 HATVP_XML_URL=https://www.hatvp.fr/livraison/merge/declarations.xml
 HATVP_CSV_URL=https://www.hatvp.fr/livraison/opendata/liste.csv
 ```
+
+Run `uv run pytest` to execute the fixture suite and the tracked-file line-budget
+check. Pull requests run these checks and `uv build`; Cloud Run deployment is
+only eligible for a push on `main`.
 
 The downloader should use connect/read timeouts, bounded retries, a descriptive
 user agent, HTTP status validation, and elapsed-time/size/hash logging. Never

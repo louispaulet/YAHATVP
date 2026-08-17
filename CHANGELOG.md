@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-08-18 — Modular Python boundaries
+
+### Added
+
+- Added packaged `src/hatvp/pipeline.yml` and typed configuration loading with
+  YAML defaults, environment overrides, and CLI-level model updates.
+- Added focused parser, pipeline, quality, triage, storage, and BigQuery
+  components plus direct fixture/fake-client tests for their public boundaries.
+- Added the tracked Python line-budget test covering package initializers and
+  tests as well as production modules.
+
+### Changed
+
+- Split the oversized parser, orchestration, quality, triage, and test modules
+  while preserving `parse_csv`, `parse_xml`, `parse_sources`, `run_pipeline`,
+  stable table schemas, provenance, immutable raw artifacts, and late state
+  updates.
+- Enabled pull-request CI testing while restricting Cloud Run deployment to
+  pushes on `main`.
+- Replaced the stale README layout sketch with the complete modular source
+  tree, including parser, pipeline, quality, triage, storage, and BigQuery
+  components plus the stable compatibility façades.
+
+### Verified
+
+- `uv run pytest`: 127 passed.
+- Ruff check and format check pass; `uv build` packages `pipeline.yml`; the
+  staged line-budget test passes for all tracked Python files; and the local
+  fixture pipeline returns `SUCCESS_WITH_WARNINGS` followed by `NO_CHANGE`.
+- PR #10 CI is green: test and deployment-config pass, while deployment is
+  skipped for the pull-request event as intended. A read-only BigQuery baseline
+  for `2026-08-17` confirms partitioned curated tables and counts/fingerprints
+  of declarations 6,611/`-5383795550778946119`, people 6,611/
+  `-2019889874151548892`, incomes 74,791/`-2929076836325473210`, and assets
+  1,157/`-5142282871526498847`.
+- The requested live replay is blocked before mutation: ADC is unavailable
+  (`google.auth.exceptions.DefaultCredentialsError: Your default credentials
+  were not found`) and the local HATVP GCS/BigQuery environment variables are
+  unset. PR #10 remains open and unmerged pending ADC/resource access.
+
 ## 2026-08-17 — Add operational retention verification and alerting
 
 ### Added

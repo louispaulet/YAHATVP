@@ -9,37 +9,65 @@ from datetime import UTC, datetime
 from zoneinfo import ZoneInfo
 
 SCHEDULER_SMOKE_TASK_VERSION = "1.0.0"
+PARIS_ZONE = ZoneInfo("Europe/Paris")
 
 
-def _payload() -> dict[str, str]:
-    observed_at = datetime.now(UTC)
+def runtime_fields() -> dict[str, str]:
+    """Return Cloud Run identity fields without exposing unrelated environment data."""
+
     return {
-        "event": "scheduler_smoke",
-        "status": "success",
-        "scheduler_smoke_task_version": SCHEDULER_SMOKE_TASK_VERSION,
-        "observed_at_utc": observed_at.isoformat(),
-        "observed_at_europe_paris": observed_at.astimezone(ZoneInfo("Europe/Paris")).isoformat(),
         "cloud_run_execution": os.getenv("CLOUD_RUN_EXECUTION", "unknown"),
         "cloud_run_task_index": os.getenv("CLOUD_RUN_TASK_INDEX", "unknown"),
     }
 
 
-def main(argv: list[str] | None = None) -> int:
+def observed_times(observed_at: datetime) -> tuple[str, str]:
+    """Return UTC and Europe/Paris representations used in the smoke payload."""
+
+    return observed_at.isoformat(), observed_at.astimezone(PARIS_ZONE).isoformat()
+
+
+def payload(observed_at: datetime | None = None) -> dict[str, str]:
+    observed_at = observed_at or datetime.now(UTC)
+    utc, paris = observed_times(observed_at)
+    return {
+        "event": "scheduler_smoke",
+        "status": "success",
+        "scheduler_smoke_task_version": SCHEDULER_SMOKE_TASK_VERSION,
+        "observed_at_utc": utc,
+        "observed_at_europe_paris": paris,
+        **runtime_fields(),
+    }
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--version",
         action="store_true",
         help="Print the smoke task version without running the task.",
     )
-    args = parser.parse_args(argv)
+    return parser.parse_args(argv)
 
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
     if args.version:
         print(SCHEDULER_SMOKE_TASK_VERSION)
         return 0
-
-    # Keep this output as one JSON object so Cloud Logging can query it directly.
-    print(json.dumps(_payload(), separators=(",", ":")))
+    print(json.dumps(payload(), separators=(",", ":")))
     return 0
+
+
+__all__ = [
+    "PARIS_ZONE",
+    "SCHEDULER_SMOKE_TASK_VERSION",
+    "main",
+    "observed_times",
+    "parse_args",
+    "payload",
+    "runtime_fields",
+]
 
 
 if __name__ == "__main__":
