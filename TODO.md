@@ -229,8 +229,8 @@ across runs; and unchanged execution `hatvp-ingestion-rmclb` emitted
 
 - [x] Add an alert for failed Cloud Run Job executions.
 - [x] Add an alert for repeated `SUCCESS_WITH_WARNINGS` or an unusual increase in flagged records.
-- [ ] Confirm the monitoring email channel delivers a test notification after
-  the merged telemetry deployment.
+- [ ] Confirm the monitoring email channel delivers a test notification.
+- [x] Verify the merged Cloud Run deployment emits the new quality telemetry.
 - [ ] Review quality reports after each weekly run.
 - [ ] Monitor recurrence and pursue source correction for the six duplicate declaration UUID groups; one pair differs only by trailing whitespace.
 - [ ] Monitor row counts and null rates for sudden changes.
@@ -243,6 +243,11 @@ The three alert policies and email channel were created and verified in
 `yahatvp-pipeline-eu` on `2026-08-17`. Policy resources are recorded in the
 monitoring runbook; the notification channel is
 `projects/yahatvp-pipeline-eu/notificationChannels/15119347564909849591`.
+
+Post-merge image `d2b4a9b` deployed successfully. Forced executions
+`hatvp-ingestion-ff7gs` and `hatvp-ingestion-dqc6b` completed with exit 0; the
+second emitted `quality_warning_streak` with `warning_streak=2`, 5,818 flagged
+records, and zero quality errors.
 
 ## Later, only if needed
 

@@ -25,8 +25,17 @@
 
 ### Follow-up
 
-- Confirm receipt of a test notification and verify the new telemetry in the
-  post-merge Cloud Run deployment.
+- Confirm receipt of a test notification email.
+
+### Post-merge verification
+
+- GitHub Actions run `32067593336` passed its tests, image build, and Cloud Run
+  deployment for image `d2b4a9b`.
+- Forced executions `hatvp-ingestion-ff7gs` and `hatvp-ingestion-dqc6b`
+  completed successfully. The second emitted the real
+  `quality_warning_streak` event with `warning_streak=2`, 5,818 flagged
+  records, and zero quality errors; the deployed job uses the expected
+  `cloud_run_job` resource labels.
 
 ## 2026-08-17 — Add income coverage recovery report
 
