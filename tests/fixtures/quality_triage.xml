@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<declarations>
+  <declaration>
+    <dateDepot>01/01/2026 08:30:00</dateDepot>
+    <uuid>triage-duplicate</uuid>
+    <general>
+      <declarant><nom>DUPLICATE</nom><prenom>Source</prenom></declarant>
+    </general>
+  </declaration>
+  <declaration>
+    <dateDepot>02/01/2026 08:30:00</dateDepot>
+    <uuid>triage-duplicate</uuid>
+    <general>
+      <declarant><nom>DUPLICATE</nom><prenom>Source</prenom></declarant>
+    </general>
+  </declaration>
+  <declaration>
+    <dateDepot>03/01/2026 08:30:00</dateDepot>
+    <uuid>triage-negative</uuid>
+    <general>
+      <declarant><nom>NEGATIVE</nom><prenom>Bank</prenom></declarant>
+    </general>
+    <comptesBancaireDto>
+      <items><items><typeCompte>Compte courant</typeCompte><valeur>-260</valeur></items></items>
+    </comptesBancaireDto>
+  </declaration>
+  <declaration>
+    <dateDepot>04/01/2026 08:30:00</dateDepot>
+    <uuid>triage-outlier</uuid>
+    <general>
+      <declarant><nom>OUTLIER</nom><prenom>Asset</prenom></declarant>
+    </general>
+    <immeubleDto>
+      <items><items><nature>Appartement</nature><valeur>500 000</valeur></items></items>
+    </immeubleDto>
+  </declaration>
+</declarations>

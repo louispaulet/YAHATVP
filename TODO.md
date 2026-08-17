@@ -3,8 +3,8 @@
 This checklist turns the project requirements into an execution plan. The local
 pipeline and first Google Cloud deployment are implemented and tested; the
 weekly Scheduler trigger is connected to the production ingestion job and has
-completed repeat live deliveries. Optional BigQuery, quality triage, and
-remaining operational hardening remain.
+completed repeat live deliveries. Optional BigQuery and remaining operational
+hardening remain; first-snapshot quality triage is documented and complete.
 
 ## Current status
 
@@ -72,7 +72,10 @@ Quality triage for the first production snapshot (`2026-08-16`): repeated names
 and robust asset outliers remain review flags because they are plausible source
 patterns; the nine negative bank-account balances are consistent with
 overdrafts, so they remain flagged and retained; six duplicate declaration UUID
-groups are actionable source-quality issues.
+groups are actionable source-quality issues. The source-linked register contains
+all 5,763 flagged rows with zero unresolved or parser/source-mismatch records;
+five duplicate UUID groups contain identical XML and one contains conflicting
+XML content.
 
 Required local checks:
 
@@ -193,7 +196,7 @@ timezone: Europe/Paris
 ## 8. Production go-live checklist
 
 - [x] Run one complete manual Cloud Run execution and review the quality report.
-- [ ] Review all flagged records from the first snapshot.
+- [x] Review all flagged records from the first snapshot and publish the source-linked triage register.
 - [x] Confirm raw data, Parquet outputs, quarantine, quality report, and state are all present.
 - [x] Confirm the Scheduler-triggered smoke execution succeeds; the smoke trigger is now paused after handoff.
 - [x] Confirm the production Scheduler-triggered ingestion execution succeeds after handoff (`hatvp-ingestion-c96k4` and `hatvp-ingestion-bbpbj`).
@@ -208,6 +211,7 @@ timezone: Europe/Paris
 - [ ] Add an alert for failed Cloud Run Job executions.
 - [ ] Add an alert for repeated `SUCCESS_WITH_WARNINGS` or an unusual increase in flagged records.
 - [ ] Review quality reports after each weekly run.
+- [ ] Investigate recurrence or source correction for the six duplicate declaration UUID groups, including the one conflicting XML group.
 - [ ] Monitor row counts and null rates for sudden changes.
 - [ ] Review HATVP schema changes before changing normalization logic.
 - [ ] Add a new fixture before fixing any newly observed source edge case.
