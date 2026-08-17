@@ -1,20 +1,24 @@
 # Changelog
 
-## 2026-08-17 — Reconcile a superseded annual-remuneration outlier
+## 2026-08-17 — Reconcile superseded annual-remuneration outliers
 
 ### Changed
 
-- Updated `reports/revenue-stream-outliers-2026-08-17.md` to use an explicit
-  effective-declaration view for the outlier register.
-- Excluded superseded declaration
-  `27c770d6-0e1f-4f7f-bb21-d4c0e003e935` after checking the latest
-  modificative declaration `d9b0bda2-d97b-4983-bf09-ea61c759b7b3` in the raw
-  XML. The 2025 `députée` value changes from `5 919 820` to `62 730`.
+- Updated `reports/revenue-stream-outliers-2026-08-17.md` after checking all
+  55 raw annual-remuneration outlier rows against later same-person,
+  same-context declaration versions.
+- Excluded 11 older declaration UUIDs covering 13 corrected outlier rows and
+  131 annual rows from the report's effective view. Raw XML verification
+  confirmed the corrections, including Stephanie Rist's 2025 `députée` value
+  changing from `5 919 820` to `62 730`.
+- Retained the 12 later-version matches whose high value was unchanged, so
+  they remain flagged for manual review.
 
 ### Verified
 
-- The effective register now contains 54 outliers across 31 declarations;
-  the raw normalized snapshot remains unchanged at 74,725 rows.
+- The effective register now contains 42 outliers across 21 declarations;
+  the raw normalized snapshot remains unchanged at 74,725 rows, with 74,594
+  rows represented in the effective view.
 - Recomputed the effective median/MAD statistics and refreshed the candidate
   table. No raw or normalized source rows were deleted.
 
