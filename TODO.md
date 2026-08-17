@@ -102,6 +102,7 @@ The deployment commands are documented in the
 
 - [x] Build and push the image to Artifact Registry from GitHub Actions using the GitHub runner's Docker client.
 - [x] Deploy the Cloud Run Job `hatvp-ingestion` with one task, one retry, and a 30-minute task timeout.
+- [x] Deploy and force-replay the income coverage fix online; verify the GCS result contains 66 normalized income rows and zero quality errors.
 - [x] Configure `HATVP_BUCKET`, `HATVP_PREFIX`, source URLs, pipeline version, and Git SHA.
 - [x] Start with `HATVP_ENABLE_BIGQUERY=false` until BigQuery permissions are verified.
 - [x] Execute the job manually with `--wait`.

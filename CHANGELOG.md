@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-17 — Deploy and replay the income coverage fix
+
+### Verified
+
+- Fast-forwarded the fix/report branch onto `main` and deployed the Cloud Run
+  Job through GitHub Actions run `31980037696` at code revision `97af103`, then
+  redeployed the force-execution entrypoint fix at `dc77f44` through run
+  `31980500905`.
+- Forced online execution `hatvp-ingestion-lcpv9` completed successfully and
+  rewrote the 2026-08-17 GCS snapshot outputs with `incomes=66`,
+  `income_rows_with_numeric_value=66`, `income_declarations=9`, and zero
+  quality errors.
+- Confirmed the normalized income Parquet object exists in GCS and the source
+  category values reconcile to the source `totalElu` aggregates.
+- Confirmed `HATVP_ENABLE_BIGQUERY=false`; the `hatvp` BigQuery dataset was not
+  found, so no BigQuery tables were created by this run.
+
 ## 2026-08-17 — Make Cloud Run force executions appendable
 
 ### Changed
