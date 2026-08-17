@@ -63,6 +63,7 @@ Workload Identity Federation, not a stored key.
 - [x] Preserve every annual `mandatElectifDto` remuneration in a dedicated normalized table.
 - [x] Add a live declaration XML/parsed-data bundle for manual review and exclude placeholder-only DTO rows.
 - [x] Add a `revenuMandatDto` income outlier report with source-to-parser reconciliation.
+- [x] Add a combined outlier report for `revenuMandatDto` and annual `mandatElectifDto` remuneration values.
 - [x] Decide whether any current negative asset values are source-valid or should remain flagged.
 - [x] Document the meaning of each normalized table and important field in the README.
 

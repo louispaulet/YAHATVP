@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-17 — Add combined revenue-stream outlier report
+
+### Added
+
+- Added `reports/revenue-stream-outliers-2026-08-17.md`, covering both sparse
+  `revenuMandatDto` income categories and annual `mandatElectifDto`
+  remuneration values.
+
+### Verified
+
+- Recomputed the report from the successful 2026-08-17 GCS snapshot using the
+  immutable XML SHA-256 and pipeline revision recorded in `state/latest.json`.
+- Confirmed 66 income rows reconcile exactly to the 22 source `totalElu`
+  aggregates, with zero formal income outliers.
+- Confirmed 74,725 annual remuneration rows, 55 robust outliers across 32
+  declarations, and zero quality errors in the deployed snapshot.
+
 ## 2026-08-17 — Preserve elected-mandate remuneration history
 
 ### Added
