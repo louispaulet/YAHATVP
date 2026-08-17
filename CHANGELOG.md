@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-17 — Add income coverage recovery report
+
+### Added
+
+- Added [`reports/income-coverage-recovery-2026-08-17.md`](reports/income-coverage-recovery-2026-08-17.md), documenting the root cause, unified stream counts, production BigQuery validation, source hashes, and remaining interpretation limits.
+
+### Verified
+
+- The report reconciles the successful production results: 74,791 unified income rows, zero quality errors, identical repeat-load fingerprints, and a post-refresh `NO_CHANGE` execution.
+
 ## 2026-08-17 — Refresh BigQuery with annual mandate incomes
 
 ### Verified
