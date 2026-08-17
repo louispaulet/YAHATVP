@@ -90,7 +90,9 @@ Keep parsing separate from normalization, and use streaming XML parsing such as
 
 ## Repository layout
 
-The implemented layout is intentionally conventional:
+The implementation is organized by responsibility. The public `parser.py`,
+`pipeline.py`, and `quality.py` modules remain small compatibility façades;
+their focused implementations live beside them.
 
 ```text
 hatvp-pipeline/
@@ -106,18 +108,58 @@ hatvp-pipeline/
 │   ├── config.py
 │   ├── pipeline.yml
 │   ├── models.py
-│   ├── pipeline*.py
-│   ├── parser*.py
-│   ├── quality*.py
-│   ├── triage*.py
-│   ├── bigquery*.py
-│   ├── download.py
-│   ├── hashing.py
-│   ├── storage.py
-│   ├── parser.py
 │   ├── normalize.py
-│   ├── quality.py
-│   └── table_schema.py
+│   ├── download.py
+│   ├── download_validation.py
+│   ├── hashing.py
+│   ├── json_logging.py
+│   ├── parquet_io.py
+│   ├── storage.py
+│   ├── local_storage.py
+│   ├── gcs_storage.py
+│   ├── xml_support.py
+│   ├── parser.py                 # stable parsing façade
+│   ├── parser_csv.py
+│   ├── parser_stream.py
+│   ├── parser_dispatch.py
+│   ├── parser_activities.py
+│   ├── parser_declarations.py
+│   ├── parser_declaration_support.py
+│   ├── parser_finance.py
+│   ├── parser_income.py
+│   ├── parser_income_fields.py
+│   ├── parser_mandates.py
+│   ├── parser_mandate_fields.py
+│   ├── parser_mandate_general.py
+│   ├── parser_mandate_income.py
+│   ├── pipeline.py                # orchestration façade
+│   ├── pipeline_artifacts.py
+│   ├── pipeline_bigquery.py
+│   ├── pipeline_result.py
+│   ├── pipeline_state.py
+│   ├── pipeline_steps.py
+│   ├── quality.py                 # stable quality façade
+│   ├── quality_checks.py
+│   ├── quality_coverage.py
+│   ├── quality_helpers.py
+│   ├── quality_numeric.py
+│   ├── quality_telemetry.py
+│   ├── quality_triage.py
+│   ├── triage_evidence.py
+│   ├── triage_evidence_helpers.py
+│   ├── triage_fingerprints.py
+│   ├── triage_matching.py
+│   ├── triage_register.py
+│   ├── triage_report.py
+│   ├── triage_snapshot.py
+│   ├── triage_summary.py
+│   ├── bigquery.py
+│   ├── bigquery_loader.py
+│   ├── bigquery_sql.py
+│   ├── bigquery_stage.py
+│   ├── table_columns.py
+│   ├── table_schema.py
+│   └── scheduler_smoke.py
 ├── tests/
 │   ├── test_*.py
 │   ├── *_support.py

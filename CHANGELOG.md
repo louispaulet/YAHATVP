@@ -19,6 +19,9 @@
   updates.
 - Enabled pull-request CI testing while restricting Cloud Run deployment to
   pushes on `main`.
+- Replaced the stale README layout sketch with the complete modular source
+  tree, including parser, pipeline, quality, triage, storage, and BigQuery
+  components plus the stable compatibility façades.
 
 ### Verified
 
