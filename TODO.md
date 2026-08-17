@@ -3,8 +3,8 @@
 This checklist turns the project requirements into an execution plan. The local
 pipeline and first Google Cloud deployment are implemented and tested; the
 weekly Scheduler trigger is connected to the production ingestion job and has
-completed repeat live deliveries. Optional BigQuery, quality triage, and
-remaining operational hardening remain.
+completed repeat live deliveries. Optional BigQuery and remaining operational
+hardening remain.
 
 ## Current status
 
@@ -72,7 +72,11 @@ Quality triage for the first production snapshot (`2026-08-16`): repeated names
 and robust asset outliers remain review flags because they are plausible source
 patterns; the nine negative bank-account balances are consistent with
 overdrafts, so they remain flagged and retained; six duplicate declaration UUID
-groups are actionable source-quality issues.
+groups were source-verified as semantically identical duplicates and remain
+flagged for recurrence monitoring. The complete source-linked review is in
+[`reports/quality-triage-2026-08-16.md`](reports/quality-triage-2026-08-16.md),
+with the machine-readable register in
+[`reports/quality-triage-2026-08-16.json`](reports/quality-triage-2026-08-16.json).
 
 Required local checks:
 
@@ -193,7 +197,7 @@ timezone: Europe/Paris
 ## 8. Production go-live checklist
 
 - [x] Run one complete manual Cloud Run execution and review the quality report.
-- [ ] Review all flagged records from the first snapshot.
+- [x] Review all flagged records from the first snapshot.
 - [x] Confirm raw data, Parquet outputs, quarantine, quality report, and state are all present.
 - [x] Confirm the Scheduler-triggered smoke execution succeeds; the smoke trigger is now paused after handoff.
 - [x] Confirm the production Scheduler-triggered ingestion execution succeeds after handoff (`hatvp-ingestion-c96k4` and `hatvp-ingestion-bbpbj`).

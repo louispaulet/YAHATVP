@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-08-17 — Complete first production snapshot quality triage
+
+### Added
+
+- Added `reports/quality-triage-2026-08-16.md`, a source-linked technical
+  review covering every flagged anomaly from the first production snapshot.
+- Added `reports/quality-triage-2026-08-16.json`, preserving the complete
+  repeated-name group register and row-level duplicate-UUID, negative-balance,
+  and asset-outlier classifications.
+
+### Verified
+
+- Reconciled all 5,763 quarantine anomaly rows: 5,599 repeated-name rows across
+  2,247 groups, 12 rows across six duplicate UUID groups, nine negative bank
+  balances, and 143 asset outliers.
+- Matched all 152 negative/outlier asset records to their serialized source
+  records in the immutable 2026-08-16 XML snapshot.
+- Confirmed all six duplicate UUID groups are semantically identical source
+  duplicates; one pair differs only by trailing whitespace. No parser or
+  normalization issue was confirmed, and no historical artifact or state was
+  changed.
+- Updated the README and TODO checklist with the completed review and the
+  remaining recurrence-monitoring follow-up.
+
 ## 2026-08-17 — Validate production pipeline contracts and Scheduler handoff
 
 ### Added
