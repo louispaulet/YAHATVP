@@ -64,4 +64,10 @@ def income_rows(
     return rows
 
 
-__all__ = ["income_rows", "is_populated", "mandate_income_rows"]
+def income_row_count(rows: list[dict[str, Any]]) -> int:
+    """Count normalized declared-income rows for coverage diagnostics."""
+
+    return len([row for row in rows if row.get("income_stream") == "revenu_mandat"])
+
+
+__all__ = ["income_row_count", "income_rows", "is_populated", "mandate_income_rows"]

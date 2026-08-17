@@ -27,6 +27,18 @@ def validate_table_selection(table_names: Sequence[str]) -> tuple[str, ...]:
     return selected
 
 
+def validate_table_files(
+    table_files: dict[str, Path], table_names: Sequence[str] = CURATED_TABLES
+) -> tuple[str, ...]:
+    """Validate that every selected table has a local or staged Parquet file."""
+
+    selected = validate_table_selection(table_names)
+    missing = [name for name in selected if name not in table_files]
+    if missing:
+        raise ValueError(f"Missing required BigQuery table files: {', '.join(missing)}")
+    return selected
+
+
 def load_curated_tables(
     *,
     project: str,
@@ -57,5 +69,6 @@ __all__ = [
     "curated_table_names",
     "load_curated_tables",
     "load_parquet_tables",
+    "validate_table_files",
     "validate_table_selection",
 ]

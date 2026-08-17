@@ -58,4 +58,16 @@ def _rows_for_item(
     ]
 
 
-__all__ = ["mandate_income_rows"]
+def is_mandate_income_row(row: dict[str, Any]) -> bool:
+    """Identify unified income rows sourced from annual mandate remuneration."""
+
+    return row.get("income_stream") == "mandate_remuneration"
+
+
+def mandate_income_years(rows: list[dict[str, Any]]) -> list[str | None]:
+    """Return annual source years in the original normalized row order."""
+
+    return [row.get("income_year") for row in rows if is_mandate_income_row(row)]
+
+
+__all__ = ["is_mandate_income_row", "mandate_income_rows", "mandate_income_years"]

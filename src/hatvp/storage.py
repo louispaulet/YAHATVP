@@ -48,6 +48,18 @@ def artifact_uri(prefix: str, relative_path: str) -> str:
     return f"{prefix.rstrip('/')}/{relative_path.lstrip('/')}"
 
 
+def artifact_path(prefix: str, relative_path: str) -> tuple[str, str]:
+    """Return normalized prefix and relative path for adapter diagnostics."""
+
+    return prefix.strip("/"), relative_path.strip("/")
+
+
+def is_immutable_artifact(relative_path: str) -> bool:
+    """Identify raw artifacts whose bytes must not be overwritten."""
+
+    return relative_path.lstrip("/").startswith("raw/")
+
+
 def store_classes() -> tuple[type, type]:
     """Expose implementations for diagnostics and adapter tests."""
 
@@ -59,6 +71,8 @@ __all__ = [
     "GCSArtifactStore",
     "LocalArtifactStore",
     "artifact_uri",
+    "artifact_path",
+    "is_immutable_artifact",
     "json_bytes",
     "store_classes",
 ]

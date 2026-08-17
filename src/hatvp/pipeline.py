@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 import tempfile
 import time
 from collections.abc import Callable
@@ -14,6 +13,7 @@ from .config import Settings
 from .download import DownloadedFile, download_to_path
 from .parser import parse_sources
 from .pipeline_artifacts import archive_raw, write_report, write_tables
+from .pipeline_result import finish_run, log_no_change
 from .pipeline_state import (
     PipelineFailure,
     build_metadata,
@@ -31,8 +31,6 @@ from .pipeline_steps import (
 )
 from .quality import QualityResult, run_quality_checks
 from .storage import ArtifactStore
-
-logger = logging.getLogger("hatvp")
 
 
 def snapshot_date() -> str:
@@ -62,9 +60,7 @@ def run_pipeline(
         downloaded = download_sources(settings, working_dir, downloader)
         log_hashes(previous, downloaded, snapshot)
         if not force and not dry_run and previous and same_snapshot(previous, downloaded):
-            logger.info(
-                "pipeline_complete", extra={"event": "pipeline_complete", "status": "NO_CHANGE"}
-            )
+            log_no_change()
             return "NO_CHANGE"
         metadata = reuse_snapshot_metadata(
             store, snapshot, build_metadata(snapshot, settings, downloaded), dry_run
@@ -95,21 +91,7 @@ def run_pipeline(
                     "pipeline_version": settings.pipeline_version,
                 },
             )
-        return _finish(snapshot, started, quality)
-
-
-def _finish(snapshot: str, started: float, quality: QualityResult) -> str:
-    status = "SUCCESS_WITH_WARNINGS" if quality.has_warnings else "SUCCESS"
-    logger.info(
-        "pipeline_complete",
-        extra={
-            "event": "pipeline_complete",
-            "status": status,
-            "snapshot_date": snapshot,
-            "elapsed_seconds": round(time.perf_counter() - started, 3),
-        },
-    )
-    return status
+        return finish_run(snapshot, started, quality)
 
 
 __all__ = ["PipelineFailure", "default_store", "run_pipeline", "snapshot_date"]

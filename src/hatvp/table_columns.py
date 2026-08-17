@@ -42,4 +42,38 @@ def all_table_names() -> tuple[str, ...]:
     return tuple(TABLE_COLUMNS)
 
 
-__all__ = ["TABLE_COLUMNS", "all_table_names", "required_columns"]
+def has_table_contract(table_name: str) -> bool:
+    """Return whether a normalized output table has a declared column contract."""
+
+    return table_name in TABLE_COLUMNS
+
+
+def validate_table_name(table_name: str) -> str:
+    """Validate a table name before writing a Parquet artifact."""
+
+    if not has_table_contract(table_name):
+        raise KeyError(f"Unknown normalized table: {table_name}")
+    return table_name
+
+
+def columns_for(table_name: str) -> tuple[str, ...]:
+    """Return an immutable view for adapters that pass column contracts around."""
+
+    validate_table_name(table_name)
+    return tuple(TABLE_COLUMNS[table_name])
+
+
+def column_count(table_name: str) -> int:
+    """Return the number of required columns in a normalized table contract."""
+
+    return len(columns_for(table_name))
+
+
+__all__ = [
+    "TABLE_COLUMNS",
+    "all_table_names",
+    "columns_for",
+    "has_table_contract",
+    "required_columns",
+    "validate_table_name",
+]

@@ -8,7 +8,8 @@ from lxml import etree
 
 from .models import ParseContext, ParserConfig
 from .parser_mandate_fields import mandate_item_fields, mandate_raw_record, remuneration_entries
-from .xml_support import child, date_fields, item_groups, normalized_child_text, raw_child_text
+from .parser_mandate_general import general_mandate_row, has_general_values
+from .xml_support import child, item_groups, normalized_child_text
 
 
 def mandate_rows(
@@ -21,8 +22,8 @@ def mandate_rows(
         general, "mandat"
     )
     rows = (
-        [_general_row(uuid, context, label, quality, general)]
-        if general is not None and (label or quality is not None)
+        [general_mandate_row(uuid, context, label, quality, general)]
+        if has_general_values(general, label)
         else []
     )
     section = child(element, config.sections["mandate"])
@@ -81,36 +82,6 @@ def remuneration_rows(
                 }
             )
     return rows
-
-
-def _general_row(
-    uuid: str | None,
-    context: ParseContext,
-    label: str | None,
-    quality: etree._Element | None,
-    general: etree._Element,
-) -> dict[str, Any]:
-    start_raw = raw_child_text(general, "dateDebutMandat")
-    end_raw = raw_child_text(general, "dateFinMandat")
-    return {
-        "declaration_uuid": uuid,
-        "snapshot_date": context.snapshot_date,
-        "source_section": "general",
-        "description": label,
-        "mandate_type": normalized_child_text(quality, "typeMandat"),
-        "commentaire": None,
-        "employeur": None,
-        "date_debut_raw": start_raw,
-        "date_debut": date_fields({"value": start_raw}, "value")[1],
-        "date_fin_raw": end_raw,
-        "date_fin": date_fields({"value": end_raw}, "value")[1],
-        "remuneration_raw": None,
-        "remuneration_eur": None,
-        "remuneration_year_raw": None,
-        "remuneration_year": None,
-        "remuneration_count": 0,
-        "raw_record_json": None,
-    }
 
 
 __all__ = [

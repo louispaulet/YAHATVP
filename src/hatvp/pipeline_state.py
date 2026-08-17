@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from .download import DownloadedFile
 from .storage import ArtifactStore
@@ -32,7 +33,7 @@ def build_metadata(
 ) -> dict[str, Any]:
     return {
         "snapshot_date": snapshot_date,
-        "fetched_at": datetime.now().astimezone().isoformat(),
+        "fetched_at": datetime.now(ZoneInfo("Europe/Paris")).isoformat(),
         "pipeline_git_sha": settings.pipeline_git_sha,
         "pipeline_version": settings.pipeline_version,
         "files": [

@@ -39,9 +39,35 @@ def digest_metadata(path: Path) -> dict[str, int | str]:
     return {"size_bytes": path.stat().st_size, "sha256": sha256_file(path)}
 
 
+def file_matches_digest(path: Path, expected: str) -> bool:
+    """Check a file against a recorded provenance digest."""
+
+    return sha256_file(path) == expected
+
+
+def digest_pair(left: Path, right: Path) -> bool:
+    """Compare two files by digest and size without retaining their contents."""
+
+    return left.stat().st_size == right.stat().st_size and sha256_file(left) == sha256_file(right)
+
+
+def digest_paths(paths: list[Path]) -> dict[str, str]:
+    """Return stable path-to-digest metadata for a batch of source files."""
+
+    return {str(path): sha256_file(path) for path in paths}
+
+
+def digest_size(path: Path) -> tuple[int, str]:
+    """Return the byte length and digest used in source metadata."""
+
+    return path.stat().st_size, sha256_file(path)
+
+
 __all__ = [
     "DEFAULT_CHUNK_SIZE",
     "digest_metadata",
+    "digest_pair",
+    "file_matches_digest",
     "same_bytes",
     "sha256_bytes",
     "sha256_file",

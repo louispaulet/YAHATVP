@@ -14,6 +14,18 @@ from .parser_finance import asset_rows, liability_rows
 from .parser_income import income_rows, mandate_income_rows
 from .parser_mandates import mandate_rows, remuneration_rows
 
+COMPONENT_TABLES = (
+    "declarations",
+    "people",
+    "mandates",
+    "mandate_remunerations",
+    "activities",
+    "participations",
+    "incomes",
+    "assets",
+    "liabilities",
+)
+
 
 def append_declaration(
     tables: TableSet,
@@ -36,4 +48,24 @@ def append_declaration(
     tables["liabilities"].extend(liability_rows(element, context, config))
 
 
-__all__ = ["append_declaration"]
+def component_table_names() -> tuple[str, ...]:
+    """Return the normalized tables populated by one XML declaration."""
+
+    return COMPONENT_TABLES
+
+
+def append_rows(tables: TableSet, table_name: str, rows: list[Row]) -> None:
+    """Append rows through one shared boundary used by component tests."""
+
+    if table_name not in tables:
+        raise KeyError(f"Unknown parser output table: {table_name}")
+    tables[table_name].extend(rows)
+
+
+def output_table_count(tables: TableSet) -> int:
+    """Count normalized output tables available after one declaration dispatch."""
+
+    return sum(name in tables for name in COMPONENT_TABLES)
+
+
+__all__ = ["COMPONENT_TABLES", "append_declaration", "append_rows", "component_table_names"]

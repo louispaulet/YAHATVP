@@ -14,6 +14,29 @@ from .triage_snapshot import build_snapshot_review
 SNAPSHOT_DATE = "2026-08-16"
 
 
+def artifact_store(bucket: str | None, local_root: Path | None, prefix: str):
+    """Select the configured triage artifact adapter for CLI and tests."""
+
+    if bucket:
+        return GCSArtifactStore(bucket, prefix)
+    if local_root is None:
+        raise ValueError("Either --bucket or --local-root is required")
+    return LocalArtifactStore(local_root, prefix)
+
+
+def triage_snapshot_path(output_dir: Path, snapshot_date: str) -> Path:
+    """Return the local report directory for a snapshot review."""
+
+    return output_dir / f"snapshot_date={snapshot_date}"
+
+
+def triage_output_paths(output_dir: Path, snapshot_date: str) -> tuple[Path, Path]:
+    """Return the JSON and Markdown destinations for a snapshot review."""
+
+    directory = triage_snapshot_path(output_dir, snapshot_date)
+    return directory / "review.json", directory / "review.md"
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     source = parser.add_mutually_exclusive_group(required=True)
@@ -28,11 +51,7 @@ def _parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
-    store = (
-        GCSArtifactStore(args.bucket, args.prefix)
-        if args.bucket
-        else LocalArtifactStore(args.local_root, args.prefix)
-    )
+    store = artifact_store(args.bucket, args.local_root, args.prefix)
     review = build_snapshot_review(store, args.snapshot_date, args.source_uri_prefix)
     json_path, markdown_path = write_review_artifacts(review, args.output_dir)
     print(f"wrote {json_path}")
@@ -44,6 +63,8 @@ __all__ = [
     "build_review_register",
     "build_snapshot_review",
     "declaration_xml_fingerprints",
+    "artifact_store",
+    "triage_snapshot_path",
     "main",
     "render_markdown",
     "write_review_artifacts",

@@ -9,9 +9,9 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from .bigquery import CURATED_TABLES, load_parquet_tables
 from .config import Settings
 from .download import DownloadedFile
+from .pipeline_bigquery import load_bigquery
 from .storage import ArtifactStore, GCSArtifactStore, LocalArtifactStore
 
 logger = logging.getLogger("hatvp")
@@ -67,49 +67,6 @@ def log_hashes(
             "new_xml_sha256": downloaded["declarations.xml"].sha256,
             "new_csv_sha256": downloaded["liste.csv"].sha256,
             "snapshot_date": snapshot,
-        },
-    )
-
-
-def load_bigquery(
-    settings: Settings,
-    files: dict[str, Path],
-    snapshot: str,
-    dry_run: bool,
-    loader: Callable[..., None] | None,
-) -> None:
-    if not settings.hatvp_enable_bigquery:
-        return
-    if dry_run:
-        logger.info("bigquery_skipped", extra={"event": "bigquery_skipped", "reason": "dry_run"})
-        return
-    if not settings.bigquery_project:
-        raise RuntimeError("HATVP_BIGQUERY_PROJECT is required when BigQuery is enabled")
-    loader = loader or load_parquet_tables
-    uris = (
-        None
-        if settings.local_output or not settings.hatvp_bucket
-        else {
-            name: f"gs://{settings.hatvp_bucket}/{settings.hatvp_prefix}/silver/{name}/snapshot_date={snapshot}/data.parquet"
-            for name in CURATED_TABLES
-        }
-    )
-    loader(
-        project=settings.bigquery_project,
-        dataset=settings.hatvp_bigquery_dataset,
-        table_files=files,
-        snapshot_date=snapshot,
-        gcs_uris=uris,
-        table_names=CURATED_TABLES,
-        location=settings.hatvp_bigquery_location,
-    )
-    logger.info(
-        "bigquery_load_complete",
-        extra={
-            "event": "bigquery_load_complete",
-            "tables": list(CURATED_TABLES),
-            "snapshot_date": snapshot,
-            "location": settings.hatvp_bigquery_location,
         },
     )
 

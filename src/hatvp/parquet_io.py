@@ -18,7 +18,7 @@ def write_parquet(
     schema: dict[str, object] | None = None,
 ) -> None:
     schema = schema or {}
-    columns = list(dict.fromkeys([*required, *schema]))
+    columns = normalized_columns(required, schema)
     frame = _frame(rows, columns, schema)
     for column in columns:
         if column not in frame.columns:
@@ -43,10 +43,34 @@ def _frame(
     )
 
 
+def normalized_columns(required: list[str], schema: dict[str, object]) -> list[str]:
+    """Combine required and schema-only columns while preserving contract order."""
+
+    return list(dict.fromkeys([*required, *schema]))
+
+
+def parquet_schema(table_name: str) -> dict[str, object]:
+    """Return a copy of the shared schema for callers preparing a fixture."""
+
+    return dict(schema_for(table_name))
+
+
+def parquet_path(directory: Path, table_name: str) -> Path:
+    """Return the conventional artifact filename for one normalized table."""
+
+    return directory / f"{table_name}.parquet"
+
+
 def write_table(rows: list[dict[str, Any]], table_name: str, path: Path) -> None:
     """Write a named table using its shared column and type contracts."""
 
     write_parquet(rows, path, required_columns(table_name), schema_for(table_name))
 
 
-__all__ = ["write_parquet", "write_table"]
+__all__ = [
+    "normalized_columns",
+    "parquet_path",
+    "parquet_schema",
+    "write_parquet",
+    "write_table",
+]

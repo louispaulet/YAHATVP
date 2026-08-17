@@ -6,6 +6,9 @@ from typing import Any
 
 from .quality_helpers import add_anomaly, robust_outliers
 
+INCOME_LIMIT_EUR = 10_000_000
+ASSET_LIMIT_EUR = 100_000_000_000
+
 
 def numeric_checks(
     tables: dict[str, list[dict[str, Any]]], anomalies: list[dict[str, Any]]
@@ -19,7 +22,7 @@ def numeric_checks(
         if value is not None and value < 0:
             negative_income += 1
             add_anomaly(anomalies, table_name="incomes", row=row, reason="negative income value")
-        elif value is not None and value > 10_000_000:
+        elif value is not None and value > INCOME_LIMIT_EUR:
             huge_income += 1
             add_anomaly(
                 anomalies, table_name="incomes", row=row, reason="annual income exceeds €10,000,000"
@@ -45,7 +48,7 @@ def numeric_checks(
         if value is not None and value < 0:
             negative_asset += 1
             add_anomaly(anomalies, table_name="assets", row=row, reason="negative asset value")
-        elif value is not None and value > 100_000_000_000:
+        elif value is not None and value > ASSET_LIMIT_EUR:
             huge_asset += 1
             add_anomaly(
                 anomalies, table_name="assets", row=row, reason="asset value exceeds €100 billion"
@@ -66,3 +69,9 @@ def numeric_checks(
     )
     warnings += sum(checks.values())
     return warnings, checks
+
+
+def numeric_limits() -> dict[str, int]:
+    """Expose the documented hard limits used by the numeric checks."""
+
+    return {"income_eur": INCOME_LIMIT_EUR, "asset_eur": ASSET_LIMIT_EUR}

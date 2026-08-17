@@ -21,17 +21,7 @@ from .table_columns import TABLE_COLUMNS
 from .table_schema import PARQUET_SCHEMAS
 
 logger = logging.getLogger("hatvp")
-__all__ = [
-    "CURATED_TABLES",
-    "DownloadedFile",
-    "PARQUET_SCHEMAS",
-    "PipelineFailure",
-    "Settings",
-    "TABLE_COLUMNS",
-    "build_parser",
-    "cli",
-    "run_pipeline",
-]
+__all__ = ["CURATED_TABLES", "DownloadedFile", "PARQUET_SCHEMAS", "PipelineFailure", "Settings", "TABLE_COLUMNS", "build_parser", "cli", "run_pipeline"]  # fmt: skip  # noqa: E501
 
 
 def _snapshot_date() -> str:

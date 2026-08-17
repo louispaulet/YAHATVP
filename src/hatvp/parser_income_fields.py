@@ -43,4 +43,28 @@ def is_populated(raw_value: Any, spouse_raw: Any) -> bool:
     return raw_value is not None or spouse_raw is not None
 
 
-__all__ = ["income_row", "is_populated"]
+def income_value_pair(row: dict[str, Any]) -> tuple[Any, Any]:
+    """Return the declared and spouse values from a normalized income row."""
+
+    return row.get("raw_value"), row.get("spouse_raw_value")
+
+
+def income_numeric_pair(row: dict[str, Any]) -> tuple[float | None, float | None]:
+    """Return both normalized numeric values for quality and fixture assertions."""
+
+    return row.get("normalized_value"), row.get("spouse_normalized_value")
+
+
+def income_has_numeric_value(row: dict[str, Any]) -> bool:
+    """Return whether either person has a successfully parsed numeric amount."""
+
+    return any(value is not None for value in income_numeric_pair(row))
+
+
+__all__ = [
+    "income_has_numeric_value",
+    "income_numeric_pair",
+    "income_row",
+    "income_value_pair",
+    "is_populated",
+]

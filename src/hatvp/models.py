@@ -23,6 +23,19 @@ class ParserConfig:
     csv_delimiter: str
     csv_identity_columns: tuple[str, ...]
 
+    def section(self, name: str) -> str:
+        """Return a configured XML section name with a useful error."""
+
+        try:
+            return str(self.sections[name])
+        except KeyError as exc:
+            raise KeyError(f"Unknown parser section: {name}") from exc
+
+    def candidates(self, name: str) -> tuple[str, ...]:
+        """Return configured field candidates for a parser component."""
+
+        return self.field_candidates.get(name, ())
+
 
 @dataclass(frozen=True)
 class PipelineConfig:
@@ -31,6 +44,11 @@ class PipelineConfig:
     version: int
     runtime: dict[str, Any]
     parser: ParserConfig
+
+    def runtime_value(self, name: str, default: Any = None) -> Any:
+        """Read one typed-runtime default without exposing the raw YAML mapping."""
+
+        return self.runtime.get(name, default)
 
 
 @dataclass(frozen=True)
@@ -43,6 +61,12 @@ class ParseContext:
     @property
     def snapshot(self) -> date:
         return date.fromisoformat(self.snapshot_date)
+
+    @property
+    def source_label(self) -> str:
+        """Return the source file label carried into normalized provenance."""
+
+        return self.source_file
 
 
 def empty_context(snapshot_date: str, source_file: str = "declarations.xml") -> ParseContext:

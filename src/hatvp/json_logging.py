@@ -48,4 +48,23 @@ def structured_event(logger: logging.Logger, event: str, **fields: object) -> No
     logger.info(event, extra={"event": event, **fields})
 
 
-__all__ = ["JsonFormatter", "configure_logging", "structured_event"]
+def event_fields(event: str, **fields: object) -> dict[str, object]:
+    """Return the standard event payload used by JSON logs and test fakes."""
+
+    return {"event": event, **fields}
+
+
+def configure_named_logger(name: str = "hatvp") -> logging.Logger:
+    """Configure the shared handler and return a named pipeline logger."""
+
+    configure_logging()
+    return logging.getLogger(name)
+
+
+__all__ = [
+    "JsonFormatter",
+    "configure_logging",
+    "configure_named_logger",
+    "event_fields",
+    "structured_event",
+]

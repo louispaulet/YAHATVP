@@ -30,4 +30,46 @@ def response_kind(name: str) -> str:
     return "unknown"
 
 
-__all__ = ["response_kind", "validate_dataset_prefix"]
+def is_supported_name(name: str) -> bool:
+    """Return whether a downloaded source has a validator in this module."""
+
+    return response_kind(name) != "unknown"
+
+
+def validate_source_name(name: str) -> None:
+    """Reject unsupported source names before network bytes are published."""
+
+    if not is_supported_name(name):
+        raise ValueError(f"Unsupported HATVP source name: {name}")
+
+
+def supported_source_names() -> tuple[str, ...]:
+    """Return the source names accepted by the downloader boundary."""
+
+    return ("declarations.xml", "liste.csv")
+
+
+def source_extension(name: str) -> str:
+    """Return the lowercase extension used by response validation."""
+
+    return Path(name).suffix.casefold()
+
+
+def source_name_for_kind(kind: str) -> str:
+    """Return the canonical source filename for a supported response kind."""
+
+    names = {"xml": "declarations.xml", "csv": "liste.csv"}
+    try:
+        return names[kind]
+    except KeyError as exc:
+        raise ValueError(f"Unsupported HATVP source kind: {kind}") from exc
+
+
+__all__ = [
+    "is_supported_name",
+    "response_kind",
+    "source_extension",
+    "supported_source_names",
+    "validate_dataset_prefix",
+    "validate_source_name",
+]

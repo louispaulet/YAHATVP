@@ -23,6 +23,7 @@ SUPPORTED_STATUSES: tuple[PipelineStatus, ...] = (
     "SUCCESS_WITH_WARNINGS",
     "FAILED",
 )
+SUCCESS_STATUSES = ("SUCCESS", "SUCCESS_WITH_WARNINGS")
 
 
 def package_metadata() -> dict[str, str]:
@@ -42,10 +43,23 @@ def is_terminal_status(status: str) -> bool:
     return status in SUPPORTED_STATUSES
 
 
+def is_success_status(status: str) -> bool:
+    """Return whether a run completed successfully, with or without warnings."""
+
+    return status in SUCCESS_STATUSES
+
+
+def is_failure_status(status: str) -> bool:
+    """Return whether a status means the required pipeline stages did not finish."""
+
+    return status == "FAILED"
+
+
 __all__ = [
     "PipelineStatus",
     "Row",
     "SUPPORTED_STATUSES",
+    "SUCCESS_STATUSES",
     "TableRows",
     "TableSet",
     "__description__",
@@ -53,5 +67,7 @@ __all__ = [
     "__title__",
     "__version__",
     "is_terminal_status",
+    "is_failure_status",
+    "is_success_status",
     "package_metadata",
 ]

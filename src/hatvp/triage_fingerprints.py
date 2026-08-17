@@ -23,6 +23,20 @@ def semantic_xml_bytes(element: etree._Element) -> bytes:
     return etree.tostring(normalized, method="c14n", exclusive=True, with_comments=False)
 
 
+def xml_digest(value: bytes) -> str:
+    """Hash canonical XML bytes with the same algorithm as source metadata."""
+
+    return hashlib.sha256(value).hexdigest()
+
+
+def occurrence_hashes(element: etree._Element) -> tuple[str, str, int]:
+    """Return canonical hash, semantic hash, and canonical byte length."""
+
+    canonical = etree.tostring(element, method="c14n", exclusive=True, with_comments=False)
+    semantic = semantic_xml_bytes(element)
+    return xml_digest(canonical), xml_digest(semantic), len(canonical)
+
+
 def declaration_xml_fingerprints(path: Path) -> dict[str, list[dict[str, Any]]]:
     fingerprints: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
     context = etree.iterparse(
@@ -40,16 +54,13 @@ def declaration_xml_fingerprints(path: Path) -> dict[str, list[dict[str, Any]]]:
                 continue
             uuid = raw_child_text(element, "uuid")
             if uuid:
-                canonical = etree.tostring(
-                    element, method="c14n", exclusive=True, with_comments=False
-                )
-                semantic = semantic_xml_bytes(element)
+                canonical_hash, semantic_hash, canonical_size = occurrence_hashes(element)
                 fingerprints[uuid].append(
                     {
                         "occurrence_index": len(fingerprints[uuid]),
-                        "canonical_xml_sha256": hashlib.sha256(canonical).hexdigest(),
-                        "canonical_xml_bytes": len(canonical),
-                        "semantic_xml_sha256": hashlib.sha256(semantic).hexdigest(),
+                        "canonical_xml_sha256": canonical_hash,
+                        "canonical_xml_bytes": canonical_size,
+                        "semantic_xml_sha256": semantic_hash,
                         "date_depot_raw": raw_child_text(element, "dateDepot"),
                     }
                 )
@@ -63,4 +74,4 @@ def declaration_xml_fingerprints(path: Path) -> dict[str, list[dict[str, Any]]]:
     return dict(fingerprints)
 
 
-__all__ = ["declaration_xml_fingerprints", "semantic_xml_bytes"]
+__all__ = ["declaration_xml_fingerprints", "occurrence_hashes", "semantic_xml_bytes", "xml_digest"]

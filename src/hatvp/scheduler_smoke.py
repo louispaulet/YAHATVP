@@ -12,16 +12,31 @@ SCHEDULER_SMOKE_TASK_VERSION = "1.0.0"
 PARIS_ZONE = ZoneInfo("Europe/Paris")
 
 
+def runtime_fields() -> dict[str, str]:
+    """Return Cloud Run identity fields without exposing unrelated environment data."""
+
+    return {
+        "cloud_run_execution": os.getenv("CLOUD_RUN_EXECUTION", "unknown"),
+        "cloud_run_task_index": os.getenv("CLOUD_RUN_TASK_INDEX", "unknown"),
+    }
+
+
+def observed_times(observed_at: datetime) -> tuple[str, str]:
+    """Return UTC and Europe/Paris representations used in the smoke payload."""
+
+    return observed_at.isoformat(), observed_at.astimezone(PARIS_ZONE).isoformat()
+
+
 def payload(observed_at: datetime | None = None) -> dict[str, str]:
     observed_at = observed_at or datetime.now(UTC)
+    utc, paris = observed_times(observed_at)
     return {
         "event": "scheduler_smoke",
         "status": "success",
         "scheduler_smoke_task_version": SCHEDULER_SMOKE_TASK_VERSION,
-        "observed_at_utc": observed_at.isoformat(),
-        "observed_at_europe_paris": observed_at.astimezone(PARIS_ZONE).isoformat(),
-        "cloud_run_execution": os.getenv("CLOUD_RUN_EXECUTION", "unknown"),
-        "cloud_run_task_index": os.getenv("CLOUD_RUN_TASK_INDEX", "unknown"),
+        "observed_at_utc": utc,
+        "observed_at_europe_paris": paris,
+        **runtime_fields(),
     }
 
 
@@ -44,7 +59,15 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-__all__ = ["PARIS_ZONE", "SCHEDULER_SMOKE_TASK_VERSION", "main", "parse_args", "payload"]
+__all__ = [
+    "PARIS_ZONE",
+    "SCHEDULER_SMOKE_TASK_VERSION",
+    "main",
+    "observed_times",
+    "parse_args",
+    "payload",
+    "runtime_fields",
+]
 
 
 if __name__ == "__main__":

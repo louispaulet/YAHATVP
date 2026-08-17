@@ -41,6 +41,24 @@ def parser_table_names() -> tuple[str, ...]:
     return tuple(empty_tables())
 
 
+def parser_config() -> object:
+    """Return the packaged parser configuration used by the compatibility façade."""
+
+    return _CONFIG
+
+
+def is_allowed_top_level(name: str) -> bool:
+    """Check an XML top-level name against the configured structural contract."""
+
+    return name in ALLOWED_TOP_LEVEL_CHILDREN
+
+
+def parser_source_tables() -> tuple[str, ...]:
+    """Return tables that can be populated from the XML and listing sources."""
+
+    return parser_table_names()
+
+
 __all__ = [
     "ALLOWED_TOP_LEVEL_CHILDREN",
     "ASSET_SECTIONS",
@@ -48,5 +66,8 @@ __all__ = [
     "parse_csv",
     "parse_sources",
     "parse_xml",
+    "is_allowed_top_level",
+    "parser_config",
+    "parser_source_tables",
     "parser_table_names",
 ]
