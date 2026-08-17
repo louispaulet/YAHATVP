@@ -195,16 +195,16 @@ timezone: Europe/Paris
 - [x] Make BigQuery curated loads add new staged columns and insert by explicit
   column name so schema evolution cannot fail on positional ordering.
 - [x] Document the analytical table schemas and example queries.
-- [ ] Rebuild the curated `incomes` partition from both observed revenue
+- [x] Rebuild the curated `incomes` partition from both observed revenue
   streams and verify the annual `mandatElectifDto` rows in BigQuery.
 
 BigQuery validation evidence for snapshot `2026-08-17`: dataset
 `yahatvp-pipeline-eu:hatvp` was created in `europe-west1`; deployment
-`ca9d19a` enabled BigQuery through GitHub Actions run `32038454470`; forced
-executions `hatvp-ingestion-74pqj` and `hatvp-ingestion-7vgcm` both succeeded;
-the four partition counts and row fingerprints were identical across runs;
-and unchanged execution `hatvp-ingestion-bzqvw` emitted `NO_CHANGE`. The
-source-linked report is
+`1000d0b03` ran through GitHub Actions run `32049058688`; forced executions
+`hatvp-ingestion-f6mdg` and `hatvp-ingestion-ts6jb` both succeeded with
+`incomes=74,791`; the four partition counts and row fingerprints were identical
+across runs; and unchanged execution `hatvp-ingestion-rmclb` emitted
+`NO_CHANGE`. The source-linked report is
 [`reports/bigquery-early-findings-2026-08-17.md`](reports/bigquery-early-findings-2026-08-17.md).
 
 ## 8. Production go-live checklist

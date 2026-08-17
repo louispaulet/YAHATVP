@@ -2,28 +2,31 @@
 
 ## Technical summary
 
-The initial BigQuery curated layer is live and validated for the
+The refreshed BigQuery curated layer is live and validated for the
 `2026-08-17` HATVP snapshot. The Cloud Run job loaded `declarations`, `people`,
 `incomes`, and `assets` into the regional `yahatvp-pipeline-eu.hatvp` dataset.
 All four tables are partitioned by a `DATE`-typed `snapshot_date` field. A
 forced replay replaced the same snapshot without changing row counts or row
-fingerprints, and an unchanged-input execution returned `NO_CHANGE`.
+fingerprints, and a post-refresh unchanged-input execution returned
+`NO_CHANGE`.
 
 The load completed with zero quality errors. The source still contains known
 review flags, so the operational status remains `SUCCESS_WITH_WARNINGS`.
 
-## Curated tables loaded exactly once per snapshot
+## Curated tables validated idempotently per snapshot
 
 | Table | Rows in snapshot partition | `snapshot_date` type | Row fingerprint |
 | --- | ---: | --- | ---: |
 | `declarations` | 6,611 | `DATE` | `-5383795550778946119` |
 | `people` | 6,611 | `DATE` | `-2019889874151548892` |
-| `incomes` | 66 | `DATE` | `-2189167083081978288` |
+| `incomes` | 74,791 | `DATE` | `-2929076836325473210` |
 | `assets` | 1,157 | `DATE` | `-5142282871526498847` |
 
-The counts and fingerprints were identical after executions
-`hatvp-ingestion-74pqj` and `hatvp-ingestion-7vgcm`. The partition metadata
+The counts and fingerprints were identical after successful executions
+`hatvp-ingestion-f6mdg` and `hatvp-ingestion-ts6jb`. The partition metadata
 reported the same row counts for partition `20260817` in all four tables.
+The unchanged execution `hatvp-ingestion-rmclb` returned `NO_CHANGE` without
+advancing state or rewriting derived outputs.
 Other normalized tables remain in GCS and were intentionally not published to
 BigQuery in this first rollout.
 
@@ -48,11 +51,13 @@ for review rather than deduplicating them.
 
 ### Income coverage is intentionally sparse
 
-The curated `incomes` table contains 66 populated numeric rows across 9
-declarations. There are 55 declarations with an income section, of which 46
-have no populated income rows. The source-aware parser therefore avoids
-presenting empty fixed category slots as income observations. No statistical
-income outliers were reported in the snapshot quality checks.
+The curated `incomes` table contains 74,791 numeric rows across 5,859
+declarations: 74,725 annual `mandate_remuneration` rows across 5,850
+declarations and 66 `revenu_mandat` rows across 9 declarations. The latter
+stream remains sparse: 55 declarations have an income section, of which 46
+have no populated category rows. Empty fixed category slots are still excluded
+from the curated table, while annual `mandatElectifDto` values are preserved
+with their source years and explicit zeroes.
 
 ### Asset anomalies are review flags, not deletions
 
@@ -73,14 +78,15 @@ identifiers remain available for follow-up.
 1. Created `yahatvp-pipeline-eu.hatvp` in `europe-west1`.
 2. Granted `roles/bigquery.jobUser` to `hatvp-runtime` at project scope and
    dataset-level `roles/bigquery.dataEditor` access.
-3. Deployed commit `ca9d19acd77c4f87916cf768c7873d3b5a0af249` through GitHub
-   Actions run `32038454470` using Workload Identity Federation.
+3. Deployed commit `1000d0b03a6fdcebef75b467fca1cf7a95860d84` through GitHub
+   Actions run `32049058688` using Workload Identity Federation.
 4. Confirmed structured `bigquery_load_complete` logging for the four selected
-   tables during `hatvp-ingestion-74pqj`.
+   tables during `hatvp-ingestion-f6mdg`.
 5. Queried `INFORMATION_SCHEMA.COLUMNS` and `INFORMATION_SCHEMA.PARTITIONS`
    to verify field type, partition id, and partition row counts.
-6. Re-ran the same snapshot with `--force` and compared counts and fingerprints.
-7. Re-ran without `--force`; `hatvp-ingestion-bzqvw` emitted both
+6. Re-ran the same snapshot with `--force` as `hatvp-ingestion-ts6jb` and
+   compared counts and fingerprints.
+7. Re-ran without `--force`; `hatvp-ingestion-rmclb` emitted both
    `pipeline_complete` and `pipeline_status` with status `NO_CHANGE`.
 
 The repeat-load comparison query was:
@@ -122,6 +128,7 @@ report and state record were read from:
 
 ## Further questions
 
-- Should `mandate_remunerations` become the next curated table, given its
-  74,725-row source population and separate outlier review work?
+- Should the detailed `mandate_remunerations` table become the next curated
+  table, given its 74,725-row source population and remuneration-specific
+  fields already represented in the unified `incomes` view?
 - What retention and cost policy should apply to future BigQuery partitions?

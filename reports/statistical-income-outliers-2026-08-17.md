@@ -7,7 +7,7 @@
 | Snapshot date | `2026-08-17` |
 | Raw source | `declarations.xml` |
 | Raw source SHA-256 | `865261857f88ec6c262558bc115b37b94f97ea3418b6829267aa6cbd1458fdaf` |
-| Parser revision | `c2252ca` |
+| Parser revision | `1000d0b` |
 | Detector | Robust median/MAD over populated elected-person category values |
 | Review threshold | Absolute robust z-score > 10 |
 
@@ -15,7 +15,10 @@
 
 There is no evidence that the `revenuMandatDto` parser is dropping the 198 source slots as if they were 198 incomes. The 198 figure is the number of fixed category slots: **22 source groups × 9 categories**. Only **66 slots contain a numeric `revenuElu` value**, and the parser emits exactly those 66 populated category rows.
 
-The full source-to-normalized funnel is:
+The full `revenuMandatDto` source-to-normalized funnel is shown below. The unified
+`incomes` table also contains annual `mandatElectifDto` remuneration rows; this
+report isolates the `income_stream=revenu_mandat` population so its category
+reconciliation remains auditable:
 
 | Stage | Count | Interpretation |
 | --- | ---: | --- |
@@ -25,7 +28,7 @@ The full source-to-normalized funnel is:
 | Source income groups | 22 | Some declarations contain several years/groups |
 | Fixed category slots | 198 | 22 groups × 9 `revenuMandatItem*` slots |
 | Numeric elected-person category values | 66 | 33.3% of slots; the remaining slots are empty |
-| Normalized `incomes` rows | 66 | Exact one-to-one match with the populated category values |
+| Normalized `incomes` rows (`revenu_mandat` stream) | 66 | Exact one-to-one match with the populated category values |
 | Source `totalElu` aggregates | 22 | Retained for reconciliation; not emitted as duplicate income rows when categories are populated |
 
 The 66 category values sum to **€1,098,531**, exactly matching the sum of the 22 source `totalElu` values. This is the key integrity check: the parser is not losing the income amounts shown in the source section, and it is not double-counting the group totals.
@@ -117,7 +120,7 @@ The sums below add the populated category rows within each declaration UUID. The
 | --- | ---: |
 | Source category slots | 198 |
 | Source numeric elected-person category values | 66 |
-| Normalized `incomes` rows with numeric `normalized_value` | 66 |
+| Normalized `incomes` rows with numeric `normalized_value` (`revenu_mandat`) | 66 |
 | Difference between source numeric values and normalized rows | 0 |
 | Sum of source numeric category values (€) | €1,098,531 |
 | Sum of source `totalElu` values (€) | €1,098,531 |
@@ -127,7 +130,7 @@ The manual review bundle contains one raw declaration and its parsed output: [`r
 
 ## Method and limitations
 
-- The source was read from the immutable XML snapshot identified by the SHA-256 above. The normalized tables were produced with the parser at revision `c2252ca`.
+- The source was read from the immutable XML snapshot identified by the SHA-256 above. The normalized tables were produced with the parser at revision `1000d0b`.
 - Category outliers use the median and median absolute deviation (MAD) over numeric elected-person category values. The robust scale is `1.4826 × MAD`; a row is formally flagged only when its absolute robust z-score is greater than 10, matching `src/hatvp/quality.py`.
 - `totalElu` is an aggregate consistency field. When at least one category is populated, the parser emits category rows and uses the source total only for reconciliation; emitting both would inflate income counts and sums.
 - This report does not assert that a high value is wrong. A high value may reflect legitimate salary, pension, elected-official compensation, or multiple years of reporting. Candidate rows should be checked against the source declaration when needed.
@@ -142,6 +145,6 @@ The manual review bundle contains one raw declaration and its parsed output: [`r
 ## Source artifacts
 
 - Raw XML snapshot: `gs://yahatvp-pipeline-eu-data/hatvp/raw/snapshot_date=2026-08-17/declarations.xml`
-- Normalized incomes: `gs://yahatvp-pipeline-eu-data/hatvp/silver/incomes/snapshot_date=2026-08-17/data.parquet`
+- Unified normalized incomes: `gs://yahatvp-pipeline-eu-data/hatvp/silver/incomes/snapshot_date=2026-08-17/data.parquet` (filter `income_stream=revenu_mandat` for this report)
 - Normalized declarations: `gs://yahatvp-pipeline-eu-data/hatvp/silver/declarations/snapshot_date=2026-08-17/data.parquet`
 - Pipeline quality report: `gs://yahatvp-pipeline-eu-data/hatvp/quality/snapshot_date=2026-08-17/report.json`

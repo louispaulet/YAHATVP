@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-17 — Refresh BigQuery with annual mandate incomes
+
+### Verified
+
+- Deployed commit `1000d0b03a6fdcebef75b467fca1cf7a95860d84` through GitHub
+  Actions run `32049058688`.
+- Successful forced execution `hatvp-ingestion-f6mdg` rebuilt the snapshot;
+  the curated `incomes` partition now contains 74,791 rows: 74,725 annual
+  `mandate_remuneration` rows and 66 `revenu_mandat` rows, with zero quality
+  errors.
+- The loader migrated the existing BigQuery `incomes` table to include
+  `income_stream` and `remuneration_index`; `snapshot_date` remains a
+  partitioning `DATE`.
+- Repeat forced execution `hatvp-ingestion-ts6jb` produced the same four table
+  row counts and fingerprints, including incomes fingerprint
+  `-2929076836325473210`.
+- Unchanged execution `hatvp-ingestion-rmclb` returned `NO_CHANGE`; GCS state
+  remains pinned to the successful `1000d0b03` snapshot.
+- Updated the BigQuery, revenue-stream, and category-income reports with the
+  unified row counts and deployment evidence.
+
 ## 2026-08-17 — Make BigQuery curated loads schema-evolution safe
 
 ### Changed
@@ -22,7 +43,7 @@
 
 ### Follow-up
 
-- Deploy this loader fix and rerun the forced production execution.
+- Resolved by the successful `hatvp-ingestion-f6mdg` replay recorded above.
 
 ## 2026-08-17 — Include annual mandate remuneration in curated incomes
 
@@ -50,8 +71,8 @@
 
 ### Follow-up
 
-- Deploy the parser revision and refresh the curated BigQuery `incomes`
-  partition, then record row counts and repeat-load evidence.
+- Resolved by the successful `hatvp-ingestion-f6mdg` and
+  `hatvp-ingestion-ts6jb` replays recorded above.
 
 ## 2026-08-17 — Enable and validate the initial BigQuery curated layer
 
