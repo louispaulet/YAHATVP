@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-08-17 — Validate production pipeline contracts and Scheduler handoff
+
+### Added
+
+- Added fixture-backed regression coverage for malformed and invalid-top-level
+  XML CLI failures, structural-quality failures, structured status events, and
+  immutable GCS writes.
+- Added state-preservation assertions proving failed transformations leave the
+  previous `state/latest.json` unchanged.
+
+### Verified
+
+- Focused pipeline tests pass: 11 tests.
+- Forced Cloud Run execution `hatvp-ingestion-hbt9d` completed successfully
+  with `quality_complete` reporting 0 errors, 3,556 warnings, and 5,763 flagged
+  records, followed by `SUCCESS_WITH_WARNINGS`.
+- Scheduler deliveries `hatvp-ingestion-c96k4` and `hatvp-ingestion-bbpbj`
+  both completed with exit 0 and `NO_CHANGE`. Repeat execution
+  `hatvp-ingestion-5pzdn` left all raw, derived, quality, and state object
+  fingerprints unchanged.
+- The isolated GCS immutable-write check rejected a different-byte overwrite
+  with HTTP 412 while preserving generation `1786959796746977` and the
+  original SHA-256.
+- `HATVP_ENABLE_BIGQUERY=false` remains unchanged. No credentials or access
+  tokens appeared in the validated structured log events.
+
+### Follow-up
+
+- Docker is not installed in the current workstation, so the local
+  `docker build` and containerized malformed-fixture run remain to be verified
+  by CI or on a machine with a container runtime. The deployed image already
+  uses the tested `python -m hatvp.main` entrypoint.
+
 ## 2026-08-17 — Reconcile a superseded annual-remuneration outlier
 
 ### Changed

@@ -2,9 +2,9 @@
 
 This checklist turns the project requirements into an execution plan. The local
 pipeline and first Google Cloud deployment are implemented and tested; the
-weekly Scheduler path is validated against a versioned no-op job, while the
-production ingestion handoff, optional BigQuery, quality triage, and operational
-hardening remain.
+weekly Scheduler trigger is connected to the production ingestion job and has
+completed repeat live deliveries. Optional BigQuery, quality triage, and
+remaining operational hardening remain.
 
 ## Current status
 
@@ -111,8 +111,8 @@ The deployment commands are documented in the
 - [x] Start with `HATVP_ENABLE_BIGQUERY=false` until BigQuery permissions are verified.
 - [x] Execute the job manually with `--wait`.
 - [x] Confirm the container exits with status 0 for a warning-bearing run (`hatvp-ingestion-q78jz`).
-- [ ] Confirm the container exits non-zero for malformed input or structural quality failure.
-- [ ] Confirm Cloud Logging contains structured events for downloads, hashes, quality, and final status.
+- [x] Confirm the application entrypoint exits non-zero for malformed input or structural quality failure; fixture tests cover both paths and the deployed container uses this entrypoint.
+- [x] Confirm Cloud Logging contains structured events for downloads, hashes, quality, and final status (`hatvp-ingestion-hbt9d`).
 
 Manual smoke-test commands:
 
@@ -127,13 +127,13 @@ After the first successful Cloud Run execution:
 
 - [x] Confirm both exact raw files exist under `raw/snapshot_date=.../`.
 - [x] Confirm `metadata.json` contains URL, size, SHA-256, timing, Git SHA, and pipeline version.
-- [ ] Confirm raw objects cannot be overwritten by a retry with different bytes.
+- [x] Confirm raw objects cannot be overwritten by a retry with different bytes; isolated validation object generation `1786959796746977` rejected the different-byte write with HTTP 412 and retained its SHA-256.
 - [x] Confirm every normalized table is written below `silver/<table>/snapshot_date=.../`.
 - [x] Confirm anomaly rows are present below `quarantine/snapshot_date=.../`.
 - [x] Confirm the machine-readable quality report is present below `quality/snapshot_date=.../`.
 - [x] Confirm `state/latest.json` is written only after all required outputs succeed.
-- [ ] Confirm a second run with unchanged inputs returns `NO_CHANGE` and does not create a new derived snapshot.
-- [ ] Confirm a failed transformation leaves the previous `state/latest.json` unchanged.
+- [x] Confirm a second run with unchanged inputs returns `NO_CHANGE` and does not create a new derived snapshot (`hatvp-ingestion-5pzdn`; pre/post object fingerprints and state hash matched).
+- [x] Confirm a failed transformation leaves the previous `state/latest.json` unchanged (fixture coverage includes structural-quality and BigQuery failures).
 
 The first smoke-test snapshot was `2026-08-16`. Its quality report contained
 zero errors, 3,510 warnings, and 5,763 flagged records; quality triage remains
@@ -151,8 +151,8 @@ open.
 - [x] Validate a second near-now schedule `4 0 * * *` (`00:04 Europe/Paris`): Scheduler attempt `2026-08-16T22:04:00Z` created execution `hatvp-scheduler-smoke-srwmc`, which completed with `succeededCount=1`.
 - [x] Confirm both executions emitted `scheduler_smoke_task_version=1.0.0` in Cloud Logging.
 - [x] Restore the final weekly schedule; next run is `2026-08-17T05:00:00Z` (`07:00 Europe/Paris`).
-- [ ] Point a production trigger at `hatvp-ingestion` after the smoke validation is accepted.
-- [ ] Confirm duplicate delivery safety for the real ingestion pipeline.
+- [x] Point the production trigger at `hatvp-ingestion` after the smoke validation is accepted; `hatvp-ingestion-weekly` is enabled and the smoke trigger is paused.
+- [x] Confirm duplicate delivery safety for the real ingestion pipeline: executions `hatvp-ingestion-c96k4` and `hatvp-ingestion-bbpbj` both completed with `NO_CHANGE` and exit 0.
 
 Recommended initial schedule:
 
@@ -195,10 +195,10 @@ timezone: Europe/Paris
 - [x] Run one complete manual Cloud Run execution and review the quality report.
 - [ ] Review all flagged records from the first snapshot.
 - [x] Confirm raw data, Parquet outputs, quarantine, quality report, and state are all present.
-- [x] Confirm the Scheduler-triggered smoke execution succeeds; the production ingestion job remains unconnected.
-- [ ] Confirm the production Scheduler-triggered ingestion execution succeeds after handoff.
-- [ ] Confirm the `NO_CHANGE` path works on a repeat execution.
-- [ ] Confirm logs never contain credentials or access tokens.
+- [x] Confirm the Scheduler-triggered smoke execution succeeds; the smoke trigger is now paused after handoff.
+- [x] Confirm the production Scheduler-triggered ingestion execution succeeds after handoff (`hatvp-ingestion-c96k4` and `hatvp-ingestion-bbpbj`).
+- [x] Confirm the `NO_CHANGE` path works on a repeat execution (`hatvp-ingestion-5pzdn`).
+- [x] Confirm logs never contain credentials or access tokens in the validated execution events.
 - [x] Confirm the runtime service account has no unnecessary project-wide roles.
 - [x] Confirm the repository branch is clean and CI is green.
 - [x] Record the first production snapshot date (`2026-08-16`) and pipeline Git SHA (`f21853d`).
