@@ -9,11 +9,8 @@ from lxml import etree
 
 from .config import load_pipeline_config
 from .models import ParseContext, Row, TableSet
-from .parser_activities import activity_rows, participation_rows
-from .parser_declarations import declaration_row, person_row
-from .parser_finance import asset_rows, liability_rows
-from .parser_income import income_rows, mandate_income_rows
-from .parser_mandates import mandate_rows, remuneration_rows
+from .parser_declarations import declaration_row
+from .parser_dispatch import append_declaration
 from .xml_support import local_name
 
 
@@ -61,7 +58,7 @@ def parse_xml(
             if local_name(element.tag) != "declaration":
                 continue
             declaration_count += 1
-            _append_declaration(tables, element, context, config, declaration_parser)
+            append_declaration(tables, element, context, config, declaration_parser)
             _clear(element)
     except etree.XMLSyntaxError as exc:
         raise ValueError(f"HATVP XML is malformed: {exc}") from exc
@@ -87,21 +84,6 @@ def _validate_start(
             raise ValueError(f"HATVP XML has invalid top-level element: {child_name}")
         count += 1
     return root, count
-
-
-def _append_declaration(
-    tables: TableSet, element: etree._Element, context: ParseContext, config, declaration_parser
-) -> None:
-    tables["declarations"].append(declaration_parser(element, context, config))
-    tables["people"].append(person_row(element, context))
-    tables["mandates"].extend(mandate_rows(element, context, config))
-    tables["mandate_remunerations"].extend(remuneration_rows(element, context, config))
-    tables["activities"].extend(activity_rows(element, context, config))
-    tables["participations"].extend(participation_rows(element, context, config))
-    tables["incomes"].extend(income_rows(element, context, config))
-    tables["incomes"].extend(mandate_income_rows(element, context, config))
-    tables["assets"].extend(asset_rows(element, context, config))
-    tables["liabilities"].extend(liability_rows(element, context, config))
 
 
 def _clear(element: etree._Element) -> None:

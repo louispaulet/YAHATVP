@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import argparse
-import json
 import logging
-from datetime import UTC, datetime
 from pathlib import Path
 
 from .bigquery import CURATED_TABLES, load_parquet_tables
 from .config import Settings
 from .download import DownloadedFile, download_to_path
+from .json_logging import configure_logging as _configure_logging
 from .parquet_io import write_parquet
 from .parser import parse_sources
 from .pipeline import default_store, snapshot_date
@@ -22,7 +21,6 @@ from .table_columns import TABLE_COLUMNS
 from .table_schema import PARQUET_SCHEMAS
 
 logger = logging.getLogger("hatvp")
-
 __all__ = [
     "CURATED_TABLES",
     "DownloadedFile",
@@ -34,36 +32,6 @@ __all__ = [
     "cli",
     "run_pipeline",
 ]
-
-
-def _configure_logging() -> None:
-    class JsonFormatter(logging.Formatter):
-        reserved = set(logging.LogRecord("", 0, "", 0, "", (), None).__dict__)
-
-        def format(self, record: logging.LogRecord) -> str:
-            payload = {
-                "timestamp": datetime.now(UTC).isoformat(),
-                "severity": record.levelname,
-                "logger": record.name,
-                "message": record.getMessage(),
-            }
-            payload.update(
-                {
-                    key: value
-                    for key, value in record.__dict__.items()
-                    if key not in self.reserved and not key.startswith("_")
-                }
-            )
-            if record.exc_info:
-                payload["exception"] = self.formatException(record.exc_info)
-            return json.dumps(payload, ensure_ascii=False, default=str)
-
-    root = logging.getLogger()
-    root.setLevel(logging.INFO)
-    root.handlers.clear()
-    handler = logging.StreamHandler()
-    handler.setFormatter(JsonFormatter())
-    root.addHandler(handler)
 
 
 def _snapshot_date() -> str:
@@ -120,9 +88,11 @@ def build_parser() -> argparse.ArgumentParser:
 def cli(argv: list[str] | None = None) -> int:
     _configure_logging()
     args = build_parser().parse_args(argv)
-    settings = Settings()
-    if args.local_output is not None:
-        settings = settings.model_copy(update={"local_output": args.local_output})
+    settings = (
+        Settings().model_copy(update={"local_output": args.local_output})
+        if args.local_output
+        else Settings()
+    )
     try:
         status = run_pipeline(settings, dry_run=args.dry_run, force=args.force)
     except Exception:

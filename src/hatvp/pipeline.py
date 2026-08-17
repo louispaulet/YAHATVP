@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import tempfile
 import time
@@ -23,28 +22,21 @@ from .pipeline_state import (
     same_snapshot,
     write_state,
 )
+from .pipeline_steps import (
+    default_store,
+    download_sources,
+    load_bigquery,
+    log_hashes,
+    previous_report,
+)
 from .quality import QualityResult, run_quality_checks
-from .storage import ArtifactStore, GCSArtifactStore, LocalArtifactStore
-from .table_columns import TABLE_COLUMNS
-from .table_schema import PARQUET_SCHEMAS
+from .storage import ArtifactStore
 
 logger = logging.getLogger("hatvp")
 
 
 def snapshot_date() -> str:
     return datetime.now(ZoneInfo("Europe/Paris")).date().isoformat()
-
-
-def default_store(settings: Settings, dry_run: bool = False) -> ArtifactStore:
-    if settings.local_output is not None:
-        return LocalArtifactStore(settings.local_output, settings.hatvp_prefix)
-    if dry_run:
-        return LocalArtifactStore(
-            Path(tempfile.mkdtemp(prefix="hatvp-dry-run-")), settings.hatvp_prefix
-        )
-    if not settings.hatvp_bucket:
-        raise ValueError("HATVP_BUCKET is required unless --local-output is used")
-    return GCSArtifactStore(settings.hatvp_bucket, settings.hatvp_prefix)
 
 
 def run_pipeline(
@@ -62,37 +54,40 @@ def run_pipeline(
     if not dry_run:
         settings.validate_storage()
     store = store_factory(settings, dry_run=dry_run)
-    date = snapshot_date_provider()
+    snapshot = snapshot_date_provider()
     started = time.perf_counter()
     previous = load_state(store) if not dry_run else {}
     with tempfile.TemporaryDirectory(prefix="hatvp-run-") as directory:
         working_dir = Path(directory)
-        downloaded = _download(settings, working_dir, downloader)
-        _log_hashes(previous, downloaded, date)
+        downloaded = download_sources(settings, working_dir, downloader)
+        log_hashes(previous, downloaded, snapshot)
         if not force and not dry_run and previous and same_snapshot(previous, downloaded):
             logger.info(
                 "pipeline_complete", extra={"event": "pipeline_complete", "status": "NO_CHANGE"}
             )
             return "NO_CHANGE"
         metadata = reuse_snapshot_metadata(
-            store, date, build_metadata(date, settings, downloaded), dry_run
+            store, snapshot, build_metadata(snapshot, settings, downloaded), dry_run
         )
-        archive_raw(store, date, downloaded, metadata, dry_run)
-        tables = parser(downloaded["liste.csv"].path, downloaded["declarations.xml"].path, date)
-        previous_report = _previous_report(store, previous, dry_run)
-        quality = quality_runner(tables, previous_report=previous_report, snapshot_date=date)
-        write_report(store, date, quality, dry_run)
-        files = write_tables(store, tables, date, working_dir, dry_run)
+        archive_raw(store, snapshot, downloaded, metadata, dry_run)
+        tables = parser(downloaded["liste.csv"].path, downloaded["declarations.xml"].path, snapshot)
+        quality = quality_runner(
+            tables,
+            previous_report=previous_report(store, previous, dry_run),
+            snapshot_date=snapshot,
+        )
+        write_report(store, snapshot, quality, dry_run)
+        files = write_tables(store, tables, snapshot, working_dir, dry_run)
         if quality.has_errors:
             raise PipelineFailure(
                 f"Quality checks failed: {quality.report['quality']['errors']} error(s)"
             )
-        _load_bigquery(settings, files, date, dry_run, bq_loader)
+        load_bigquery(settings, files, snapshot, dry_run, bq_loader)
         if not dry_run:
             write_state(
                 store,
                 {
-                    "snapshot_date": date,
+                    "snapshot_date": snapshot,
                     "fetched_at": metadata["fetched_at"],
                     "xml_sha256": downloaded["declarations.xml"].sha256,
                     "csv_sha256": downloaded["liste.csv"].sha256,
@@ -100,109 +95,21 @@ def run_pipeline(
                     "pipeline_version": settings.pipeline_version,
                 },
             )
-        status = "SUCCESS_WITH_WARNINGS" if quality.has_warnings else "SUCCESS"
-        logger.info(
-            "pipeline_complete",
-            extra={
-                "event": "pipeline_complete",
-                "status": status,
-                "snapshot_date": date,
-                "elapsed_seconds": round(time.perf_counter() - started, 3),
-            },
-        )
-        return status
+        return _finish(snapshot, started, quality)
 
 
-def _download(
-    settings: Settings, directory: Path, downloader: Callable[..., DownloadedFile]
-) -> dict[str, DownloadedFile]:
-    kwargs = {
-        "user_agent": settings.user_agent,
-        "connect_timeout_seconds": settings.download_connect_timeout_seconds,
-        "read_timeout_seconds": settings.download_read_timeout_seconds,
-        "retries": settings.download_retries,
-    }
-    return {
-        "liste.csv": downloader(
-            settings.hatvp_csv_url, "liste.csv", directory / "liste.csv", **kwargs
-        ),
-        "declarations.xml": downloader(
-            settings.hatvp_xml_url, "declarations.xml", directory / "declarations.xml", **kwargs
-        ),
-    }
-
-
-def _previous_report(store: ArtifactStore, previous: dict, dry_run: bool) -> dict | None:
-    if dry_run or not previous.get("snapshot_date"):
-        return None
-    path = f"quality/snapshot_date={previous['snapshot_date']}/report.json"
-    return json.loads(store.read_bytes(path)) if store.exists(path) else None
-
-
-def _log_hashes(previous: dict, downloaded: dict[str, DownloadedFile], date: str) -> None:
+def _finish(snapshot: str, started: float, quality: QualityResult) -> str:
+    status = "SUCCESS_WITH_WARNINGS" if quality.has_warnings else "SUCCESS"
     logger.info(
-        "hash_comparison",
+        "pipeline_complete",
         extra={
-            "event": "hash_comparison",
-            "previous_xml_sha256": previous.get("xml_sha256"),
-            "previous_csv_sha256": previous.get("csv_sha256"),
-            "new_xml_sha256": downloaded["declarations.xml"].sha256,
-            "new_csv_sha256": downloaded["liste.csv"].sha256,
-            "snapshot_date": date,
+            "event": "pipeline_complete",
+            "status": status,
+            "snapshot_date": snapshot,
+            "elapsed_seconds": round(time.perf_counter() - started, 3),
         },
     )
+    return status
 
 
-def _load_bigquery(
-    settings: Settings,
-    files: dict[str, Path],
-    date: str,
-    dry_run: bool,
-    loader: Callable[..., None] | None,
-) -> None:
-    if not settings.hatvp_enable_bigquery:
-        return
-    if dry_run:
-        logger.info("bigquery_skipped", extra={"event": "bigquery_skipped", "reason": "dry_run"})
-        return
-    if not settings.bigquery_project:
-        raise PipelineFailure("HATVP_BIGQUERY_PROJECT is required when BigQuery is enabled")
-    from .bigquery import CURATED_TABLES, load_parquet_tables
-
-    loader = loader or load_parquet_tables
-    uris = (
-        None
-        if settings.local_output or not settings.hatvp_bucket
-        else {
-            name: f"gs://{settings.hatvp_bucket}/{settings.hatvp_prefix}/silver/{name}/snapshot_date={date}/data.parquet"
-            for name in CURATED_TABLES
-        }
-    )
-    loader(
-        project=settings.bigquery_project,
-        dataset=settings.hatvp_bigquery_dataset,
-        table_files=files,
-        snapshot_date=date,
-        gcs_uris=uris,
-        table_names=CURATED_TABLES,
-        location=settings.hatvp_bigquery_location,
-    )
-    logger.info(
-        "bigquery_load_complete",
-        extra={
-            "event": "bigquery_load_complete",
-            "tables": list(CURATED_TABLES),
-            "snapshot_date": date,
-            "location": settings.hatvp_bigquery_location,
-        },
-    )
-
-
-__all__ = [
-    "PARQUET_SCHEMAS",
-    "TABLE_COLUMNS",
-    "PipelineFailure",
-    "default_store",
-    "run_pipeline",
-    "snapshot_date",
-]
+__all__ = ["PipelineFailure", "default_store", "run_pipeline", "snapshot_date"]

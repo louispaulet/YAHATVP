@@ -8,6 +8,7 @@ from lxml import etree
 
 from .models import ParseContext, ParserConfig
 from .normalize import parse_date
+from .parser_declaration_support import income_item_has_value
 from .parser_mandates import mandate_rows
 from .xml_support import child, item_groups, normalized_child_text, raw_child_text
 
@@ -37,7 +38,7 @@ def declaration_row(
         "declaration_type_label": normalized_child_text(declaration_type, "label"),
         "income_section_present": income_section is not None,
         "income_section_populated_item_count": sum(
-            _income_item_has_value(item) for item in item_groups(income_section)
+            income_item_has_value(item) for item in item_groups(income_section)
         ),
         "mandat_label": normalized_child_text(mandate, "label")
         or normalized_child_text(general, "mandat"),
@@ -60,16 +61,6 @@ def declaration_row(
         "date_derniere_declaration_raw": raw_child_text(general, "dateDernDeclar"),
         "declaration_modificative": normalized_child_text(general, "declarationModificative"),
     }
-
-
-def _income_item_has_value(item: etree._Element) -> bool:
-    for category in item:
-        if category.tag.rsplit("}", 1)[-1].startswith("revenuMandatItem"):
-            values = {child.tag.rsplit("}", 1)[-1]: child.text for child in category}
-            if values.get("revenuElu") or values.get("revenuConjoint"):
-                return True
-    values = {child.tag.rsplit("}", 1)[-1]: child.text for child in item}
-    return values.get("totalElu") is not None or values.get("totalConjoint") is not None
 
 
 def person_row(element: etree._Element, context: ParseContext) -> dict[str, Any]:
