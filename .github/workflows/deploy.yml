@@ -1,0 +1,133 @@
+name: Test and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  GCP_REGION: ${{ vars.GCP_REGION }}
+  ARTIFACT_REPOSITORY: ${{ vars.ARTIFACT_REPOSITORY }}
+  CLOUD_RUN_JOB: ${{ vars.CLOUD_RUN_JOB }}
+  HATVP_BUCKET: ${{ vars.HATVP_BUCKET }}
+  HATVP_RUNTIME_SERVICE_ACCOUNT: ${{ vars.HATVP_RUNTIME_SERVICE_ACCOUNT }}
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+  DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv build
+      - run: uv run pytest
+
+  deployment-config:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check deployment configuration
+        env:
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}
+          ARTIFACT_REPOSITORY: ${{ vars.ARTIFACT_REPOSITORY }}
+          CLOUD_RUN_JOB: ${{ vars.CLOUD_RUN_JOB }}
+          HATVP_BUCKET: ${{ vars.HATVP_BUCKET }}
+          HATVP_RUNTIME_SERVICE_ACCOUNT: ${{ vars.HATVP_RUNTIME_SERVICE_ACCOUNT }}
+          WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+          DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+        run: |
+          missing=()
+          for variable in \
+            GCP_PROJECT_ID \
+            GCP_REGION \
+            ARTIFACT_REPOSITORY \
+            CLOUD_RUN_JOB \
+            HATVP_BUCKET \
+            HATVP_RUNTIME_SERVICE_ACCOUNT \
+            WIF_PROVIDER \
+            DEPLOY_SERVICE_ACCOUNT; do
+            if [ -z "${!variable}" ]; then
+              missing+=("$variable")
+            fi
+          done
+
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::notice title=Cloud deployment skipped::Configure the missing repository variables before enabling deployment: ${missing[*]}"
+          else
+            echo "All Cloud deployment variables are configured."
+          fi
+
+  deploy:
+    needs: [test, deployment-config]
+    if: >-
+      ${{
+        github.event_name == 'push' &&
+        github.ref == 'refs/heads/main' &&
+        vars.GCP_PROJECT_ID != '' &&
+        vars.GCP_REGION != '' &&
+        vars.ARTIFACT_REPOSITORY != '' &&
+        vars.CLOUD_RUN_JOB != '' &&
+        vars.HATVP_BUCKET != '' &&
+        vars.HATVP_RUNTIME_SERVICE_ACCOUNT != '' &&
+        vars.GCP_WIF_PROVIDER != '' &&
+        vars.GCP_DEPLOY_SERVICE_ACCOUNT != ''
+      }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Authenticate Docker
+        run: gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+
+      - name: Build and push image
+        env:
+          IMAGE: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/hatvp:${{ github.sha }}
+        run: |
+          docker build --tag "$IMAGE" .
+          docker push "$IMAGE"
+
+      - name: Deploy Cloud Run Job
+        env:
+          IMAGE: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/hatvp:${{ github.sha }}
+        run: |
+          gcloud run jobs deploy "$CLOUD_RUN_JOB" \
+            --project="$GCP_PROJECT_ID" \
+            --region="$GCP_REGION" \
+            --image="$IMAGE" \
+            --service-account="$HATVP_RUNTIME_SERVICE_ACCOUNT" \
+            --tasks=1 \
+            --max-retries=1 \
+            --memory=2Gi \
+            --task-timeout=30m \
+            --set-env-vars="HATVP_BUCKET=${HATVP_BUCKET},HATVP_PREFIX=hatvp,HATVP_ENABLE_BIGQUERY=true,HATVP_BIGQUERY_PROJECT=${GCP_PROJECT_ID},HATVP_BIGQUERY_DATASET=hatvp,HATVP_BIGQUERY_LOCATION=${GCP_REGION},PIPELINE_GIT_SHA=${GITHUB_SHA},PIPELINE_VERSION=${GITHUB_SHA}"
