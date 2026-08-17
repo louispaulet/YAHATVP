@@ -284,8 +284,16 @@ records. Repeated names are expected identity-collision flags and must not be
 deduplicated. The 143 robust asset outliers are retained for review because
 asset values are skewed. The nine negative asset values are small negative
 bank-account balances consistent with overdrafts; they are source-valid for
-retention but remain flagged. The six duplicate declaration UUID groups are
-actionable source-quality issues and require investigation if they recur.
+retention but remain flagged. The six duplicate declaration UUID groups were
+source-verified as semantically identical duplicates, including one pair that
+differs only by trailing whitespace; they remain flagged for investigation if
+they recur. All 152 negative/outlier asset rows match their serialized source
+records in the immutable XML, and no parser or normalization issue was found.
+
+The complete source-linked review is documented in
+[`reports/quality-triage-2026-08-16.md`](reports/quality-triage-2026-08-16.md),
+with the complete group- and row-level register in
+[`reports/quality-triage-2026-08-16.json`](reports/quality-triage-2026-08-16.json).
 
 Income coverage is source-dependent. The `incomes` table is derived only from
 the XML `revenuMandatDto` section, not from every declaration or from
