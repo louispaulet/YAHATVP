@@ -25,6 +25,12 @@
   `mandate_remunerations` rows across 5,850 declarations, with zero quality
   errors.
 
+### Operational follow-up
+
+- Increased the Cloud Run Job memory limit to `2Gi` after the first deployed
+  force replay reached the previous `512Mi` limit while writing the expanded
+  normalized outputs.
+
 ## 2026-08-17 — Deploy and replay the income coverage fix
 
 ### Verified
