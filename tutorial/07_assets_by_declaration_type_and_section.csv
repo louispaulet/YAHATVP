@@ -1,0 +1,21 @@
+snapshot_date,declaration_type,source_section,asset_count,declaration_count,total_asset_value_eur
+2026-08-18,Déclaration de situation patrimoniale,immeubleDto,128,39,43796174
+2026-08-18,Déclaration de situation patrimoniale modificative,immeubleDto,91,21,18115824
+2026-08-18,Déclaration de situation patrimoniale,assuranceVieDto,97,35,10142419
+2026-08-18,Déclaration de situation patrimoniale,valeursNonEnBourseDto,22,14,7662313
+2026-08-18,Déclaration de situation patrimoniale modificative,valeursNonEnBourseDto,17,10,7495782
+2026-08-18,Déclaration de situation patrimoniale modificative,assuranceVieDto,54,22,6979145
+2026-08-18,Déclaration de situation patrimoniale,comptesBancaireDto,288,42,3700507
+2026-08-18,Déclaration de situation patrimoniale de fin de mandat,assuranceVieDto,12,6,3662818
+2026-08-18,Déclaration de situation patrimoniale de fin de mandat,valeursEnBourseDto,9,4,3308488
+2026-08-18,Déclaration de situation patrimoniale de fin de mandat,immeubleDto,9,6,3250090
+2026-08-18,Déclaration de situation patrimoniale modificative,comptesBancaireDto,176,23,2736480
+2026-08-18,Déclaration de situation patrimoniale,autreBienDto,14,7,2716831
+2026-08-18,Déclaration de situation patrimoniale,sciDto,11,10,1802775
+2026-08-18,Déclaration de situation patrimoniale,bienEtrangerDto,6,4,1386069
+2026-08-18,Déclaration initiale de situation patrimoniale,assuranceVieDto,3,1,1293676
+2026-08-18,Déclaration de situation patrimoniale modificative,autreBienDto,11,6,1214001
+2026-08-18,Déclaration de situation patrimoniale,valeursEnBourseDto,42,24,1089453
+2026-08-18,Déclaration de situation patrimoniale de fin de mandat,comptesBancaireDto,38,7,618636
+2026-08-18,Déclaration de situation patrimoniale modificative,valeursEnBourseDto,18,10,578750
+2026-08-18,Déclaration de situation patrimoniale modificative,bienEtrangerDto,3,2,410000

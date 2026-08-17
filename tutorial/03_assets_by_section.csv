@@ -1,0 +1,12 @@
+snapshot_date,source_section,asset_count,valued_asset_count,total_normalized_value_eur,average_normalized_value_eur
+2026-08-18,immeubleDto,230,230,65563528,285058.82
+2026-08-18,assuranceVieDto,168,168,22114203,131632.16
+2026-08-18,valeursNonEnBourseDto,41,41,15178622,370210.29
+2026-08-18,comptesBancaireDto,521,521,7374725,14154.94
+2026-08-18,valeursEnBourseDto,72,72,5260907,73068.15
+2026-08-18,autreBienDto,25,25,3930832,157233.28
+2026-08-18,sciDto,21,21,2377373,113208.24
+2026-08-18,bienEtrangerDto,12,12,1848912,154076
+2026-08-18,vehiculeDto,51,51,506108,9923.69
+2026-08-18,bienDiverDto,13,13,239500,18423.08
+2026-08-18,fondDto,3,2,46240,23120

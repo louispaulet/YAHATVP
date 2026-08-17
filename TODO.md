@@ -254,6 +254,13 @@ Post-merge image `d2b4a9b` deployed successfully. Forced executions
 second emitted `quality_warning_streak` with `warning_streak=2`, 5,818 flagged
 records, and zero quality errors.
 
+## 10. BigQuery tutorial
+
+- [x] Add ten atomic BigQuery tutorial queries with matching CSV results for the
+  validated `2026-08-18` snapshot.
+- [x] Document the query progression, fixed snapshot convention, stable-UUID
+  joins, and CSV regeneration commands.
+
 ## Later, only if needed
 
 - [ ] Add semantic/content hashes after the exact-byte hash path is stable.
