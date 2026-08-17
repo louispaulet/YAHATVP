@@ -3,7 +3,7 @@
 import pytest
 
 from hatvp.parser import parse_xml
-from hatvp.parser_declaration_support import (
+from hatvp.parser.declaration_support import (
     declaration_child_names,
     declaration_has_general,
     declaration_has_income,

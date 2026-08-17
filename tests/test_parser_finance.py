@@ -1,6 +1,6 @@
 """Fixture tests for asset and liability DTO components."""
 
-from hatvp.parser_finance import asset_rows, liability_rows
+from hatvp.parser.finance import asset_rows, liability_rows
 from hatvp.xml_support import local_name
 from tests.parser_support import asset_sections, first_row, xml_tables
 

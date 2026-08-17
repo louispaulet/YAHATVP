@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 
 from hatvp.bigquery import curated_table_names, validate_table_files, validate_table_selection
-from hatvp.bigquery_loader import curated_load_defaults, staging_name
-from hatvp.bigquery_sql import (
+from hatvp.bigquery.loader import curated_load_defaults, staging_name
+from hatvp.bigquery.sql import (
     create_partitioned_sql,
     delete_sql,
     field_type_sql,

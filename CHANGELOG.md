@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-08-18 — Group Python modules into domain packages
+
+### Changed
+
+- Reorganized prefixed modules into `parser`, `pipeline`, `quality`, `triage`,
+  `bigquery`, `storage`, `download`, and `tables` packages.
+- Kept `hatvp-ingest`, `python -m hatvp.main`, and the façade package APIs
+  working while making the nested modules the canonical internal import paths.
+- Updated all repository imports and tests, and documented the complete new
+  `src/hatvp` tree and `python -m hatvp.triage` command in the main README.
+
+### Verified
+
+- `uv run pytest`: 127 passed, including the 70–100-line module-budget checks.
+- Ruff lint and formatting checks pass; `uv build` packages successfully.
+- `python -m hatvp.main --help` and `python -m hatvp.triage --help` both pass.
+- No removed prefixed modules remain directly under `src/hatvp`.
+
 ## 2026-08-18 — Modular Python boundaries
 
 ### Added

@@ -7,15 +7,15 @@ import pytest
 from lxml import etree
 
 from hatvp.parser import is_allowed_top_level
-from hatvp.parser_csv import (
+from hatvp.parser.csv import (
     csv_config,
     csv_delimiter,
     csv_has_header,
     csv_row_count,
     validate_identity_columns,
 )
-from hatvp.parser_declaration_support import child_values, local_name
-from hatvp.parser_dispatch import (
+from hatvp.parser.declaration_support import child_values, local_name
+from hatvp.parser.dispatch import (
     COMPONENT_TABLES,
     append_rows,
     component_table_names,

@@ -1,6 +1,6 @@
 """Source-linked quality register acceptance tests."""
 
-from hatvp.quality_triage import build_review_register, declaration_xml_fingerprints
+from hatvp.triage import build_review_register, declaration_xml_fingerprints
 from tests.triage_support import (
     FIXTURES,
     anomaly,

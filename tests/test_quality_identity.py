@@ -1,8 +1,8 @@
 """Quality identity checks retain duplicate rows and flag stable-ID collisions."""
 
 from hatvp.quality import run_quality_checks
-from hatvp.quality_helpers import add_anomaly, previous_summary
-from hatvp.triage_evidence_helpers import normal_name
+from hatvp.quality.helpers import add_anomaly, previous_summary
+from hatvp.triage.evidence_helpers import normal_name
 from tests.quality_support import tables
 
 

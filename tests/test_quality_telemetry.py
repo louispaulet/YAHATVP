@@ -3,7 +3,7 @@
 import logging
 
 from hatvp.quality import run_quality_checks
-from hatvp.quality_telemetry import flagged_ratio, is_regression, warning_streak
+from hatvp.quality.telemetry import flagged_ratio, is_regression, warning_streak
 from tests.quality_support import clean_tables, tables
 
 

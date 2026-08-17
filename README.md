@@ -109,57 +109,66 @@ hatvp-pipeline/
 │   ├── pipeline.yml
 │   ├── models.py
 │   ├── normalize.py
-│   ├── download.py
-│   ├── download_validation.py
 │   ├── hashing.py
 │   ├── json_logging.py
-│   ├── parquet_io.py
-│   ├── storage.py
-│   ├── local_storage.py
-│   ├── gcs_storage.py
 │   ├── xml_support.py
-│   ├── parser.py                 # stable parsing façade
-│   ├── parser_csv.py
-│   ├── parser_stream.py
-│   ├── parser_dispatch.py
-│   ├── parser_activities.py
-│   ├── parser_declarations.py
-│   ├── parser_declaration_support.py
-│   ├── parser_finance.py
-│   ├── parser_income.py
-│   ├── parser_income_fields.py
-│   ├── parser_mandates.py
-│   ├── parser_mandate_fields.py
-│   ├── parser_mandate_general.py
-│   ├── parser_mandate_income.py
-│   ├── pipeline.py                # orchestration façade
-│   ├── pipeline_artifacts.py
-│   ├── pipeline_bigquery.py
-│   ├── pipeline_result.py
-│   ├── pipeline_state.py
-│   ├── pipeline_steps.py
-│   ├── quality.py                 # stable quality façade
-│   ├── quality_checks.py
-│   ├── quality_coverage.py
-│   ├── quality_helpers.py
-│   ├── quality_numeric.py
-│   ├── quality_telemetry.py
-│   ├── quality_triage.py
-│   ├── triage_evidence.py
-│   ├── triage_evidence_helpers.py
-│   ├── triage_fingerprints.py
-│   ├── triage_matching.py
-│   ├── triage_register.py
-│   ├── triage_report.py
-│   ├── triage_snapshot.py
-│   ├── triage_summary.py
-│   ├── bigquery.py
-│   ├── bigquery_loader.py
-│   ├── bigquery_sql.py
-│   ├── bigquery_stage.py
-│   ├── table_columns.py
-│   ├── table_schema.py
-│   └── scheduler_smoke.py
+│   ├── scheduler_smoke.py
+│   ├── download/
+│   │   ├── __init__.py            # download façade
+│   │   └── validation.py
+│   ├── tables/
+│   │   ├── __init__.py            # Parquet writer façade
+│   │   ├── columns.py
+│   │   └── schema.py
+│   ├── storage/
+│   │   ├── __init__.py            # storage façade
+│   │   ├── gcs.py
+│   │   └── local.py
+│   ├── parser/
+│   │   ├── __init__.py            # stable parsing façade
+│   │   ├── activities.py
+│   │   ├── csv.py
+│   │   ├── declaration_support.py
+│   │   ├── declarations.py
+│   │   ├── dispatch.py
+│   │   ├── finance.py
+│   │   ├── income.py
+│   │   ├── income_fields.py
+│   │   ├── mandate_fields.py
+│   │   ├── mandate_general.py
+│   │   ├── mandate_income.py
+│   │   ├── mandates.py
+│   │   └── stream.py
+│   ├── pipeline/
+│   │   ├── __init__.py            # orchestration façade
+│   │   ├── artifacts.py
+│   │   ├── bigquery.py
+│   │   ├── result.py
+│   │   ├── state.py
+│   │   └── steps.py
+│   ├── quality/
+│   │   ├── __init__.py            # stable quality façade
+│   │   ├── checks.py
+│   │   ├── coverage.py
+│   │   ├── helpers.py
+│   │   ├── numeric.py
+│   │   └── telemetry.py
+│   ├── triage/
+│   │   ├── __init__.py            # quality-review CLI façade
+│   │   ├── __main__.py
+│   │   ├── evidence.py
+│   │   ├── evidence_helpers.py
+│   │   ├── fingerprints.py
+│   │   ├── matching.py
+│   │   ├── register.py
+│   │   ├── report.py
+│   │   ├── snapshot.py
+│   │   └── summary.py
+│   └── bigquery/
+│       ├── __init__.py            # curated-table façade
+│       ├── loader.py
+│       ├── sql.py
+│       └── stage.py
 ├── tests/
 │   ├── test_*.py
 │   ├── *_support.py
@@ -168,11 +177,16 @@ hatvp-pipeline/
 ```
 
 Parser navigation, streaming, CSV, declaration/person, mandate/remuneration,
-income, finance, and activity components live in focused `parser_*.py` modules.
-Pipeline orchestration, state, artifacts, quality checks, triage, storage, and
-BigQuery staging follow the same component boundary. Every tracked Python file,
-including tests and package initializers, is intentionally kept between 70 and
-100 physical lines; `tests/test_module_line_budget.py` enforces this contract.
+income, finance, and activity components live in the `parser/` package.
+Pipeline orchestration and its state, artifacts, results, steps, and BigQuery
+integration live in `pipeline/`. Quality checks live in `quality/`, source-linked
+review generation lives in `triage/`, curated BigQuery loading lives in
+`bigquery/`, storage adapters live in `storage/`, downloads live in `download/`,
+and Parquet/table contracts live in `tables/`. Package `__init__.py` files are
+the small façades used by the application; the focused modules below them are
+the canonical internal import paths. Every tracked Python file, including tests
+and package initializers, is intentionally kept between 70 and 100 physical
+lines; `tests/test_module_line_budget.py` enforces this contract.
 
 ### Configuration
 
@@ -359,7 +373,7 @@ trailing whitespace.
 The report can be regenerated from a read-only artifact store with ADC:
 
 ```bash
-uv run python -m hatvp.quality_triage \
+uv run python -m hatvp.triage \
   --bucket yahatvp-pipeline-eu-data \
   --prefix hatvp \
   --snapshot-date 2026-08-16 \

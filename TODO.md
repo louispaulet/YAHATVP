@@ -26,6 +26,7 @@ expansion. First-snapshot quality triage is documented and complete.
 - [x] Add Dockerfile and GitHub Actions deployment workflow using Workload Identity Federation.
 - [x] Run the test suite, Ruff, package build, and a live local run against the current HATVP files.
 - [x] Modularize every tracked Python module into 70–100 physical lines, add YAML-driven typed configuration, and split fixture tests by behavior.
+- [x] Group prefixed Python modules into domain packages and document the complete layout in the main README.
 - [ ] Complete the ADC-backed refactored GCS/BigQuery replay and merge PR #10; currently blocked because ADC is unavailable in the local environment.
 
 ## Google Cloud project details (completed)

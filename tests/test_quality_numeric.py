@@ -1,7 +1,7 @@
 """Numeric quality checks retain suspicious values and expose limits."""
 
 from hatvp.quality import run_quality_checks
-from hatvp.quality_numeric import ASSET_LIMIT_EUR, INCOME_LIMIT_EUR, numeric_limits
+from hatvp.quality.numeric import ASSET_LIMIT_EUR, INCOME_LIMIT_EUR, numeric_limits
 from tests.quality_support import tables
 
 

@@ -4,9 +4,9 @@ from pathlib import Path
 
 from lxml import etree
 
-from hatvp.quality_triage import artifact_store, triage_output_paths, triage_snapshot_path
 from hatvp.storage import LocalArtifactStore
-from hatvp.triage_evidence_helpers import (
+from hatvp.triage import artifact_store, triage_output_paths, triage_snapshot_path
+from hatvp.triage.evidence_helpers import (
     asset_key,
     asset_rows,
     assets_match,
@@ -14,8 +14,8 @@ from hatvp.triage_evidence_helpers import (
     normal_name,
     same_asset_values,
 )
-from hatvp.triage_fingerprints import occurrence_hashes, xml_digest
-from hatvp.triage_summary import duplicate_groups, summary_counts
+from hatvp.triage.fingerprints import occurrence_hashes, xml_digest
+from hatvp.triage.summary import duplicate_groups, summary_counts
 
 
 def test_triage_matching_helpers_use_identity_and_source_positions() -> None:

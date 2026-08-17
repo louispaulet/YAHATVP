@@ -2,13 +2,13 @@
 
 import json
 
-from hatvp.parser_income import income_row_count
-from hatvp.parser_income_fields import (
+from hatvp.parser.income import income_row_count
+from hatvp.parser.income_fields import (
     income_has_numeric_value,
     income_numeric_pair,
     income_value_pair,
 )
-from hatvp.parser_mandate_income import is_mandate_income_row, mandate_income_years
+from hatvp.parser.mandate_income import is_mandate_income_row, mandate_income_years
 from tests.parser_support import first_row, raw_record, rows_for, xml_tables
 
 

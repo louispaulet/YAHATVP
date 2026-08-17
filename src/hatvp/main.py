@@ -10,15 +10,15 @@ from .bigquery import CURATED_TABLES, load_parquet_tables
 from .config import Settings
 from .download import DownloadedFile, download_to_path
 from .json_logging import configure_logging as _configure_logging
-from .parquet_io import write_parquet
 from .parser import parse_sources
 from .pipeline import default_store, snapshot_date
 from .pipeline import run_pipeline as _run_pipeline
-from .pipeline_state import PipelineFailure, load_state
+from .pipeline.state import PipelineFailure, load_state
 from .quality import run_quality_checks
 from .storage import ArtifactStore
-from .table_columns import TABLE_COLUMNS
-from .table_schema import PARQUET_SCHEMAS
+from .tables import write_parquet
+from .tables.columns import TABLE_COLUMNS
+from .tables.schema import PARQUET_SCHEMAS
 
 logger = logging.getLogger("hatvp")
 __all__ = ["CURATED_TABLES", "DownloadedFile", "PARQUET_SCHEMAS", "PipelineFailure", "Settings", "TABLE_COLUMNS", "build_parser", "cli", "run_pipeline"]  # fmt: skip  # noqa: E501
