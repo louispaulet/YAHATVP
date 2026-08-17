@@ -3,11 +3,11 @@
 This folder contains one declaration from the 2026-08-17 HATVP XML snapshot
 for manual parser review.
 
-- `declaration.xml` is the selected declaration serialized under a
+- `01-declaration.xml` is the selected declaration serialized under a
   `<declarations>` wrapper for easy XML inspection.
-- `parsed.json` contains the declaration summary and every normalized row whose
+- `02-parsed.json` contains the declaration summary and every normalized row whose
   `declaration_uuid` matches the source UUID, grouped by table.
-- `parsed.json` also contains `source_income.category_slots` with all nine raw
+- `02-parsed.json` also contains `source_income.category_slots` with all nine raw
   income categories, including empty slots, plus `source_income.totals` and a
   category-to-total reconciliation.
 
@@ -24,6 +24,6 @@ The six populated category values sum to the source `totalElu` value of
 `73005`. The total is kept in the source-income view but is not emitted as a
 seventh normalized income row because it is an aggregate of the categories.
 
-`parsed.json` records the full source XML SHA-256, source URL, GCS raw snapshot
-path, snapshot date, and parser commit. `raw_record_json` fields retain the
-source-level values used for normalization.
+`02-parsed.json` records the full source XML SHA-256, source URL, GCS raw
+snapshot path, snapshot date, and parser commit. `raw_record_json` fields
+retain the source-level values used for normalization.

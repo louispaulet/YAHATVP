@@ -29,7 +29,7 @@ The parser fix is therefore doing the right structural thing: it preserves every
 | Sum of `totalElu` values | €1,098,531 |
 | Reconciliation difference | €0 |
 
-The robust distribution has a median of **€9,000**, a MAD of **€8,218.50**, and a maximum of **€82,023**. The largest review candidate is Charlotte LECOCQ's `Traitements salaires` value for 2025; its robust z-score is 5.99, below the formal threshold of 10. The full category breakdown and manual Rachida Dati bundle remain in [`statistical-income-outliers-2026-08-17.md`](statistical-income-outliers-2026-08-17.md).
+The robust distribution has a median of **€9,000**, a MAD of **€8,218.50**, and a maximum of **€82,023**. The largest review candidate is Charlotte LECOCQ's `Traitements salaires` value for 2025; its robust z-score is 5.99, below the formal threshold of 10. The full category breakdown and manual Rachida Dati bundle remain in [`2026-08-17-income-outliers.md`](2026-08-17-income-outliers.md).
 
 ## Key findings: the effective annual-remuneration register contains 42 formal outliers
 
