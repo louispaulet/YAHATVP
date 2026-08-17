@@ -7,8 +7,9 @@ datasets.
 > Project status: the local end-to-end path is implemented and has been exercised
 > against the current public HATVP files. The Cloud Run deployment is in place,
 > and the weekly `hatvp-ingestion-weekly` Scheduler trigger runs the real
-> ingestion job at 07:00 Europe/Paris. The earlier smoke trigger is paused;
-> BigQuery remains disabled for the first production handoff.
+> ingestion job at 07:00 Europe/Paris. BigQuery is enabled for the initial
+> `declarations`, `people`, `incomes`, and `assets` curated tables; the remaining
+> normalized tables remain GCS-only until a later expansion.
 
 ## Goal
 
@@ -443,26 +444,23 @@ bq --location="$REGION" mk --dataset "${PROJECT_ID}:${DATASET}"
 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${RUNTIME_SA_EMAIL}" \
   --role="roles/bigquery.jobUser"
-bq add-iam-policy-binding \
-  --member="serviceAccount:${RUNTIME_SA_EMAIL}" \
-  --role="roles/bigquery.dataEditor" \
-  "${PROJECT_ID}:${DATASET}"
+bq --project_id="$PROJECT_ID" --location="$REGION" query \
+  --use_legacy_sql=false \
+  "GRANT \`roles/bigquery.dataEditor\` ON SCHEMA \`${PROJECT_ID}.${DATASET}\` TO \"serviceAccount:${RUNTIME_SA_EMAIL}\""
 ```
 
 Useful validation queries for the first curated snapshot are:
 
 ```sql
-SELECT table_name, row_count
-FROM `yahatvp-pipeline-eu.hatvp.INFORMATION_SCHEMA.TABLES`
-WHERE table_name IN ('declarations', 'people', 'incomes', 'assets');
+SELECT table_name, partition_id, total_rows
+FROM `yahatvp-pipeline-eu.hatvp.INFORMATION_SCHEMA.PARTITIONS`
+WHERE partition_id = '20260817'
+  AND table_name IN ('declarations', 'people', 'incomes', 'assets');
 
 SELECT table_name, column_name, data_type
 FROM `yahatvp-pipeline-eu.hatvp.INFORMATION_SCHEMA.COLUMNS`
 WHERE column_name = 'snapshot_date';
 
-SELECT table_name, partition_id, total_rows
-FROM `yahatvp-pipeline-eu.hatvp.INFORMATION_SCHEMA.PARTITIONS`
-WHERE partition_id = '20260817';
 ```
 
 ## Google Cloud deployment
@@ -546,7 +544,7 @@ gcloud run jobs deploy "$JOB_NAME" \
   --tasks=1 \
   --max-retries=1 \
   --task-timeout=30m \
-  --set-env-vars="HATVP_BUCKET=${BUCKET_NAME},HATVP_PREFIX=hatvp,HATVP_ENABLE_BIGQUERY=false,HATVP_BIGQUERY_PROJECT=${PROJECT_ID},HATVP_BIGQUERY_DATASET=hatvp"
+  --set-env-vars="HATVP_BUCKET=${BUCKET_NAME},HATVP_PREFIX=hatvp,HATVP_ENABLE_BIGQUERY=true,HATVP_BIGQUERY_PROJECT=${PROJECT_ID},HATVP_BIGQUERY_DATASET=hatvp,HATVP_BIGQUERY_LOCATION=${REGION}"
 ```
 
 Run a manual smoke test and wait for the result:
@@ -738,5 +736,5 @@ Keep the implementation specific to HATVP, with clear boundaries between:
 
 Prefer deterministic, testable functions over a generic data-engineering
 framework. The first milestone is a minimal end-to-end local run backed by
-fixtures. The next milestone is a GCS-backed run. Enable BigQuery only after the
-source-to-Parquet path and quality report are stable.
+fixtures. The initial GCS-backed and curated BigQuery paths are now validated.
+Keep additional BigQuery tables behind a focused schema and quality review.

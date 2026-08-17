@@ -1,5 +1,40 @@
 # Changelog
 
+## 2026-08-17 — Enable and validate the initial BigQuery curated layer
+
+### Changed
+
+- Added an explicit four-table BigQuery allowlist for `declarations`, `people`,
+  `incomes`, and `assets`; other normalized tables remain GCS-only.
+- Removed runtime dataset creation, added regional BigQuery configuration, and
+  made empty and null-only curated Parquet fields use stable types, including a
+  `DATE` `snapshot_date`.
+- Updated the deployment workflow to enable BigQuery after the dataset and
+  least-privilege runtime IAM were configured.
+- Added loader, table-selection, idempotency-order, and stable-schema tests.
+
+### Verified
+
+- Full local checks pass: 36 tests, Ruff, formatting, and package build.
+- Created dataset `yahatvp-pipeline-eu:hatvp` in `europe-west1`; granted
+  `roles/bigquery.jobUser` to `hatvp-runtime` at project scope and dataset-level
+  `roles/bigquery.dataEditor` access.
+- GitHub Actions run `32038454470` deployed commit `ca9d19a` through Workload
+  Identity Federation with `HATVP_ENABLE_BIGQUERY=true`.
+- Forced executions `hatvp-ingestion-74pqj` and `hatvp-ingestion-7vgcm`
+  succeeded. Partition row counts were 6,611 declarations, 6,611 people, 66
+  incomes, and 1,157 assets; all four tables use `snapshot_date` as a `DATE`.
+- The replay produced identical `BIT_XOR(FARM_FINGERPRINT(...))` row
+  fingerprints, and unchanged execution `hatvp-ingestion-bzqvw` emitted
+  `NO_CHANGE`. The weekly Scheduler trigger was restored to `ENABLED`.
+- Published the technical findings report at
+  `reports/bigquery-early-findings-2026-08-17.md`.
+
+### Follow-up
+
+- Add operational alerts and monitor the first weekly BigQuery partitions
+  before expanding the curated table set.
+
 ## 2026-08-17 — Complete first production snapshot quality triage
 
 ### Added

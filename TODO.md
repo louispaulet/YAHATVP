@@ -3,8 +3,9 @@
 This checklist turns the project requirements into an execution plan. The local
 pipeline and first Google Cloud deployment are implemented and tested; the
 weekly Scheduler trigger is connected to the production ingestion job and has
-completed repeat live deliveries. Optional BigQuery and remaining operational
-hardening remain; first-snapshot quality triage is documented and complete.
+completed repeat live deliveries. The initial four-table BigQuery layer is
+enabled and validated; remaining work is operational hardening and later table
+expansion. First-snapshot quality triage is documented and complete.
 
 ## Current status
 
@@ -97,7 +98,7 @@ uv run python -m hatvp.main --local-output ./data --dry-run
 - [x] Create the Cloud Run runtime service account `hatvp-runtime`.
 - [x] Create the Cloud Scheduler invoker service account `hatvp-scheduler`.
 - [x] Grant the runtime account object access only to the dedicated HATVP bucket.
-- [ ] If BigQuery is enabled, grant only BigQuery job and dataset write permissions required by the loader.
+- [x] Grant only BigQuery job and dataset write permissions required by the loader (`roles/bigquery.jobUser` on the project and dataset-level `roles/bigquery.dataEditor`).
 - [x] Grant the Scheduler account `roles/run.invoker` on the `hatvp-scheduler-smoke` Cloud Run Job; keep `hatvp-ingestion` unconnected until acceptance.
 - [ ] Confirm Cloud Audit Logs and Cloud Logging retention meet operational needs.
 
@@ -185,13 +186,22 @@ timezone: Europe/Paris
 
 ## 7. Enable and validate BigQuery, if wanted
 
-- [ ] Decide the first curated tables: `declarations`, `people`, `incomes`, and `assets` at minimum.
-- [ ] Confirm every table includes `snapshot_date`.
-- [ ] Confirm tables are partitioned by `snapshot_date` where supported.
-- [ ] Run the same snapshot twice and confirm the second load replaces that snapshot rather than duplicating rows.
-- [ ] Confirm BigQuery remains optional when `HATVP_ENABLE_BIGQUERY=false`.
-- [ ] Confirm a BigQuery failure prevents the latest state hash from advancing.
-- [ ] Document the analytical table schemas and example queries.
+- [x] Decide the first curated tables: `declarations`, `people`, `incomes`, and `assets` at minimum.
+- [x] Confirm every curated table includes `snapshot_date` as a `DATE`.
+- [x] Confirm curated tables are partitioned by `snapshot_date`.
+- [x] Run the same snapshot twice and confirm the second load replaces that snapshot rather than duplicating rows.
+- [x] Confirm BigQuery remains optional when `HATVP_ENABLE_BIGQUERY=false`.
+- [x] Confirm a BigQuery failure prevents the latest state hash from advancing.
+- [x] Document the analytical table schemas and example queries.
+
+BigQuery validation evidence for snapshot `2026-08-17`: dataset
+`yahatvp-pipeline-eu:hatvp` was created in `europe-west1`; deployment
+`ca9d19a` enabled BigQuery through GitHub Actions run `32038454470`; forced
+executions `hatvp-ingestion-74pqj` and `hatvp-ingestion-7vgcm` both succeeded;
+the four partition counts and row fingerprints were identical across runs;
+and unchanged execution `hatvp-ingestion-bzqvw` emitted `NO_CHANGE`. The
+source-linked report is
+[`reports/bigquery-early-findings-2026-08-17.md`](reports/bigquery-early-findings-2026-08-17.md).
 
 ## 8. Production go-live checklist
 
