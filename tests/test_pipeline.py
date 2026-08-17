@@ -3,11 +3,13 @@ import shutil
 from pathlib import Path
 
 import pytest
+from google.api_core.exceptions import PreconditionFailed
 
 from hatvp import main as main_module
 from hatvp.config import Settings
 from hatvp.download import DownloadedFile
 from hatvp.main import PipelineFailure, run_pipeline
+from hatvp.storage import GCSArtifactStore
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -71,6 +73,33 @@ def _settings(output: Path) -> Settings:
     )
 
 
+def _cli_with_fixture(
+    monkeypatch: pytest.MonkeyPatch,
+    output: Path,
+    *,
+    xml_source: Path = FIXTURES / "declarations.xml",
+    csv_source: Path = FIXTURES / "liste.csv",
+) -> int:
+    real_run_pipeline = main_module.run_pipeline
+
+    def fixture_run_pipeline(
+        settings: Settings, *, dry_run: bool = False, force: bool = False
+    ) -> str:
+        return real_run_pipeline(
+            settings,
+            dry_run=dry_run,
+            force=force,
+            downloader=_downloader_for(xml_source=xml_source, csv_source=csv_source),
+        )
+
+    monkeypatch.setattr(main_module, "run_pipeline", fixture_run_pipeline)
+    return main_module.cli(["--local-output", str(output)])
+
+
+def _json_log_events(stderr: str) -> list[dict]:
+    return [json.loads(line) for line in stderr.splitlines() if line.startswith("{")]
+
+
 def test_unchanged_snapshot_detection(tmp_path: Path) -> None:
     output = tmp_path / "output"
     assert (
@@ -81,6 +110,75 @@ def test_unchanged_snapshot_detection(tmp_path: Path) -> None:
 
     assert run_pipeline(_settings(output), downloader=_fixture_downloader) == "NO_CHANGE"
     assert json.loads(state_path.read_text()) == first_state
+
+
+def test_cli_returns_nonzero_and_logs_failed_for_invalid_xml(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    for fixture_name in ("malformed.xml", "invalid_top_level.xml"):
+        output = tmp_path / fixture_name.removesuffix(".xml")
+
+        assert _cli_with_fixture(monkeypatch, output, xml_source=FIXTURES / fixture_name) == 1
+
+        events = _json_log_events(capsys.readouterr().err)
+        assert any(
+            event.get("event") == "pipeline_failed" and event.get("status") == "FAILED"
+            for event in events
+        )
+        assert not _state_path(output).exists()
+
+
+def test_cli_structural_quality_failure_preserves_previous_state(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    output = tmp_path / "output"
+    changed_xml = _changed_fixture(
+        FIXTURES / "declarations.xml",
+        tmp_path / "changed-declarations.xml",
+        b"fixture-uuid-1",
+        b"fixture-uuid-1-quality-failure",
+    )
+    dates = iter(("2026-08-16", "2026-08-17"))
+    monkeypatch.setattr(main_module, "_snapshot_date", lambda: next(dates))
+
+    _assert_warning_status(run_pipeline(_settings(output), downloader=_fixture_downloader))
+    previous_state = _state_path(output).read_bytes()
+
+    real_parse_sources = main_module.parse_sources
+
+    def structurally_invalid_parse(*args: object, **kwargs: object) -> dict[str, list[dict]]:
+        tables = real_parse_sources(*args, **kwargs)
+        tables["declarations"][0].pop("declaration_uuid")
+        return tables
+
+    monkeypatch.setattr(main_module, "parse_sources", structurally_invalid_parse)
+    assert _cli_with_fixture(monkeypatch, output, xml_source=changed_xml) == 1
+
+    events = _json_log_events(capsys.readouterr().err)
+    assert any(
+        event.get("event") == "quality_complete" and event.get("status") == "error"
+        for event in events
+    )
+    assert any(
+        event.get("event") == "pipeline_failed" and event.get("status") == "FAILED"
+        for event in events
+    )
+    assert _state_path(output).read_bytes() == previous_state
+
+
+def test_cli_warning_run_emits_structured_hash_quality_and_status_events(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    output = tmp_path / "output"
+
+    assert _cli_with_fixture(monkeypatch, output) == 0
+
+    events = _json_log_events(capsys.readouterr().err)
+    by_event = {event.get("event"): event for event in events}
+    assert by_event["hash_comparison"]["new_xml_sha256"]
+    assert by_event["hash_comparison"]["new_csv_sha256"]
+    assert by_event["quality_complete"]["counts"]
+    assert by_event["pipeline_complete"]["status"] == "SUCCESS_WITH_WARNINGS"
 
 
 def test_dry_run_does_not_write_local_outputs(tmp_path: Path) -> None:
@@ -219,3 +317,42 @@ def test_immutable_raw_snapshot_rejects_different_bytes_for_same_date(
         _raw_path(output, "2026-08-16", "liste.csv").read_bytes()
         == (FIXTURES / "liste.csv").read_bytes()
     )
+
+
+class _FakeGCSBlob:
+    def __init__(self, bucket: "_FakeGCSBucket", name: str) -> None:
+        self.bucket = bucket
+        self.name = name
+
+    def upload_from_string(self, content: bytes, **_: object) -> None:
+        if self.name in self.bucket.objects:
+            raise PreconditionFailed("object already exists")
+        self.bucket.objects[self.name] = bytes(content)
+
+    def exists(self) -> bool:
+        return self.name in self.bucket.objects
+
+    def download_as_bytes(self) -> bytes:
+        return self.bucket.objects[self.name]
+
+
+class _FakeGCSBucket:
+    def __init__(self) -> None:
+        self.objects: dict[str, bytes] = {}
+
+    def blob(self, name: str) -> _FakeGCSBlob:
+        return _FakeGCSBlob(self, name)
+
+
+def test_gcs_immutable_write_is_idempotent_for_same_bytes_and_rejects_changes() -> None:
+    store = GCSArtifactStore.__new__(GCSArtifactStore)
+    store.bucket = _FakeGCSBucket()
+    store.prefix = "hatvp"
+
+    store.put_bytes("raw/snapshot_date=2026-08-16/liste.csv", b"original", immutable=True)
+    store.put_bytes("raw/snapshot_date=2026-08-16/liste.csv", b"original", immutable=True)
+
+    with pytest.raises(PreconditionFailed):
+        store.put_bytes("raw/snapshot_date=2026-08-16/liste.csv", b"changed", immutable=True)
+
+    assert store.read_bytes("raw/snapshot_date=2026-08-16/liste.csv") == b"original"
