@@ -520,6 +520,9 @@ after the first BigQuery validation. Every curated table includes
 is part of the success gate: if a required load fails, do not advance
 `state/latest.json`.
 
+For progressively harder read-only examples and checked-in result CSVs, see the
+[BigQuery tutorial](tutorial/README.md).
+
 The `hatvp` dataset is created once by an operator in the same region as the
 archive bucket. The Cloud Run runtime does not create datasets; it only needs
 project-level BigQuery job execution and dataset-level table write access:
