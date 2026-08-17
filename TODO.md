@@ -27,7 +27,7 @@ expansion. First-snapshot quality triage is documented and complete.
 - [x] Run the test suite, Ruff, package build, and a live local run against the current HATVP files.
 - [x] Modularize every tracked Python module into 70–100 physical lines, add YAML-driven typed configuration, and split fixture tests by behavior.
 - [x] Group prefixed Python modules into domain packages and document the complete layout in the main README.
-- [ ] Complete the ADC-backed refactored GCS/BigQuery replay and merge PR #10; currently blocked because ADC is unavailable in the local environment.
+- [x] Deploy the refactored domain-package image and complete a forced production GCS/BigQuery replay.
 
 ## Google Cloud project details (completed)
 

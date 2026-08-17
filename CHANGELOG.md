@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-18 — Deploy refactored packages and replay production
+
+### Verified
+
+- Built and pushed image `europe-west1-docker.pkg.dev/yahatvp-pipeline-eu/hatvp/hatvp:b25e9c8`; Cloud Build `22512c8c-8000-482e-af39-897e3430db70` completed successfully with image digest `sha256:db8a6fd1cd6649332beed0c7b8bd74b5a300704c4faaf6cc524787d0fcc32906`.
+- Updated Cloud Run Job `hatvp-ingestion` to the refactored image and ran forced execution `hatvp-ingestion-84n27`; it completed in 1m22.85s with `succeededCount=1` and container exit 0.
+- GCS snapshot `2026-08-18` advanced only after processing completed, with pipeline SHA/version `b25e9c8`, raw CSV/XML objects, all ten silver Parquet tables, quarantine anomalies, and a quality report.
+- The quality report contains 0 errors, 3,611 warnings, 5,818 flagged records, and full counts of 6,611 declarations, 6,611 people, 74,791 incomes, and 1,157 assets.
+- BigQuery successfully loaded the four curated tables for the new partition: 6,611 declarations, 6,611 people, 74,791 incomes, and 1,157 assets.
+- Cloud Logging contains the expected download, hash comparison, quality, BigQuery completion, pipeline completion, and `SUCCESS_WITH_WARNINGS` status events.
+
 ## 2026-08-18 — Group Python modules into domain packages
 
 ### Changed
