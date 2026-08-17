@@ -151,6 +151,7 @@ gs://<bucket>/hatvp/
 │   ├── liste.csv
 │   └── metadata.json
 ├── silver/declarations/snapshot_date=YYYY-MM-DD/data.parquet
+├── silver/mandate_remunerations/snapshot_date=YYYY-MM-DD/data.parquet
 ├── silver/incomes/snapshot_date=YYYY-MM-DD/data.parquet
 ├── silver/assets/snapshot_date=YYYY-MM-DD/data.parquet
 ├── quarantine/snapshot_date=YYYY-MM-DD/anomalies.parquet
@@ -180,9 +181,10 @@ BigQuery load must never advance this state.
 
 ### Normalized data
 
-Start with entities supported by the observed HATVP source schema. Likely
-logical tables include declarations, people, incomes, assets, mandates/functions,
-and companies/participations, but the source data is authoritative.
+Start with entities supported by the observed HATVP source schema. Logical tables
+include declarations, people, incomes, elected mandates and their annual
+remunerations, activities, assets, and companies/participations, but the source
+data is authoritative.
 
 Preserve source values and provenance. For fields that are normalized, keep the
 equivalent of:
@@ -267,6 +269,7 @@ parsed numeric value; parsing does not imply that a value is valid.
 | `declarations` | One row per XML declaration. | `declaration_uuid`, deposit and mandate dates, declaration type, mandate and organ labels |
 | `people` | One declarant row per declaration. | Name, contact, birth date, and address fields |
 | `mandates` | One row per general or elected-mandate section item. | `source_section`, description, dates, employer, remuneration |
+| `mandate_remunerations` | One row per annual remuneration value nested in an elected mandate item. | `source_item_index`, description, remuneration basis, `remuneration_year`, `raw_value`, `normalized_value` |
 | `activities` | One row per professional, consulting, spouse, volunteer, or collaborator activity. | `source_section`, description, employer, dates, remuneration |
 | `participations` | One row per financial or management participation. | Company, valuation, capital held, number of shares, raw record |
 | `incomes` | One row per declared income category and year that has a source value; empty category slots are excluded. | `income_year`, `income_type`, `raw_value`, `normalized_value`, spouse value |
@@ -285,12 +288,16 @@ actionable source-quality issues and require investigation if they recur.
 
 Income coverage is source-dependent. The `incomes` table is derived only from
 the XML `revenuMandatDto` section, not from every declaration or from
-remuneration fields in the mandates and activities tables. Empty fixed category
-slots are not counted as income rows. The quality report separately records
+remuneration fields in the mandates and activities tables. Elected-mandate
+remuneration comes from the separate `mandatElectifDto` section and is emitted
+to `mandate_remunerations` at one row per source year/value; repeated annual
+values are never collapsed to the final value. Empty fixed category slots are
+not counted as income rows. The quality report separately records
 `income_section_declarations`, `income_declarations`,
-`income_rows_with_numeric_value`, and `income_sections_without_rows` so a low
-source population is visible without treating interest-only declarations as
-parser failures.
+`income_rows_with_numeric_value`, `income_sections_without_rows`,
+`mandate_remuneration_declarations`, and
+`mandate_remuneration_rows_with_numeric_value`, so the sparse `revenuMandatDto`
+population is not mistaken for total remuneration coverage.
 
 ## Configuration
 

@@ -11,6 +11,7 @@ def _tables() -> dict[str, list[dict]]:
             {"declaration_uuid": "a", "prenom": "Alice", "nom": "Dupont"},
             {"declaration_uuid": "b", "prenom": "Alice", "nom": "Dupont"},
         ],
+        "mandate_remunerations": [],
         "incomes": [
             {
                 "declaration_uuid": "a",
@@ -67,6 +68,33 @@ def test_income_coverage_is_reported_separately_from_row_count() -> None:
     assert result.report["checks"]["income_rows_with_numeric_value"] == 1
     assert result.report["checks"]["income_sections_without_rows"] == 1
     assert result.report["quality"]["warnings"] > 0
+
+
+def test_mandate_remuneration_coverage_is_reported_separately() -> None:
+    tables = _tables()
+    tables["mandate_remunerations"] = [
+        {
+            "declaration_uuid": "a",
+            "snapshot_date": "2026-08-16",
+            "normalized_value": 55_740.0,
+            "raw_value": "55 740",
+            "remuneration_year": 2020,
+        },
+        {
+            "declaration_uuid": "a",
+            "snapshot_date": "2026-08-16",
+            "normalized_value": 0.0,
+            "raw_value": "0",
+            "remuneration_year": 2021,
+        },
+    ]
+
+    result = run_quality_checks(tables, snapshot_date="2026-08-16")
+
+    assert result.report["counts"]["mandate_remunerations"] == 2
+    assert result.report["checks"]["mandate_remuneration_declarations"] == 1
+    assert result.report["checks"]["mandate_remuneration_rows_with_source_value"] == 2
+    assert result.report["checks"]["mandate_remuneration_rows_with_numeric_value"] == 2
 
 
 def test_catastrophic_row_count_reduction_is_explicitly_reported() -> None:

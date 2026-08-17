@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-08-17 — Preserve elected-mandate remuneration history
+
+### Added
+
+- Added the `mandate_remunerations` normalized table with one row per annual
+  value nested in `mandatElectifDto`.
+- Added parser and quality coverage for repeated annual remuneration values,
+  including zero values and French number formatting.
+
+### Changed
+
+- Elected mandate rows no longer expose the final annual amount as if it were a
+  scalar total when an item contains multiple years. They retain the complete
+  source series in `raw_record_json`, expose `remuneration_count`, and leave
+  scalar remuneration fields null for multi-year items.
+- Documentation now distinguishes `revenuMandatDto` category incomes from
+  elected-mandate remuneration and reports separate coverage metrics.
+
+### Verified
+
+- Full local checks pass: Ruff, 25 tests, and `uv build`.
+- A live local-output run against the 2026-08-17 HATVP source wrote 74,725
+  `mandate_remunerations` rows across 5,850 declarations, with zero quality
+  errors.
+
 ## 2026-08-17 — Deploy and replay the income coverage fix
 
 ### Verified

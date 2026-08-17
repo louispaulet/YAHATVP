@@ -26,6 +26,13 @@ TABLE_COLUMNS = {
     "declarations": ["declaration_uuid", "snapshot_date", "source_file"],
     "people": ["declaration_uuid", "snapshot_date", "source_file"],
     "mandates": ["declaration_uuid", "snapshot_date", "source_section"],
+    "mandate_remunerations": [
+        "declaration_uuid",
+        "snapshot_date",
+        "source_section",
+        "remuneration_year",
+        "normalized_value",
+    ],
     "activities": ["declaration_uuid", "snapshot_date", "source_section"],
     "participations": ["declaration_uuid", "snapshot_date", "source_section"],
     "incomes": ["declaration_uuid", "snapshot_date", "source_section", "normalized_value"],

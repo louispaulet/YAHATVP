@@ -91,13 +91,92 @@ def _income_item_has_value(item: etree._Element) -> bool:
     return values.get("totalElu") is not None or values.get("totalConjoint") is not None
 
 
-def _raw_record(values: dict[str, str | None]) -> str:
+def _raw_record(values: dict[str, Any]) -> str:
     return json.dumps(values, ensure_ascii=False, sort_keys=True)
 
 
 def _date_fields(values: dict[str, str | None], field: str) -> tuple[str | None, str | None]:
     raw = values.get(field)
     return raw, parse_date(raw)
+
+
+def _parse_year(value: str | None) -> int | None:
+    normalized = normalize_text(value)
+    if normalized is None or len(normalized) != 4 or not normalized.isdigit():
+        return None
+    return int(normalized)
+
+
+def _mandate_item_fields(item: etree._Element) -> dict[str, Any]:
+    values = _flatten_leaf_values(item)
+    date_debut_raw, date_debut = _date_fields(values, "dateDebut")
+    date_fin_raw, date_fin = _date_fields(values, "dateFin")
+    return {
+        "description": normalize_text(
+            _first_value(values, "descriptionMandat", "description", "label")
+        ),
+        "commentaire": normalize_text(values.get("commentaire")),
+        "employeur": normalize_text(values.get("employeur")),
+        "date_debut_raw": date_debut_raw,
+        "date_debut": date_debut,
+        "date_fin_raw": date_fin_raw,
+        "date_fin": date_fin,
+    }
+
+
+def _mandate_remuneration_entries(item: etree._Element) -> list[dict[str, Any]]:
+    remuneration = _child(item, "remuneration")
+    if remuneration is None:
+        return []
+
+    basis_raw = _raw_child_text(remuneration, "brutNet")
+    amount_container = _child(remuneration, "montant")
+    if amount_container is None:
+        return []
+
+    annual_amounts = _children(amount_container, "montant")
+    candidates = annual_amounts or [remuneration]
+    entries: list[dict[str, Any]] = []
+    for candidate in candidates:
+        if candidate is remuneration:
+            year_raw = _raw_child_text(remuneration, "annee")
+            raw_value = _raw_child_text(remuneration, "montant")
+        else:
+            year_raw = _raw_child_text(candidate, "annee")
+            raw_value = _raw_child_text(candidate, "montant")
+        if raw_value is None:
+            continue
+        entries.append(
+            {
+                "remuneration_basis_raw": basis_raw,
+                "remuneration_basis": normalize_text(basis_raw),
+                "remuneration_year_raw": year_raw,
+                "remuneration_year": _parse_year(year_raw),
+                "raw_value": raw_value,
+                "normalized_value": parse_french_number(raw_value),
+            }
+        )
+    return entries
+
+
+def _mandate_item_raw_record(item: etree._Element, entries: list[dict[str, Any]]) -> str:
+    values = _flatten_leaf_values(item)
+    record: dict[str, Any] = {
+        key: value for key, value in values.items() if not key.startswith("remuneration_")
+    }
+    remuneration = _child(item, "remuneration")
+    record["remuneration"] = {
+        "brutNet": _raw_child_text(remuneration, "brutNet"),
+        "amounts": [
+            {
+                "annee": entry["remuneration_year_raw"],
+                "montant": entry["raw_value"],
+            }
+            for entry in entries
+        ],
+        "raw_text": raw_text(remuneration.text if remuneration is not None else None),
+    }
+    return _raw_record(record)
 
 
 def _declaration_row(declaration: etree._Element, snapshot_date: str) -> dict[str, Any]:
@@ -200,39 +279,81 @@ def _mandate_rows(declaration: etree._Element, snapshot_date: str) -> list[dict[
                 "date_fin": parse_date(date_fin_raw),
                 "remuneration_raw": None,
                 "remuneration_eur": None,
+                "remuneration_year_raw": None,
+                "remuneration_year": None,
+                "remuneration_count": 0,
                 "raw_record_json": None,
             }
         )
 
     section = _child(declaration, "mandatElectifDto")
     for index, item in enumerate(_item_groups(section)):
-        values = _flatten_leaf_values(item)
-        debut_raw, debut = _date_fields(values, "dateDebut")
-        fin_raw, fin = _date_fields(values, "dateFin")
-        remuneration_raw = _first_key_containing(values, "remuneration", "montant") or values.get(
-            "remuneration"
-        )
+        fields = _mandate_item_fields(item)
+        entries = _mandate_remuneration_entries(item)
+        scalar_entry = entries[0] if len(entries) == 1 else None
         rows.append(
             {
                 "declaration_uuid": declaration_uuid,
                 "snapshot_date": snapshot_date,
                 "source_section": "mandatElectifDto",
                 "source_item_index": index,
-                "description": normalize_text(
-                    _first_value(values, "descriptionMandat", "description", "label")
-                ),
+                "description": fields["description"],
                 "mandate_type": None,
-                "commentaire": normalize_text(values.get("commentaire")),
-                "employeur": normalize_text(values.get("employeur")),
-                "date_debut_raw": debut_raw,
-                "date_debut": debut,
-                "date_fin_raw": fin_raw,
-                "date_fin": fin,
-                "remuneration_raw": remuneration_raw,
-                "remuneration_eur": parse_french_number(remuneration_raw),
-                "raw_record_json": _raw_record(values),
+                "commentaire": fields["commentaire"],
+                "employeur": fields["employeur"],
+                "date_debut_raw": fields["date_debut_raw"],
+                "date_debut": fields["date_debut"],
+                "date_fin_raw": fields["date_fin_raw"],
+                "date_fin": fields["date_fin"],
+                "remuneration_raw": scalar_entry["raw_value"] if scalar_entry else None,
+                "remuneration_eur": scalar_entry["normalized_value"] if scalar_entry else None,
+                "remuneration_year_raw": (
+                    scalar_entry["remuneration_year_raw"] if scalar_entry else None
+                ),
+                "remuneration_year": scalar_entry["remuneration_year"] if scalar_entry else None,
+                "remuneration_count": len(entries),
+                "raw_record_json": _mandate_item_raw_record(item, entries),
             }
         )
+    return rows
+
+
+def _mandate_remuneration_rows(
+    declaration: etree._Element, snapshot_date: str
+) -> list[dict[str, Any]]:
+    declaration_uuid = _normalized_child_text(declaration, "uuid")
+    rows: list[dict[str, Any]] = []
+    section = _child(declaration, "mandatElectifDto")
+    for item_index, item in enumerate(_item_groups(section)):
+        fields = _mandate_item_fields(item)
+        entries = _mandate_remuneration_entries(item)
+        raw_record_json = _mandate_item_raw_record(item, entries)
+        for remuneration_index, entry in enumerate(entries):
+            rows.append(
+                {
+                    "declaration_uuid": declaration_uuid,
+                    "snapshot_date": snapshot_date,
+                    "source_section": "mandatElectifDto",
+                    "source_item_index": item_index,
+                    "remuneration_index": remuneration_index,
+                    "description": fields["description"],
+                    "commentaire": fields["commentaire"],
+                    "employeur": fields["employeur"],
+                    "date_debut_raw": fields["date_debut_raw"],
+                    "date_debut": fields["date_debut"],
+                    "date_fin_raw": fields["date_fin_raw"],
+                    "date_fin": fields["date_fin"],
+                    "remuneration_basis_raw": entry["remuneration_basis_raw"],
+                    "remuneration_basis": entry["remuneration_basis"],
+                    "remuneration_year_raw": entry["remuneration_year_raw"],
+                    "remuneration_year": entry["remuneration_year"],
+                    "raw_value": entry["raw_value"],
+                    "normalized_value": entry["normalized_value"],
+                    "quality_status": "OK",
+                    "quality_reason": None,
+                    "raw_record_json": raw_record_json,
+                }
+            )
     return rows
 
 
@@ -473,6 +594,7 @@ def _empty_tables() -> dict[str, list[dict[str, Any]]]:
         "declarations": [],
         "people": [],
         "mandates": [],
+        "mandate_remunerations": [],
         "activities": [],
         "participations": [],
         "incomes": [],
@@ -518,6 +640,9 @@ def parse_xml(path: Path, snapshot_date: str) -> dict[str, list[dict[str, Any]]]
             tables["declarations"].append(_declaration_row(element, snapshot_date))
             tables["people"].append(_person_row(element, snapshot_date))
             tables["mandates"].extend(_mandate_rows(element, snapshot_date))
+            tables["mandate_remunerations"].extend(
+                _mandate_remuneration_rows(element, snapshot_date)
+            )
             tables["activities"].extend(_activity_rows(element, snapshot_date))
             tables["participations"].extend(_participation_rows(element, snapshot_date))
             tables["incomes"].extend(_income_rows(element, snapshot_date))

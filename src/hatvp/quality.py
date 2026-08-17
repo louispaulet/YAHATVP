@@ -93,6 +93,7 @@ REQUIRED_FIELDS = {
     "declarations": ("declaration_uuid", "snapshot_date"),
     "people": ("declaration_uuid", "snapshot_date"),
     "incomes": ("declaration_uuid", "snapshot_date", "normalized_value"),
+    "mandate_remunerations": ("declaration_uuid", "snapshot_date", "normalized_value"),
     "assets": ("declaration_uuid", "snapshot_date", "normalized_value"),
 }
 
@@ -100,6 +101,7 @@ NULL_RATE_FIELDS = {
     "declarations": ("declaration_uuid", "declaration_type_id", "date_depot"),
     "people": ("declaration_uuid", "nom", "prenom"),
     "incomes": ("declaration_uuid", "income_year", "normalized_value"),
+    "mandate_remunerations": ("declaration_uuid", "remuneration_year", "normalized_value"),
     "assets": ("declaration_uuid", "asset_name", "normalized_value"),
 }
 
@@ -118,6 +120,7 @@ def run_quality_checks(
     declarations = tables.get("declarations", [])
     people = tables.get("people", [])
     incomes = tables.get("incomes", [])
+    mandate_remunerations = tables.get("mandate_remunerations", [])
     assets = tables.get("assets", [])
 
     missing_required_fields = 0
@@ -208,6 +211,27 @@ def run_quality_checks(
     checks["income_rows_with_numeric_value"] = income_rows_with_numeric_value
     checks["income_sections_without_rows"] = income_sections_without_rows
     warnings += income_sections_without_rows
+
+    mandate_remuneration_declarations = len(
+        {
+            row.get("declaration_uuid")
+            for row in mandate_remunerations
+            if row.get("declaration_uuid")
+        }
+    )
+    mandate_remuneration_rows_with_source_value = sum(
+        row.get("raw_value") is not None for row in mandate_remunerations
+    )
+    mandate_remuneration_rows_with_numeric_value = sum(
+        isinstance(row.get("normalized_value"), (int, float)) for row in mandate_remunerations
+    )
+    checks["mandate_remuneration_declarations"] = mandate_remuneration_declarations
+    checks["mandate_remuneration_rows_with_source_value"] = (
+        mandate_remuneration_rows_with_source_value
+    )
+    checks["mandate_remuneration_rows_with_numeric_value"] = (
+        mandate_remuneration_rows_with_numeric_value
+    )
 
     huge_income = 0
     negative_income = 0

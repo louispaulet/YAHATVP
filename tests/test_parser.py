@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -19,6 +20,10 @@ def test_parser_uses_observed_xml_structure() -> None:
     assert tables["declarations"][0]["mandat_label"] == "Élu local"
     assert tables["people"][0]["email"] is None
     assert tables["incomes"][0]["normalized_value"] == 12000.0
+    mandate_remuneration = tables["mandate_remunerations"][0]
+    assert mandate_remuneration["description"] == "Maire"
+    assert mandate_remuneration["remuneration_year"] == 2025
+    assert mandate_remuneration["normalized_value"] == 50000.0
     assert tables["assets"][0]["normalized_value"] == 12345.67
     assert tables["participations"][0]["evaluation_eur"] == 1200.5
     assert len(tables["liste"]) == 2
@@ -31,6 +36,54 @@ def test_single_real_declaration_fixture_is_the_first_acceptance_case() -> None:
     assert tables["declarations"][0]["declaration_uuid"] == ("40c65083-094f-4170-9e21-b9c95f4390d6")
     assert tables["people"][0]["nom"] == "ABAD"
     assert len(tables["mandates"]) >= 6
+    remuneration_rows = [
+        row
+        for row in tables["mandate_remunerations"]
+        if row["declaration_uuid"] == "40c65083-094f-4170-9e21-b9c95f4390d6"
+        and row["source_item_index"] == 0
+    ]
+    assert [row["remuneration_year"] for row in remuneration_rows] == [
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+    ]
+    assert [row["normalized_value"] for row in remuneration_rows] == [
+        71105.0,
+        70773.0,
+        70676.0,
+        63050.0,
+        73698.0,
+        43491.0,
+    ]
+    zero_remuneration_rows = [
+        row
+        for row in tables["mandate_remunerations"]
+        if row["declaration_uuid"] == "40c65083-094f-4170-9e21-b9c95f4390d6"
+        and row["source_item_index"] == 2
+    ]
+    assert [row["normalized_value"] for row in zero_remuneration_rows] == [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    ]
+    mandate_item = next(
+        row
+        for row in tables["mandates"]
+        if row["declaration_uuid"] == "40c65083-094f-4170-9e21-b9c95f4390d6"
+        and row["source_section"] == "mandatElectifDto"
+        and row["source_item_index"] == 0
+    )
+    assert mandate_item["remuneration_raw"] is None
+    assert mandate_item["remuneration_count"] == 6
+    raw_record = json.loads(mandate_item["raw_record_json"])
+    assert raw_record["remuneration"]["amounts"][-1] == {
+        "annee": "2024",
+        "montant": "43 491",
+    }
     assert len(tables["participations"]) >= 2
 
 
