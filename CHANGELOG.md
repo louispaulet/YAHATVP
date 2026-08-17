@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-08-17 — Make BigQuery curated loads schema-evolution safe
+
+### Changed
+
+- Updated the BigQuery loader to detect new staged columns, add them to an
+  existing curated table, and insert by explicit column names rather than
+  relying on positional `SELECT *` alignment.
+- Kept the existing snapshot delete/insert order and null-filled any target
+  columns absent from a future staged schema.
+- Added fixture coverage for both first-table creation and an existing-table
+  schema migration.
+
+### Verified
+
+- Focused BigQuery and pipeline checks pass: 16 tests.
+- The first production replay of commit `e50eb09` reached quality completion
+  with `incomes=74,791` and zero quality errors, then failed only at the old
+  14-column BigQuery insert; the job log confirms `state/latest.json` was not
+  advanced.
+
+### Follow-up
+
+- Deploy this loader fix and rerun the forced production execution.
+
 ## 2026-08-17 — Include annual mandate remuneration in curated incomes
 
 ### Changed

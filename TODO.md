@@ -192,6 +192,8 @@ timezone: Europe/Paris
 - [x] Run the same snapshot twice and confirm the second load replaces that snapshot rather than duplicating rows.
 - [x] Confirm BigQuery remains optional when `HATVP_ENABLE_BIGQUERY=false`.
 - [x] Confirm a BigQuery failure prevents the latest state hash from advancing.
+- [x] Make BigQuery curated loads add new staged columns and insert by explicit
+  column name so schema evolution cannot fail on positional ordering.
 - [x] Document the analytical table schemas and example queries.
 - [ ] Rebuild the curated `incomes` partition from both observed revenue
   streams and verify the annual `mandatElectifDto` rows in BigQuery.

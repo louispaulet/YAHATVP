@@ -25,6 +25,7 @@ def load_parquet_tables(
     emulator/test adapter and are not used by the default GCS pipeline.
     """
 
+    from google.api_core.exceptions import NotFound
     from google.cloud import bigquery
 
     selected_tables = tuple(table_names)
@@ -64,11 +65,43 @@ def load_parquet_tables(
 
             table_id = f"`{project}.{dataset}.{table_name}`"
             staging_id = f"`{project}.{dataset}._hatvp_staging_{table_name}`"
-            client.query(
-                f"CREATE TABLE IF NOT EXISTS {table_id} PARTITION BY snapshot_date "
-                f"AS SELECT * FROM {staging_id} WHERE FALSE",
-                location=location,
-            ).result()
+            target_ref = dataset_ref.table(table_name)
+            try:
+                target_table = client.get_table(target_ref)
+            except NotFound:
+                client.query(
+                    f"CREATE TABLE {table_id} PARTITION BY snapshot_date "
+                    f"AS SELECT * FROM {staging_id} WHERE FALSE",
+                    location=location,
+                ).result()
+                target_table = client.get_table(target_ref)
+
+            staging_table = client.get_table(staging_ref)
+            target_fields = {field.name: field for field in target_table.schema}
+
+            def field_type_sql(field: Any) -> str:
+                field_type = field.field_type
+                return f"ARRAY<{field_type}>" if field.mode == "REPEATED" else field_type
+
+            for field in staging_table.schema:
+                if field.name in target_fields:
+                    continue
+                client.query(
+                    f"ALTER TABLE {table_id} ADD COLUMN IF NOT EXISTS `{field.name}` "
+                    f"{field_type_sql(field)}",
+                    location=location,
+                ).result()
+            target_table = client.get_table(target_ref)
+            staging_fields = {field.name for field in staging_table.schema}
+            insert_columns = [field.name for field in target_table.schema]
+            select_expressions = [
+                f"`{field_name}`"
+                if field_name in staging_fields
+                else (
+                    f"CAST(NULL AS {field_type_sql(target_fields[field_name])}) AS `{field_name}`"
+                )
+                for field_name in insert_columns
+            ]
             delete_config = bigquery.QueryJobConfig(
                 query_parameters=[
                     bigquery.ScalarQueryParameter("snapshot_date", "DATE", snapshot_date)
@@ -80,7 +113,8 @@ def load_parquet_tables(
                 location=location,
             ).result()
             client.query(
-                f"INSERT INTO {table_id} SELECT * FROM {staging_id}",
+                f"INSERT INTO {table_id} ({', '.join(f'`{name}`' for name in insert_columns)}) "
+                f"SELECT {', '.join(select_expressions)} FROM {staging_id}",
                 location=location,
             ).result()
         finally:
