@@ -51,11 +51,14 @@ backend-deploy: bridge-deploy
 		cd $(WORKER_DIR) && npx wrangler deploy --var "BRIDGE_URL:$$BRIDGE_URL" --var "FRONTEND_ORIGIN:$(FRONTEND_ORIGIN)"
 
 frontend-test:
-	npm --prefix $(FRONTEND_DIR) run test
+	env -u VITE_API_BASE_URL npm --prefix $(FRONTEND_DIR) run test
 	npm --prefix $(FRONTEND_DIR) run build
 
 frontend-dev:
 	npm --prefix $(FRONTEND_DIR) run dev
 
-frontend-deploy: frontend-test
-	npm --prefix $(FRONTEND_DIR) run deploy
+frontend-deploy:
+	@test -n "$(VITE_API_BASE_URL)" || (echo "Set VITE_API_BASE_URL to the deployed Worker URL before publishing." >&2; exit 1)
+	env -u VITE_API_BASE_URL npm --prefix $(FRONTEND_DIR) run test
+	VITE_API_BASE_URL="$(VITE_API_BASE_URL)" npm --prefix $(FRONTEND_DIR) run build
+	VITE_API_BASE_URL="$(VITE_API_BASE_URL)" npm --prefix $(FRONTEND_DIR) run deploy

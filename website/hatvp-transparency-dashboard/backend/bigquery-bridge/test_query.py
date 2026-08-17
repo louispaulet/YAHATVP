@@ -50,6 +50,7 @@ def test_query_groups_declarations_by_type():
     query = build_query("project", "dataset")
     assert "declaration_type_label" in query
     assert "COUNT(*) AS row_count" in query
+    assert "ORDER BY row_count DESC, label" in query
 
 
 def test_query_limits_public_breakdowns():

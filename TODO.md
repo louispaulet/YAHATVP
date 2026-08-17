@@ -262,9 +262,16 @@ records, and zero quality errors.
 - [x] Keep the public API aggregate-only and exclude raw rows and personal contact fields.
 - [x] Add Worker, bridge, and frontend fixture/unit tests plus Makefile targets.
 - [x] Document local development, secret handling, Cloudflare deployment, and GitHub Pages deployment.
-- [ ] Configure the production bridge token and deploy the Cloudflare Worker.
-- [ ] Configure the repository GitHub Pages source and publish the frontend `gh-pages` branch.
-- [ ] Run a live dashboard smoke test against the deployed Worker and review the public aggregate output.
+- [x] Configure the production bridge token and deploy the Cloudflare Worker.
+- [x] Configure the repository GitHub Pages source and publish the frontend `gh-pages` branch.
+- [x] Run a live dashboard smoke test against the deployed Worker and review the public aggregate output.
+
+Deployment evidence (2026-08-18): Cloud Run bridge revision
+`hatvp-dashboard-api-00003-xzr` and Worker version
+`c3caf8a3-7ee8-47cf-bc3e-52b06db3138f` are serving. The Worker returned 200
+for `/healthz` and `/api/dashboard`; the latter returned the latest snapshot
+and aggregate counts of 6,611 declarations, 6,611 people, 74,791 incomes, and
+1,157 assets. GitHub Pages is configured from `gh-pages` and returned 200.
 
 ## Later, only if needed
 

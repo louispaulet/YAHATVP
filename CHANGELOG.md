@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-08-18 — Deploy HATVP transparency dashboard
+
+### Deployed
+
+- Created Secret Manager secret `hatvp-dashboard-bridge-token` and configured
+  the matching encrypted Cloudflare Worker secret without committing the token.
+- Deployed the read-only Cloud Run bridge as revision
+  `hatvp-dashboard-api-00003-xzr` with the dedicated
+  `hatvp-dashboard-reader` service account and dataset-level BigQuery access.
+- Deployed Worker version `c3caf8a3-7ee8-47cf-bc3e-52b06db3138f` at
+  `https://hatvp-transparency-api.louispaulet13.workers.dev`.
+- Published the Vite frontend to the `gh-pages` branch at
+  `https://louispaulet.github.io/YAHATVP/`.
+- Fixed the declaration-type aggregate ordering alias found during the first
+  live smoke test and republished the frontend with an explicit production
+  `VITE_API_BASE_URL`; the Makefile now requires that URL for publication.
+
+### Verified
+
+- Live Worker `/healthz`, Worker `/api/dashboard`, authenticated bridge
+  `/v1/dashboard`, and GitHub Pages all returned HTTP 200.
+- The live dashboard payload contains the `2026-08-18` snapshot and counts of
+  6,611 declarations, 6,611 people, 74,791 incomes, and 1,157 assets.
+
 ## 2026-08-18 — Add HATVP transparency dashboard foundation
 
 ### Added
@@ -19,12 +43,6 @@
   Ruff lint/format passes, and the frontend tests plus production build pass.
 - Repository checks: 127 existing project tests pass, Ruff lint/format passes,
   and `uv build` succeeds.
-
-### Follow-up
-
-- Configure production secrets and deploy the read-only bridge and Worker.
-- Configure the repository GitHub Pages source, publish `gh-pages`, and run a
-  live dashboard smoke test.
 
 ## 2026-08-18 — Reorganize the report catalog
 

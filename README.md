@@ -603,7 +603,7 @@ backend:
 export BRIDGE_TOKEN="<random-token>"
 make backend-secrets
 make backend-deploy
-make frontend-deploy
+make frontend-deploy VITE_API_BASE_URL="<WORKER_URL>"
 ```
 
 The Makefile creates or reuses the `hatvp-dashboard-reader` service account,
@@ -613,6 +613,13 @@ bridge URL. `frontend-deploy` builds the Vite app and publishes `dist/` to the
 `gh-pages` branch using the `gh-pages` npm module. Override `GCP_PROJECT_ID`,
 `GCP_REGION`, `BQ_DATASET`, `BRIDGE_SERVICE`, and `FRONTEND_ORIGIN` when using
 different resources.
+
+The initial deployment is available at
+[GitHub Pages](https://louispaulet.github.io/YAHATVP/) and uses the Worker API
+at `https://hatvp-transparency-api.louispaulet13.workers.dev`. The deployed
+Worker health check and aggregate endpoint returned HTTP 200 after deployment;
+the bridge remains protected by its shared token and is not a public data
+endpoint.
 
 ## Google Cloud deployment
 

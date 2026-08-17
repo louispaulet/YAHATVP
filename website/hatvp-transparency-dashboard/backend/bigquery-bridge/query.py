@@ -80,7 +80,7 @@ SELECT
   ) AS assets_json,
   TO_JSON_STRING(
     ARRAY(SELECT AS STRUCT label, row_count FROM declaration_breakdown
-          ORDER BY rows DESC, label LIMIT 12)
+          ORDER BY row_count DESC, label LIMIT 12)
   ) AS declaration_json
 FROM latest
 """
