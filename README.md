@@ -104,22 +104,41 @@ hatvp-pipeline/
 │   ├── __init__.py
 │   ├── main.py
 │   ├── config.py
+│   ├── pipeline.yml
+│   ├── models.py
+│   ├── pipeline*.py
+│   ├── parser*.py
+│   ├── quality*.py
+│   ├── triage*.py
+│   ├── bigquery*.py
 │   ├── download.py
 │   ├── hashing.py
 │   ├── storage.py
 │   ├── parser.py
 │   ├── normalize.py
 │   ├── quality.py
-│   ├── quality_triage.py
-│   ├── models.py
-│   └── bigquery.py
+│   └── table_schema.py
 ├── tests/
-│   ├── test_hashing.py
-│   ├── test_normalize.py
-│   ├── test_quality.py
+│   ├── test_*.py
+│   ├── *_support.py
 │   └── fixtures/
 └── .github/workflows/deploy.yml
 ```
+
+Parser navigation, streaming, CSV, declaration/person, mandate/remuneration,
+income, finance, and activity components live in focused `parser_*.py` modules.
+Pipeline orchestration, state, artifacts, quality checks, triage, storage, and
+BigQuery staging follow the same component boundary. Every tracked Python file,
+including tests and package initializers, is intentionally kept between 70 and
+100 physical lines; `tests/test_module_line_budget.py` enforces this contract.
+
+### Configuration
+
+The packaged [`src/hatvp/pipeline.yml`](src/hatvp/pipeline.yml) contains the
+non-secret runtime defaults and the observed HATVP XML/CSV schema rules. Typed
+settings resolve values in this order: YAML defaults, environment variables,
+then CLI overrides. Use environment variables for deployment configuration and
+`--local-output` for local fixture runs; never put credentials in YAML.
 
 Use Python 3.12 or newer and `uv`. Prefer a small dependency set:
 
@@ -325,8 +344,10 @@ remuneration available to standard income queries.
 
 ## Configuration
 
-Configuration belongs in environment variables, not source code or committed
-credentials:
+The packaged `src/hatvp/pipeline.yml` supplies non-secret runtime and observed
+schema defaults. Typed settings apply environment variables over those defaults;
+CLI arguments such as `--local-output` are applied last. Credentials remain in
+runtime identity configuration and never belong in YAML or source code:
 
 ```text
 HATVP_BUCKET=<required for GCS mode>
@@ -338,6 +359,10 @@ HATVP_BIGQUERY_LOCATION=europe-west1
 HATVP_XML_URL=https://www.hatvp.fr/livraison/merge/declarations.xml
 HATVP_CSV_URL=https://www.hatvp.fr/livraison/opendata/liste.csv
 ```
+
+Run `uv run pytest` to execute the fixture suite and the tracked-file line-budget
+check. Pull requests run these checks and `uv build`; Cloud Run deployment is
+only eligible for a push on `main`.
 
 The downloader should use connect/read timeouts, bounded retries, a descriptive
 user agent, HTTP status validation, and elapsed-time/size/hash logging. Never

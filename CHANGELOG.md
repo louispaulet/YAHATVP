@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-08-18 — Modular Python boundaries
+
+### Added
+
+- Added packaged `src/hatvp/pipeline.yml` and typed configuration loading with
+  YAML defaults, environment overrides, and CLI-level model updates.
+- Added focused parser, pipeline, quality, triage, storage, and BigQuery
+  components plus direct fixture/fake-client tests for their public boundaries.
+- Added the tracked Python line-budget test covering package initializers and
+  tests as well as production modules.
+
+### Changed
+
+- Split the oversized parser, orchestration, quality, triage, and test modules
+  while preserving `parse_csv`, `parse_xml`, `parse_sources`, `run_pipeline`,
+  stable table schemas, provenance, immutable raw artifacts, and late state
+  updates.
+- Enabled pull-request CI testing while restricting Cloud Run deployment to
+  pushes on `main`.
+
+### Verified
+
+- `uv run pytest`: 127 passed.
+- Ruff check and format check pass; `uv build` packages `pipeline.yml`; the
+  staged line-budget test passes for all tracked Python files; and the local
+  fixture pipeline returns `SUCCESS_WITH_WARNINGS` followed by `NO_CHANGE`.
+
 ## 2026-08-17 — Add operational retention verification and alerting
 
 ### Added
