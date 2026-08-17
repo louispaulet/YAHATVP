@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-18 — Fix live dashboard CORS
+
+### Fixed
+
+- Corrected the production `FRONTEND_ORIGIN` from the GitHub Pages path to the
+  actual browser origin `https://louispaulet.github.io`; URL paths are not part
+  of the CORS origin value.
+- Redeployed Cloud Run revision `hatvp-dashboard-api-00004-49f` and Worker
+  version `b2450c38-cc3a-48d8-8f46-81b6a5b396e1`.
+
+### Verified
+
+- Chrome now renders the live dashboard instead of `Failed to fetch`.
+- The Worker returns `Access-Control-Allow-Origin:
+  https://louispaulet.github.io` and the dashboard API returns HTTP 200.
+
 ## 2026-08-18 — Deploy HATVP transparency dashboard
 
 ### Deployed

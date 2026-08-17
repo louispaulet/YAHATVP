@@ -272,6 +272,8 @@ Deployment evidence (2026-08-18): Cloud Run bridge revision
 for `/healthz` and `/api/dashboard`; the latter returned the latest snapshot
 and aggregate counts of 6,611 declarations, 6,611 people, 74,791 incomes, and
 1,157 assets. GitHub Pages is configured from `gh-pages` and returned 200.
+Chrome verification also confirmed the production CORS header and successful
+dashboard rendering after Worker version `b2450c38-cc3a-48d8-8f46-81b6a5b396e1`.
 
 ## Later, only if needed
 
