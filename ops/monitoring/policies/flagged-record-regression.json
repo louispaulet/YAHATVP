@@ -1,0 +1,27 @@
+{
+  "displayName": "HATVP flagged-record regression",
+  "documentation": {
+    "content": "The HATVP pipeline detected a flagged-record increase above the 10% review threshold compared with the prior successful snapshot. Review the quality report and source-linked anomalies.",
+    "mimeType": "text/markdown"
+  },
+  "conditions": [
+    {
+      "displayName": "flagged records increased above the review threshold",
+      "conditionMatchedLog": {
+        "filter": "resource.type = \"cloud_run_job\" AND resource.labels.project_id = \"yahatvp-pipeline-eu\" AND resource.labels.location = \"europe-west1\" AND resource.labels.job_name = \"hatvp-ingestion\" AND jsonPayload.event = \"quality_regression\" AND jsonPayload.metric = \"flagged_records\""
+      }
+    }
+  ],
+  "combiner": "OR",
+  "enabled": true,
+  "userLabels": {
+    "service": "hatvp",
+    "managed-by": "runbook"
+  },
+  "alertStrategy": {
+    "notificationRateLimit": {
+      "period": "86400s"
+    },
+    "autoClose": "604800s"
+  }
+}

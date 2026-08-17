@@ -100,7 +100,12 @@ uv run python -m hatvp.main --local-output ./data --dry-run
 - [x] Grant the runtime account object access only to the dedicated HATVP bucket.
 - [x] Grant only BigQuery job and dataset write permissions required by the loader (`roles/bigquery.jobUser` on the project and dataset-level `roles/bigquery.dataEditor`).
 - [x] Grant the Scheduler account `roles/run.invoker` on the `hatvp-scheduler-smoke` Cloud Run Job; keep `hatvp-ingestion` unconnected until acceptance.
-- [ ] Confirm Cloud Audit Logs and Cloud Logging retention meet operational needs.
+- [x] Confirm Cloud Audit Logs and Cloud Logging retention meet operational needs.
+
+Retention verification on `2026-08-17` confirmed the production `_Required`
+audit bucket is locked with 400-day retention, the `_Default` application-log
+bucket retains 30 days, and the required audit sinks are present. No retention
+settings were changed.
 
 The deployment commands are documented in the
 [Google Cloud deployment section of README.md](README.md#google-cloud-deployment).
@@ -222,8 +227,10 @@ across runs; and unchanged execution `hatvp-ingestion-rmclb` emitted
 
 ## 9. Ongoing operations
 
-- [ ] Add an alert for failed Cloud Run Job executions.
-- [ ] Add an alert for repeated `SUCCESS_WITH_WARNINGS` or an unusual increase in flagged records.
+- [x] Add an alert for failed Cloud Run Job executions.
+- [x] Add an alert for repeated `SUCCESS_WITH_WARNINGS` or an unusual increase in flagged records.
+- [ ] Confirm the monitoring email channel delivers a test notification after
+  the merged telemetry deployment.
 - [ ] Review quality reports after each weekly run.
 - [ ] Monitor recurrence and pursue source correction for the six duplicate declaration UUID groups; one pair differs only by trailing whitespace.
 - [ ] Monitor row counts and null rates for sudden changes.
@@ -231,6 +238,11 @@ across runs; and unchanged execution `hatvp-ingestion-rmclb` emitted
 - [ ] Add a new fixture before fixing any newly observed source edge case.
 - [ ] Keep historical raw snapshots immutable.
 - [ ] Periodically review bucket lifecycle/retention policy without deleting required audit history.
+
+The three alert policies and email channel were created and verified in
+`yahatvp-pipeline-eu` on `2026-08-17`. Policy resources are recorded in the
+monitoring runbook; the notification channel is
+`projects/yahatvp-pipeline-eu/notificationChannels/15119347564909849591`.
 
 ## Later, only if needed
 

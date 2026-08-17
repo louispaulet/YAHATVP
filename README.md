@@ -690,9 +690,18 @@ gcloud logging read \
 
 The ingestion job emits structured events named `download_complete`,
 `hash_comparison`, `quality_complete`, `pipeline_complete`, and
-`pipeline_failed`. The normal full-run sequence includes source URLs, exact
+`pipeline_failed`. Repeated warning snapshots emit `quality_warning_streak`,
+and flagged-record increases above the 10% threshold emit
+`quality_regression`. The normal full-run sequence includes source URLs, exact
 SHA-256 hashes, quality counts, snapshot date, and the final status; it must
 never include credentials or access tokens.
+
+Operational retention verification and Cloud Monitoring alert setup are
+documented in the [monitoring and retention runbook](ops/monitoring/README.md).
+The production baseline retains the locked `_Required` audit bucket for 400
+days and the `_Default` application bucket for 30 days. The runbook also
+configures alerts for failed `hatvp-ingestion` executions, repeated quality
+warnings, and flagged-record regressions above 10%.
 
 Run the Scheduler job immediately:
 

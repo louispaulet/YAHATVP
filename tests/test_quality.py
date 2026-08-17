@@ -1,22 +1,72 @@
+import logging
+
 from hatvp.quality import run_quality_checks
 
 
 def _tables() -> dict[str, list[dict]]:
     return {
         "declarations": [
-            {"declaration_uuid": "a"},
-            {"declaration_uuid": "b"},
+            {"declaration_uuid": "a", "snapshot_date": "2026-08-16"},
+            {"declaration_uuid": "b", "snapshot_date": "2026-08-16"},
         ],
         "people": [
-            {"declaration_uuid": "a", "prenom": "Alice", "nom": "Dupont"},
-            {"declaration_uuid": "b", "prenom": "Alice", "nom": "Dupont"},
+            {
+                "declaration_uuid": "a",
+                "snapshot_date": "2026-08-16",
+                "prenom": "Alice",
+                "nom": "Dupont",
+            },
+            {
+                "declaration_uuid": "b",
+                "snapshot_date": "2026-08-16",
+                "prenom": "Alice",
+                "nom": "Dupont",
+            },
         ],
         "mandate_remunerations": [],
         "incomes": [
             {
                 "declaration_uuid": "a",
+                "snapshot_date": "2026-08-16",
                 "normalized_value": 20_000_001.0,
                 "raw_record_json": "income-a",
+            }
+        ],
+        "assets": [],
+        "mandates": [],
+        "activities": [],
+        "participations": [],
+        "liabilities": [],
+        "liste": [],
+    }
+
+
+def _clean_tables() -> dict[str, list[dict]]:
+    return {
+        "declarations": [
+            {"declaration_uuid": "a", "snapshot_date": "2026-08-16"},
+            {"declaration_uuid": "b", "snapshot_date": "2026-08-16"},
+        ],
+        "people": [
+            {
+                "declaration_uuid": "a",
+                "snapshot_date": "2026-08-16",
+                "prenom": "Alice",
+                "nom": "Dupont",
+            },
+            {
+                "declaration_uuid": "b",
+                "snapshot_date": "2026-08-16",
+                "prenom": "Bob",
+                "nom": "Martin",
+            },
+        ],
+        "mandate_remunerations": [],
+        "incomes": [
+            {
+                "declaration_uuid": "a",
+                "snapshot_date": "2026-08-16",
+                "normalized_value": 20_000.0,
             }
         ],
         "assets": [],
@@ -146,6 +196,95 @@ def test_catastrophic_row_count_reduction_is_explicitly_reported() -> None:
         snapshot_date="2026-08-16",
     )
     assert failed_previous_report.report["checks"]["catastrophic_row_count_reductions"] == 0
+
+
+def test_quality_warning_streak_emits_only_after_repeated_warnings(
+    caplog,
+) -> None:
+    caplog.set_level(logging.WARNING, logger="hatvp")
+
+    result = run_quality_checks(
+        _tables(),
+        previous_report={
+            "status": "warning",
+            "quality": {"flagged_records": 100, "warning_streak": 1},
+        },
+        snapshot_date="2026-08-16",
+    )
+
+    assert result.report["quality"]["warning_streak"] == 2
+    assert any(
+        record.__dict__.get("event") == "quality_warning_streak" for record in caplog.records
+    )
+
+    caplog.clear()
+    clean_result = run_quality_checks(
+        _clean_tables(),
+        previous_report={
+            "status": "warning",
+            "quality": {"flagged_records": 100, "warning_streak": 2},
+        },
+        snapshot_date="2026-08-17",
+    )
+
+    assert clean_result.report["status"] == "ok"
+    assert clean_result.report["quality"]["warning_streak"] == 0
+    assert not any(
+        record.__dict__.get("event") == "quality_warning_streak" for record in caplog.records
+    )
+
+
+def test_flagged_record_regression_uses_previous_successful_report(caplog) -> None:
+    caplog.set_level(logging.WARNING, logger="hatvp")
+
+    below_threshold = run_quality_checks(
+        _tables(),
+        previous_report={
+            "status": "warning",
+            "quality": {"flagged_records": 100, "warning_streak": 1},
+        },
+        snapshot_date="2026-08-16",
+    )
+    assert below_threshold.report["quality"]["quality_regression"] is False
+    assert not any(
+        record.__dict__.get("event") == "quality_regression" for record in caplog.records
+    )
+
+    caplog.clear()
+    above_threshold = run_quality_checks(
+        _tables(),
+        previous_report={
+            "status": "warning",
+            "quality": {"flagged_records": 2, "warning_streak": 1},
+        },
+        snapshot_date="2026-08-16",
+    )
+    assert above_threshold.report["quality"]["quality_regression"] is True
+    assert above_threshold.report["quality"]["flagged_records_increase_ratio"] == 0.5
+    assert any(record.__dict__.get("event") == "quality_regression" for record in caplog.records)
+
+
+def test_quality_telemetry_ignores_missing_or_failed_previous_reports(caplog) -> None:
+    caplog.set_level(logging.WARNING, logger="hatvp")
+
+    for previous_report in (
+        None,
+        {
+            "status": "error",
+            "quality": {"flagged_records": 1, "warning_streak": 7},
+        },
+    ):
+        caplog.clear()
+        result = run_quality_checks(
+            _tables(), previous_report=previous_report, snapshot_date="2026-08-16"
+        )
+
+        assert result.report["quality"]["warning_streak"] == 1
+        assert result.report["quality"]["previous_flagged_records"] is None
+        assert not any(
+            record.__dict__.get("event") in {"quality_warning_streak", "quality_regression"}
+            for record in caplog.records
+        )
 
 
 def test_negative_asset_values_are_retained_and_flagged() -> None:

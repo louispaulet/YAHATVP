@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-08-17 — Add operational retention verification and alerting
+
+### Added
+
+- Added structured quality telemetry for warning streaks and flagged-record
+  regressions above 10% from the previous successful snapshot.
+- Added the monitoring and retention runbook at
+  [`ops/monitoring/README.md`](ops/monitoring/README.md) and three versioned
+  Cloud Monitoring policy manifests for failed executions, repeated warnings,
+  and flagged-record regressions.
+
+### Verified
+
+- Confirmed project `yahatvp-pipeline-eu` has a locked 400-day `_Required` audit
+  bucket, a 30-day `_Default` application-log bucket, and the required audit
+  sinks; no retention settings were changed.
+- Created email notification channel
+  `projects/yahatvp-pipeline-eu/notificationChannels/15119347564909849591` for
+  the configured operator email.
+- Created and enabled policies `6502266148116163647`, `11520248707029483720`,
+  and `6502266148116161328`, each attached to the email channel.
+- Focused telemetry checks pass: 10 tests, Ruff lint, and formatting.
+
+### Follow-up
+
+- Confirm receipt of a test notification and verify the new telemetry in the
+  post-merge Cloud Run deployment.
+
 ## 2026-08-17 — Add income coverage recovery report
 
 ### Added
