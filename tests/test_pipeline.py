@@ -2,13 +2,15 @@ import json
 import shutil
 from pathlib import Path
 
+import polars as pl
 import pytest
 from google.api_core.exceptions import PreconditionFailed
 
 from hatvp import main as main_module
+from hatvp.bigquery import CURATED_TABLES
 from hatvp.config import Settings
 from hatvp.download import DownloadedFile
-from hatvp.main import PipelineFailure, run_pipeline
+from hatvp.main import PARQUET_SCHEMAS, TABLE_COLUMNS, PipelineFailure, _write_parquet, run_pipeline
 from hatvp.storage import GCSArtifactStore
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -293,6 +295,53 @@ def test_bigquery_failure_does_not_advance_state(
         )
 
     assert _state_path(output).read_bytes() == previous_state
+
+
+def test_bigquery_receives_only_curated_tables(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output = tmp_path / "output"
+    captured: dict[str, object] = {}
+
+    def capture_bigquery(**kwargs: object) -> None:
+        captured.update(kwargs)
+
+    monkeypatch.setattr(main_module, "load_parquet_tables", capture_bigquery)
+    _assert_warning_status(
+        run_pipeline(_settings_with_bigquery(output), downloader=_fixture_downloader)
+    )
+
+    assert captured["table_names"] == CURATED_TABLES
+    assert captured["location"] == "europe-west1"
+    assert set(captured["table_files"]) >= set(CURATED_TABLES)
+    assert captured["gcs_uris"] is None
+
+
+def test_curated_parquet_schema_is_stable_for_empty_and_null_only_rows(
+    tmp_path: Path,
+) -> None:
+    empty_path = tmp_path / "empty-incomes.parquet"
+    _write_parquet(
+        [],
+        empty_path,
+        TABLE_COLUMNS["incomes"],
+        PARQUET_SCHEMAS["incomes"],
+    )
+    empty_schema = pl.read_parquet_schema(empty_path)
+    assert empty_schema["snapshot_date"] == pl.Date
+    assert empty_schema["normalized_value"] == pl.Float64
+    assert empty_schema["raw_value"] == pl.String
+
+    null_only_path = tmp_path / "null-only-people.parquet"
+    _write_parquet(
+        [{"declaration_uuid": "fixture", "snapshot_date": "2026-08-17", "email": None}],
+        null_only_path,
+        TABLE_COLUMNS["people"],
+        PARQUET_SCHEMAS["people"],
+    )
+    null_only_schema = pl.read_parquet_schema(null_only_path)
+    assert null_only_schema["snapshot_date"] == pl.Date
+    assert null_only_schema["email"] == pl.String
 
 
 def test_immutable_raw_snapshot_rejects_different_bytes_for_same_date(

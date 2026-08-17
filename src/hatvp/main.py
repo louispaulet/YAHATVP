@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo
 
 import polars as pl
 
-from .bigquery import load_parquet_tables
+from .bigquery import CURATED_TABLES, load_parquet_tables
 from .config import Settings
 from .download import DownloadedFile, download_to_path
 from .parser import parse_sources
@@ -38,6 +38,91 @@ TABLE_COLUMNS = {
     "incomes": ["declaration_uuid", "snapshot_date", "source_section", "normalized_value"],
     "assets": ["declaration_uuid", "snapshot_date", "source_section", "normalized_value"],
     "liabilities": ["declaration_uuid", "snapshot_date", "source_section", "normalized_value"],
+}
+
+PARQUET_SCHEMAS = {
+    "declarations": {
+        "declaration_uuid": pl.String,
+        "snapshot_date": pl.Date,
+        "source_file": pl.String,
+        "date_depot_raw": pl.String,
+        "date_depot": pl.String,
+        "origine": pl.String,
+        "complete": pl.String,
+        "declaration_version": pl.String,
+        "declaration_type_id": pl.String,
+        "declaration_type_label": pl.String,
+        "income_section_present": pl.Boolean,
+        "income_section_populated_item_count": pl.Int64,
+        "mandat_label": pl.String,
+        "mandat_type": pl.String,
+        "mandat_category_code": pl.String,
+        "mandat_category_label": pl.String,
+        "mandat_file_type": pl.String,
+        "mandat_type_label": pl.String,
+        "organ_code": pl.String,
+        "organ_code_list": pl.String,
+        "organ_label": pl.String,
+        "organ_declaration_label": pl.String,
+        "organ_parent": pl.String,
+        "quality_declarant": pl.String,
+        "quality_declarant_pdf": pl.String,
+        "date_debut_mandat_raw": pl.String,
+        "date_debut_mandat": pl.String,
+        "date_fin_mandat_raw": pl.String,
+        "date_fin_mandat": pl.String,
+        "date_derniere_declaration_raw": pl.String,
+        "declaration_modificative": pl.String,
+        "quality_status": pl.String,
+        "quality_reason": pl.String,
+    },
+    "people": {
+        "declaration_uuid": pl.String,
+        "snapshot_date": pl.Date,
+        "source_file": pl.String,
+        "civilite": pl.String,
+        "nom": pl.String,
+        "prenom": pl.String,
+        "email": pl.String,
+        "date_naissance_raw": pl.String,
+        "date_naissance": pl.String,
+        "telephone_dec": pl.String,
+        "adresse_voie": pl.String,
+        "adresse_complement": pl.String,
+        "adresse_code_postal": pl.String,
+        "adresse_ville": pl.String,
+        "adresse_pays": pl.String,
+        "quality_status": pl.String,
+        "quality_reason": pl.String,
+    },
+    "incomes": {
+        "declaration_uuid": pl.String,
+        "snapshot_date": pl.Date,
+        "source_section": pl.String,
+        "source_item_index": pl.Int64,
+        "income_category_index": pl.Int64,
+        "income_year": pl.String,
+        "income_type": pl.String,
+        "raw_value": pl.String,
+        "normalized_value": pl.Float64,
+        "spouse_raw_value": pl.String,
+        "spouse_normalized_value": pl.Float64,
+        "quality_status": pl.String,
+        "quality_reason": pl.String,
+        "raw_record_json": pl.String,
+    },
+    "assets": {
+        "declaration_uuid": pl.String,
+        "snapshot_date": pl.Date,
+        "source_section": pl.String,
+        "source_item_index": pl.Int64,
+        "asset_name": pl.String,
+        "raw_value": pl.String,
+        "normalized_value": pl.Float64,
+        "quality_status": pl.String,
+        "quality_reason": pl.String,
+        "raw_record_json": pl.String,
+    },
 }
 
 
@@ -97,16 +182,32 @@ def _load_state(store: ArtifactStore) -> dict:
     return json.loads(store.read_bytes("state/latest.json"))
 
 
-def _write_parquet(rows: list[dict], path: Path, required_columns: list[str]) -> None:
+def _write_parquet(
+    rows: list[dict],
+    path: Path,
+    required_columns: list[str],
+    schema: dict[str, object] | None = None,
+) -> None:
+    schema = schema or {}
+    columns = list(dict.fromkeys([*required_columns, *schema]))
     if rows:
         frame = pl.DataFrame(rows, infer_schema_length=None)
     else:
-        frame = pl.DataFrame({column: [] for column in required_columns})
-    for column in required_columns:
+        frame = pl.DataFrame(
+            {column: pl.Series(column, [], dtype=schema.get(column, pl.Null)) for column in columns}
+        )
+    for column in columns:
         if column not in frame.columns:
-            frame = frame.with_columns(pl.lit(None).alias(column))
-    if "snapshot_date" in frame.columns and frame.schema["snapshot_date"] == pl.String:
-        frame = frame.with_columns(pl.col("snapshot_date").str.to_date(format="%Y-%m-%d"))
+            frame = frame.with_columns(
+                pl.Series(column, [None] * frame.height, dtype=schema.get(column, pl.Null))
+            )
+    for column, dtype in schema.items():
+        if column == "snapshot_date" and frame.schema[column] == pl.String:
+            frame = frame.with_columns(
+                pl.col(column).str.to_date(format="%Y-%m-%d", strict=True).alias(column)
+            )
+        else:
+            frame = frame.with_columns(pl.col(column).cast(dtype, strict=True).alias(column))
     frame.write_parquet(path, compression="zstd")
 
 
@@ -191,7 +292,12 @@ def _write_tables(
     files: dict[str, Path] = {}
     for table_name, rows in tables.items():
         output = working_dir / f"{table_name}.parquet"
-        _write_parquet(rows, output, TABLE_COLUMNS.get(table_name, []))
+        _write_parquet(
+            rows,
+            output,
+            TABLE_COLUMNS.get(table_name, []),
+            PARQUET_SCHEMAS.get(table_name),
+        )
         files[table_name] = output
         if not dry_run:
             store.put_file(
@@ -319,7 +425,7 @@ def run_pipeline(
                 gcs_uris = {
                     table_name: f"gs://{settings.hatvp_bucket}/{settings.hatvp_prefix}/silver/{table_name}/"
                     f"snapshot_date={snapshot_date}/data.parquet"
-                    for table_name in table_files
+                    for table_name in CURATED_TABLES
                 }
             load_parquet_tables(
                 project=settings.bigquery_project,
@@ -327,6 +433,17 @@ def run_pipeline(
                 table_files=table_files,
                 snapshot_date=snapshot_date,
                 gcs_uris=gcs_uris,
+                table_names=CURATED_TABLES,
+                location=settings.hatvp_bigquery_location,
+            )
+            logger.info(
+                "bigquery_load_complete",
+                extra={
+                    "event": "bigquery_load_complete",
+                    "tables": list(CURATED_TABLES),
+                    "snapshot_date": snapshot_date,
+                    "location": settings.hatvp_bigquery_location,
+                },
             )
         elif settings.hatvp_enable_bigquery and dry_run:
             logger.info(

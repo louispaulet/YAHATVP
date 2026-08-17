@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     hatvp_enable_bigquery: bool = False
     hatvp_bigquery_project: str | None = None
     hatvp_bigquery_dataset: str = "hatvp"
+    hatvp_bigquery_location: str = "europe-west1"
 
     local_output: Path | None = None
     pipeline_version: str = "0.1.0"

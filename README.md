@@ -328,6 +328,7 @@ HATVP_PREFIX=hatvp
 HATVP_ENABLE_BIGQUERY=false
 HATVP_BIGQUERY_PROJECT=<optional>
 HATVP_BIGQUERY_DATASET=hatvp
+HATVP_BIGQUERY_LOCATION=europe-west1
 HATVP_XML_URL=https://www.hatvp.fr/livraison/merge/declarations.xml
 HATVP_CSV_URL=https://www.hatvp.fr/livraison/opendata/liste.csv
 ```
@@ -421,10 +422,48 @@ BigQuery is optional and is the curated/gold analytical layer. GCS remains the
 archive and source of truth. The application must work with
 `HATVP_ENABLE_BIGQUERY=false`.
 
-When enabled, load normalized tables such as `declarations`, `people`,
-`incomes`, and `assets`, with a `snapshot_date` column. Partition tables by
-`snapshot_date` where appropriate. BigQuery loading is part of the success gate:
-if a required load fails, do not advance `state/latest.json`.
+The initial curated layer publishes only `declarations`, `people`, `incomes`,
+and `assets`. Other normalized tables remain available in GCS and can be added
+after the first BigQuery validation. Every curated table includes
+`snapshot_date` as a `DATE` and is partitioned by that column. BigQuery loading
+is part of the success gate: if a required load fails, do not advance
+`state/latest.json`.
+
+The `hatvp` dataset is created once by an operator in the same region as the
+archive bucket. The Cloud Run runtime does not create datasets; it only needs
+project-level BigQuery job execution and dataset-level table write access:
+
+```bash
+export PROJECT_ID="yahatvp-pipeline-eu"
+export REGION="europe-west1"
+export DATASET="hatvp"
+export RUNTIME_SA_EMAIL="hatvp-runtime@${PROJECT_ID}.iam.gserviceaccount.com"
+
+bq --location="$REGION" mk --dataset "${PROJECT_ID}:${DATASET}"
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+  --member="serviceAccount:${RUNTIME_SA_EMAIL}" \
+  --role="roles/bigquery.jobUser"
+bq add-iam-policy-binding \
+  --member="serviceAccount:${RUNTIME_SA_EMAIL}" \
+  --role="roles/bigquery.dataEditor" \
+  "${PROJECT_ID}:${DATASET}"
+```
+
+Useful validation queries for the first curated snapshot are:
+
+```sql
+SELECT table_name, row_count
+FROM `yahatvp-pipeline-eu.hatvp.INFORMATION_SCHEMA.TABLES`
+WHERE table_name IN ('declarations', 'people', 'incomes', 'assets');
+
+SELECT table_name, column_name, data_type
+FROM `yahatvp-pipeline-eu.hatvp.INFORMATION_SCHEMA.COLUMNS`
+WHERE column_name = 'snapshot_date';
+
+SELECT table_name, partition_id, total_rows
+FROM `yahatvp-pipeline-eu.hatvp.INFORMATION_SCHEMA.PARTITIONS`
+WHERE partition_id = '20260817';
+```
 
 ## Google Cloud deployment
 
