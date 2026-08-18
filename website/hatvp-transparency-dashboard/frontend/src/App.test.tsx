@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
@@ -11,8 +11,8 @@ const dashboard = {
     { label: "mandate_remuneration", rows: 2, totalValue: 120000 },
     { label: "revenu_mandat", rows: 1, totalValue: 30000 },
   ],
-  assetsBySection: [{ label: "bank_accounts", rows: 4, totalValue: 80000 }],
-  declarationsByType: [{ label: "mandat", rows: 2 }],
+  assetsBySection: [{ label: "immeubleDto", rows: 4, totalValue: 80000 }],
+  declarationsByType: [{ label: "Déclaration d'intérêts", rows: 2 }],
 };
 
 describe("dashboard application", () => {
@@ -24,8 +24,9 @@ describe("dashboard application", () => {
     render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
     expect(await screen.findByText("Declarations")).toBeInTheDocument();
     expect(screen.getByText("Income, by stream")).toBeInTheDocument();
-    expect(screen.getByText("Mandate Remuneration")).toBeInTheDocument();
-    expect(screen.getByText("Revenu Mandat")).toBeInTheDocument();
+    expect(screen.getByText("Mandate remuneration")).toBeInTheDocument();
+    expect(screen.getByText("Mandate income")).toBeInTheDocument();
+    expect(screen.getByText("Real estate")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Income totals by stream/i })).toBeInTheDocument();
     expect(screen.getByText("Declaration types")).toBeInTheDocument();
   });
@@ -34,5 +35,15 @@ describe("dashboard application", () => {
     render(<MemoryRouter initialEntries={["/about"]}><App /></MemoryRouter>);
     expect(screen.getByText("A small window into a public dataset.")).toBeInTheDocument();
     expect(screen.getByText("HATVP open data")).toBeInTheDocument();
+  });
+
+  it("switches to French and translates configured data labels", async () => {
+    render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+    expect(await screen.findByText("Real estate")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "French" }));
+    expect(screen.getByText("Vue d’ensemble")).toBeInTheDocument();
+    expect(screen.getByText("Immobilier")).toBeInTheDocument();
+    expect(screen.getByText("Revenus, par source")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Totaux des revenus par source/i })).toBeInTheDocument();
   });
 });

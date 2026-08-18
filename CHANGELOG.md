@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-18 — Localize dashboard labels
+
+### Changed
+
+- Added English and French locale configuration files for the dashboard copy,
+  with English as the default language and a persistent language switcher.
+- Replaced technical asset identifiers such as `immeubleDto` and
+  `assuranceVieDto` with readable English/French labels, and translated the
+  income-stream and declaration-type labels through the same configuration.
+- Localized number, currency, date, navigation, metric, panel, about, and
+  accessibility labels for both languages.
+
+### Verified
+
+- Frontend tests cover the default English view and switching to French;
+  production Vite build passes.
+
 ## 2026-08-18 — Add two-stream income pie chart
 
 ### Changed
