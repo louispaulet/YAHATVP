@@ -9,10 +9,11 @@ from typing import Any
 
 from .anomaly_support import text_value
 
+LIFECYCLE_RULE_IDS = frozenset({"ANOMALY_KNOWN", "ANOMALY_REGRESSION"})
+
 
 def anomaly_id(anomaly_key: str) -> str:
     """Return the stable evidence identifier for one logical anomaly."""
-
     return f"anomaly_{hashlib.sha256(anomaly_key.encode()).hexdigest()[:24]}"
 
 
@@ -20,7 +21,6 @@ def upsert_registry(
     occurrences: list[dict[str, Any]], existing: list[dict[str, Any]], snapshot_date: str
 ) -> list[dict[str, Any]]:
     """Merge current occurrences without duplicating retry or snapshot alerts."""
-
     merged = {str(row["anomaly_key"]): dict(row) for row in existing if row.get("anomaly_key")}
     for occurrence in occurrences:
         key = str(occurrence["anomaly_key"])
@@ -31,8 +31,7 @@ def upsert_registry(
         status = (
             "regression"
             if previous.get("status") == "regression"
-            or previous.get("status") in {"superseded", "resolved"}
-            and not repeated
+            or (previous.get("status") in {"superseded", "resolved"} and not repeated)
             else "known/reported"
             if previous
             else "active"
@@ -44,21 +43,24 @@ def upsert_registry(
 def _registry_row(
     item: dict[str, Any], previous: dict[str, Any], snapshot: str, snapshots: set[str], status: str
 ) -> dict[str, Any]:
-    now = date.today().isoformat()
+    evidence = item.get("evidence")
+    evidence_map = evidence if isinstance(evidence, dict) else {}
+    source_rule = str(item.get("original_rule_id") or item["rule_id"])
+    previous_rule = str(previous.get("rule_id") or "")
     return {
         "anomaly_id": previous.get("anomaly_id") or anomaly_id(item["anomaly_key"]),
         "anomaly_key": item["anomaly_key"],
-        "rule_id": item["rule_id"],
+        "rule_id": previous_rule
+        if previous_rule and previous_rule not in LIFECYCLE_RULE_IDS
+        else source_rule,
         "severity": item.get("severity", "review"),
         "declarant_key": item.get("declarant_key"),
         "field": item.get("field"),
         "period": text_value(item.get("period")),
         "observed_value": text_value(item.get("observed_value")),
-        "expected_value_or_range": text_value(item.get("evidence", {}).get("expected"))
-        if isinstance(item.get("evidence"), dict)
-        else None,
+        "expected_value_or_range": text_value(evidence_map.get("expected")),
         "evidence": json.dumps(
-            {"record_ref": item.get("record_ref"), **(item.get("evidence") or {})},
+            {"record_ref": item.get("record_ref"), **evidence_map},
             ensure_ascii=False,
             sort_keys=True,
             default=str,
@@ -76,12 +78,10 @@ def _registry_row(
         "source_format": item.get("source_format"),
         "source_uri_or_object": item.get("source_uri_or_object"),
         "source_location": item.get("source_location"),
-        "candidate_value_or_range": text_value(item.get("evidence", {}).get("candidates"))
-        if isinstance(item.get("evidence"), dict)
-        else None,
+        "candidate_value_or_range": text_value(evidence_map.get("candidates")),
         "metric_eligible": False,
         "active_in_gold": False,
-        "detected_at": previous.get("detected_at") or now,
+        "detected_at": previous.get("detected_at") or date.today().isoformat(),
         "occurrence_count": len(snapshots),
         "seen_snapshots": json.dumps(sorted(snapshots)),
         "snapshot_date": snapshot,

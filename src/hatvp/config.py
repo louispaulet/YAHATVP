@@ -74,6 +74,7 @@ class Settings(BaseSettings):
         default=_DEFAULTS["download_read_timeout_seconds"], gt=0
     )
     download_retries: int = Field(default=_DEFAULTS["download_retries"], ge=1, le=8)
+    hatvp_person_dob_max_age_years: int = Field(default=_DEFAULTS["person_dob_max_age_years"], gt=0)
 
     def validate_storage(self) -> None:
         if self.local_output is None and not self.hatvp_bucket:
