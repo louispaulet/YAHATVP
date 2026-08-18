@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-19 — Stabilize About-page source cards in both languages
+
+### Fixed
+
+- Made official-source cards use a container-aware header that stacks titles
+  and badges when a card is narrow, then returns to a horizontal layout when
+  there is room.
+- Added word wrapping and a non-shrinking badge so the English source titles
+  cannot render underneath their action labels.
+
+### Verified
+
+- Frontend unit tests and the production Vite build pass.
+
 ## 2026-08-19 — Add the repository-local deployment skill
 
 ### Added
