@@ -2,6 +2,7 @@ import { createContext, lazy, Suspense, useContext, useEffect, useState } from "
 import { NavLink, Route, Routes } from "react-router-dom";
 import { fetchAssets, fetchDeclarations, fetchIncome, fetchOverview } from "./api";
 import { defaultLanguage, getLocale, languages, translateDataLabel, type Language, type Locale } from "./config/i18n";
+import { formatNumber } from "./formatters";
 import type { DashboardBreakdownResponse, DashboardOverviewResponse } from "./types";
 
 interface I18nContextValue {
@@ -16,10 +17,6 @@ function useI18n(): I18nContextValue {
   const context = useContext(I18nContext);
   if (!context) throw new Error("useI18n must be used within the I18n provider");
   return context;
-}
-
-function formatNumber(value: number, language: Language): string {
-  return new Intl.NumberFormat(language === "fr" ? "fr-FR" : "en-GB").format(value);
 }
 
 function formatDateTime(value: string, language: Language): string {
@@ -210,9 +207,9 @@ function SourceLinkCard({ link }: { link: Locale["about"]["sources"]["links"][nu
       rel={isDownload ? undefined : "noreferrer"}
       download={isDownload ? "" : undefined}
     >
-      <span className="flex items-start justify-between gap-3">
-        <span className="text-sm font-bold text-ink">{link.label}</span>
-        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] ${badgeClass}`}>{link.type}</span>
+      <span className="flex flex-wrap items-start justify-between gap-3">
+        <span className="min-w-0 flex-1 text-sm font-bold text-ink">{link.label}</span>
+        <span className={`max-w-full rounded-full px-2.5 py-1 text-center text-[0.65rem] font-bold uppercase leading-5 tracking-[0.12em] ${badgeClass}`}>{link.type}</span>
       </span>
       <span className="mt-3 block text-sm leading-6 text-slate-500">{link.description}</span>
       <span className="mt-auto flex items-center gap-2 border-t border-slate-100 pt-5 text-xs font-bold uppercase tracking-[0.12em] text-slate-700">

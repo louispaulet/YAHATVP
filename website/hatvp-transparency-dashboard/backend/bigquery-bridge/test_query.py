@@ -33,6 +33,15 @@ def test_overview_counts_the_four_curated_tables():
     assert query.count("CROSS JOIN latest l") == 4
 
 
+def test_overview_counts_distinct_people_by_normalized_name_pair():
+    query = build_query("project", "dataset", "overview")
+    assert "COUNT(DISTINCT IF(" in query
+    assert "NORMALIZE_AND_CASEFOLD" in query
+    assert "TO_JSON_STRING(STRUCT(" in query
+    assert "NULLIF(TRIM(t.nom), '')" in query
+    assert "NULLIF(TRIM(t.prenom), '')" in query
+
+
 def test_income_groups_values_by_stream():
     query = build_query("project", "dataset", "income")
     assert "income_stream" in query

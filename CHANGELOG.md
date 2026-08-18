@@ -14,6 +14,66 @@
 - `make frontend-test` passes, including the expanded navigation, placeholder
   route, active link state, and French translations.
 
+## 2026-08-18 — Compact large dashboard values
+
+### Changed
+
+- Centralized dashboard number and currency formatting so charts, legends,
+  axes, tooltips, metrics, explanatory copy, and accessible descriptions share
+  the same readability rule.
+- Displayed large monetary values with compact locale-aware units such as
+  `€65.6M` and `€506.1K`, while keeping the underlying aggregate values and
+  ordinary row counts unchanged.
+
+### Verified
+
+- `make frontend-test` passes: 4 frontend test files and 11 tests, followed by
+  a successful TypeScript/Vite production build; `make backend-test`, the 127
+  Python tests, Ruff lint/format checks, and `uv build` also pass.
+
+## 2026-08-18 — Prevent source-card badge overflow
+
+### Fixed
+
+- Allowed official-source card headers to wrap and constrained download badges
+  to the card width, preventing the “Direct download” labels from painting
+  outside their cards at narrow responsive widths.
+
+### Verified
+
+- Frontend unit tests and the production Vite build pass.
+
+## 2026-08-18 — Keep comparison-chart legend values visible
+
+### Fixed
+
+- Removed the comparison legend label truncation that cropped the long income
+  label in the pie-chart panel.
+- Kept comparison amounts on one line while allowing labels to wrap within the
+  available legend width.
+
+### Verified
+
+- `make frontend-test` passes with the legend layout regression assertions and
+  a successful production build.
+
+## 2026-08-18 — Count unique dashboard declarants
+
+### Fixed
+
+- Changed the homepage People metric to count distinct non-empty `nom` +
+  `prenom` pairs within the latest snapshot instead of counting every
+  declaration-linked people row.
+- Clarified the metric detail as “unique declarants” in English and French.
+
+### Verified
+
+- Added BigQuery bridge coverage for case-insensitive, whitespace-trimmed name
+  pairs and missing-name handling.
+- The live `2026-08-18` snapshot resolves to 3,259 unique declarants versus
+  6,611 declaration-linked people rows.
+- `make backend-test` and `make frontend-test` pass.
+
 ## 2026-08-18 — Annualize dashboard income comparison
 
 ### Changed

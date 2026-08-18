@@ -32,7 +32,7 @@
   },
   "metrics": {
     "declarations": { "label": "Déclarations", "detail": "dernier instantané" },
-    "people": { "label": "Personnes", "detail": "dossiers de déclarants" },
+    "people": { "label": "Personnes", "detail": "déclarants uniques" },
     "incomes": { "label": "Lignes de revenus", "detail": "valeurs déclarées" },
     "assets": { "label": "Lignes de patrimoine", "detail": "biens observés" }
   },
