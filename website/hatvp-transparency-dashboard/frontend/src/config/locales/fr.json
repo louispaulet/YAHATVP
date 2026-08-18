@@ -63,8 +63,29 @@
       "Ce tableau de bord est construit à partir du pipeline de données ouvertes de la HATVP. Le pipeline conserve les fichiers sources, normalise les enregistrements, contrôle leur qualité et publie quatre tables BigQuery sélectionnées.",
       "La vue d’ensemble expose uniquement des agrégats. Les coordonnées personnelles et les lignes brutes des déclarations ne font pas partie de cette API publique."
     ],
-    "sourcePrefix": "Pour consulter la source officielle et le contexte complet des déclarations, visitez",
-    "sourceLink": "les données ouvertes de la HATVP",
+    "sourcePrefix": "Pour consulter la source officielle et le contexte complet des déclarations, utilisez les liens officiels de la HATVP ci-dessous.",
+    "sources": {
+      "eyebrow": "Sources officielles",
+      "title": "Remontez à la source HATVP.",
+      "description": "Voici les pages et flux officiels de la HATVP utilisés pour construire ce tableau de bord.",
+      "links": [
+        {
+          "label": "Open data de la HATVP",
+          "description": "Point d’accès officiel aux déclarations publiques.",
+          "href": "https://www.hatvp.fr/open-data/"
+        },
+        {
+          "label": "Index des déclarations (CSV)",
+          "description": "Liste des déclarations publiées utilisée par le pipeline.",
+          "href": "https://www.hatvp.fr/livraison/opendata/liste.csv"
+        },
+        {
+          "label": "Flux des déclarations (XML)",
+          "description": "Contenu des déclarations publié et utilisé par le pipeline.",
+          "href": "https://www.hatvp.fr/livraison/merge/declarations.xml"
+        }
+      ]
+    },
     "curatedTables": "Tables sélectionnées",
     "curatedTablesDetail": "déclarations, personnes, revenus, patrimoine",
     "updateRhythm": "Rythme de mise à jour",

@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-18 — Link dashboard to official HATVP sources
+
+### Added
+
+- Added translated About-page source cards linking to the official HATVP
+  open-data landing page, declaration index CSV, and declarations XML feed.
+- Added fixture coverage for the source-link destinations.
+
+### Verified
+
+- Official HATVP open-data page confirms the CSV list and XML declaration feed;
+  frontend checks remain covered by the repository's `frontend-test` target.
+
 ## 2026-08-18 — Harden declaration-type translations
 
 ### Fixed

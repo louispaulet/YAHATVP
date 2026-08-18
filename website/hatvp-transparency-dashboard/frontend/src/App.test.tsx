@@ -35,6 +35,9 @@ describe("dashboard application", () => {
     render(<MemoryRouter initialEntries={["/about"]}><App /></MemoryRouter>);
     expect(screen.getByText("A small window into a public dataset.")).toBeInTheDocument();
     expect(screen.getByText("HATVP open data")).toBeInTheDocument();
+    expect(screen.getByText("Follow the data back to HATVP.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Declaration index \(CSV\)/ })).toHaveAttribute("href", "https://www.hatvp.fr/livraison/opendata/liste.csv");
+    expect(screen.getByRole("link", { name: /Declarations feed \(XML\)/ })).toHaveAttribute("href", "https://www.hatvp.fr/livraison/merge/declarations.xml");
   });
 
   it("switches to French and translates configured data labels", async () => {

@@ -317,8 +317,21 @@ function AboutPage() {
       <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">{locale.about.title}</h1>
       <div className="mt-8 space-y-6 text-base leading-8 text-slate-600">
         {locale.about.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-        <p>{locale.about.sourcePrefix} <a className="font-bold text-ink underline decoration-lime underline-offset-4" href="https://www.hatvp.fr/open-data/" target="_blank" rel="noreferrer">{locale.about.sourceLink}</a>.</p>
+        <p>{locale.about.sourcePrefix}</p>
       </div>
+      <section className="mt-12">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.about.sources.eyebrow}</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-ink">{locale.about.sources.title}</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-600">{locale.about.sources.description}</p>
+        <div className="mt-5 grid gap-4 sm:grid-cols-3">
+          {locale.about.sources.links.map((link) => (
+            <a key={link.href} className="dashboard-card group p-5 transition hover:-translate-y-0.5 hover:border-emerald/40 hover:shadow-soft" href={link.href} target="_blank" rel="noreferrer">
+              <span className="flex items-start justify-between gap-3 text-sm font-bold text-ink"><span>{link.label}</span><span aria-hidden="true" className="text-emerald transition group-hover:translate-x-0.5">↗</span></span>
+              <span className="mt-3 block text-sm leading-6 text-slate-500">{link.description}</span>
+            </a>
+          ))}
+        </div>
+      </section>
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         <div className="dashboard-card p-5"><p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">{locale.about.curatedTables}</p><p className="mt-2 text-2xl font-black">4</p><p className="mt-1 text-sm text-slate-500">{locale.about.curatedTablesDetail}</p></div>
         <div className="dashboard-card p-5"><p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">{locale.about.updateRhythm}</p><p className="mt-2 text-2xl font-black">{locale.about.updateRhythmValue}</p><p className="mt-1 text-sm text-slate-500">{locale.about.updateRhythmDetail}</p></div>

@@ -63,8 +63,29 @@
       "This dashboard is built from the HATVP open-data pipeline. The pipeline preserves raw source files, normalizes records, checks quality, and publishes four curated BigQuery tables.",
       "The overview intentionally exposes aggregates only. Personal contact details and raw declaration rows are not part of this public API."
     ],
-    "sourcePrefix": "For the authoritative source and the full declaration context, visit",
-    "sourceLink": "HATVP open data",
+    "sourcePrefix": "For the authoritative source and the full declaration context, use the official HATVP links below.",
+    "sources": {
+      "eyebrow": "Official sources",
+      "title": "Follow the data back to HATVP.",
+      "description": "These are the official HATVP pages and feeds used to build this dashboard.",
+      "links": [
+        {
+          "label": "HATVP open data",
+          "description": "Official entry point for public declarations.",
+          "href": "https://www.hatvp.fr/open-data/"
+        },
+        {
+          "label": "Declaration index (CSV)",
+          "description": "List of published declarations consumed by the pipeline.",
+          "href": "https://www.hatvp.fr/livraison/opendata/liste.csv"
+        },
+        {
+          "label": "Declarations feed (XML)",
+          "description": "Published declaration content consumed by the pipeline.",
+          "href": "https://www.hatvp.fr/livraison/merge/declarations.xml"
+        }
+      ]
+    },
     "curatedTables": "Curated tables",
     "curatedTablesDetail": "declarations, people, incomes, assets",
     "updateRhythm": "Update rhythm",
