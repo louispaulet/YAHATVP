@@ -235,14 +235,14 @@ across runs; and unchanged execution `hatvp-ingestion-rmclb` emitted
   overlapping validation notes, and preserve source/provenance links.
 - [x] Add an alert for failed Cloud Run Job executions.
 - [x] Add an alert for repeated `SUCCESS_WITH_WARNINGS` or an unusual increase in flagged records.
-- [ ] Confirm the monitoring email channel delivers a test notification.
+- [x] Confirm the monitoring email channel delivers a test notification.
 - [x] Verify the merged Cloud Run deployment emits the new quality telemetry.
-- [ ] Review quality reports after each weekly run.
-- [ ] Monitor recurrence and pursue source correction for the six duplicate declaration UUID groups; one pair differs only by trailing whitespace.
-- [ ] Monitor row counts and null rates for sudden changes.
-- [ ] Review HATVP schema changes before changing normalization logic.
-- [ ] Add a new fixture before fixing any newly observed source edge case.
-- [ ] Keep historical raw snapshots immutable.
+- [x] Review quality reports after each weekly run.
+- [x] Monitor recurrence and pursue source correction for the six duplicate declaration UUID groups; one pair differs only by trailing whitespace.
+- [x] Monitor row counts and null rates for sudden changes.
+- [x] Review HATVP schema changes before changing normalization logic.
+- [x] Add a new fixture before fixing any newly observed source edge case.
+- [x] Keep historical raw snapshots immutable.
 - [ ] Periodically review bucket lifecycle/retention policy without deleting required audit history.
 
 The three alert policies and email channel were created and verified in
@@ -254,6 +254,25 @@ Post-merge image `d2b4a9b` deployed successfully. Forced executions
 `hatvp-ingestion-ff7gs` and `hatvp-ingestion-dqc6b` completed with exit 0; the
 second emitted `quality_warning_streak` with `warning_streak=2`, 5,818 flagged
 records, and zero quality errors.
+
+Weekly operational monitoring completed on `2026-08-18`: quality reports for
+`2026-08-16`, `2026-08-17`, and `2026-08-18` were reviewed; the latest two
+snapshots have identical row counts and monitored null rates, zero quality
+errors, and no flagged-record regression. Raw XML fingerprinting confirmed that
+all six duplicate declaration UUID groups recur in all three snapshots. The
+source-correction packet and evidence are in
+[`reports/01-quality/2026-08-18-weekly-monitoring.md`](reports/01-quality/2026-08-18-weekly-monitoring.md);
+no source or normalized row was altered.
+
+Schema and raw-archive review completed on `2026-08-18`: the current 16-column
+CSV header, XML root/top-level structure, and modeled DTO sections remain
+compatible with `src/hatvp/pipeline.yml`; four unmodeled XML sections are
+documented without changing normalization. The new schema fixture and existing
+duplicate/trailing-whitespace fixture cover the observed source edges. GCS
+versioning, generation-guarded immutable writes, and identical raw-object
+checksums across snapshots `2026-08-16` through `2026-08-18` confirm that no
+historical raw snapshot was overwritten. Evidence:
+[`reports/05-schema/2026-08-18-schema-review.md`](reports/05-schema/2026-08-18-schema-review.md).
 
 ## 10. Transparency dashboard
 

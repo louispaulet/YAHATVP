@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<declarations>
+  <declaration>
+    <dateDepot>18/08/2026 08:30:00</dateDepot>
+    <uuid>fixture-schema-review</uuid>
+    <origine>ADEL</origine>
+    <complete>true</complete>
+    <declarationVersion>20260818</declarationVersion>
+    <attachedFiles>
+      <file>declaration.pdf</file>
+    </attachedFiles>
+    <evenementMajeurDto>
+      <items><items><description>Observed but not normalized</description></items></items>
+    </evenementMajeurDto>
+    <observationInteretDto>
+      <items><items><description>Observed but not normalized</description></items></items>
+    </observationInteretDto>
+    <observationPatrimoineDto>
+      <items><items><description>Observed but not normalized</description></items></items>
+    </observationPatrimoineDto>
+    <general>
+      <declarant>
+        <nom>SCHEMA</nom>
+        <prenom>Review</prenom>
+      </declarant>
+    </general>
+  </declaration>
+</declarations>
