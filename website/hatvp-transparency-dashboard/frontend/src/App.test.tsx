@@ -39,6 +39,11 @@ describe("dashboard application", () => {
     expect(screen.getByText("Follow the data back to HATVP.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Declaration index \(CSV\)/ })).toHaveAttribute("href", "https://www.hatvp.fr/livraison/opendata/liste.csv");
     expect(screen.getByRole("link", { name: /Declarations feed \(XML\)/ })).toHaveAttribute("href", "https://www.hatvp.fr/livraison/merge/declarations.xml");
+    expect(screen.getByRole("link", { name: /Open source page/ })).toHaveAttribute("target", "_blank");
+    expect(screen.getByRole("link", { name: /Open source page/ })).not.toHaveAttribute("download");
+    expect(screen.getByRole("link", { name: /Download CSV/ })).toHaveAttribute("download", "");
+    expect(screen.getByRole("link", { name: /Download CSV/ })).not.toHaveAttribute("target");
+    expect(screen.getByRole("link", { name: /Download XML/ })).toHaveAttribute("download", "");
     expect(screen.getByRole("link", { name: "View project on GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
     expect(screen.getByRole("link", { name: /Explore YAHATVP on GitHub/ })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
   });
