@@ -254,7 +254,38 @@ Post-merge image `d2b4a9b` deployed successfully. Forced executions
 second emitted `quality_warning_streak` with `warning_streak=2`, 5,818 flagged
 records, and zero quality errors.
 
-## 10. BigQuery tutorial
+## 10. Transparency dashboard
+
+- [x] Add an isolated Vite/React/Tailwind frontend with HashRouter under `website/hatvp-transparency-dashboard/frontend`.
+- [x] Add a Cloudflare Worker API under `website/hatvp-transparency-dashboard/backend/worker`.
+- [x] Add a read-only BigQuery Cloud Run bridge under `website/hatvp-transparency-dashboard/backend/bigquery-bridge`.
+- [x] Keep the public API aggregate-only and exclude raw rows and personal contact fields.
+- [x] Add Worker, bridge, and frontend fixture/unit tests plus Makefile targets.
+- [x] Document local development, secret handling, Cloudflare deployment, and GitHub Pages deployment.
+- [x] Configure the production bridge token and deploy the Cloudflare Worker.
+- [x] Configure the repository GitHub Pages source and publish the frontend `gh-pages` branch.
+- [x] Run a live dashboard smoke test against the deployed Worker and review the public aggregate output.
+- [x] Split dashboard overview, income, assets, and declaration data into independently cacheable API slices.
+- [x] Add slow-blinking loading shells so the dashboard layout renders before any slice completes.
+- [x] Use lazy-loaded Recharts pie and bar plots with animation, responsive sizing, tooltips, and accessible value lists.
+- [x] Add English/French locale configuration, a language switcher, and readable translations for dynamic dashboard labels.
+- [x] Harden declaration-type translation lookup for source-label casing and punctuation variants.
+- [x] Add translated About-page links to the official HATVP open-data page and source CSV/XML feeds.
+- [x] Add a sticky footer with a translated link to the YAHATVP GitHub project.
+- [x] Add a translated About-page link to the YAHATVP GitHub project.
+- [x] Add a generated WebP HATVP mark to the navbar and browser favicon.
+- [x] Distinguish the external HATVP page from the direct CSV/XML downloads on the About page.
+
+Deployment evidence (2026-08-18): Cloud Run bridge revision
+`hatvp-dashboard-api-00003-xzr` and Worker version
+`c3caf8a3-7ee8-47cf-bc3e-52b06db3138f` are serving. The Worker returned 200
+for `/healthz` and `/api/dashboard`; the latter returned the latest snapshot
+and aggregate counts of 6,611 declarations, 6,611 people, 74,791 incomes, and
+1,157 assets. GitHub Pages is configured from `gh-pages` and returned 200.
+Chrome verification also confirmed the production CORS header and successful
+dashboard rendering after Worker version `b2450c38-cc3a-48d8-8f46-81b6a5b396e1`.
+
+## 11. BigQuery tutorial
 
 - [x] Add ten atomic BigQuery tutorial queries with matching CSV results for the
   validated `2026-08-18` snapshot.

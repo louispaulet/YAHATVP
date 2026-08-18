@@ -1,0 +1,162 @@
+{
+  "languageSwitcher": {
+    "label": "Language",
+    "options": {
+      "en": "English",
+      "fr": "French"
+    }
+  },
+  "brand": {
+    "name": "Transparency dashboard"
+  },
+  "nav": {
+    "overview": "Overview",
+    "about": "About the data"
+  },
+  "footer": {
+    "builtFrom": "Built from public HATVP declarations.",
+    "project": "View project on GitHub"
+  },
+  "loading": {
+    "label": "Loading dashboard data"
+  },
+  "hero": {
+    "eyebrow": "Public data, made clearer",
+    "title": "A clearer view of public declarations.",
+    "description": "Explore the latest curated HATVP snapshot through a small set of transparent, source-linked aggregates.",
+    "snapshot": "Snapshot",
+    "notAvailable": "not available",
+    "totalRows": "total rows"
+  },
+  "metrics": {
+    "declarations": { "label": "Declarations", "detail": "latest snapshot" },
+    "people": { "label": "People", "detail": "declarant records" },
+    "incomes": { "label": "Income rows", "detail": "declared values" },
+    "assets": { "label": "Asset rows", "detail": "observed assets" }
+  },
+  "panels": {
+    "income": {
+      "title": "Income, by stream",
+      "eyebrow": "Declared amounts",
+      "empty": "No income rows were found in this snapshot."
+    },
+    "assets": {
+      "title": "Assets, by section",
+      "eyebrow": "Observed values",
+      "empty": "No asset rows were found in this snapshot."
+    },
+    "declarationTypes": {
+      "title": "Declaration types",
+      "eyebrow": "Composition",
+      "type": "Type",
+      "rows": "Rows",
+      "empty": "No declaration types were found."
+    },
+    "snapshotMeaning": {
+      "title": "What this snapshot means",
+      "eyebrow": "Reading the data",
+      "counts": "Counts are limited to the latest successful snapshot shared across the curated tables.",
+      "amounts": "Amounts preserve the normalized numeric values produced by the ingestion pipeline. They are presented as indicators, not as a substitute for the source declarations.",
+      "lastGenerated": "Last generated"
+    }
+  },
+  "about": {
+    "eyebrow": "About the data",
+    "title": "A small window into a public dataset.",
+    "paragraphs": [
+      "This dashboard is built from the HATVP open-data pipeline. The pipeline preserves raw source files, normalizes records, checks quality, and publishes four curated BigQuery tables.",
+      "The overview intentionally exposes aggregates only. Personal contact details and raw declaration rows are not part of this public API."
+    ],
+    "sourcePrefix": "For the authoritative source and the full declaration context, use the official HATVP links below.",
+    "sources": {
+      "eyebrow": "Official sources",
+      "title": "Follow the data back to HATVP.",
+      "description": "These are the official HATVP pages and feeds used to build this dashboard.",
+      "links": [
+        {
+          "label": "HATVP open data",
+          "kind": "redirect",
+          "type": "External page",
+          "action": "Open source page",
+          "description": "Official entry point for public declarations.",
+          "href": "https://www.hatvp.fr/open-data/"
+        },
+        {
+          "label": "Declaration index (CSV)",
+          "kind": "download",
+          "type": "Direct download",
+          "action": "Download CSV",
+          "description": "List of published declarations consumed by the pipeline.",
+          "href": "https://www.hatvp.fr/livraison/opendata/liste.csv"
+        },
+        {
+          "label": "Declarations feed (XML)",
+          "kind": "download",
+          "type": "Direct download",
+          "action": "Download XML",
+          "description": "Published declaration content consumed by the pipeline.",
+          "href": "https://www.hatvp.fr/livraison/merge/declarations.xml"
+        }
+      ]
+    },
+    "project": {
+      "eyebrow": "Project source",
+      "title": "Explore YAHATVP on GitHub.",
+      "description": "Browse the dashboard source code, ingestion pipeline, and documentation.",
+      "href": "https://github.com/louispaulet/YAHATVP/tree/main"
+    },
+    "curatedTables": "Curated tables",
+    "curatedTablesDetail": "declarations, people, incomes, assets",
+    "updateRhythm": "Update rhythm",
+    "updateRhythmValue": "Weekly",
+    "updateRhythmDetail": "following the ingestion pipeline"
+  },
+  "errors": {
+    "title": "The dashboard is taking a pause.",
+    "noData": "No data is available yet.",
+    "tryAgain": "Try again",
+    "load": "Dashboard data could not be loaded.",
+    "sliceLoad": "This panel could not be loaded.",
+    "notFound": "Page not found.",
+    "backToOverview": "Back to overview"
+  },
+  "accessibility": {
+    "incomeChart": "Income totals by stream",
+    "incomeLegend": "Income stream legend",
+    "rows": "rows"
+  },
+  "labels": {
+    "incomeStreams": {
+      "mandate_remuneration": "Mandate remuneration",
+      "revenu_mandat": "Mandate income"
+    },
+    "assetSections": {
+      "immeubleDto": "Real estate",
+      "assuranceVieDto": "Life insurance",
+      "valeursNonEnBourseDto": "Unlisted securities",
+      "comptesBancaireDto": "Bank accounts",
+      "valeursEnBourseDto": "Listed securities",
+      "autreBienDto": "Other assets",
+      "sciDto": "Property-holding company (SCI)",
+      "bienEtrangerDto": "Foreign property",
+      "vehiculeDto": "Vehicles",
+      "bienDiverDto": "Miscellaneous assets",
+      "fondDto": "Funds",
+      "bank_accounts": "Bank accounts",
+      "detteDto": "Liabilities",
+      "empruntDto": "Loans"
+    },
+    "declarationTypes": {
+      "Déclaration d'intérêts": "Declaration of interests",
+      "Déclaration d'intérêts modificative": "Amended declaration of interests",
+      "Déclaration d'intérêts et d'activités": "Declaration of interests and activities",
+      "Déclaration d'intérêts et d'activités modificative": "Amended declaration of interests and activities",
+      "Déclaration de situation patrimoniale": "Asset declaration",
+      "Déclaration de situation patrimoniale modificative": "Amended asset declaration",
+      "Déclaration de situation patrimoniale de fin de mandat": "End-of-mandate asset declaration",
+      "Déclaration de situation patrimoniale de fin de mandat modificative": "Amended end-of-mandate asset declaration",
+      "Déclaration initiale de situation patrimoniale": "Initial asset declaration",
+      "mandat": "Mandate"
+    }
+  }
+}

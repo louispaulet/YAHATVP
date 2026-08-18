@@ -220,3 +220,10 @@ __marimo__/
 data/
 .env.*
 !.env.example
+
+# Transparency dashboard local dependencies, builds, and credentials
+website/hatvp-transparency-dashboard/**/node_modules/
+website/hatvp-transparency-dashboard/**/dist/
+website/hatvp-transparency-dashboard/**/.wrangler/
+website/hatvp-transparency-dashboard/**/.dev.vars
+website/hatvp-transparency-dashboard/frontend/.env.local

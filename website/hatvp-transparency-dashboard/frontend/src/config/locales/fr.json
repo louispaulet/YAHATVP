@@ -1,0 +1,162 @@
+{
+  "languageSwitcher": {
+    "label": "Langue",
+    "options": {
+      "en": "Anglais",
+      "fr": "Français"
+    }
+  },
+  "brand": {
+    "name": "Tableau de transparence"
+  },
+  "nav": {
+    "overview": "Vue d’ensemble",
+    "about": "À propos des données"
+  },
+  "footer": {
+    "builtFrom": "Construit à partir des déclarations publiques de la HATVP.",
+    "project": "Voir le projet sur GitHub"
+  },
+  "loading": {
+    "label": "Chargement des données du tableau de bord"
+  },
+  "hero": {
+    "eyebrow": "Les données publiques, plus lisibles",
+    "title": "Une vue plus claire des déclarations publiques.",
+    "description": "Explorez le dernier instantané HATVP sélectionné à travers quelques agrégats transparents et reliés à leurs sources.",
+    "snapshot": "Instantané",
+    "notAvailable": "indisponible",
+    "totalRows": "lignes au total"
+  },
+  "metrics": {
+    "declarations": { "label": "Déclarations", "detail": "dernier instantané" },
+    "people": { "label": "Personnes", "detail": "dossiers de déclarants" },
+    "incomes": { "label": "Lignes de revenus", "detail": "valeurs déclarées" },
+    "assets": { "label": "Lignes de patrimoine", "detail": "biens observés" }
+  },
+  "panels": {
+    "income": {
+      "title": "Revenus, par source",
+      "eyebrow": "Montants déclarés",
+      "empty": "Aucune ligne de revenus n’a été trouvée dans cet instantané."
+    },
+    "assets": {
+      "title": "Patrimoine, par catégorie",
+      "eyebrow": "Valeurs observées",
+      "empty": "Aucune ligne de patrimoine n’a été trouvée dans cet instantané."
+    },
+    "declarationTypes": {
+      "title": "Types de déclarations",
+      "eyebrow": "Composition",
+      "type": "Type",
+      "rows": "Lignes",
+      "empty": "Aucun type de déclaration n’a été trouvé."
+    },
+    "snapshotMeaning": {
+      "title": "Ce que signifie cet instantané",
+      "eyebrow": "Lire les données",
+      "counts": "Les décomptes se limitent au dernier instantané réussi partagé par les tables sélectionnées.",
+      "amounts": "Les montants conservent les valeurs numériques normalisées par le pipeline d’ingestion. Ils constituent des indicateurs et ne remplacent pas les déclarations sources.",
+      "lastGenerated": "Dernière génération"
+    }
+  },
+  "about": {
+    "eyebrow": "À propos des données",
+    "title": "Une petite fenêtre sur un jeu de données public.",
+    "paragraphs": [
+      "Ce tableau de bord est construit à partir du pipeline de données ouvertes de la HATVP. Le pipeline conserve les fichiers sources, normalise les enregistrements, contrôle leur qualité et publie quatre tables BigQuery sélectionnées.",
+      "La vue d’ensemble expose uniquement des agrégats. Les coordonnées personnelles et les lignes brutes des déclarations ne font pas partie de cette API publique."
+    ],
+    "sourcePrefix": "Pour consulter la source officielle et le contexte complet des déclarations, utilisez les liens officiels de la HATVP ci-dessous.",
+    "sources": {
+      "eyebrow": "Sources officielles",
+      "title": "Remontez à la source HATVP.",
+      "description": "Voici les pages et flux officiels de la HATVP utilisés pour construire ce tableau de bord.",
+      "links": [
+        {
+          "label": "Open data de la HATVP",
+          "kind": "redirect",
+          "type": "Page externe",
+          "action": "Ouvrir la page source",
+          "description": "Point d’accès officiel aux déclarations publiques.",
+          "href": "https://www.hatvp.fr/open-data/"
+        },
+        {
+          "label": "Index des déclarations (CSV)",
+          "kind": "download",
+          "type": "Téléchargement direct",
+          "action": "Télécharger le CSV",
+          "description": "Liste des déclarations publiées utilisée par le pipeline.",
+          "href": "https://www.hatvp.fr/livraison/opendata/liste.csv"
+        },
+        {
+          "label": "Flux des déclarations (XML)",
+          "kind": "download",
+          "type": "Téléchargement direct",
+          "action": "Télécharger le XML",
+          "description": "Contenu des déclarations publié et utilisé par le pipeline.",
+          "href": "https://www.hatvp.fr/livraison/merge/declarations.xml"
+        }
+      ]
+    },
+    "project": {
+      "eyebrow": "Source du projet",
+      "title": "Découvrez YAHATVP sur GitHub.",
+      "description": "Consultez le code du tableau de bord, le pipeline d’ingestion et la documentation.",
+      "href": "https://github.com/louispaulet/YAHATVP/tree/main"
+    },
+    "curatedTables": "Tables sélectionnées",
+    "curatedTablesDetail": "déclarations, personnes, revenus, patrimoine",
+    "updateRhythm": "Rythme de mise à jour",
+    "updateRhythmValue": "Hebdomadaire",
+    "updateRhythmDetail": "selon le pipeline d’ingestion"
+  },
+  "errors": {
+    "title": "Le tableau de bord fait une pause.",
+    "noData": "Aucune donnée n’est encore disponible.",
+    "tryAgain": "Réessayer",
+    "load": "Les données du tableau de bord n’ont pas pu être chargées.",
+    "sliceLoad": "Ce panneau n’a pas pu être chargé.",
+    "notFound": "Page introuvable.",
+    "backToOverview": "Retour à la vue d’ensemble"
+  },
+  "accessibility": {
+    "incomeChart": "Totaux des revenus par source",
+    "incomeLegend": "Légende des sources de revenus",
+    "rows": "lignes"
+  },
+  "labels": {
+    "incomeStreams": {
+      "mandate_remuneration": "Rémunération du mandat",
+      "revenu_mandat": "Revenu du mandat"
+    },
+    "assetSections": {
+      "immeubleDto": "Immobilier",
+      "assuranceVieDto": "Assurance-vie",
+      "valeursNonEnBourseDto": "Valeurs non cotées",
+      "comptesBancaireDto": "Comptes bancaires",
+      "valeursEnBourseDto": "Valeurs cotées",
+      "autreBienDto": "Autres biens",
+      "sciDto": "Société civile immobilière (SCI)",
+      "bienEtrangerDto": "Biens à l’étranger",
+      "vehiculeDto": "Véhicules",
+      "bienDiverDto": "Biens divers",
+      "fondDto": "Fonds",
+      "bank_accounts": "Comptes bancaires",
+      "detteDto": "Dettes",
+      "empruntDto": "Emprunts"
+    },
+    "declarationTypes": {
+      "Déclaration d'intérêts": "Déclaration d’intérêts",
+      "Déclaration d'intérêts modificative": "Déclaration d’intérêts modificative",
+      "Déclaration d'intérêts et d'activités": "Déclaration d’intérêts et d’activités",
+      "Déclaration d'intérêts et d'activités modificative": "Déclaration d’intérêts et d’activités modificative",
+      "Déclaration de situation patrimoniale": "Déclaration de situation patrimoniale",
+      "Déclaration de situation patrimoniale modificative": "Déclaration de situation patrimoniale modificative",
+      "Déclaration de situation patrimoniale de fin de mandat": "Déclaration de situation patrimoniale de fin de mandat",
+      "Déclaration de situation patrimoniale de fin de mandat modificative": "Déclaration de situation patrimoniale de fin de mandat modificative",
+      "Déclaration initiale de situation patrimoniale": "Déclaration initiale de situation patrimoniale",
+      "mandat": "Mandat"
+    }
+  }
+}

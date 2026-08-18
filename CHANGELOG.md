@@ -1,5 +1,210 @@
 # Changelog
 
+## 2026-08-18 — Load dashboard plots independently
+
+### Changed
+
+- Split the dashboard API into independent `overview`, `income`, `assets`, and
+  `declarations` routes through the Cloudflare Worker and read-only BigQuery
+  bridge; each route runs one fixed aggregate query and receives its own cache
+  policy.
+- Removed the page-wide loading gate in favor of panel-level, slow-blinking
+  loading shells and retryable errors, so the dashboard stays useful while
+  individual slices are in flight.
+- Replaced the CSS-only income pie and asset bars with lazy-loaded Recharts
+  charts featuring responsive sizing, animated transitions, tooltips, and
+  accessible value lists.
+
+### Verified
+
+- Frontend tests: 8 passed; production Vite build passes with the chart code in
+  a deferred chunk (initial bundle 255.65 kB, 80.51 kB gzip).
+- Worker tests: 6 passed; Worker typecheck passes.
+- BigQuery bridge fixture tests: 23 passed; Ruff lint and formatting pass.
+
+## 2026-08-18 — Clarify official source actions
+
+### Changed
+
+- Updated the dashboard About page so the HATVP open-data page is presented as
+  an external-page action, while the CSV and XML feeds are presented as direct
+  downloads.
+- Added translated action labels, distinct icons, download semantics, and
+  aligned card actions for the English and French interfaces.
+
+### Verified
+
+- Frontend unit tests and the production Vite build pass.
+
+## 2026-08-18 — Add generated HATVP brand mark
+
+### Added
+
+- Added a generated 256px WebP HATVP mark with transparent outer pixels.
+- Replaced the navbar’s CSS-only badge and added the mark as the browser
+  favicon.
+
+### Verified
+
+- Frontend tests and the production Vite build pass.
+- Published the generated mark to `gh-pages` (deployment commit `203cd51`);
+  the live HTML references `hatvp-mark.webp`, which returns HTTP 200 as
+  `image/webp`, and the navbar bundle contains the asset reference.
+
+## 2026-08-18 — Link About page to project source
+
+### Added
+
+- Added translated About-page project cards linking to the YAHATVP GitHub
+  repository.
+
+### Verified
+
+- Frontend tests and the production Vite build pass.
+- Published the About-page project link to `gh-pages` (deployment commit
+  `a803a62`); the GitHub Pages About route returned HTTP 200 and served both
+  translated project-link labels with the requested repository URL.
+
+## 2026-08-18 — Add sticky project footer
+
+### Changed
+
+- Made the dashboard shell a flex column so the footer stays at the bottom on
+  short pages.
+- Added translated English and French links to the YAHATVP GitHub project.
+
+### Verified
+
+- Frontend tests and the production Vite build pass.
+- Published the footer update to `gh-pages` (deployment commit `d27770e`);
+  the GitHub Pages root returned HTTP 200 and served both translated footer
+  labels with the requested project URL.
+
+## 2026-08-18 — Link dashboard to official HATVP sources
+
+### Added
+
+- Added translated About-page source cards linking to the official HATVP
+  open-data landing page, declaration index CSV, and declarations XML feed.
+- Added fixture coverage for the source-link destinations.
+
+### Verified
+
+- Official HATVP open-data page confirms the CSV list and XML declaration feed;
+  frontend checks remain covered by the repository's `frontend-test` target.
+- Published the About-page links to `gh-pages` (deployment commit `1bbc44f`);
+  the GitHub Pages root returned HTTP 200.
+
+## 2026-08-18 — Harden declaration-type translations
+
+### Fixed
+
+- Made declaration-type locale lookup insensitive to source-label casing,
+  accents, apostrophes, spaces, and punctuation, so legacy values such as
+  `DéClaration D'IntéRêTs` resolve to the configured human-readable wording.
+- Added regression coverage for all nine declaration types in English and the
+  French fallback path.
+
+### Verified
+
+- Frontend tests and the production Vite build pass.
+- Published the corrected frontend to `gh-pages` (deployment commit
+  `3210a4d`); the GitHub Pages root returned HTTP 200.
+
+## 2026-08-18 — Localize dashboard labels
+
+### Changed
+
+- Added English and French locale configuration files for the dashboard copy,
+  with English as the default language and a persistent language switcher.
+- Replaced technical asset identifiers such as `immeubleDto` and
+  `assuranceVieDto` with readable English/French labels, and translated the
+  income-stream and declaration-type labels through the same configuration.
+- Localized number, currency, date, navigation, metric, panel, about, and
+  accessibility labels for both languages.
+
+### Verified
+
+- Frontend tests cover the default English view and switching to French;
+  production Vite build passes.
+- Published the frontend build to `gh-pages` (deployment commit `2d0f000`);
+  the GitHub Pages root returned HTTP 200 and the branch contains the new
+  localized bundle.
+
+## 2026-08-18 — Add two-stream income pie chart
+
+### Changed
+
+- Updated the dashboard's `Income, by stream` panel to use a two-slice pie chart
+  when exactly two income streams are present, with labeled amounts, row counts,
+  percentages, and an accessible chart description.
+- Kept the existing breakdown list for empty, single-stream, or larger
+  comparisons.
+
+### Verified
+
+- Frontend fixture tests and the production Vite build pass.
+
+## 2026-08-18 — Fix live dashboard CORS
+
+### Fixed
+
+- Corrected the production `FRONTEND_ORIGIN` from the GitHub Pages path to the
+  actual browser origin `https://louispaulet.github.io`; URL paths are not part
+  of the CORS origin value.
+- Redeployed Cloud Run revision `hatvp-dashboard-api-00004-49f` and Worker
+  version `b2450c38-cc3a-48d8-8f46-81b6a5b396e1`.
+
+### Verified
+
+- Chrome now renders the live dashboard instead of `Failed to fetch`.
+- The Worker returns `Access-Control-Allow-Origin:
+  https://louispaulet.github.io` and the dashboard API returns HTTP 200.
+
+## 2026-08-18 — Deploy HATVP transparency dashboard
+
+### Deployed
+
+- Created Secret Manager secret `hatvp-dashboard-bridge-token` and configured
+  the matching encrypted Cloudflare Worker secret without committing the token.
+- Deployed the read-only Cloud Run bridge as revision
+  `hatvp-dashboard-api-00003-xzr` with the dedicated
+  `hatvp-dashboard-reader` service account and dataset-level BigQuery access.
+- Deployed Worker version `c3caf8a3-7ee8-47cf-bc3e-52b06db3138f` at
+  `https://hatvp-transparency-api.louispaulet13.workers.dev`.
+- Published the Vite frontend to the `gh-pages` branch at
+  `https://louispaulet.github.io/YAHATVP/`.
+- Fixed the declaration-type aggregate ordering alias found during the first
+  live smoke test and republished the frontend with an explicit production
+  `VITE_API_BASE_URL`; the Makefile now requires that URL for publication.
+
+### Verified
+
+- Live Worker `/healthz`, Worker `/api/dashboard`, authenticated bridge
+  `/v1/dashboard`, and GitHub Pages all returned HTTP 200.
+- The live dashboard payload contains the `2026-08-18` snapshot and counts of
+  6,611 declarations, 6,611 people, 74,791 incomes, and 1,157 assets.
+
+## 2026-08-18 — Add HATVP transparency dashboard foundation
+
+### Added
+
+- Added the isolated `website/hatvp-transparency-dashboard/` workspace with a
+  tested Cloudflare Worker proxy, read-only BigQuery Cloud Run bridge, and
+  Vite/React/Tailwind HashRouter frontend.
+- Added aggregate-only dashboard data for the latest curated snapshot,
+  including table counts, income streams, asset sections, and declaration
+  types; raw rows and contact fields are not exposed.
+- Added Makefile targets for installation, local development, fixture tests,
+  bridge/Worker deployment, and GitHub Pages publication through `gh-pages`.
+
+### Verified
+
+- Dashboard backend: 26 fixture/unit tests pass, Worker typechecking passes,
+  Ruff lint/format passes, and the frontend tests plus production build pass.
+- Repository checks: 127 existing project tests pass, Ruff lint/format passes,
+  and `uv build` succeeds.
+
 ## 2026-08-18 — Reorganize the report catalog
 
 ### Changed

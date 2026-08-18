@@ -556,6 +556,79 @@ WHERE column_name = 'snapshot_date';
 
 ```
 
+## Transparency dashboard
+
+The repository also contains a deliberately small public dashboard under
+`website/hatvp-transparency-dashboard/`. It is separate from the ingestion
+pipeline and reads only aggregate data from the four curated BigQuery tables:
+`declarations`, `people`, `incomes`, and `assets`.
+
+```text
+GitHub Pages React app
+        │ GET /api/dashboard/{slice}
+        ▼
+Cloudflare Worker
+        │ authenticated aggregate request per slice
+        ▼
+Read-only Cloud Run bridge ─── BigQuery curated tables
+```
+
+The public API does not expose arbitrary SQL, raw rows, addresses, contact
+fields, or other personal fields. The bridge selects the latest shared
+`snapshot_date` and exposes four fixed read-only slices: `overview`, `income`,
+`assets`, and `declarations`. The Worker adds CORS and a short cache header to
+each slice, so one slow aggregate cannot hold the rest of the page hostage.
+The frontend starts all four requests independently, preserves each panel’s
+layout with a slow-blinking loading shell, and lazy-loads the interactive
+[Recharts](https://recharts.org/) module for the income and asset plots.
+
+### Local dashboard checks
+
+Install the two JavaScript workspaces and run their fixture-only checks:
+
+```bash
+make dashboard-install
+make backend-test
+make frontend-test
+```
+
+Copy `website/hatvp-transparency-dashboard/backend/worker/.dev.vars.example`
+to `.dev.vars` for local Worker development. Set
+`VITE_API_BASE_URL=http://localhost:8787` in
+`website/hatvp-transparency-dashboard/frontend/.env.local` and use
+`make backend-dev` and `make frontend-dev` in separate terminals.
+
+### Dashboard deployment
+
+The deployment requires `gcloud` access for the read-only bridge and the
+existing `wrangler login` session for the Worker. No service-account JSON key is
+needed or accepted. Set a random shared bridge token once, then deploy the
+backend:
+
+```bash
+export BRIDGE_TOKEN="<random-token>"
+make backend-secrets
+make backend-deploy
+make frontend-deploy VITE_API_BASE_URL="<WORKER_URL>"
+```
+
+The Makefile creates or reuses the `hatvp-dashboard-reader` service account,
+grants it BigQuery job execution plus dataset-level read-only access, deploys
+the bridge with Secret Manager, and then deploys the Worker with the resolved
+bridge URL. `frontend-deploy` builds the Vite app and publishes `dist/` to the
+`gh-pages` branch using the `gh-pages` npm module. Override `GCP_PROJECT_ID`,
+`GCP_REGION`, `BQ_DATASET`, `BRIDGE_SERVICE`, and `FRONTEND_ORIGIN` when using
+different resources.
+
+The initial deployment is available at
+[GitHub Pages](https://louispaulet.github.io/YAHATVP/) and uses the Worker API
+at `https://hatvp-transparency-api.louispaulet13.workers.dev`. The deployed
+Worker health check and aggregate endpoint returned HTTP 200 after the initial
+deployment; the bridge remains protected by its shared token and is not a
+public data endpoint. After deploying this slice-based API, verify
+`/api/dashboard/overview`, `/api/dashboard/income`,
+`/api/dashboard/assets`, and `/api/dashboard/declarations` individually.
+
 ## Google Cloud deployment
 
 The commands below are a deployment checklist. Replace every placeholder before

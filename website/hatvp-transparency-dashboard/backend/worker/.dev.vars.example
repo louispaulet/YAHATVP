@@ -1,0 +1,3 @@
+BRIDGE_URL=http://localhost:8788
+FRONTEND_ORIGIN=http://localhost:5173
+BRIDGE_TOKEN=replace-with-a-local-fixture-token
