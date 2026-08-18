@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-08-18 — Deploy declaration search and source XML viewer
+
+### Fixed
+
+- Packaged every dashboard bridge Python module in the Cloud Run image so the
+  new search and immutable XML routes start successfully in production.
+
+### Deployed
+
+- Cloud Run bridge revision `hatvp-dashboard-api-00009-wx6` is serving 100% of
+  traffic; Cloudflare Worker version `a849662a-8564-4c00-a21f-d7441cd24947`
+  is live at `hatvp-transparency-api.louispaulet13.workers.dev`.
+- GitHub Pages publish commit `aa42c90d3a87443283cfdbd2832cd6d476c56b3b`
+  serves the custom domain `yahatvp.thefrenchartist.dev`.
+
+### Verified
+
+- Full repository checks pass: 128 Python tests, Ruff lint/format, package
+  build, 8 Worker tests, Worker typecheck, 31 bridge tests, 13 frontend tests,
+  and the frontend production build.
+- Live health, overview, income, assets, declarations, search, and source XML
+  detail routes return successfully; direct bridge access remains 401 without
+  its token, and custom-domain CORS is present.
+
 ## 2026-08-18 — Add declaration search and source XML detail pages
 
 ### Added

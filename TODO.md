@@ -306,7 +306,7 @@ historical raw snapshot was overwritten. Evidence:
 - [x] Read one matched declaration node from the immutable GCS XML snapshot and
   render it in a dedicated escaped source viewer; fixture coverage includes the
   UUID match and private-field exclusion.
-- [ ] Deploy the search/XML bridge, Worker, and frontend changes after merge and
+- [x] Deploy the search/XML bridge, Worker, and frontend changes after merge and
   smoke-test a live declaration search plus source XML detail route.
 - [x] Split the frontend monolith into focused pages, components, i18n context,
   and a cancellable resource hook while keeping each TypeScript source file
