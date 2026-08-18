@@ -128,6 +128,8 @@ The deployment commands are documented in the
 - [x] Confirm the container exits with status 0 for a warning-bearing run (`hatvp-ingestion-q78jz`).
 - [x] Confirm the application entrypoint exits non-zero for malformed input or structural quality failure; fixture tests cover both paths and the deployed container uses this entrypoint.
 - [x] Confirm Cloud Logging contains structured events for downloads, hashes, quality, and final status (`hatvp-ingestion-hbt9d`).
+- [x] Merge PR #27, deploy main commit `2669de9`, and force-replay the
+  anomaly-lifecycle fix through Cloud Run execution `hatvp-ingestion-2sfxd`.
 
 Manual smoke-test commands:
 

@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-08-19 — Merge and production-replay the anomaly lifecycle fix
+
+### Deployed
+
+- Merged PR [#27](https://github.com/louispaulet/YAHATVP/pull/27) into `main`
+  at commit `2669de9`; GitHub Actions run
+  [32197266958](https://github.com/louispaulet/YAHATVP/actions/runs/32197266958)
+  passed tests, deployment configuration, image build/push, and Cloud Run Job
+  deployment.
+- Forced the production `hatvp-ingestion` replay as execution
+  `hatvp-ingestion-2sfxd`; it completed successfully with
+  `SUCCESS_WITH_WARNINGS` for snapshot `2026-08-19`.
+
+### Verified
+
+- The deployed job used the `2669de9` image with 4 GiB memory, one task, and a
+  30-minute timeout; no replay overlapped the forced execution.
+- Cloud Logging emitted `bigquery_load_complete` for all 13 Bronze, Silver,
+  Gold, and anomaly-registry tables.
+- BigQuery snapshot counts are Bronze 6,611/6,611/74,791/1,157, Silver
+  6,611/6,611/74,791/1,157, Gold 6,605/6,605/74,730/1,157, and registry
+  3,042 rows for declarations/people/incomes/assets respectively.
+- The six `date_naissance` registry rows retain `PERSON_DOB_IMPLAUSIBLE`,
+  `known/reported`, and `previously_reported=true`, confirming the production
+  BigQuery impact of the fix.
+- Reconciled `TODO.md` section 3 with the completed merge, deployment, and
+  forced-replay evidence.
+
 ## 2026-08-19 — Add direct anomaly lifecycle regression tests
 
 ### Added
