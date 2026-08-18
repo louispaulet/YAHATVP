@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-19 — Add direct anomaly lifecycle regression tests
+
+### Added
+
+- Added direct unit coverage for `implausible_birth` reference-date and
+  configurable maximum-age boundaries, including future-date behavior.
+- Added an explicit `ANOMALY_REGRESSION` registry test proving the original
+  `PERSON_DOB_IMPLAUSIBLE` rule, regression status, occurrence count, and
+  first/last-seen metadata remain intact.
+
+### Verified
+
+- Focused anomaly, configuration, and module-budget checks pass: 24 tests;
+  the full repository suite passes with 146 tests.
+- Reconciled `TODO.md` section 12.7 with the completed direct unit coverage.
+
 ## 2026-08-19 — Fix DOB plausibility and anomaly registry rule identity
 
 ### Fixed

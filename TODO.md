@@ -695,6 +695,8 @@ reviewed_at
   repeated input must update occurrence metadata rather than duplicate alerts.
 - [x] Preserve each anomaly’s original `rule_id` when known or regression
   lifecycle aliases are emitted, while retaining their lifecycle status.
+- [x] Add direct unit coverage for DOB reference-date boundaries and both
+  known and regression registry lifecycle aliases.
 - [x] Test Gold uniqueness: one latest applicable declaration per declarant at
   the documented grain, with child records joined to that version.
 - [x] Test metric queries exclude flagged values through eligibility fields and
