@@ -72,6 +72,12 @@ describe("dashboard application", () => {
     expect(screen.getByRole("link", { name: /Download CSV/ })).toHaveAttribute("download", "");
     expect(screen.getByRole("link", { name: /Download CSV/ })).not.toHaveAttribute("target");
     expect(screen.getByRole("link", { name: /Download XML/ })).toHaveAttribute("download", "");
+    const downloadBadges = screen.getAllByText("Direct download");
+    expect(downloadBadges).toHaveLength(2);
+    downloadBadges.forEach((badge) => {
+      expect(badge).toHaveClass("max-w-full");
+      expect(badge.parentElement).toHaveClass("flex-wrap");
+    });
     expect(screen.getByRole("link", { name: "View project on GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
     expect(screen.getByRole("link", { name: /Explore YAHATVP on GitHub/ })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
   });
