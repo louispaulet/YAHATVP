@@ -235,7 +235,7 @@ across runs; and unchanged execution `hatvp-ingestion-rmclb` emitted
   overlapping validation notes, and preserve source/provenance links.
 - [x] Add an alert for failed Cloud Run Job executions.
 - [x] Add an alert for repeated `SUCCESS_WITH_WARNINGS` or an unusual increase in flagged records.
-- [ ] Confirm the monitoring email channel delivers a test notification.
+- [x] Confirm the monitoring email channel delivers a test notification.
 - [x] Verify the merged Cloud Run deployment emits the new quality telemetry.
 - [ ] Review quality reports after each weekly run.
 - [ ] Monitor recurrence and pursue source correction for the six duplicate declaration UUID groups; one pair differs only by trailing whitespace.
