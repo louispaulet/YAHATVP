@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import replace
 from typing import Any
 
 from lxml import etree
 
 from ..models import ParseContext, Row, TableSet
+from ..xml_support import child, normalized_child_text
 from .activities import activity_rows, participation_rows
 from .declarations import person_row
 from .finance import asset_rows, liability_rows
 from .income import income_rows, mandate_income_rows
 from .mandates import mandate_rows, remuneration_rows
+from .provenance import apply_provenance, record_key, source_location
 
 COMPONENT_TABLES = (
     "declarations",
@@ -33,19 +36,33 @@ def append_declaration(
     context: ParseContext,
     config: Any,
     declaration_parser: Callable[..., Row],
+    declaration_index: int = 0,
 ) -> None:
     """Append all rows while preserving the legacy table order."""
 
-    tables["declarations"].append(declaration_parser(element, context, config))
-    tables["people"].append(person_row(element, context))
-    tables["mandates"].extend(mandate_rows(element, context, config))
-    tables["mandate_remunerations"].extend(remuneration_rows(element, context, config))
-    tables["activities"].extend(activity_rows(element, context, config))
-    tables["participations"].extend(participation_rows(element, context, config))
-    tables["incomes"].extend(income_rows(element, context, config))
-    tables["incomes"].extend(mandate_income_rows(element, context, config))
-    tables["assets"].extend(asset_rows(element, context, config))
-    tables["liabilities"].extend(liability_rows(element, context, config))
+    general = child(element, "general")
+    local_context = replace(
+        context,
+        declaration_version=normalized_child_text(element, "declarationVersion"),
+        declaration_modificative=normalized_child_text(general, "declarationModificative"),
+    )
+    starts = {name: len(tables[name]) for name in COMPONENT_TABLES}
+    tables["declarations"].append(declaration_parser(element, local_context, config))
+    tables["people"].append(person_row(element, local_context))
+    tables["mandates"].extend(mandate_rows(element, local_context, config))
+    tables["mandate_remunerations"].extend(remuneration_rows(element, local_context, config))
+    tables["activities"].extend(activity_rows(element, local_context, config))
+    tables["participations"].extend(participation_rows(element, local_context, config))
+    tables["incomes"].extend(income_rows(element, local_context, config))
+    tables["incomes"].extend(mandate_income_rows(element, local_context, config))
+    tables["assets"].extend(asset_rows(element, local_context, config))
+    tables["liabilities"].extend(liability_rows(element, local_context, config))
+    source_id = normalized_child_text(element, "uuid")
+    key = record_key(local_context, source_id, declaration_index)
+    base = f"{context.source_file}#/declaration[{declaration_index}]"
+    for name in COMPONENT_TABLES:
+        for row in tables[name][starts[name] :]:
+            apply_provenance(row, local_context, key, source_id, source_location(row, base))
 
 
 def component_table_names() -> tuple[str, ...]:

@@ -8,7 +8,7 @@ from lxml import etree
 
 from ..models import ParseContext, ParserConfig
 from ..normalize import parse_date
-from ..xml_support import child, item_groups, normalized_child_text, raw_child_text
+from ..xml_support import child, element_record, item_groups, normalized_child_text, raw_child_text
 from .declaration_support import income_item_has_value
 from .mandates import mandate_rows
 
@@ -29,6 +29,7 @@ def declaration_row(
         "declaration_uuid": normalized_child_text(element, "uuid"),
         "snapshot_date": context.snapshot_date,
         "source_file": context.source_file,
+        "raw_record_json": element_record(element),
         "date_depot_raw": depot_raw,
         "date_depot": parse_date(depot_raw),
         "origine": normalized_child_text(element, "origine"),
@@ -76,6 +77,7 @@ def person_row(element: etree._Element, context: ParseContext) -> dict[str, Any]
         "date_naissance_raw": birth_raw,
         "date_naissance": parse_date(birth_raw),
         "telephone_dec": normalized_child_text(person, "telephoneDec"),
+        "raw_record_json": element_record(person),
     }
     fields.update(
         {

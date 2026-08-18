@@ -1,5 +1,3 @@
-"""Small dependency-injected runner for the finite HATVP batch pipeline."""
-
 from __future__ import annotations
 
 import tempfile
@@ -31,6 +29,8 @@ from .steps import (
     log_hashes,
     previous_report,
 )
+
+__all__ = ["PipelineFailure", "default_store", "run_pipeline", "snapshot_date"]
 
 
 def snapshot_date() -> str:
@@ -66,7 +66,12 @@ def run_pipeline(
             store, snapshot, build_metadata(snapshot, settings, downloaded), dry_run
         )
         archive_raw(store, snapshot, downloaded, metadata, dry_run)
-        tables = parser(downloaded["liste.csv"].path, downloaded["declarations.xml"].path, snapshot)
+        tables = parser(
+            downloaded["liste.csv"].path,
+            downloaded["declarations.xml"].path,
+            snapshot,
+            source_metadata=metadata["source_metadata"],
+        )
         quality = quality_runner(
             tables,
             previous_report=previous_report(store, previous, dry_run),
@@ -92,6 +97,3 @@ def run_pipeline(
                 },
             )
         return finish_run(snapshot, started, quality)
-
-
-__all__ = ["PipelineFailure", "default_store", "run_pipeline", "snapshot_date"]

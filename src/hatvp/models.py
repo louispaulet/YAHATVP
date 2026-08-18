@@ -57,6 +57,14 @@ class ParseContext:
 
     snapshot_date: str
     source_file: str = "declarations.xml"
+    source_format: str = "xml"
+    source_url: str | None = None
+    source_object: str | None = None
+    source_sha256: str | None = None
+    pipeline_version: str | None = None
+    parser_version: str = "1"
+    declaration_version: str | None = None
+    declaration_modificative: str | None = None
 
     @property
     def snapshot(self) -> date:

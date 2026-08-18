@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<declarations>
+  <declaration>
+    <dateDepot>01/02/2025 08:30:00</dateDepot>
+    <uuid>versioned-declaration</uuid>
+    <origine>ADEL</origine>
+    <complete>true</complete>
+    <declarationVersion>20171221</declarationVersion>
+    <general>
+      <declarationModificative>false</declarationModificative>
+      <dateDernDeclar>01/02/2025</dateDernDeclar>
+      <mandat><label>Maire</label></mandat>
+      <declarant><nom>VERSION</nom><prenom>Initial</prenom></declarant>
+    </general>
+  </declaration>
+  <declaration>
+    <dateDepot>02/02/2025 08:30:00</dateDepot>
+    <uuid>versioned-declaration</uuid>
+    <origine>ADEL</origine>
+    <complete>true</complete>
+    <declarationVersion>20171221</declarationVersion>
+    <general>
+      <declarationModificative>true</declarationModificative>
+      <dateDernDeclar>02/02/2025</dateDernDeclar>
+      <mandat><label>Maire</label></mandat>
+      <declarant><nom>VERSION</nom><prenom>Amended</prenom></declarant>
+    </general>
+  </declaration>
+</declarations>

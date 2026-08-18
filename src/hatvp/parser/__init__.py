@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -17,21 +18,32 @@ ALLOWED_TOP_LEVEL_CHILDREN = set(_CONFIG.allowed_top_level_children)
 ASSET_SECTIONS = tuple(_CONFIG.sections["assets"])
 
 
-def parse_xml(path: Path, snapshot_date: str) -> dict[str, list[dict[str, Any]]]:
+def parse_xml(
+    path: Path,
+    snapshot_date: str,
+    source_metadata: Mapping[str, Any] | None = None,
+) -> dict[str, list[dict[str, Any]]]:
     """Parse declarations with the legacy public signature."""
 
-    return _stream_parse_xml(path, snapshot_date, declaration_parser=_declaration_row)
+    return _stream_parse_xml(
+        path,
+        snapshot_date,
+        declaration_parser=_declaration_row,
+        source_metadata=source_metadata,
+    )
 
 
 def parse_sources(
     csv_path: Path,
     xml_path: Path,
     snapshot_date: str,
+    source_metadata: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     """Parse both source files and return the stable normalized table mapping."""
 
-    tables = parse_xml(xml_path, snapshot_date)
-    tables["liste"] = parse_csv(csv_path, snapshot_date)
+    metadata = source_metadata or {}
+    tables = parse_xml(xml_path, snapshot_date, metadata.get("declarations.xml"))
+    tables["liste"] = parse_csv(csv_path, snapshot_date, metadata.get("liste.csv"))
     return tables
 
 

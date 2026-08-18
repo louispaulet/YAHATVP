@@ -8,14 +8,14 @@ datasets.
 > against the current public HATVP files. The Cloud Run deployment is in place,
 > and the weekly `hatvp-ingestion-weekly` Scheduler trigger runs the real
 > ingestion job at 07:00 Europe/Paris. BigQuery is enabled for the initial
-> `declarations`, `people`, `incomes`, and `assets` curated tables; the remaining
+> `declarations`, `people`, `incomes`, and `assets` Bronze tables; the remaining
 > normalized tables remain GCS-only until a later expansion.
 
 ## Goal
 
 The pipeline downloads the two public HATVP datasets, detects changes using
 SHA-256 hashes, preserves immutable raw snapshots, produces normalized Parquet
-datasets, reports data-quality issues, and optionally publishes curated tables
+datasets, reports data-quality issues, and optionally publishes Bronze tables
 to BigQuery.
 
 The pipeline is deliberately small. It runs once per week as a Cloud Run Job;
@@ -38,7 +38,7 @@ flowchart TB
     parquet["Parquet to GCS"]
     anomalies["Anomalies to GCS"]
     report["Quality report to GCS"]
-    bigquery["Optional curated BigQuery tables"]
+    bigquery["Optional BigQuery Bronze tables"]
     state["Update state/latest.json last"]
     status["Emit status<br/>NO_CHANGE / SUCCESS /<br/>SUCCESS_WITH_WARNINGS / FAILED"]
     github["GitHub Actions +<br/>Workload Identity Federation"]
@@ -165,7 +165,7 @@ hatvp-pipeline/
 │   │   ├── snapshot.py
 │   │   └── summary.py
 │   └── bigquery/
-│       ├── __init__.py            # curated-table façade
+│       ├── __init__.py            # Bronze-table façade
 │       ├── loader.py
 │       ├── sql.py
 │       └── stage.py
@@ -180,7 +180,7 @@ Parser navigation, streaming, CSV, declaration/person, mandate/remuneration,
 income, finance, and activity components live in the `parser/` package.
 Pipeline orchestration and its state, artifacts, results, steps, and BigQuery
 integration live in `pipeline/`. Quality checks live in `quality/`, source-linked
-review generation lives in `triage/`, curated BigQuery loading lives in
+review generation lives in `triage/`, Bronze BigQuery loading lives in
 `bigquery/`, storage adapters live in `storage/`, downloads live in `download/`,
 and Parquet/table contracts live in `tables/`. Package `__init__.py` files are
 the small façades used by the application; the focused modules below them are
@@ -384,14 +384,14 @@ uv run python -m hatvp.triage \
   --output-dir reports/01-quality
 ```
 
-Income coverage is source-dependent but the curated `incomes` table now
+Income coverage is source-dependent but the Bronze `incomes` table now
 combines both observed revenue streams. Rows from `revenuMandatDto` use
 `income_stream=revenu_mandat` and contain populated elected-person or fallback
 total values; empty fixed category slots are excluded. Rows from
 `mandatElectifDto` use `income_stream=mandate_remuneration` and preserve one
 row per annual source year/value, including explicit zeroes. The detailed
 `mandate_remunerations` table remains available with the remuneration-specific
-fields and the same raw source record, so this is an additional curated view,
+fields and the same raw source record, so this is an additional normalized view,
 not a lossy replacement or silent deduplication.
 
 The quality report records `income_rows_by_stream` and
@@ -507,18 +507,36 @@ catastrophic row-count reductions, immutable raw snapshots, BigQuery failure
 gating, required XML structure, and state remaining unchanged after a failed
 pipeline.
 
-## BigQuery
+## BigQuery Bronze layer
 
-BigQuery is optional and is the curated/gold analytical layer. GCS remains the
-archive and source of truth. The application must work with
+BigQuery is optional and currently contains the version-complete Bronze copy.
+GCS remains the archive and source of truth. The application must work with
 `HATVP_ENABLE_BIGQUERY=false`.
 
-The initial curated layer publishes only `declarations`, `people`, `incomes`,
+The initial Bronze layer publishes only `declarations`, `people`, `incomes`,
 and `assets`. Other normalized tables remain available in GCS and can be added
-after the first BigQuery validation. Every curated table includes
+after a focused schema review. Every Bronze table includes
 `snapshot_date` as a `DATE` and is partitioned by that column. BigQuery loading
 is part of the success gate: if a required load fails, do not advance
 `state/latest.json`.
+
+Bronze keeps one row per observed declaration occurrence and does not collapse
+initial, amended, superseding, or repeated-UUID records. Each row carries a
+deterministic `bronze_record_key`, the stable source identifier, declaration
+version/amendment metadata where available, exact source hash and URL/object,
+typed source snapshot date, parser/pipeline versions, source location, and raw
+record JSON. See the [Bronze contract](reports/05-schema/2026-08-18-bronze-contract.md)
+for the table grains, observed HATVP fields, and future Silver/Gold boundary.
+
+For example, inspect all historical occurrences without deduplicating UUIDs:
+
+```sql
+SELECT declaration_uuid, bronze_record_key, snapshot_date, date_depot,
+       declaration_modificative, declaration_version
+FROM `PROJECT.hatvp.declarations`
+WHERE declaration_uuid = 'SOURCE_UUID'
+ORDER BY snapshot_date, date_depot, bronze_record_key;
+```
 
 For progressively harder read-only examples and checked-in result CSVs, see the
 [BigQuery tutorial](tutorial/README.md).
@@ -542,7 +560,7 @@ bq --project_id="$PROJECT_ID" --location="$REGION" query \
   "GRANT \`roles/bigquery.dataEditor\` ON SCHEMA \`${PROJECT_ID}.${DATASET}\` TO \"serviceAccount:${RUNTIME_SA_EMAIL}\""
 ```
 
-Useful validation queries for the first curated snapshot are:
+Useful validation queries for the first Bronze snapshot are:
 
 ```sql
 SELECT table_name, partition_id, total_rows
@@ -560,7 +578,7 @@ WHERE column_name = 'snapshot_date';
 
 The repository also contains a deliberately small public dashboard under
 `website/hatvp-transparency-dashboard/`. It is separate from the ingestion
-pipeline and reads aggregate data from the four curated BigQuery tables:
+pipeline and reads aggregate data from the four Bronze BigQuery tables:
 `declarations`, `people`, `incomes`, and `assets`. Its declaration search can
 open one matching public declaration and display that declaration's source XML
 node from the immutable GCS snapshot.
@@ -574,15 +592,15 @@ GitHub Pages React app
 Cloudflare Worker
         │ authenticated aggregate request per slice
         ▼
-Read-only Cloud Run bridge ─── BigQuery curated tables
+Read-only Cloud Run bridge ─── BigQuery Bronze tables
                          └── immutable GCS XML snapshot
 ```
 
-The public API does not expose arbitrary SQL or curated contact/address fields.
+The public API does not expose arbitrary SQL or contact/address fields.
 The bridge selects the latest shared `snapshot_date` and exposes four fixed
 read-only slices: `overview`, `income`, `assets`, and `declarations`. The
 parameterized search matches public declarant and declaration metadata plus
-curated income/asset labels. A declaration detail route accepts only a public
+published income/asset labels. A declaration detail route accepts only a public
 declaration UUID, reads the corresponding immutable `declarations.xml` object,
 and returns the matching `<declaration>` node; the full feed is never sent to
 the browser. The Worker adds CORS and a short cache header to each public route.
@@ -945,5 +963,5 @@ Keep the implementation specific to HATVP, with clear boundaries between:
 
 Prefer deterministic, testable functions over a generic data-engineering
 framework. The first milestone is a minimal end-to-end local run backed by
-fixtures. The initial GCS-backed and curated BigQuery paths are now validated.
+fixtures. The initial GCS-backed and Bronze BigQuery paths are now validated.
 Keep additional BigQuery tables behind a focused schema and quality review.

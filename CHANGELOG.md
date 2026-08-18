@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-08-18 — Complete the version-complete Bronze contract
+
+### Changed
+
+- Added deterministic `bronze_record_key` values so repeated or amended HATVP
+  declaration occurrences are retained instead of being collapsed by UUID.
+- Carried declaration amendment/version metadata, stable source identifiers,
+  exact source hashes, raw XML/CSV record evidence, source locations, immutable
+  raw object references, snapshot dates, and parser/pipeline versions into the
+  normalized Bronze inputs.
+- Kept the existing four BigQuery table names, snapshot partition replacement,
+  and immutable GCS raw archive behavior unchanged while documenting the
+  observed Bronze grain and future Silver/Gold migration boundary.
+- Added a repeated-UUID amended-declaration fixture and Bronze contract report.
+
+### Verified
+
+- Focused parser, BigQuery loader/schema, pipeline-output, and structure checks
+  pass; Ruff lint/format and the 70–100-line module budget pass.
+- The fixture proves both declaration occurrences remain present with distinct
+  Bronze keys and source evidence.
+
 ## 2026-08-18 — Define the BigQuery Bronze → Silver → Gold anomaly plan
 
 ### Changed
