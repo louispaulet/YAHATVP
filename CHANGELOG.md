@@ -225,6 +225,26 @@
 - Report inventory contains no root-level report files other than the index;
   all report links resolve to the reorganized paths.
 
+## 2026-08-18 — Add BigQuery tutorial query pack
+
+### Added
+
+- Added ten progressively harder, one-query-per-file BigQuery examples under
+  `tutorial/`, covering the curated `declarations`, `people`, `incomes`, and
+  `assets` tables and their simple joins.
+- Added matching CSV outputs for the fixed `2026-08-18` snapshot and a tutorial
+  README with execution, interpretation, and regeneration guidance.
+- Linked the tutorial from the main README and recorded the completed work in
+  TODO.md.
+
+### Verified
+
+- The checked-in CSVs were generated from read-only BigQuery queries in project
+  `yahatvp-pipeline-eu`, dataset `hatvp`, region `europe-west1`.
+- Re-executing all ten SQL files produced byte-for-byte identical CSV output;
+  `uv run pytest` passed 127 tests, Ruff lint/format checks passed, and
+  `uv build` completed successfully.
+
 ## 2026-08-18 — Deploy refactored packages and replay production
 
 ### Verified

@@ -1,0 +1,10 @@
+snapshot_date,declaration_type,declaration_count,declarations_with_people,declarations_with_income,declarations_with_assets,income_coverage_pct,asset_coverage_pct,total_income_eur,total_asset_value_eur
+2026-08-18,Déclaration d'intérêts,2617,2617,2308,0,88.19,0.0,414077984,0
+2026-08-18,Déclaration d'intérêts modificative,1846,1846,1699,0,92.04,0.0,364030103,0
+2026-08-18,Déclaration d'intérêts et d'activités,1134,1134,984,0,86.77,0.0,254770668.8,0
+2026-08-18,Déclaration d'intérêts et d'activités modificative,933,933,859,0,92.07,0.0,209617594,0
+2026-08-18,Déclaration de situation patrimoniale,42,42,0,42,0.0,100.0,0,72750039
+2026-08-18,Déclaration de situation patrimoniale modificative,23,23,0,23,0.0,100.0,0,38199300
+2026-08-18,Déclaration de situation patrimoniale de fin de mandat,7,7,7,7,100.0,100.0,944195,11024542
+2026-08-18,Déclaration de situation patrimoniale de fin de mandat modificative,2,2,2,2,100.0,100.0,154336,645232
+2026-08-18,Déclaration initiale de situation patrimoniale,1,1,0,1,0.0,100.0,0,1821837

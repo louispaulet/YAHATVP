@@ -285,6 +285,13 @@ and aggregate counts of 6,611 declarations, 6,611 people, 74,791 incomes, and
 Chrome verification also confirmed the production CORS header and successful
 dashboard rendering after Worker version `b2450c38-cc3a-48d8-8f46-81b6a5b396e1`.
 
+## 11. BigQuery tutorial
+
+- [x] Add ten atomic BigQuery tutorial queries with matching CSV results for the
+  validated `2026-08-18` snapshot.
+- [x] Document the query progression, fixed snapshot convention, stable-UUID
+  joins, and CSV regeneration commands.
+
 ## Later, only if needed
 
 - [ ] Add semantic/content hashes after the exact-byte hash path is stable.
