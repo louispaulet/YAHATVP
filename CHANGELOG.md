@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-18 — Keep comparison-chart legend values visible
+
+### Fixed
+
+- Removed the comparison legend label truncation that cropped the long income
+  label in the pie-chart panel.
+- Kept comparison amounts on one line while allowing labels to wrap within the
+  available legend width.
+
+### Verified
+
+- `make frontend-test` passes with the legend layout regression assertions and
+  a successful production build.
+
 ## 2026-08-18 — Annualize dashboard income comparison
 
 ### Changed
