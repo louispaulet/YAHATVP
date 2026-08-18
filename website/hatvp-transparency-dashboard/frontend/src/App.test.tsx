@@ -85,6 +85,17 @@ describe("dashboard application", () => {
     expect(screen.getByText("More ways to explore are on the way.")).toBeInTheDocument();
   });
 
+  it("renders the redacted HATVP quality issue register", () => {
+    render(<MemoryRouter initialEntries={["/quality-issues"]}><App /></MemoryRouter>);
+    expect(screen.getByText("Issues reported to HATVP.")).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Issue type" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Open for" })).toBeInTheDocument();
+    expect(screen.getAllByText("Not solved")).toHaveLength(10);
+    expect(screen.getAllByText(/days$/)).toHaveLength(10);
+    expect(screen.getAllByRole("link", { name: "Open link ↗" })[0]).toHaveAttribute("href", "https://www.hatvp.fr/fiche-nominative/?declarant=vigier-jean-francois-17617");
+    expect(screen.getByRole("link", { name: "Reported issues" })).toHaveAttribute("aria-current", "page");
+  });
+
   it("searches declarations and opens the source XML detail page", async () => {
     render(<MemoryRouter initialEntries={["/search?q=Alice"]}><App /></MemoryRouter>);
     expect(await screen.findByText("M. Alice DUPONT")).toBeInTheDocument();

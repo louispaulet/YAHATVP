@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-19 — Add a privacy-safe HATVP quality issues page
+
+### Added
+
+- Added a localized `/quality-issues` dashboard page backed by a static local
+  JSON register containing only issue type, contact date, public HATVP links,
+  and solved state; unresolved durations are calculated from contact dates.
+- Kept source CSVs, emails, message contents, HATVP replies, Gmail URLs, and
+  message identifiers out of the repository.
+
+### Verified
+
+- Frontend fixture suite passes with 19 tests and the Vite production build
+  succeeds.
+- The local page renders 10 unresolved rows, and the mobile smoke check reports
+  no horizontal overflow.
+
 ## 2026-08-19 — Add the repository-local deployment skill
 
 ### Added

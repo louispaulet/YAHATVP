@@ -14,7 +14,8 @@
     "overview": "Overview",
     "search": "Search declarations",
     "explore": "Data explorer",
-    "about": "About the data"
+    "about": "About the data",
+    "qualityIssues": "Reported issues"
   },
   "footer": {
     "builtFrom": "Built from public HATVP declarations.",
@@ -125,6 +126,27 @@
     "description": "This space is reserved for deeper views of the Gold HATVP data, with more ways to follow a declaration from its source to its aggregate.",
     "status": "Placeholder page",
     "next": "New exploration tools will appear here in a future update."
+  },
+  "qualityIssues": {
+    "eyebrow": "Data quality follow-up",
+    "title": "Issues reported to HATVP.",
+    "description": "A public, redacted register of data-quality issues raised with HATVP. It contains only issue types, contact dates, public HATVP links, and resolution status.",
+    "privacyNote": "Emails, message contents, and HATVP replies are intentionally excluded from this page.",
+    "reported": "Issues reported",
+    "solved": "Solved",
+    "open": "Open issues",
+    "columns": {
+      "issueType": "Issue type",
+      "contactDate": "Contacted HATVP",
+      "declaration": "Declaration / source link",
+      "status": "Solved?",
+      "duration": "Open for"
+    },
+    "openLink": "Open link",
+    "noLink": "No direct link",
+    "notSolved": "Not solved",
+    "solvedLabel": "Solved",
+    "days": "days"
   },
   "search": {
     "eyebrow": "Declaration search",

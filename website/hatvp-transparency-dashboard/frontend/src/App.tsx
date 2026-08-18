@@ -6,6 +6,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { DeclarationPage } from "./pages/DeclarationPage";
 import { ExplorePage } from "./pages/ExplorePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { QualityIssuesPage } from "./pages/QualityIssuesPage";
 import { SearchPage } from "./pages/SearchPage";
 
 export function App() {
@@ -18,6 +19,7 @@ export function App() {
           <Route path="/declarations/:uuid" element={<DeclarationPage />} />
           <Route path="/explore" element={<ExplorePage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/quality-issues" element={<QualityIssuesPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Layout>

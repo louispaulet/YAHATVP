@@ -1,0 +1,86 @@
+[
+  {
+    "issueType": "Amount inconsistency across declarations",
+    "contactDate": "2023-06-21",
+    "declarationLinks": [],
+    "solved": false
+  },
+  {
+    "issueType": "Salary amount outlier",
+    "contactDate": "2023-06-22",
+    "declarationLinks": [
+      "https://www.hatvp.fr/fiche-nominative/?declarant=vigier-jean-francois-17617"
+    ],
+    "solved": false
+  },
+  {
+    "issueType": "Salary amount outlier",
+    "contactDate": "2023-06-22",
+    "declarationLinks": [
+      "https://www.hatvp.fr/fiche-nominative/?declarant=kelyor-alain"
+    ],
+    "solved": false
+  },
+  {
+    "issueType": "Salary amount outlier",
+    "contactDate": "2023-06-22",
+    "declarationLinks": [
+      "https://www.hatvp.fr/fiche-nominative/?declarant=kaloi-bearune-isabelle-15019",
+      "https://www.hatvp.fr/fiche-nominative/?declarant=cavanna-robert",
+      "https://www.hatvp.fr/fiche-nominative/?declarant=rio-jean-louis-19533"
+    ],
+    "solved": false
+  },
+  {
+    "issueType": "Geographic department mismatch",
+    "contactDate": "2024-06-28",
+    "declarationLinks": [
+      "https://www.hatvp.fr/livraison/opendata/liste.csv"
+    ],
+    "solved": false
+  },
+  {
+    "issueType": "Birth date invalid or suspicious",
+    "contactDate": "2024-06-28",
+    "declarationLinks": [
+      "https://www.hatvp.fr/livraison/dossiers/cannet-claude-di26305-departement-71.pdf",
+      "https://www.hatvp.fr/livraison/dossiers/michel-deleage-christelle-dim21345-departement-43.pdf"
+    ],
+    "solved": false
+  },
+  {
+    "issueType": "Birth date invalid or suspicious",
+    "contactDate": "2024-06-28",
+    "declarationLinks": [
+      "https://www.hatvp.fr/livraison/dossiers/rouge-daniel-di19008-commune-toulouse.pdf",
+      "https://www.hatvp.fr/livraison/dossiers/botella-georges-di14584-epci-06.pdf",
+      "https://www.hatvp.fr/livraison/dossiers/salmon-allen-dim27587-ctsp-987.pdf"
+    ],
+    "solved": false
+  },
+  {
+    "issueType": "Salary amount error",
+    "contactDate": "2024-06-28",
+    "declarationLinks": [
+      "https://www.hatvp.fr/livraison/dossiers/juglard-chantal-di16259-commune-argenteuil.pdf",
+      "https://www.hatvp.fr/livraison/dossiers/vigier-jean-francois-di14463-epci-91.pdf"
+    ],
+    "solved": false
+  },
+  {
+    "issueType": "Birth date invalid or suspicious",
+    "contactDate": "2026-08-19",
+    "declarationLinks": [
+      "https://www.hatvp.fr/livraison/dossiers/salmon-allen-dim27587-ctsp-987.pdf"
+    ],
+    "solved": false
+  },
+  {
+    "issueType": "Birth date invalid or suspicious",
+    "contactDate": "2026-08-19",
+    "declarationLinks": [
+      "https://www.hatvp.fr/livraison/dossiers/keller-fabienne-dim33245-europe.pdf"
+    ],
+    "solved": false
+  }
+]

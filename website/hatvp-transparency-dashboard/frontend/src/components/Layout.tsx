@@ -26,6 +26,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <NavLink to="/search" className={navClass}>{locale.nav.search}</NavLink>
               <NavLink to="/explore" className={navClass}>{locale.nav.explore}</NavLink>
               <NavLink to="/about" className={navClass}>{locale.nav.about}</NavLink>
+              <NavLink to="/quality-issues" className={navClass}>{locale.nav.qualityIssues}</NavLink>
             </nav>
             <LanguageSwitcher />
           </div>
