@@ -44,6 +44,7 @@ describe("dashboard application", () => {
   it("renders aggregate metrics and breakdowns", async () => {
     render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
     expect(await screen.findByText("Declarations")).toBeInTheDocument();
+    expect(screen.getByText("unique declarants")).toBeInTheDocument();
     expect(screen.getByText("Average annual income vs assets")).toBeInTheDocument();
     expect(await screen.findByText("Average annual income")).toBeInTheDocument();
     expect(screen.getByText("Assets", { selector: "p" })).toBeInTheDocument();
@@ -80,6 +81,7 @@ describe("dashboard application", () => {
     expect(await screen.findByText("Real estate")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "French" }));
     expect(screen.getByText("Vue d’ensemble")).toBeInTheDocument();
+    expect(screen.getByText("déclarants uniques")).toBeInTheDocument();
     expect(screen.getByText("Immobilier")).toBeInTheDocument();
     expect(screen.getByText("Revenu annuel moyen vs patrimoine")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Revenu annuel moyen et patrimoine total/i })).toBeInTheDocument();
