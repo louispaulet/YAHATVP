@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-18 — Fix dashboard asset-panel overflow
+
+### Changed
+
+- Let the asset chart panel include its value legend in normal layout flow so
+  the legend cannot overlap the declaration or snapshot panels below it.
+- Allow long asset labels to shrink and truncate within their legend cells.
+
+### Verified
+
+- `make frontend-test` passes: 8 frontend tests and a production build.
+- GitHub Pages publish commit `48e7290` serves the new frontend bundle.
+- Chrome verification confirmed the asset panel's content height matches its
+  layout height and the page has no horizontal overflow.
+
 ## 2026-08-18 — Merge dashboard and deploy all services
 
 ### Deployed
