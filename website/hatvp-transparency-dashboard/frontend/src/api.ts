@@ -23,7 +23,9 @@ function isOverviewResponse(value: unknown): value is DashboardOverviewResponse 
 }
 
 function isBreakdownResponse(value: unknown): value is DashboardBreakdownResponse {
-  return isMeta(value) && Array.isArray(value.items);
+  if (!isMeta(value) || !Array.isArray(value.items)) return false;
+  return (value.totalValue === undefined || typeof value.totalValue === "number") &&
+    (value.yearCount === undefined || typeof value.yearCount === "number");
 }
 
 async function fetchJson<T>(path: string, validate: (value: unknown) => value is T, signal?: AbortSignal): Promise<T> {

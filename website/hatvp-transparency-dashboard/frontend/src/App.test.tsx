@@ -12,6 +12,8 @@ const dashboard = {
 const income = {
   snapshotDate: "2026-08-18",
   generatedAt: "2026-08-18T08:00:00Z",
+  totalValue: 150000,
+  yearCount: 2,
   items: [
     { label: "mandate_remuneration", rows: 2, totalValue: 120000 },
     { label: "revenu_mandat", rows: 1, totalValue: 30000 },
@@ -21,6 +23,7 @@ const income = {
 const assets = {
   snapshotDate: "2026-08-18",
   generatedAt: "2026-08-18T08:00:00Z",
+  totalValue: 80000,
   items: [{ label: "immeubleDto", rows: 4, totalValue: 80000 }],
 };
 
@@ -41,11 +44,14 @@ describe("dashboard application", () => {
   it("renders aggregate metrics and breakdowns", async () => {
     render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
     expect(await screen.findByText("Declarations")).toBeInTheDocument();
-    expect(screen.getByText("Income, by stream")).toBeInTheDocument();
-    expect(await screen.findByText("Mandate remuneration")).toBeInTheDocument();
-    expect(screen.getByText("Mandate income")).toBeInTheDocument();
+    expect(screen.getByText("Average annual income vs assets")).toBeInTheDocument();
+    expect(await screen.findByText("Average annual income")).toBeInTheDocument();
+    expect(screen.getByText("Assets", { selector: "p" })).toBeInTheDocument();
+    expect(screen.getByText("€75,000")).toBeInTheDocument();
+    expect(screen.getAllByText("€80,000")).toHaveLength(2);
+    expect(screen.getByText(/Average annual income: €75,000/)).toBeInTheDocument();
     expect(screen.getByText("Real estate")).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: /Income totals by stream/i })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Average annual income and asset totals/i })).toBeInTheDocument();
     expect(screen.getByText("Declaration types")).toBeInTheDocument();
     expect(document.querySelector("header img")).toHaveAttribute("src", expect.stringMatching(/hatvp-mark\.webp$/));
   });
@@ -72,8 +78,8 @@ describe("dashboard application", () => {
     fireEvent.click(screen.getByRole("button", { name: "French" }));
     expect(screen.getByText("Vue d’ensemble")).toBeInTheDocument();
     expect(screen.getByText("Immobilier")).toBeInTheDocument();
-    expect(screen.getByText("Revenus, par source")).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: /Totaux des revenus par source/i })).toBeInTheDocument();
+    expect(screen.getByText("Revenu annuel moyen vs patrimoine")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Revenu annuel moyen et patrimoine total/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Voir le projet sur GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
     fireEvent.click(screen.getByRole("link", { name: "À propos des données" }));
     expect(screen.getByRole("link", { name: /Découvrez YAHATVP sur GitHub/ })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");

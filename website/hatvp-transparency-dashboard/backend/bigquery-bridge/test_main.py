@@ -48,6 +48,7 @@ def items_row():
         "items_json": json.dumps(
             [{"label": "mandate_remuneration", "row_count": 3, "total_value": 12}]
         ),
+        **{"total_value": 12, "year_count": 3},
     }
 
 
@@ -84,6 +85,7 @@ def test_bridge_returns_breakdown_slice(monkeypatch):
 
     assert result[1] == 200
     assert body(result)["items"][0]["totalValue"] == 12.0
+    assert (body(result)["totalValue"], body(result)["yearCount"]) == (12.0, 3)
 
 
 def test_bridge_reports_empty_result_without_leaking_query_details(monkeypatch):

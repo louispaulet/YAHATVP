@@ -21,6 +21,8 @@ export interface DashboardBreakdownResponse {
   snapshotDate: string | null;
   generatedAt: string;
   items: BreakdownItem[];
+  totalValue?: number;
+  yearCount?: number;
 }
 
 export interface WorkerEnv {
