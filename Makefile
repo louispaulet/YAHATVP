@@ -12,7 +12,7 @@ BQ_DATASET ?= hatvp
 BRIDGE_SERVICE ?= hatvp-dashboard-api
 BRIDGE_SECRET_NAME ?= hatvp-dashboard-bridge-token
 READER_SERVICE_ACCOUNT ?= hatvp-dashboard-reader
-FRONTEND_ORIGIN ?= https://louispaulet.github.io
+FRONTEND_ORIGIN ?= https://yahatvp.thefrenchartist.dev
 
 .PHONY: dashboard-install backend-test backend-dev backend-secrets bridge-deploy backend-deploy frontend-test frontend-dev frontend-deploy
 
