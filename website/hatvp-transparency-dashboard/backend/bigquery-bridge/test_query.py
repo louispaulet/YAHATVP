@@ -7,10 +7,10 @@ from query import (
 )
 
 
-def test_query_is_fixed_to_curated_tables_and_latest_snapshot():
+def test_query_is_fixed_to_gold_tables_and_latest_snapshot():
     query = build_query("yahatvp-pipeline-eu", "hatvp", "overview")
     for table in TABLES:
-        assert f"`yahatvp-pipeline-eu.hatvp`.{table}" in query
+        assert f"`yahatvp-pipeline-eu.hatvp`.gold_{table}" in query
     assert "MAX(snapshot_date)" in query
     assert "WHERE t.snapshot_date = l.snapshot_date" in query
 
@@ -31,10 +31,10 @@ def test_each_slice_returns_snapshot_metadata_and_one_public_payload(view):
     assert "tables_json" in query or "items_json" in query
 
 
-def test_overview_counts_the_four_curated_tables():
+def test_overview_counts_the_four_gold_tables():
     query = build_query("project", "dataset", "overview")
     for table in TABLES:
-        assert f"{table} t" in query
+        assert f"gold_{table} t" in query
     assert query.count("CROSS JOIN latest l") == 4
 
 

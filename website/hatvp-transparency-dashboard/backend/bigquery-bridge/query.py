@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from query_support import TABLES, VIEWS, dataset_prefix, validate_identifier
+from query_support import TABLES, VIEWS, dataset_prefix, table, validate_identifier
 
 
 def build_query(project: str, dataset: str, view: str = "overview") -> str:
@@ -11,15 +11,17 @@ def build_query(project: str, dataset: str, view: str = "overview") -> str:
     if view not in VIEWS:
         raise ValueError("Invalid dashboard query view")
     prefix = dataset_prefix(project, dataset)
-    latest = (
-        f"WITH latest AS (SELECT MAX(snapshot_date) AS snapshot_date FROM {prefix}.declarations)\n"
-    )
+    declarations = table(prefix, "declarations")
+    people = table(prefix, "people")
+    incomes = table(prefix, "incomes")
+    assets = table(prefix, "assets")
+    latest = f"WITH latest AS (SELECT MAX(snapshot_date) AS snapshot_date FROM {declarations})\n"
     if view == "overview":
         body = f"""SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
 CURRENT_TIMESTAMP() AS generated_at,
 TO_JSON_STRING(ARRAY(
   SELECT AS STRUCT table_name, row_count FROM (
-    SELECT 'declarations' AS table_name, COUNT(*) AS row_count FROM {prefix}.declarations t
+    SELECT 'declarations' AS table_name, COUNT(*) AS row_count FROM {declarations} t
     CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
     UNION ALL SELECT 'people', COUNT(DISTINCT IF(
       NULLIF(TRIM(t.nom), '') IS NULL AND NULLIF(TRIM(t.prenom), '') IS NULL,
@@ -28,11 +30,11 @@ TO_JSON_STRING(ARRAY(
         NORMALIZE_AND_CASEFOLD(NULLIF(TRIM(t.nom), '')) AS nom,
         NORMALIZE_AND_CASEFOLD(NULLIF(TRIM(t.prenom), '')) AS prenom
       ))
-    )) FROM {prefix}.people t
+    )) FROM {people} t
     CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
-    UNION ALL SELECT 'incomes', COUNT(*) FROM {prefix}.incomes t
+    UNION ALL SELECT 'incomes', COUNT(*) FROM {incomes} t
     CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
-    UNION ALL SELECT 'assets', COUNT(*) FROM {prefix}.assets t
+    UNION ALL SELECT 'assets', COUNT(*) FROM {assets} t
     CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
   ) ORDER BY table_name
 )) AS tables_json FROM latest l"""
@@ -41,11 +43,11 @@ TO_JSON_STRING(ARRAY(
 CURRENT_TIMESTAMP() AS generated_at,
 TO_JSON_STRING(ARRAY(SELECT AS STRUCT COALESCE(income_stream, 'unknown') AS label,
 COUNT(*) AS row_count, COALESCE(SUM(normalized_value), 0) AS total_value
-FROM {prefix}.incomes t CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
+FROM {incomes} t CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
 GROUP BY label ORDER BY total_value DESC, label)) AS items_json,
-COALESCE((SELECT SUM(normalized_value) FROM {prefix}.incomes t
+COALESCE((SELECT SUM(normalized_value) FROM {incomes} t
 WHERE t.snapshot_date = l.snapshot_date), 0) AS total_value,
-(SELECT COUNT(DISTINCT income_year) FROM {prefix}.incomes t
+(SELECT COUNT(DISTINCT income_year) FROM {incomes} t
 WHERE t.snapshot_date = l.snapshot_date) AS year_count
 FROM latest l"""
     elif view == "assets":
@@ -53,9 +55,9 @@ FROM latest l"""
 CURRENT_TIMESTAMP() AS generated_at,
 TO_JSON_STRING(ARRAY(SELECT AS STRUCT COALESCE(source_section, 'unknown') AS label,
 COUNT(*) AS row_count, COALESCE(SUM(normalized_value), 0) AS total_value
-FROM {prefix}.assets t CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
+FROM {assets} t CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
 GROUP BY label ORDER BY total_value DESC, label LIMIT 12)) AS items_json,
-COALESCE((SELECT SUM(normalized_value) FROM {prefix}.assets t
+COALESCE((SELECT SUM(normalized_value) FROM {assets} t
 WHERE t.snapshot_date = l.snapshot_date), 0) AS total_value
 FROM latest l"""
     else:
@@ -63,7 +65,7 @@ FROM latest l"""
 CURRENT_TIMESTAMP() AS generated_at,
 TO_JSON_STRING(ARRAY(SELECT AS STRUCT COALESCE(declaration_type_label, 'unknown') AS label,
 COUNT(*) AS row_count
-FROM {prefix}.declarations t CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
+FROM {declarations} t CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
 GROUP BY label ORDER BY row_count DESC, label LIMIT 12)) AS items_json FROM latest l"""
     return latest + body
 

@@ -30,7 +30,7 @@ def table(prefix: str, name: str) -> str:
 
     if name not in TABLES:
         raise ValueError("Invalid dashboard table")
-    return f"{prefix}.{name}"
+    return f"{prefix}.gold_{name}"
 
 
 def latest_cte(prefix: str) -> str:
@@ -53,11 +53,11 @@ def any_predicates(predicates: Iterable[str]) -> str:
 
 
 def exists_text_match(table_name: str, alias: str, predicates: Iterable[str]) -> str:
-    """Build an existence check for fields in one child curated table."""
+    """Build an existence check for fields in one child Gold table."""
 
     conditions = any_predicates(predicates)
     return f"""OR EXISTS (
-        SELECT 1 FROM {{prefix}}.{table_name} {alias}
+        SELECT 1 FROM {{prefix}}.gold_{table_name} {alias}
         WHERE {alias}.declaration_uuid = d.declaration_uuid
           AND {alias}.snapshot_date = d.snapshot_date
           AND (

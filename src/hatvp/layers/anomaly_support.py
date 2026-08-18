@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 
@@ -68,6 +69,18 @@ def role_name(row: dict[str, Any]) -> str:
     return str(row.get("income_type") or row.get("source_section") or "")
 
 
+def text_value(value: Any) -> str | None:
+    """Keep scalar and structured evidence within text-valued table fields."""
+
+    return (
+        None
+        if value is None
+        else value
+        if isinstance(value, str)
+        else json.dumps(value, ensure_ascii=False, sort_keys=True, default=str)
+    )
+
+
 __all__ = [
     "declarant_key",
     "field_period",
@@ -76,4 +89,5 @@ __all__ = [
     "parent_map",
     "record_ref",
     "role_name",
+    "text_value",
 ]

@@ -26,7 +26,7 @@
   "hero": {
     "eyebrow": "Public data, made clearer",
     "title": "A clearer view of public declarations.",
-    "description": "Explore the latest curated HATVP snapshot through a small set of transparent, source-linked aggregates.",
+    "description": "Explore the latest Gold HATVP snapshot through a small set of transparent, source-linked aggregates.",
     "snapshot": "Snapshot",
     "notAvailable": "not available",
     "totalRows": "total rows"
@@ -63,7 +63,7 @@
     "snapshotMeaning": {
       "title": "What this snapshot means",
       "eyebrow": "Reading the data",
-      "counts": "Counts are limited to the latest successful snapshot shared across the curated tables.",
+      "counts": "Counts are limited to the latest successful snapshot shared across the Gold tables.",
       "amounts": "Amounts preserve the normalized numeric values produced by the ingestion pipeline. They are presented as indicators, not as a substitute for the source declarations.",
       "lastGenerated": "Last generated"
     }
@@ -72,7 +72,7 @@
     "eyebrow": "About the data",
     "title": "A small window into a public dataset.",
     "paragraphs": [
-      "This dashboard is built from the HATVP open-data pipeline. The pipeline preserves raw source files, normalizes records, checks quality, and publishes four curated BigQuery tables.",
+      "This dashboard is built from the HATVP open-data pipeline. The pipeline preserves raw source files, normalizes records, checks quality, and publishes four Gold BigQuery tables.",
       "The overview intentionally exposes aggregates only. Personal contact details and raw declaration rows are not part of this public API."
     ],
     "sourcePrefix": "For the authoritative source and the full declaration context, use the official HATVP links below.",
@@ -113,7 +113,7 @@
       "description": "Browse the dashboard source code, ingestion pipeline, and documentation.",
       "href": "https://github.com/louispaulet/YAHATVP/tree/main"
     },
-    "curatedTables": "Curated tables",
+    "curatedTables": "Gold tables",
     "curatedTablesDetail": "declarations, people, incomes, assets",
     "updateRhythm": "Update rhythm",
     "updateRhythmValue": "Weekly",
@@ -122,7 +122,7 @@
   "explore": {
     "eyebrow": "Data explorer",
     "title": "More ways to explore are on the way.",
-    "description": "This space is reserved for deeper views of the curated HATVP data, with more ways to follow a declaration from its source to its aggregate.",
+    "description": "This space is reserved for deeper views of the Gold HATVP data, with more ways to follow a declaration from its source to its aggregate.",
     "status": "Placeholder page",
     "next": "New exploration tools will appear here in a future update."
   },

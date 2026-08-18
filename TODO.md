@@ -3,12 +3,11 @@
 This checklist turns the project requirements into an execution plan. The local
 pipeline and first Google Cloud deployment are implemented and tested; the
 weekly Scheduler trigger is connected to the production ingestion job and has
-completed repeat live deliveries. The initial four-table BigQuery layer is
-enabled and validated as the current Bronze foundation; the planned Silver
-anomaly layer and Gold latest-declarant layer are not implemented yet.
-Remaining work is operational hardening, historical anomaly detection, and the
-Bronze → Silver → Gold expansion. First-snapshot quality triage is documented
-and complete.
+completed repeat live deliveries. The four-table BigQuery layer is the Bronze
+foundation, with explicit Silver, Gold, and anomaly-registry artifacts now
+implemented and validated locally. Remaining unchecked items are explicitly
+deferred enhancements in the final section. First-snapshot quality triage is
+documented and complete.
 
 ## Current status
 
@@ -257,7 +256,7 @@ the current load behavior, partitioning, and idempotency.
 - [x] Review HATVP schema changes before changing normalization logic.
 - [x] Add a new fixture before fixing any newly observed source edge case.
 - [x] Keep historical raw snapshots immutable.
-- [ ] Periodically review bucket lifecycle/retention policy without deleting required audit history.
+- [x] Periodically review bucket lifecycle/retention policy without deleting required audit history.
 
 The three alert policies and email channel were created and verified in
 `yahatvp-pipeline-eu` on `2026-08-17`. Policy resources are recorded in the
@@ -287,6 +286,10 @@ versioning, generation-guarded immutable writes, and identical raw-object
 checksums across snapshots `2026-08-16` through `2026-08-18` confirm that no
 historical raw snapshot was overwritten. Evidence:
 [`reports/05-schema/2026-08-18-schema-review.md`](reports/05-schema/2026-08-18-schema-review.md).
+
+Read-only lifecycle review on `2026-08-18` confirmed the required `400d` rule
+for `_Required` objects and the `30d` default rule without deleting or mutating
+audit history.
 
 ## 10. Transparency dashboard
 
@@ -363,7 +366,7 @@ the Worker overview slice returned HTTP 200 with the custom-domain CORS header.
 
 ## 12. BigQuery Bronze → Silver → Gold anomaly architecture
 
-This is the planned analytical model for all declaration versions. It changes
+This is the implemented analytical model for all declaration versions. It changes
 the role of the existing BigQuery tables without deleting or rewriting their
 history:
 
@@ -405,68 +408,68 @@ metric query excludes it.
 
 ### 12.2 Silver: historical anomaly detection and flags
 
-- [ ] Build Silver tables from Bronze at the same historical declaration
+- [x] Build Silver tables from Bronze at the same historical declaration
   version grain. Silver must contain every Bronze version, including versions
   that are later superseded.
-- [ ] Apply deterministic structural normalization only where already defined
+- [x] Apply deterministic structural normalization only where already defined
   by the source contract, such as whitespace, missing-marker, date, and French
   number parsing. Preserve the original value beside any normalized value.
-- [ ] Add row-level and field-level anomaly metadata without changing the
+- [x] Add row-level and field-level anomaly metadata without changing the
   observed value. At minimum, expose whether the field has an active anomaly,
   whether it is eligible for a metric, the applicable rule IDs, and a link to
   the anomaly registry evidence.
-- [ ] Run all anomaly rules against all available historical declaration
+- [x] Run all anomaly rules against all available historical declaration
   versions, not only the latest snapshot and not only the latest declaration.
-- [ ] Compare a person’s values across years, declaration versions, roles, and
+- [x] Compare a person’s values across years, declaration versions, roles, and
   relevant periods using stable HATVP identifiers and declaration metadata.
   Do not use first-name plus surname as the sole identity key; unresolved
   identity matches must become review flags.
-- [ ] Compare initial and amended declarations explicitly. Determine whether a
+- [x] Compare initial and amended declarations explicitly. Determine whether a
   later declaration supersedes an earlier anomaly, but retain the earlier row
   and anomaly permanently in the historical audit trail.
-- [ ] Compare CSV, XML, and PDF values when an authoritative representation is
+- [x] Compare CSV, XML, and PDF values when an authoritative representation is
   available. Store the source format, location, and conflicting values in the
   evidence; absence of a source format is not itself a contradiction.
-- [ ] Keep anomalous rows in Silver. Do not automatically correct a decimal,
+- [x] Keep anomalous rows in Silver. Do not automatically correct a decimal,
   digit, concatenation, salary, geography, date, identifier, or other source
   value; do not silently delete or deduplicate a record because a rule fired.
-- [ ] Make Silver writes deterministic and idempotent by snapshot and stable
+- [x] Make Silver writes deterministic and idempotent by snapshot and stable
   source identifiers. A retry must not create duplicate anomaly rows.
 
 ### 12.3 Gold: latest declaration per declarant
 
-- [ ] Define the ordering used to select the latest declaration from the
+- [x] Define the ordering used to select the latest declaration from the
   observed HATVP amendment/version fields. “Latest” must be evaluated within
   the same declarant plus role/mandate/period context, rather than comparing
   unrelated declarations.
-- [ ] Resolve the declarant using stable source identifiers wherever available;
+- [x] Resolve the declarant using stable source identifiers wherever available;
   retain an explicit review state when the source does not provide a reliable
   identity key.
-- [ ] Derive Gold tables or views from Silver so that each declarant has only
+- [x] Derive Gold tables or views from Silver so that each declarant has only
   the latest applicable declaration/version for the documented Gold grain.
   Keep child-table joins aligned to that selected declaration version.
-- [ ] Carry Silver anomaly status into Gold. Gold must show whether an anomaly
+- [x] Carry Silver anomaly status into Gold. Gold must show whether an anomaly
   affects the latest declaration and whether the affected field is eligible
   for metrics; Gold must not contain an automatically repaired replacement
   value.
-- [ ] Make the latest declaration determine whether an anomaly is currently
+- [x] Make the latest declaration determine whether an anomaly is currently
   active for reporting. If an amended declaration corrects a historical value,
   mark the older anomaly as superseded/resolved in the registry while keeping
   it in Silver and the audit trail.
-- [ ] Report only anomalies attached to the latest applicable declaration in
+- [x] Report only anomalies attached to the latest applicable declaration in
   Gold to HATVP. Use Silver for historical anomaly reports, recurrence
   analysis, source-correction evidence, and auditability.
-- [ ] Ensure Gold selection is repeatable, partition-aware, and idempotent;
+- [x] Ensure Gold selection is repeatable, partition-aware, and idempotent;
   rerunning the same source snapshot must produce the same latest-declarant
   rows and anomaly statuses.
-- [ ] Update the dashboard and analytical examples to read Gold for current
+- [x] Update the dashboard and analytical examples to read Gold for current
   declarant metrics after Gold is validated. Historical trend and anomaly
   investigations must read Silver or the anomaly registry explicitly.
 
 ### 12.4 Anomaly rules to implement between Bronze and Silver
 
 Each rule must emit a flag and evidence, never an automatic correction. The
-following rule IDs are the proposed stable identifiers; keep them stable once
+following rule IDs are the implemented stable identifiers; keep them stable once
 reports or external follow-up refer to them.
 
 1. **`COMP_YOY_CHANGE` — abnormally large year-over-year compensation change**
@@ -628,44 +631,44 @@ detected_at
 reviewed_at
 ```
 
-- [ ] Define a deterministic `anomaly_key` and registry upsert behavior so
+- [x] Define a deterministic `anomaly_key` and registry upsert behavior so
   repeated weekly snapshots update `last_seen` rather than creating duplicate
   alerts.
-- [ ] Define the lifecycle statuses at minimum as active, superseded/resolved,
+- [x] Define the lifecycle statuses at minimum as active, superseded/resolved,
   known/reported, and regression. Keep status transitions explainable from
   declaration-version evidence.
-- [ ] Set `is_latest_declaration` and `active_in_gold` from the same version
+- [x] Set `is_latest_declaration` and `active_in_gold` from the same version
   ordering used by Gold; do not maintain two competing definitions of latest.
-- [ ] Set `previously_reported` from the registry and preserve first/last-seen
+- [x] Set `previously_reported` from the registry and preserve first/last-seen
   dates across snapshots.
-- [ ] Store enough evidence to reproduce each flag from immutable source bytes,
+- [x] Store enough evidence to reproduce each flag from immutable source bytes,
   including source locations and the compared values.
-- [ ] Keep historical anomaly records even after they are superseded. A
+- [x] Keep historical anomaly records even after they are superseded. A
   superseded anomaly may stop being an active Gold alert, but it must remain
   queryable in Silver and the registry.
-- [ ] Make registry updates part of the required processing gate. If anomaly
+- [x] Make registry updates part of the required processing gate. If anomaly
   detection or registry persistence fails, do not advance `state/latest.json`.
 
 ### 12.6 Metric eligibility and reporting policy
 
-- [ ] Treat anomaly detection as a flagging system, not an automatic correction
+- [x] Treat anomaly detection as a flagging system, not an automatic correction
   system. No rule may silently change, impute, cap, round, split, or delete a
   source value.
-- [ ] Add field-level metric eligibility so a metric can exclude an anomalous
+- [x] Add field-level metric eligibility so a metric can exclude an anomalous
   compensation, date, geography, or identifier without discarding unrelated
   fields from the same declarant.
-- [ ] Define the default policy that unresolved or active anomalies affecting a
+- [x] Define the default policy that unresolved or active anomalies affecting a
   metric make that field ineligible for the metric. Keep the row available for
   audit and anomaly counts.
-- [ ] Make Gold-facing metric queries filter by the explicit eligibility/status
+- [x] Make Gold-facing metric queries filter by the explicit eligibility/status
   fields rather than reimplementing anomaly logic ad hoc.
-- [ ] Report current anomalies from the latest Gold declaration/version to
+- [x] Report current anomalies from the latest Gold declaration/version to
   HATVP. Report historical and superseded anomalies from Silver and the
   registry for auditability and source-correction follow-up.
-- [ ] Do not report a historical anomaly as a current issue when a later
+- [x] Do not report a historical anomaly as a current issue when a later
   declaration has superseded it, unless the later declaration still carries
   the anomaly or it has regressed.
-- [ ] Keep future feature-specific clean versions out of this phase. If they are
+- [x] Keep future feature-specific clean versions out of this phase. If they are
   later needed, build them as explicitly named derived views/tables with the
   original observed value, anomaly links, and transformation rules preserved.
 
@@ -674,35 +677,40 @@ reviewed_at
 - [x] Add a schema/version design note before changing the physical BigQuery
   layout. Include the Bronze-to-Silver field mapping, Gold grain, identity and
   amendment ordering, anomaly registry key, and retention policy.
-- [ ] Implement the anomaly rules behind small, testable HATVP-specific
+- [x] Implement the anomaly rules behind small, testable HATVP-specific
   components. Do not introduce a general-purpose orchestrator.
-- [ ] Add fixtures for stable historical compensation, factor-of-10 errors,
+- [x] Add fixtures for stable historical compensation, factor-of-10 errors,
   concatenated values, digit edits, same-period conflicts, amended
   declarations, geography mismatches, impossible/conflicting birth dates,
   cross-format conflicts, known anomalies, and regressions.
-- [ ] Test that every fixture is flagged without changing its observed value and
+- [x] Test that every fixture is flagged without changing its observed value and
   that all source/provenance fields remain available.
-- [ ] Test that a corrected amended declaration supersedes the historical
+- [x] Test that a corrected amended declaration supersedes the historical
   anomaly, while the historical row remains in Silver and the registry.
-- [ ] Test that a reappearing value is marked as a regression and is active in
+- [x] Test that a reappearing value is marked as a regression and is active in
   Gold when it is the latest applicable declaration.
-- [ ] Test anomaly-registry idempotency across repeated snapshots and retries;
+- [x] Test anomaly-registry idempotency across repeated snapshots and retries;
   repeated input must update occurrence metadata rather than duplicate alerts.
-- [ ] Test Gold uniqueness: one latest applicable declaration per declarant at
+- [x] Test Gold uniqueness: one latest applicable declaration per declarant at
   the documented grain, with child records joined to that version.
-- [ ] Test metric queries exclude flagged values through eligibility fields and
+- [x] Test metric queries exclude flagged values through eligibility fields and
   never depend on silently corrected values.
-- [ ] Backfill Silver and the anomaly registry from every retained Bronze
+- [x] Backfill Silver and the anomaly registry from every retained Bronze
   snapshot before enabling Gold reporting. Record the backfill range and
   source hashes.
-- [ ] Build Gold from the backfilled Silver history, then compare current Gold
+- [x] Build Gold from the backfilled Silver history, then compare current Gold
   row counts and latest-version choices against source-linked review evidence.
-- [ ] Run a forced replay and an unchanged-input replay. Confirm Bronze,
+- [x] Run a forced replay and an unchanged-input replay. Confirm Bronze,
   Silver, Gold, registry contents, partition counts, anomaly statuses, and
   `state/latest.json` behavior are deterministic and idempotent.
-- [ ] Update README, code/module names, dashboard queries, permissions, and
+- [x] Update README, code/module names, dashboard queries, permissions, and
   validation reports from the transitional “curated” terminology to the final
   Bronze/Silver/Gold terminology once the implementation is deployed.
+
+Acceptance evidence is recorded in
+[`reports/03-validation/2026-08-18-silver-gold-validation.md`](reports/03-validation/2026-08-18-silver-gold-validation.md),
+including the forced live-source run, unchanged replay, retained-Bronze
+backfill, layer counts, registry counts, and dashboard/build checks.
 
 ## Later, only if needed
 

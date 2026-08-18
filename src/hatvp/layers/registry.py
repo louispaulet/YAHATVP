@@ -7,6 +7,8 @@ import json
 from datetime import date
 from typing import Any
 
+from .anomaly_support import text_value
+
 
 def anomaly_id(anomaly_key: str) -> str:
     """Return the stable evidence identifier for one logical anomaly."""
@@ -50,9 +52,9 @@ def _registry_row(
         "severity": item.get("severity", "review"),
         "declarant_key": item.get("declarant_key"),
         "field": item.get("field"),
-        "period": item.get("period"),
-        "observed_value": item.get("observed_value"),
-        "expected_value_or_range": item.get("evidence", {}).get("expected")
+        "period": text_value(item.get("period")),
+        "observed_value": text_value(item.get("observed_value")),
+        "expected_value_or_range": text_value(item.get("evidence", {}).get("expected"))
         if isinstance(item.get("evidence"), dict)
         else None,
         "evidence": json.dumps(
@@ -74,7 +76,7 @@ def _registry_row(
         "source_format": item.get("source_format"),
         "source_uri_or_object": item.get("source_uri_or_object"),
         "source_location": item.get("source_location"),
-        "candidate_value_or_range": item.get("evidence", {}).get("candidates")
+        "candidate_value_or_range": text_value(item.get("evidence", {}).get("candidates"))
         if isinstance(item.get("evidence"), dict)
         else None,
         "metric_eligible": False,

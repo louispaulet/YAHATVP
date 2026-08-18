@@ -46,7 +46,9 @@ def _registry_gold_state(row: dict[str, Any], selected: set[str]) -> dict[str, A
     updated["active_in_gold"] = latest and row.get("status") not in {"superseded", "resolved"}
     if not latest and row.get("status") == "active":
         updated["status"] = "superseded"
-        updated["superseded_by"] = next(iter(selected), None)
+        updated["superseded_by"] = evidence.get("superseded_by") or (
+            sorted(selected)[0] if selected else None
+        )
     updated["metric_eligible"] = latest and bool(row.get("metric_eligible", False))
     return updated
 

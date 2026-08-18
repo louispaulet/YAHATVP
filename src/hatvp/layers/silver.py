@@ -9,6 +9,7 @@ import polars as pl
 
 from .anomaly import detect_anomalies, parent_map, record_ref
 from .registry import upsert_registry
+from .silver_dedupe import unique_rows
 from .silver_metadata import annotate_tables, occurrences_by_ref
 
 SILVER_TABLES = ("declarations", "people", "incomes", "assets")
@@ -37,7 +38,10 @@ def build_silver(
     """Return current Silver, full historical Silver context, and registry rows."""
 
     history = history or {}
-    combined = {name: [*history.get(name, []), *current.get(name, [])] for name in SILVER_TABLES}
+    combined = {
+        name: unique_rows([*history.get(name, []), *current.get(name, [])])
+        for name in SILVER_TABLES
+    }
     occurrences = detect_anomalies(current, history, registry)
     current_refs = {
         record_ref(name, row) for name in SILVER_TABLES for row in current.get(name, [])
