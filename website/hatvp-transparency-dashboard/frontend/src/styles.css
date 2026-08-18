@@ -44,6 +44,24 @@ h3 {
   box-shadow: 0 10px 30px rgb(23 35 31 / 0.04);
 }
 
+.source-link-card {
+  container-type: inline-size;
+}
+
+.source-link-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+@container (min-width: 24rem) {
+  .source-link-header {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
 .loading-shell {
   background: linear-gradient(110deg, #e2e8f0 22%, #f8fafc 42%, #e2e8f0 62%);
   background-size: 200% 100%;

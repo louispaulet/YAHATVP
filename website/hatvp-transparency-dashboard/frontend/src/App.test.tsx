@@ -72,7 +72,14 @@ describe("dashboard application", () => {
     expect(screen.getByRole("link", { name: /Download CSV/ })).toHaveAttribute("download", "");
     expect(screen.getByRole("link", { name: /Download CSV/ })).not.toHaveAttribute("target");
     expect(screen.getByRole("link", { name: /Download XML/ })).toHaveAttribute("download", "");
-    expect(screen.getAllByText("Direct download")).toHaveLength(2);
+    const downloadBadges = screen.getAllByText("Direct download");
+    expect(downloadBadges).toHaveLength(2);
+    downloadBadges.forEach((badge) => {
+      expect(badge).toHaveClass("max-w-full");
+      expect(badge).toHaveClass("shrink-0");
+      expect(badge.parentElement).toHaveClass("source-link-header");
+    });
+    expect(screen.getAllByRole("link").filter((link) => link.classList.contains("source-link-card"))).toHaveLength(3);
     expect(screen.getByRole("link", { name: "View project on GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
     expect(screen.getByRole("link", { name: /Explore YAHATVP on GitHub/ })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
   });
@@ -113,6 +120,10 @@ describe("dashboard application", () => {
     expect(screen.getByRole("link", { name: "Voir le projet sur GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
     expect(screen.getByRole("link", { name: "Explorer les données" })).toHaveAttribute("href", "/explore");
     fireEvent.click(screen.getByRole("link", { name: "À propos des données" }));
+    expect(screen.getByText("Sources officielles")).toBeInTheDocument();
+    const frenchDownloadBadges = screen.getAllByText("Téléchargement direct");
+    expect(frenchDownloadBadges).toHaveLength(2);
+    frenchDownloadBadges.forEach((badge) => expect(badge.parentElement).toHaveClass("source-link-header"));
     expect(screen.getByRole("link", { name: /Découvrez YAHATVP sur GitHub/ })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
   });
 });
