@@ -12,6 +12,8 @@
 
 - Official HATVP open-data page confirms the CSV list and XML declaration feed;
   frontend checks remain covered by the repository's `frontend-test` target.
+- Published the About-page links to `gh-pages` (deployment commit `1bbc44f`);
+  the GitHub Pages root returned HTTP 200.
 
 ## 2026-08-18 — Harden declaration-type translations
 
