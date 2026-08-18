@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-08-18 — Define the BigQuery Bronze → Silver → Gold anomaly plan
+
+### Changed
+
+- Reclassified the existing four-table BigQuery layer as the planned Bronze
+  foundation for version-complete declaration data.
+- Added a detailed TODO plan for anomaly detection across all declaration
+  versions in Silver and latest-declaration-per-declarant selection in Gold.
+- Documented the twelve required anomaly families, anomaly registry fields and
+  lifecycle, amended-declaration supersession, regression detection, metric
+  eligibility, HATVP reporting scope, backfill, fixtures, and idempotency
+  checks.
+- Recorded the explicit rule that anomalies are flagged and retained rather
+  than automatically corrected, deleted, or silently deduplicated.
+
+### Verified
+
+- `git diff --check`, `uv run pytest -q` (128 passed), `uv run ruff check .`,
+  and `uv run ruff format --check .` pass.
+- Documentation-only change; no runtime code, source data, or deployed
+  infrastructure was modified.
+
 ## 2026-08-18 — Expose declaration search in navigation
 
 ### Fixed

@@ -4,8 +4,11 @@ This checklist turns the project requirements into an execution plan. The local
 pipeline and first Google Cloud deployment are implemented and tested; the
 weekly Scheduler trigger is connected to the production ingestion job and has
 completed repeat live deliveries. The initial four-table BigQuery layer is
-enabled and validated; remaining work is operational hardening and later table
-expansion. First-snapshot quality triage is documented and complete.
+enabled and validated as the current Bronze foundation; the planned Silver
+anomaly layer and Gold latest-declarant layer are not implemented yet.
+Remaining work is operational hardening, historical anomaly detection, and the
+Bronze → Silver → Gold expansion. First-snapshot quality triage is documented
+and complete.
 
 ## Current status
 
@@ -193,19 +196,25 @@ timezone: Europe/Paris
 - [x] Confirm the workflow builds, pushes, and deploys without any JSON credential secret.
 - [x] Confirm the deployed job uses the commit SHA image tag rather than a floating `latest` tag.
 
-## 7. Enable and validate BigQuery, if wanted
+## 7. Enable and validate the current BigQuery Bronze foundation
 
-- [x] Decide the first curated tables: `declarations`, `people`, `incomes`, and `assets` at minimum.
-- [x] Confirm every curated table includes `snapshot_date` as a `DATE`.
-- [x] Confirm curated tables are partitioned by `snapshot_date`.
+- [x] Establish the current BigQuery tables `declarations`, `people`, `incomes`, and `assets` as the initial Bronze layer.
+- [x] Confirm every Bronze table includes `snapshot_date` as a `DATE`.
+- [x] Confirm Bronze tables are partitioned by `snapshot_date`.
 - [x] Run the same snapshot twice and confirm the second load replaces that snapshot rather than duplicating rows.
 - [x] Confirm BigQuery remains optional when `HATVP_ENABLE_BIGQUERY=false`.
 - [x] Confirm a BigQuery failure prevents the latest state hash from advancing.
-- [x] Make BigQuery curated loads add new staged columns and insert by explicit
+- [x] Make BigQuery Bronze loads add new staged columns and insert by explicit
   column name so schema evolution cannot fail on positional ordering.
-- [x] Document the analytical table schemas and example queries.
-- [x] Rebuild the curated `incomes` partition from both observed revenue
+- [x] Document the current Bronze table schemas and example queries.
+- [x] Rebuild the Bronze `incomes` partition from both observed revenue
   streams and verify the annual `mandatElectifDto` rows in BigQuery.
+- [ ] Keep the Bronze layer version-complete: retain every declaration version
+  present in every source snapshot and never collapse initial and amended
+  declarations into one Bronze row.
+- [ ] Preserve the stable source identifiers, declaration-version metadata,
+  snapshot provenance, source values, and raw record evidence needed to compare
+  versions later.
 
 BigQuery validation evidence for snapshot `2026-08-17`: dataset
 `yahatvp-pipeline-eu:hatvp` was created in `europe-west1`; deployment
@@ -215,6 +224,11 @@ BigQuery validation evidence for snapshot `2026-08-17`: dataset
 across runs; and unchanged execution `hatvp-ingestion-rmclb` emitted
 `NO_CHANGE`. The source-linked report is
 [`reports/03-validation/2026-08-17-bigquery-and-income-validation.md`](reports/03-validation/2026-08-17-bigquery-and-income-validation.md).
+
+The historical validation report calls these tables “curated”; the next
+architecture section deliberately reclassifies the existing physical tables as
+Bronze inputs for anomaly detection. The report remains valid as evidence of
+the current load behavior, partitioning, and idempotency.
 
 ## 8. Production go-live checklist
 
@@ -341,6 +355,349 @@ the Worker overview slice returned HTTP 200 with the custom-domain CORS header.
   validated `2026-08-18` snapshot.
 - [x] Document the query progression, fixed snapshot convention, stable-UUID
   joins, and CSV regeneration commands.
+
+## 12. BigQuery Bronze → Silver → Gold anomaly architecture
+
+This is the planned analytical model for all declaration versions. It changes
+the role of the existing BigQuery tables without deleting or rewriting their
+history:
+
+| Layer | Role | Required behavior |
+| --- | --- | --- |
+| **Bronze** | The existing BigQuery `declarations`, `people`, `incomes`, and `assets` tables. | Version-complete source-shaped records, partitioned by `snapshot_date`, with source identifiers, provenance, and observed values retained. Bronze is not a latest-person table. |
+| **Silver** | A cleaned-up and anomaly-annotated representation of every Bronze declaration version. | Run the anomaly rules below across the full history. Keep the observed value and source evidence; add flags and eligibility metadata. Do not repair, replace, silently drop, or deduplicate an anomalous value. |
+| **Gold** | The latest declaration for each declarant, derived from Silver. | Select the latest applicable declaration/version for each declarant and role/period grouping. Expose current anomalies for reporting and metric eligibility, while retaining all historical anomalies in Silver. |
+
+“Cleaned-up” in Silver and “clean data” in Gold mean structurally usable,
+traceable data with explicit anomaly flags—not values that the pipeline has
+automatically corrected. A future feature-specific clean view may be created
+later, but it is outside this phase. An anomaly must remain visible even when a
+metric query excludes it.
+
+### 12.1 Bronze contract and migration boundary
+
+- [x] Adopt the existing four physical BigQuery tables as the initial Bronze
+  layer for this design; do not treat them as the final Gold output.
+- [x] Keep the current exact-snapshot loading and partition replacement
+  guarantees while the downstream layers are added.
+- [ ] Inspect the observed BigQuery schemas and declaration-version fields
+  before choosing physical names for the new layers. Prefer an explicit,
+  stable convention such as separate Bronze/Silver/Gold datasets or clearly
+  prefixed tables; do not rename the existing Bronze tables until readers and
+  dashboard queries have a migration path.
+- [ ] Confirm the Bronze grain for each table and document how a declaration,
+  declarant, role, period, amendment, and source snapshot are identified from
+  the actual HATVP schema.
+- [ ] Preserve all source versions across snapshots, including initial,
+  amended, and superseding declarations. A later declaration must not erase
+  the earlier Bronze record.
+- [ ] Keep source values, normalized values, raw record JSON where available,
+  source file/format, source URL or object, source snapshot date, stable IDs,
+  and parser/pipeline versions available to Silver and the anomaly evidence.
+- [ ] Treat the existing GCS raw archive as immutable provenance behind the
+  Bronze input. Never use anomaly processing as a reason to overwrite raw XML,
+  CSV, or other source evidence.
+
+### 12.2 Silver: historical anomaly detection and flags
+
+- [ ] Build Silver tables from Bronze at the same historical declaration
+  version grain. Silver must contain every Bronze version, including versions
+  that are later superseded.
+- [ ] Apply deterministic structural normalization only where already defined
+  by the source contract, such as whitespace, missing-marker, date, and French
+  number parsing. Preserve the original value beside any normalized value.
+- [ ] Add row-level and field-level anomaly metadata without changing the
+  observed value. At minimum, expose whether the field has an active anomaly,
+  whether it is eligible for a metric, the applicable rule IDs, and a link to
+  the anomaly registry evidence.
+- [ ] Run all anomaly rules against all available historical declaration
+  versions, not only the latest snapshot and not only the latest declaration.
+- [ ] Compare a person’s values across years, declaration versions, roles, and
+  relevant periods using stable HATVP identifiers and declaration metadata.
+  Do not use first-name plus surname as the sole identity key; unresolved
+  identity matches must become review flags.
+- [ ] Compare initial and amended declarations explicitly. Determine whether a
+  later declaration supersedes an earlier anomaly, but retain the earlier row
+  and anomaly permanently in the historical audit trail.
+- [ ] Compare CSV, XML, and PDF values when an authoritative representation is
+  available. Store the source format, location, and conflicting values in the
+  evidence; absence of a source format is not itself a contradiction.
+- [ ] Keep anomalous rows in Silver. Do not automatically correct a decimal,
+  digit, concatenation, salary, geography, date, identifier, or other source
+  value; do not silently delete or deduplicate a record because a rule fired.
+- [ ] Make Silver writes deterministic and idempotent by snapshot and stable
+  source identifiers. A retry must not create duplicate anomaly rows.
+
+### 12.3 Gold: latest declaration per declarant
+
+- [ ] Define the ordering used to select the latest declaration from the
+  observed HATVP amendment/version fields. “Latest” must be evaluated within
+  the same declarant plus role/mandate/period context, rather than comparing
+  unrelated declarations.
+- [ ] Resolve the declarant using stable source identifiers wherever available;
+  retain an explicit review state when the source does not provide a reliable
+  identity key.
+- [ ] Derive Gold tables or views from Silver so that each declarant has only
+  the latest applicable declaration/version for the documented Gold grain.
+  Keep child-table joins aligned to that selected declaration version.
+- [ ] Carry Silver anomaly status into Gold. Gold must show whether an anomaly
+  affects the latest declaration and whether the affected field is eligible
+  for metrics; Gold must not contain an automatically repaired replacement
+  value.
+- [ ] Make the latest declaration determine whether an anomaly is currently
+  active for reporting. If an amended declaration corrects a historical value,
+  mark the older anomaly as superseded/resolved in the registry while keeping
+  it in Silver and the audit trail.
+- [ ] Report only anomalies attached to the latest applicable declaration in
+  Gold to HATVP. Use Silver for historical anomaly reports, recurrence
+  analysis, source-correction evidence, and auditability.
+- [ ] Ensure Gold selection is repeatable, partition-aware, and idempotent;
+  rerunning the same source snapshot must produce the same latest-declarant
+  rows and anomaly statuses.
+- [ ] Update the dashboard and analytical examples to read Gold for current
+  declarant metrics after Gold is validated. Historical trend and anomaly
+  investigations must read Silver or the anomaly registry explicitly.
+
+### 12.4 Anomaly rules to implement between Bronze and Silver
+
+Each rule must emit a flag and evidence, never an automatic correction. The
+following rule IDs are the proposed stable identifiers; keep them stable once
+reports or external follow-up refer to them.
+
+1. **`COMP_YOY_CHANGE` — abnormally large year-over-year compensation change**
+
+   - Flag compensation that is multiplied or divided by approximately 10 or
+     more compared with the person’s historical value.
+   - Flag a sudden jump or drop inconsistent with the person’s own history.
+   - Flag an abrupt break after several stable years.
+   - Record the comparison years, prior values, ratio, absolute change, role,
+     and period. Thresholds must be configurable and reviewed against the
+     observed HATVP distribution so legitimate changes are not silently
+     treated as errors.
+
+2. **`COMP_IMPLAUSIBLE_AMOUNT` — obviously implausible compensation amount**
+
+   - Flag annual compensation in the hundreds of thousands or millions when
+     that amount is highly unlikely for the role.
+   - Compare against the person’s previous years and comparable office holders
+     where a defensible comparison group exists.
+   - Preserve the observed amount and the expected range or comparison basis;
+     do not cap, winsorize, or replace it.
+
+3. **`COMP_FACTOR_ERROR` — factor-of-10 or missing-decimal-separator error**
+
+   - Test whether multiplying or dividing the observed value by 10, 100, or
+     another configured decimal factor produces a value close to the person’s
+     historical values or a defensible comparison range.
+   - The candidate corrected value is evidence only. Never write it back as the
+     value used by default.
+   - Preserve the locale-aware raw text so a French decimal/thousands separator
+     issue can be distinguished from a source-entry error.
+
+4. **`COMP_CONCATENATED_VALUE` — accidental concatenation of values**
+
+   - Flag unusually long numeric values that may contain two fields joined
+     together.
+   - Test whether a plausible salary prefix or suffix is followed by unrelated
+     digits, using source field widths, neighboring fields, historical values,
+     and raw source text as evidence.
+   - Keep the entire observed value and the candidate segments in the anomaly
+     evidence; never split it automatically.
+
+5. **`COMP_DIGIT_EDIT` — extra or missing digit**
+
+   - Flag a value that is one digit-edit away from a historically plausible
+     amount, especially an inserted or deleted `0`.
+   - More generally test one-digit insertion, deletion, substitution, and
+     transposition candidates where the comparison is explainable.
+   - Store the candidate value and edit operation as evidence only; do not
+     replace the observed value.
+
+6. **`COMP_CONFLICT_SAME_PERIOD` — conflicting values for the same year**
+
+   - Flag the same person, role, and year/period when different compensation
+     values appear across declarations.
+   - Explicitly compare initial and amended declarations and retain every
+     observed value with its declaration identifier and source snapshot.
+   - Let the latest applicable declaration decide current Gold status; keep the
+     conflict and all earlier values in Silver.
+
+7. **`COMP_SUPERSEDED_DECLARATION` — historical error corrected by amendment**
+
+   - Do not treat every anomalous historical declaration as an active current
+     error.
+   - Identify the latest declaration for the same person, role, and period.
+   - Keep the historical anomaly in the audit trail, link it to the replacing
+     declaration, and mark it superseded/resolved when the latest evidence
+     supports that conclusion.
+   - If the latest declaration remains anomalous, keep the anomaly active in
+     Gold and report it through the latest-version workflow.
+
+8. **`GEO_DEPARTMENT_MUNICIPALITY` — department inconsistent with municipality or office**
+
+   - Flag a department code that does not match the declared municipality,
+     office, or other authoritative geography.
+   - Compare geographic information across CSV, XML, and PDF representations
+     when present, retaining each source value and the reference used for the
+     mismatch.
+   - Do not infer or overwrite a department merely because a municipality has
+     a likely match.
+
+9. **`PERSON_DOB_IMPLAUSIBLE` — impossible or highly implausible date of birth**
+
+   - Flag a future date, a clearly anomalous year, or an age incompatible with
+     holding the relevant public office.
+   - Compare dates of birth across declarations for the same person and flag
+     conflicting values.
+   - Preserve the source date, parsed date, declaration version, and evidence
+     used for the plausibility decision.
+
+10. **`SOURCE_CROSS_FORMAT` — CSV/XML/PDF inconsistency**
+
+    - Flag contradictory identifiers, geography, dates, mandates, or
+      compensation values for the same record across CSV, XML, and PDF.
+    - Record all conflicting representations and source locations, with a
+      clear indication of which declaration/version each value belongs to.
+    - Do not choose a winning format automatically; source precedence must be a
+      documented review decision.
+
+11. **`ANOMALY_KNOWN` — previously detected or reported anomaly**
+
+    - Maintain a persistent anomaly registry keyed, where possible, by
+      `person_id + field + period + anomalous_value`, supplemented by
+      declaration/version and rule identifiers when needed to prevent false
+      matches.
+    - Link a new occurrence to the known anomaly instead of generating an
+      indistinguishable duplicate alert after every refresh.
+    - Do not hide known anomalies from Silver or Gold; suppress only redundant
+      notifications while retaining occurrence counts and last-seen evidence.
+
+12. **`ANOMALY_REGRESSION` — a previously corrected anomaly reappears**
+
+    - If an anomalous value disappears in a later declaration/version and then
+      reappears, flag the new occurrence as a regression.
+    - Link the regression to the original anomaly, the intervening corrected
+      declaration, and the new source snapshot.
+    - Reactivate the issue for Gold reporting when the reappearing value is in
+      the latest applicable declaration.
+
+### 12.5 Anomaly registry contract and lifecycle
+
+Each anomaly record should contain at least:
+
+```text
+rule_id
+severity
+person_id
+field
+period
+observed_value
+expected_value_or_range
+evidence
+first_seen
+last_seen
+is_latest_declaration
+superseded_by
+previously_reported
+status
+```
+
+The implementation should also retain the following provenance and lifecycle
+fields where available:
+
+```text
+anomaly_id
+anomaly_key
+declaration_id
+declaration_version
+declarant_key
+role_or_mandate
+source_snapshot_date
+source_format
+source_uri_or_object
+source_location
+candidate_value_or_range
+metric_eligible
+active_in_gold
+detected_at
+reviewed_at
+```
+
+- [ ] Define a deterministic `anomaly_key` and registry upsert behavior so
+  repeated weekly snapshots update `last_seen` rather than creating duplicate
+  alerts.
+- [ ] Define the lifecycle statuses at minimum as active, superseded/resolved,
+  known/reported, and regression. Keep status transitions explainable from
+  declaration-version evidence.
+- [ ] Set `is_latest_declaration` and `active_in_gold` from the same version
+  ordering used by Gold; do not maintain two competing definitions of latest.
+- [ ] Set `previously_reported` from the registry and preserve first/last-seen
+  dates across snapshots.
+- [ ] Store enough evidence to reproduce each flag from immutable source bytes,
+  including source locations and the compared values.
+- [ ] Keep historical anomaly records even after they are superseded. A
+  superseded anomaly may stop being an active Gold alert, but it must remain
+  queryable in Silver and the registry.
+- [ ] Make registry updates part of the required processing gate. If anomaly
+  detection or registry persistence fails, do not advance `state/latest.json`.
+
+### 12.6 Metric eligibility and reporting policy
+
+- [ ] Treat anomaly detection as a flagging system, not an automatic correction
+  system. No rule may silently change, impute, cap, round, split, or delete a
+  source value.
+- [ ] Add field-level metric eligibility so a metric can exclude an anomalous
+  compensation, date, geography, or identifier without discarding unrelated
+  fields from the same declarant.
+- [ ] Define the default policy that unresolved or active anomalies affecting a
+  metric make that field ineligible for the metric. Keep the row available for
+  audit and anomaly counts.
+- [ ] Make Gold-facing metric queries filter by the explicit eligibility/status
+  fields rather than reimplementing anomaly logic ad hoc.
+- [ ] Report current anomalies from the latest Gold declaration/version to
+  HATVP. Report historical and superseded anomalies from Silver and the
+  registry for auditability and source-correction follow-up.
+- [ ] Do not report a historical anomaly as a current issue when a later
+  declaration has superseded it, unless the later declaration still carries
+  the anomaly or it has regressed.
+- [ ] Keep future feature-specific clean versions out of this phase. If they are
+  later needed, build them as explicitly named derived views/tables with the
+  original observed value, anomaly links, and transformation rules preserved.
+
+### 12.7 Implementation, backfill, and acceptance checks
+
+- [ ] Add a schema/version design note before changing the physical BigQuery
+  layout. Include the Bronze-to-Silver field mapping, Gold grain, identity and
+  amendment ordering, anomaly registry key, and retention policy.
+- [ ] Implement the anomaly rules behind small, testable HATVP-specific
+  components. Do not introduce a general-purpose orchestrator.
+- [ ] Add fixtures for stable historical compensation, factor-of-10 errors,
+  concatenated values, digit edits, same-period conflicts, amended
+  declarations, geography mismatches, impossible/conflicting birth dates,
+  cross-format conflicts, known anomalies, and regressions.
+- [ ] Test that every fixture is flagged without changing its observed value and
+  that all source/provenance fields remain available.
+- [ ] Test that a corrected amended declaration supersedes the historical
+  anomaly, while the historical row remains in Silver and the registry.
+- [ ] Test that a reappearing value is marked as a regression and is active in
+  Gold when it is the latest applicable declaration.
+- [ ] Test anomaly-registry idempotency across repeated snapshots and retries;
+  repeated input must update occurrence metadata rather than duplicate alerts.
+- [ ] Test Gold uniqueness: one latest applicable declaration per declarant at
+  the documented grain, with child records joined to that version.
+- [ ] Test metric queries exclude flagged values through eligibility fields and
+  never depend on silently corrected values.
+- [ ] Backfill Silver and the anomaly registry from every retained Bronze
+  snapshot before enabling Gold reporting. Record the backfill range and
+  source hashes.
+- [ ] Build Gold from the backfilled Silver history, then compare current Gold
+  row counts and latest-version choices against source-linked review evidence.
+- [ ] Run a forced replay and an unchanged-input replay. Confirm Bronze,
+  Silver, Gold, registry contents, partition counts, anomaly statuses, and
+  `state/latest.json` behavior are deterministic and idempotent.
+- [ ] Update README, code/module names, dashboard queries, permissions, and
+  validation reports from the transitional “curated” terminology to the final
+  Bronze/Silver/Gold terminology once the implementation is deployed.
 
 ## Later, only if needed
 
