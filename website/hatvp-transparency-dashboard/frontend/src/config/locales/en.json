@@ -14,7 +14,8 @@
     "about": "About the data"
   },
   "footer": {
-    "builtFrom": "Built from public HATVP declarations."
+    "builtFrom": "Built from public HATVP declarations.",
+    "project": "View project on GitHub"
   },
   "hero": {
     "eyebrow": "Public data, made clearer",

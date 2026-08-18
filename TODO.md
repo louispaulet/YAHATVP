@@ -269,6 +269,7 @@ records, and zero quality errors.
 - [x] Add English/French locale configuration, a language switcher, and readable translations for dynamic dashboard labels.
 - [x] Harden declaration-type translation lookup for source-label casing and punctuation variants.
 - [x] Add translated About-page links to the official HATVP open-data page and source CSV/XML feeds.
+- [x] Add a sticky footer with a translated link to the YAHATVP GitHub project.
 
 Deployment evidence (2026-08-18): Cloud Run bridge revision
 `hatvp-dashboard-api-00003-xzr` and Worker version

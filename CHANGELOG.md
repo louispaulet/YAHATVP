@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-18 — Add sticky project footer
+
+### Changed
+
+- Made the dashboard shell a flex column so the footer stays at the bottom on
+  short pages.
+- Added translated English and French links to the YAHATVP GitHub project.
+
+### Verified
+
+- Frontend tests and the production Vite build pass.
+
 ## 2026-08-18 — Link dashboard to official HATVP sources
 
 ### Added

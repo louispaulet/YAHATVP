@@ -14,7 +14,8 @@
     "about": "À propos des données"
   },
   "footer": {
-    "builtFrom": "Construit à partir des déclarations publiques de la HATVP."
+    "builtFrom": "Construit à partir des déclarations publiques de la HATVP.",
+    "project": "Voir le projet sur GitHub"
   },
   "hero": {
     "eyebrow": "Les données publiques, plus lisibles",

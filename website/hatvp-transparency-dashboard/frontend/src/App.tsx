@@ -74,7 +74,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   const { locale } = useI18n();
 
   return (
-    <div className="min-h-screen bg-canvas text-ink">
+    <div className="flex min-h-screen flex-col bg-canvas text-ink">
       <header className="border-b border-slate-200/80 bg-canvas/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
           <NavLink to="/" className="flex items-center gap-3">
@@ -95,12 +95,19 @@ function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main>{children}</main>
-      <footer className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-10 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-        <span>{locale.footer.builtFrom}</span>
-        <a className="font-semibold text-slate-700 underline decoration-lime underline-offset-4" href="https://www.hatvp.fr/" target="_blank" rel="noreferrer">
-          hatvp.fr
-        </a>
+      <main className="flex-1">{children}</main>
+      <footer className="mt-auto border-t border-slate-200/80">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-8 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+          <span>{locale.footer.builtFrom}</span>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            <a className="font-semibold text-slate-700 underline decoration-lime underline-offset-4" href="https://github.com/louispaulet/YAHATVP/tree/main" target="_blank" rel="noreferrer">
+              {locale.footer.project}
+            </a>
+            <a className="font-semibold text-slate-700 underline decoration-lime underline-offset-4" href="https://www.hatvp.fr/" target="_blank" rel="noreferrer">
+              hatvp.fr
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );

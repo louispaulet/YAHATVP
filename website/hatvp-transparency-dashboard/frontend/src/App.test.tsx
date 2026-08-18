@@ -38,6 +38,7 @@ describe("dashboard application", () => {
     expect(screen.getByText("Follow the data back to HATVP.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Declaration index \(CSV\)/ })).toHaveAttribute("href", "https://www.hatvp.fr/livraison/opendata/liste.csv");
     expect(screen.getByRole("link", { name: /Declarations feed \(XML\)/ })).toHaveAttribute("href", "https://www.hatvp.fr/livraison/merge/declarations.xml");
+    expect(screen.getByRole("link", { name: "View project on GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
   });
 
   it("switches to French and translates configured data labels", async () => {
@@ -48,5 +49,6 @@ describe("dashboard application", () => {
     expect(screen.getByText("Immobilier")).toBeInTheDocument();
     expect(screen.getByText("Revenus, par source")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Totaux des revenus par source/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Voir le projet sur GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
   });
 });
