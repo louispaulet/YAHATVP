@@ -11,6 +11,9 @@
 ### Verified
 
 - Frontend tests and the production Vite build pass.
+- Published the generated mark to `gh-pages` (deployment commit `203cd51`);
+  the live HTML references `hatvp-mark.webp`, which returns HTTP 200 as
+  `image/webp`, and the navbar bundle contains the asset reference.
 
 ## 2026-08-18 — Link About page to project source
 
