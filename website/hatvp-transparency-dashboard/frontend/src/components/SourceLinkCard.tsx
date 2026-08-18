@@ -11,15 +11,15 @@ export function SourceLinkCard({ link }: { link: SourceLink }) {
 
   return (
     <a
-      className={`dashboard-card group flex h-full flex-col p-5 transition hover:-translate-y-0.5 ${cardClass}`}
+      className={`dashboard-card source-link-card group flex h-full flex-col p-5 transition hover:-translate-y-0.5 ${cardClass}`}
       href={link.href}
       target={isDownload ? undefined : "_blank"}
       rel={isDownload ? undefined : "noreferrer"}
       download={isDownload ? "" : undefined}
     >
-      <span className="flex flex-wrap items-start justify-between gap-3">
-        <span className="min-w-0 flex-1 text-sm font-bold text-ink">{link.label}</span>
-        <span className={`max-w-full rounded-full px-2.5 py-1 text-center text-[0.65rem] font-bold uppercase leading-5 tracking-[0.12em] ${badgeClass}`}>{link.type}</span>
+      <span className="source-link-header">
+        <span className="min-w-0 break-words text-sm font-bold text-ink">{link.label}</span>
+        <span className={`max-w-full shrink-0 rounded-full px-2.5 py-1 text-center text-[0.65rem] font-bold uppercase leading-5 tracking-[0.12em] ${badgeClass}`}>{link.type}</span>
       </span>
       <span className="mt-3 block text-sm leading-6 text-slate-500">{link.description}</span>
       <span className="mt-auto flex items-center gap-2 border-t border-slate-100 pt-5 text-xs font-bold uppercase tracking-[0.12em] text-slate-700">
