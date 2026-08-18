@@ -82,6 +82,14 @@ describe("dashboard application", () => {
     expect(screen.getByRole("link", { name: /Explore YAHATVP on GitHub/ })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
   });
 
+  it("renders the placeholder page in the expanded navigation", () => {
+    render(<MemoryRouter initialEntries={["/explore"]}><App /></MemoryRouter>);
+    expect(screen.getByRole("navigation", { name: "Primary navigation" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Data explorer" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByText("More ways to explore are on the way.")).toBeInTheDocument();
+    expect(screen.getByText("Placeholder page")).toBeInTheDocument();
+  });
+
   it("switches to French and translates configured data labels", async () => {
     render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
     expect(await screen.findByText("Real estate")).toBeInTheDocument();
@@ -92,6 +100,7 @@ describe("dashboard application", () => {
     expect(screen.getByText("Revenu annuel moyen vs patrimoine")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Revenu annuel moyen et patrimoine total/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Voir le projet sur GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
+    expect(screen.getByRole("link", { name: "Explorer les données" })).toHaveAttribute("href", "/explore");
     fireEvent.click(screen.getByRole("link", { name: "À propos des données" }));
     expect(screen.getByRole("link", { name: /Découvrez YAHATVP sur GitHub/ })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
   });

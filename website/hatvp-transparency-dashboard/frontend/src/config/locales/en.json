@@ -10,7 +10,9 @@
     "name": "Transparency dashboard"
   },
   "nav": {
+    "label": "Primary navigation",
     "overview": "Overview",
+    "explore": "Data explorer",
     "about": "About the data"
   },
   "footer": {
@@ -115,6 +117,13 @@
     "updateRhythm": "Update rhythm",
     "updateRhythmValue": "Weekly",
     "updateRhythmDetail": "following the ingestion pipeline"
+  },
+  "explore": {
+    "eyebrow": "Data explorer",
+    "title": "More ways to explore are on the way.",
+    "description": "This space is reserved for deeper views of the curated HATVP data, with more ways to follow a declaration from its source to its aggregate.",
+    "status": "Placeholder page",
+    "next": "New exploration tools will appear here in a future update."
   },
   "errors": {
     "title": "The dashboard is taking a pause.",

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-18 — Expand dashboard navigation
+
+### Changed
+
+- Replaced the pill-style Overview/About page switcher with a text navigation
+  bar that uses an active underline and can accommodate additional pages.
+- Added a localized Data explorer placeholder route between Overview and About.
+- Kept the existing EN/FR language button design unchanged.
+
+### Verified
+
+- `make frontend-test` passes, including the expanded navigation, placeholder
+  route, active link state, and French translations.
+
 ## 2026-08-18 — Compact large dashboard values
 
 ### Changed

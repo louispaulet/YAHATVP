@@ -626,8 +626,15 @@ bridge URL. `frontend-deploy` builds the Vite app and publishes `dist/` to the
 `GCP_REGION`, `BQ_DATASET`, `BRIDGE_SERVICE`, and `FRONTEND_ORIGIN` when using
 different resources.
 
+The frontend keeps `website/hatvp-transparency-dashboard/frontend/public/CNAME`
+in the build so every `gh-pages` publish preserves the custom domain
+`yahatvp.thefrenchartist.dev`. Configure the repository GitHub Pages site to use
+that CNAME and ensure DNS points the hostname to `louispaulet.github.io` before
+the first custom-domain publish.
+
 The initial deployment is available at
-[GitHub Pages](https://louispaulet.github.io/YAHATVP/) and uses the Worker API
+[yahatvp.thefrenchartist.dev](https://yahatvp.thefrenchartist.dev/) (with the
+[GitHub Pages fallback](https://louispaulet.github.io/YAHATVP/)) and uses the Worker API
 at `https://hatvp-transparency-api.louispaulet13.workers.dev`. The deployed
 Worker health check and aggregate endpoint returned HTTP 200 after the initial
 deployment; the bridge remains protected by its shared token and is not a

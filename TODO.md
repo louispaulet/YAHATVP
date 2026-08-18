@@ -280,6 +280,8 @@ records, and zero quality errors.
 - [x] Compare total income and asset amounts in the dashboard pie chart.
 - [x] Compare average annual reported income with total assets and explain the calculation.
 - [x] Use compact, locale-aware formatting for large dashboard values.
+- [ ] Publish and smoke-test the dashboard at `yahatvp.thefrenchartist.dev`
+  with the GitHub Pages custom domain and HTTPS enabled.
 
 Deployment evidence (2026-08-18): Cloud Run bridge revision
 `hatvp-dashboard-api-00003-xzr` and Worker version
