@@ -36,11 +36,14 @@
   },
   "panels": {
     "comparison": {
-      "title": "Incomes vs assets",
-      "eyebrow": "Declared amounts",
+      "title": "Average annual income vs assets",
+      "eyebrow": "Reported amounts",
       "empty": "No income or asset rows were found in this snapshot.",
-      "income": "Incomes",
-      "assets": "Assets"
+      "income": "Average annual income",
+      "assets": "Assets",
+      "incomeExplanation": "Average annual income: {average} ({total} divided by {years} reported years).",
+      "assetsExplanation": "Total observed assets: {assets}.",
+      "note": "The pie shows each amount as a share of the combined comparison. It is an indicator, not a measure of annual spending or personal wealth."
     },
     "assets": {
       "title": "Assets, by section",
@@ -123,8 +126,8 @@
     "backToOverview": "Back to overview"
   },
   "accessibility": {
-    "comparisonChart": "Income and asset totals",
-    "comparisonLegend": "Income and asset totals legend",
+    "comparisonChart": "Average annual income and asset totals",
+    "comparisonLegend": "Average annual income and asset totals legend",
     "rows": "rows"
   },
   "labels": {

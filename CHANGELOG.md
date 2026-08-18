@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-18 — Annualize dashboard income comparison
+
+### Changed
+
+- Updated the dashboard comparison to divide total declared income by the
+  distinct reported income years in the latest snapshot.
+- Added explanatory copy below the pie chart for the annualization, total
+  observed assets, and the indicator’s limitations.
+- Exposed aggregate totals and the income-year count from the fixed bridge query
+  so the comparison remains accurate as asset sections change.
+
+### Verified
+
+- The current snapshot contains 17 distinct income years (2010–2026), producing
+  an average annual income of €73,152,640.05 and a 37.0% income / 63.0% asset
+  comparison split.
+
 ## 2026-08-18 — Compare dashboard incomes and assets
 
 ### Changed

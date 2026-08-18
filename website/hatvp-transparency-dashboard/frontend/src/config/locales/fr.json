@@ -36,11 +36,14 @@
   },
   "panels": {
     "comparison": {
-      "title": "Revenus vs patrimoine",
+      "title": "Revenu annuel moyen vs patrimoine",
       "eyebrow": "Montants déclarés",
       "empty": "Aucune ligne de revenus ou de patrimoine n’a été trouvée dans cet instantané.",
-      "income": "Revenus",
-      "assets": "Patrimoine"
+      "income": "Revenu annuel moyen",
+      "assets": "Patrimoine",
+      "incomeExplanation": "Revenu annuel moyen : {average} ({total} ÷ {years} années déclarées).",
+      "assetsExplanation": "Patrimoine total observé : {assets}.",
+      "note": "Le graphique montre chaque montant comme une part de la comparaison combinée. C’est un indicateur, pas une mesure des dépenses annuelles ou du patrimoine personnel."
     },
     "assets": {
       "title": "Patrimoine, par catégorie",
@@ -123,8 +126,8 @@
     "backToOverview": "Retour à la vue d’ensemble"
   },
   "accessibility": {
-    "comparisonChart": "Totaux des revenus et du patrimoine",
-    "comparisonLegend": "Légende des totaux de revenus et de patrimoine",
+    "comparisonChart": "Revenu annuel moyen et patrimoine total",
+    "comparisonLegend": "Légende du revenu annuel moyen et du patrimoine total",
     "rows": "lignes"
   },
   "labels": {

@@ -580,8 +580,10 @@ fields, or other personal fields. The bridge selects the latest shared
 each slice, so one slow aggregate cannot hold the rest of the page hostage.
 The frontend starts all four requests independently, preserves each panel’s
 layout with a slow-blinking loading shell, and lazy-loads the interactive
-[Recharts](https://recharts.org/) module for the income-versus-asset comparison
-and asset plot.
+[Recharts](https://recharts.org/) module for the average-annual-income versus
+asset comparison and asset plot. The comparison uses the distinct reported
+income years from the latest snapshot to explain the annualization; it is an
+indicator, not a measure of annual spending or personal wealth.
 
 ### Local dashboard checks
 

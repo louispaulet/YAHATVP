@@ -37,12 +37,15 @@ def test_income_groups_values_by_stream():
     query = build_query("project", "dataset", "income")
     assert "income_stream" in query
     assert "SUM(normalized_value)" in query
+    assert "COUNT(DISTINCT income_year)" in query
+    assert "AS year_count" in query
     assert "GROUP BY label" in query
 
 
 def test_assets_groups_values_by_source_section():
     query = build_query("project", "dataset", "assets")
     assert "source_section" in query
+    assert "AS total_value" in query
     assert "LIMIT 12" in query
 
 

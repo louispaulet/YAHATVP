@@ -52,8 +52,6 @@ def normalize_breakdown(items: list[dict[str, Any]], include_total: bool) -> lis
 
 
 def dashboard_payload(row: Any, view: str) -> dict[str, Any]:
-    """Convert one independent query row to the public slice contract."""
-
     payload = {
         "snapshotDate": row_value(row, "snapshot_date"),
         "generatedAt": str(row_value(row, "generated_at")),
@@ -66,6 +64,10 @@ def dashboard_payload(row: Any, view: str) -> dict[str, Any]:
     payload["items"] = normalize_breakdown(
         parse_array(row_value(row, "items_json")), view != "declarations"
     )
+    if view != "declarations":
+        payload["totalValue"] = float(row_value(row, "total_value") or 0)
+    if view == "income":
+        payload["yearCount"] = int(row_value(row, "year_count") or 0)
     return payload
 
 
