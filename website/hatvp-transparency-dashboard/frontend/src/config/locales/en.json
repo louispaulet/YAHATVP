@@ -87,6 +87,12 @@
         }
       ]
     },
+    "project": {
+      "eyebrow": "Project source",
+      "title": "Explore YAHATVP on GitHub.",
+      "description": "Browse the dashboard source code, ingestion pipeline, and documentation.",
+      "href": "https://github.com/louispaulet/YAHATVP/tree/main"
+    },
     "curatedTables": "Curated tables",
     "curatedTablesDetail": "declarations, people, incomes, assets",
     "updateRhythm": "Update rhythm",

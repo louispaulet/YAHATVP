@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-18 — Link About page to project source
+
+### Added
+
+- Added translated About-page project cards linking to the YAHATVP GitHub
+  repository.
+
+### Verified
+
+- Frontend tests and the production Vite build pass.
+
 ## 2026-08-18 — Add sticky project footer
 
 ### Changed

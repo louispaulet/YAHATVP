@@ -87,6 +87,12 @@
         }
       ]
     },
+    "project": {
+      "eyebrow": "Source du projet",
+      "title": "Découvrez YAHATVP sur GitHub.",
+      "description": "Consultez le code du tableau de bord, le pipeline d’ingestion et la documentation.",
+      "href": "https://github.com/louispaulet/YAHATVP/tree/main"
+    },
     "curatedTables": "Tables sélectionnées",
     "curatedTablesDetail": "déclarations, personnes, revenus, patrimoine",
     "updateRhythm": "Rythme de mise à jour",
