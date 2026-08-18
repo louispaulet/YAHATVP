@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-08-18 — Turn declaration detail into a readable interface
+
+### Changed
+
+- Replaced the raw-XML-first declaration detail page with a schema-aware view
+  that renders source metadata, public profile fields, mandate date ranges,
+  repeated interests and activities, annual amounts, assets, liabilities,
+  attachments, and source-marked empty sections.
+- Added annual amount bar summaries by year and kept the original XML in a
+  collapsed audit panel so every parsed source field remains traceable.
+- Added five schema-variant XML fixtures covering interest/activity, asset,
+  attachment/company-interest, amended, and empty-section declarations.
+
+### Verified
+
+- Frontend unit tests: 18 passed; Vite production build passed.
+- Five seeded live declarations from the current HATVP XML snapshot rendered
+  with source coverage counts, no parser errors, and zero horizontal overflow;
+  the asset-heavy variant exposed real estate, securities, insurance, bank
+  accounts, vehicles, liabilities, events, and asset observations.
+- Responsive browser verification passed at 390px and 1280px widths.
+
 ## 2026-08-18 — Complete the version-complete Bronze contract
 
 ### Changed

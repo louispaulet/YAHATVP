@@ -325,6 +325,11 @@ historical raw snapshot was overwritten. Evidence:
 - [x] Split the frontend monolith into focused pages, components, i18n context,
   and a cancellable resource hook while keeping each TypeScript source file
    below the 100-line review budget.
+- [x] Replace the declaration raw-XML-first detail page with a schema-aware
+  interface that renders identity, source metadata, mandates, annual amounts,
+  activities, interests, assets, liabilities, attachments, empty sections, and
+  a collapsed raw-XML audit view; cover five live schema variants with fixture
+  and responsive regression tests.
 
 Deployment evidence (2026-08-18): Cloud Run bridge revision
 `hatvp-dashboard-api-00003-xzr` and Worker version
