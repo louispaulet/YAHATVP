@@ -11,13 +11,16 @@ export interface BreakdownItem {
   totalValue?: number;
 }
 
-export interface DashboardResponse {
+export interface DashboardOverviewResponse {
   snapshotDate: string | null;
   generatedAt: string;
   tables: DashboardTableCounts;
-  incomeByStream: BreakdownItem[];
-  assetsBySection: BreakdownItem[];
-  declarationsByType: BreakdownItem[];
+}
+
+export interface DashboardBreakdownResponse {
+  snapshotDate: string | null;
+  generatedAt: string;
+  items: BreakdownItem[];
 }
 
 export interface WorkerEnv {

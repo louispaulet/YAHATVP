@@ -265,7 +265,9 @@ records, and zero quality errors.
 - [x] Configure the production bridge token and deploy the Cloudflare Worker.
 - [x] Configure the repository GitHub Pages source and publish the frontend `gh-pages` branch.
 - [x] Run a live dashboard smoke test against the deployed Worker and review the public aggregate output.
-- [x] Render the two-stream income comparison as an accessible pie chart with a list fallback for other breakdown sizes.
+- [x] Split dashboard overview, income, assets, and declaration data into independently cacheable API slices.
+- [x] Add slow-blinking loading shells so the dashboard layout renders before any slice completes.
+- [x] Use lazy-loaded Recharts pie and bar plots with animation, responsive sizing, tooltips, and accessible value lists.
 - [x] Add English/French locale configuration, a language switcher, and readable translations for dynamic dashboard labels.
 - [x] Harden declaration-type translation lookup for source-label casing and punctuation variants.
 - [x] Add translated About-page links to the official HATVP open-data page and source CSV/XML feeds.

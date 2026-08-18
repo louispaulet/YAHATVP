@@ -1,4 +1,4 @@
-"""Authentication, BigQuery execution, and dashboard response conversion."""
+"""Authentication, BigQuery execution, and dashboard slice conversion."""
 
 from __future__ import annotations
 
@@ -16,10 +16,7 @@ def response(payload: dict[str, Any], status: int) -> tuple[str, int, dict[str, 
     return (
         json.dumps(payload, separators=(",", ":"), default=str),
         status,
-        {
-            "Content-Type": "application/json; charset=utf-8",
-            "Cache-Control": "no-store",
-        },
+        {"Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store"},
     )
 
 
@@ -54,19 +51,22 @@ def normalize_breakdown(items: list[dict[str, Any]], include_total: bool) -> lis
     return result
 
 
-def dashboard_payload(row: Any) -> dict[str, Any]:
-    table_items = parse_array(row_value(row, "tables_json"))
-    tables = {str(item["table_name"]): int(item["row_count"]) for item in table_items}
-    return {
+def dashboard_payload(row: Any, view: str) -> dict[str, Any]:
+    """Convert one independent query row to the public slice contract."""
+
+    payload = {
         "snapshotDate": row_value(row, "snapshot_date"),
         "generatedAt": str(row_value(row, "generated_at")),
-        "tables": {name: tables.get(name, 0) for name in TABLES},
-        "incomeByStream": normalize_breakdown(parse_array(row_value(row, "income_json")), True),
-        "assetsBySection": normalize_breakdown(parse_array(row_value(row, "assets_json")), True),
-        "declarationsByType": normalize_breakdown(
-            parse_array(row_value(row, "declaration_json")), False
-        ),
     }
+    if view == "overview":
+        table_items = parse_array(row_value(row, "tables_json"))
+        tables = {str(item["table_name"]): int(item["row_count"]) for item in table_items}
+        payload["tables"] = {name: tables.get(name, 0) for name in TABLES}
+        return payload
+    payload["items"] = normalize_breakdown(
+        parse_array(row_value(row, "items_json")), view != "declarations"
+    )
+    return payload
 
 
 def authorized(request: Any, expected: str) -> bool:
@@ -80,18 +80,18 @@ def client() -> Any:
     return bigquery.Client(project=os.environ["BQ_PROJECT_ID"])
 
 
-def run_dashboard() -> tuple[str, int, dict[str, str]]:
-    """Execute the fixed aggregate query and convert its single result row."""
+def run_dashboard(view: str = "overview") -> tuple[str, int, dict[str, str]]:
+    """Execute one fixed slice query and convert its single result row."""
 
     try:
         project = os.environ["BQ_PROJECT_ID"]
         dataset = os.environ["BQ_DATASET"]
         query_job = client().query(
-            build_query(project, dataset), location=os.environ.get("BQ_LOCATION")
+            build_query(project, dataset, view), location=os.environ.get("BQ_LOCATION")
         )
         rows = list(query_job.result())
-        if not rows:
+        if not rows or row_value(rows[0], "snapshot_date") is None:
             return response(error_payload("NO_DATA", "No dashboard snapshot is available"), 404)
-        return response(dashboard_payload(rows[0]), 200)
+        return response(dashboard_payload(rows[0], view), 200)
     except Exception:
         return response(error_payload("QUERY_FAILED", "Dashboard data is unavailable"), 502)

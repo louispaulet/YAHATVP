@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, lazy, Suspense, useContext, useEffect, useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
-import { fetchDashboard } from "./api";
-import { defaultLanguage, getLocale, languages, translateDataLabel, type DataLabelCategory, type Language, type Locale } from "./config/i18n";
-import type { BreakdownItem, DashboardResponse } from "./types";
+import { fetchAssets, fetchDeclarations, fetchIncome, fetchOverview } from "./api";
+import { defaultLanguage, getLocale, languages, translateDataLabel, type Language, type Locale } from "./config/i18n";
+import type { DashboardBreakdownResponse, DashboardOverviewResponse } from "./types";
 
 interface I18nContextValue {
   language: Language;
@@ -22,14 +22,6 @@ function formatNumber(value: number, language: Language): string {
   return new Intl.NumberFormat(language === "fr" ? "fr-FR" : "en-GB").format(value);
 }
 
-function formatCurrency(value: number, language: Language): string {
-  return new Intl.NumberFormat(language === "fr" ? "fr-FR" : "en-GB", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
 function formatDateTime(value: string, language: Language): string {
   return new Date(value).toLocaleString(language === "fr" ? "fr-FR" : "en-GB");
 }
@@ -42,6 +34,36 @@ function readLanguagePreference(): Language {
   }
 }
 
+interface ResourceState<T> {
+  data: T | null;
+  error: boolean;
+  loading: boolean;
+  reload: () => void;
+}
+
+function useResource<T>(loader: (signal: AbortSignal) => Promise<T>): ResourceState<T> {
+  const [attempt, setAttempt] = useState(0);
+  const [state, setState] = useState<Omit<ResourceState<T>, "reload">>({
+    data: null,
+    error: false,
+    loading: true,
+  });
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setState((current) => ({ ...current, loading: true, error: false }));
+    loader(controller.signal)
+      .then((data) => setState({ data, error: false, loading: false }))
+      .catch((reason: unknown) => {
+        if (reason instanceof DOMException && reason.name === "AbortError") return;
+        setState((current) => ({ ...current, error: true, loading: false }));
+      });
+    return () => controller.abort();
+  }, [attempt, loader]);
+
+  return { ...state, reload: () => setAttempt((value) => value + 1) };
+}
+
 function navClass({ isActive }: { isActive: boolean }): string {
   return isActive
     ? "rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white"
@@ -49,6 +71,8 @@ function navClass({ isActive }: { isActive: boolean }): string {
 }
 
 const logoSrc = `${import.meta.env.BASE_URL}hatvp-mark.webp`;
+const IncomeChart = lazy(() => import("./charts").then(({ IncomeChart: Chart }) => ({ default: Chart })));
+const AssetChart = lazy(() => import("./charts").then(({ AssetChart: Chart }) => ({ default: Chart })));
 
 function LanguageSwitcher() {
   const { language, locale, setLanguage } = useI18n();
@@ -124,93 +148,20 @@ function MetricCard({ label, value, detail, accent, language }: { label: string;
   );
 }
 
-function BreakdownList({ items, currency, emptyLabel, labelCategory }: { items: BreakdownItem[]; currency: boolean; emptyLabel: string; labelCategory: DataLabelCategory }) {
-  const { language, locale } = useI18n();
-  const max = Math.max(...items.map((item) => Math.abs(item.totalValue ?? item.rows)), 1);
-  if (items.length === 0) return <p className="py-8 text-sm text-slate-500">{emptyLabel}</p>;
-  return (
-    <div className="space-y-5">
-      {items.map((item) => {
-        const amount = item.totalValue ?? item.rows;
-        const width = Math.max(4, Math.round((Math.abs(amount) / max) * 100));
-        return (
-          <div key={item.label}>
-            <div className="mb-2 flex items-center justify-between gap-3 text-sm">
-              <span className="truncate font-semibold text-slate-700">{translateDataLabel(language, labelCategory, item.label)}</span>
-              <span className="shrink-0 font-bold text-ink">{currency ? formatCurrency(amount, language) : formatNumber(item.rows, language)}</span>
-            </div>
-            <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full rounded-full bg-emerald" style={{ width: `${width}%` }} />
-            </div>
-            <p className="mt-1 text-xs text-slate-400">{formatNumber(item.rows, language)} {locale.accessibility.rows}</p>
-          </div>
-        );
-      })}
-    </div>
-  );
+function LoadingShell({ className }: { className: string }) {
+  const { locale } = useI18n();
+  return <div className={`loading-shell ${className}`} role="status" aria-label={locale.loading.label} />;
 }
 
-const pieColors = ["var(--color-emerald)", "var(--color-sky)"];
-
-function IncomePieChart({ items, emptyLabel }: { items: BreakdownItem[]; emptyLabel: string }) {
-  const { language, locale } = useI18n();
-  if (items.length === 0) return <p className="py-8 text-sm text-slate-500">{emptyLabel}</p>;
-
-  const values = items.map((item) => Math.max(0, item.totalValue ?? item.rows));
-  const total = values.reduce((sum, value) => sum + value, 0);
-  let cursor = 0;
-  const segments = values.map((value, index) => {
-    const share = total > 0 ? value / total : 1 / values.length;
-    const start = cursor;
-    cursor += share * 100;
-    return `${pieColors[index % pieColors.length]} ${start}% ${cursor}%`;
-  });
-  const chartLabel = items
-    .map((item, index) => {
-      const percentage = total > 0 ? (values[index] / total) * 100 : 100 / values.length;
-      return `${translateDataLabel(language, "incomeStreams", item.label)} ${formatCurrency(values[index], language)}, ${percentage.toFixed(1)}%`;
-    })
-    .join("; ");
-
+function SliceError({ onRetry }: { onRetry: () => void }) {
+  const { locale } = useI18n();
   return (
-    <div className="flex flex-col items-center gap-7 sm:flex-row sm:items-center">
-      <div
-        aria-label={`${locale.accessibility.incomeChart}: ${chartLabel}`}
-        className="size-44 shrink-0 rounded-full shadow-inner ring-8 ring-white sm:size-52"
-        role="img"
-        style={{ background: `conic-gradient(${segments.join(", ")})` }}
-      />
-      <div className="w-full min-w-0 space-y-4" aria-label={locale.accessibility.incomeLegend}>
-        {items.map((item, index) => {
-          const amount = values[index];
-          const percentage = total > 0 ? (amount / total) * 100 : 100 / values.length;
-          return (
-            <div key={item.label} className="flex items-start justify-between gap-4">
-              <div className="flex min-w-0 items-start gap-2.5">
-                <span
-                  aria-hidden="true"
-                  className="mt-1.5 size-3 shrink-0 rounded-full"
-                  style={{ backgroundColor: pieColors[index % pieColors.length] }}
-                />
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-slate-700">{translateDataLabel(language, "incomeStreams", item.label)}</p>
-                  <p className="mt-1 text-xs text-slate-400">{formatNumber(item.rows, language)} {locale.accessibility.rows} · {percentage.toFixed(1)}%</p>
-                </div>
-              </div>
-              <span className="shrink-0 text-right text-sm font-bold text-ink">{formatCurrency(amount, language)}</span>
-            </div>
-          );
-        })}
-      </div>
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950">
+      <p>{locale.errors.sliceLoad}</p>
+      <button type="button" onClick={onRetry} className="mt-3 rounded-full bg-ink px-4 py-2 text-xs font-bold text-white transition hover:bg-slate-700">
+        {locale.errors.tryAgain}
+      </button>
     </div>
-  );
-}
-
-function IncomeBreakdown({ items, emptyLabel }: { items: BreakdownItem[]; emptyLabel: string }) {
-  return items.length === 2 ? (
-    <IncomePieChart items={items} emptyLabel={emptyLabel} />
-  ) : (
-    <BreakdownList items={items} currency labelCategory="incomeStreams" emptyLabel={emptyLabel} />
   );
 }
 
@@ -224,43 +175,32 @@ function Panel({ title, eyebrow, children }: { title: string; eyebrow: string; c
   );
 }
 
+function MetricSkeleton() {
+  return (
+    <article className="dashboard-card p-6">
+      <LoadingShell className="h-4 w-28 rounded-full" />
+      <LoadingShell className="mt-5 h-10 w-32 rounded-xl" />
+      <LoadingShell className="mt-3 h-3 w-24 rounded-full" />
+    </article>
+  );
+}
+
+function ChartSkeleton({ table = false }: { table?: boolean }) {
+  return (
+    <div className="space-y-4" aria-busy="true">
+      <LoadingShell className={table ? "h-4 w-3/4 rounded-full" : "h-56 w-full rounded-[1.5rem]"} />
+      {table && <><LoadingShell className="h-4 w-full rounded-full" /><LoadingShell className="h-4 w-5/6 rounded-full" /><LoadingShell className="h-4 w-2/3 rounded-full" /></>}
+    </div>
+  );
+}
+
 function DashboardPage() {
   const { language, locale } = useI18n();
-  const [data, setData] = useState<DashboardResponse | null>(null);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const load = () => {
-    setLoading(true);
-    setError(false);
-    const controller = new AbortController();
-    fetchDashboard(controller.signal)
-      .then(setData)
-      .catch((reason: unknown) => {
-        if (reason instanceof DOMException && reason.name === "AbortError") return;
-        setError(true);
-      })
-      .finally(() => setLoading(false));
-    return () => controller.abort();
-  };
-
-  useEffect(() => load(), []);
-
-  const totalRows = useMemo(() => data ? Object.values(data.tables).reduce((sum, value) => sum + value, 0) : 0, [data]);
-
-  if (loading) {
-    return <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8"><div className="h-56 animate-pulse rounded-[2rem] bg-slate-200/70" /></div>;
-  }
-  if (error || !data) {
-    return (
-      <div className="mx-auto max-w-2xl px-5 py-24 text-center lg:px-8">
-        <span className="text-5xl">◌</span>
-        <h1 className="mt-6 text-3xl font-black">{locale.errors.title}</h1>
-        <p className="mt-3 text-slate-600">{error ? locale.errors.load : locale.errors.noData}</p>
-        <button onClick={load} className="mt-7 rounded-full bg-ink px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-700">{locale.errors.tryAgain}</button>
-      </div>
-    );
-  }
+  const overview = useResource<DashboardOverviewResponse>(fetchOverview);
+  const income = useResource<DashboardBreakdownResponse>(fetchIncome);
+  const assets = useResource<DashboardBreakdownResponse>(fetchAssets);
+  const declarations = useResource<DashboardBreakdownResponse>(fetchDeclarations);
+  const totalRows = overview.data ? Object.values(overview.data.tables).reduce((sum, value) => sum + value, 0) : null;
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-14">
@@ -273,42 +213,58 @@ function DashboardPage() {
           <p className="mt-5 max-w-lg text-base leading-7 text-slate-300">{locale.hero.description}</p>
         </div>
         <div className="relative z-10 mt-10 flex flex-wrap gap-3 text-sm sm:mt-0 sm:justify-end">
-          <span className="rounded-full bg-white/10 px-4 py-2 font-semibold text-slate-200">{locale.hero.snapshot} {data.snapshotDate ?? locale.hero.notAvailable}</span>
-          <span className="rounded-full bg-lime px-4 py-2 font-bold text-ink">{formatNumber(totalRows, language)} {locale.hero.totalRows}</span>
+          <span className="rounded-full bg-white/10 px-4 py-2 font-semibold text-slate-200">
+            {locale.hero.snapshot} {overview.loading ? <span className="loading-shell-dark inline-block h-4 w-24 rounded-full align-middle" /> : overview.data?.snapshotDate ?? locale.hero.notAvailable}
+          </span>
+          <span className="rounded-full bg-lime px-4 py-2 font-bold text-ink">
+            {overview.loading ? <span className="loading-shell-dark inline-block h-4 w-28 rounded-full align-middle" /> : totalRows === null ? locale.hero.notAvailable : formatNumber(totalRows, language)} {overview.loading || totalRows !== null ? locale.hero.totalRows : ""}
+          </span>
         </div>
       </section>
 
       <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard language={language} label={locale.metrics.declarations.label} value={data.tables.declarations} detail={locale.metrics.declarations.detail} accent="bg-emerald" />
-        <MetricCard language={language} label={locale.metrics.people.label} value={data.tables.people} detail={locale.metrics.people.detail} accent="bg-lime" />
-        <MetricCard language={language} label={locale.metrics.incomes.label} value={data.tables.incomes} detail={locale.metrics.incomes.detail} accent="bg-sky" />
-        <MetricCard language={language} label={locale.metrics.assets.label} value={data.tables.assets} detail={locale.metrics.assets.detail} accent="bg-violet" />
+        {overview.loading && [0, 1, 2, 3].map((key) => <MetricSkeleton key={key} />)}
+        {overview.error && <div className="sm:col-span-2 lg:col-span-4"><SliceError onRetry={overview.reload} /></div>}
+        {overview.data && <>
+          <MetricCard language={language} label={locale.metrics.declarations.label} value={overview.data.tables.declarations} detail={locale.metrics.declarations.detail} accent="bg-emerald" />
+          <MetricCard language={language} label={locale.metrics.people.label} value={overview.data.tables.people} detail={locale.metrics.people.detail} accent="bg-lime" />
+          <MetricCard language={language} label={locale.metrics.incomes.label} value={overview.data.tables.incomes} detail={locale.metrics.incomes.detail} accent="bg-sky" />
+          <MetricCard language={language} label={locale.metrics.assets.label} value={overview.data.tables.assets} detail={locale.metrics.assets.detail} accent="bg-violet" />
+        </>}
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-2">
         <Panel title={locale.panels.income.title} eyebrow={locale.panels.income.eyebrow}>
-          <IncomeBreakdown items={data.incomeByStream} emptyLabel={locale.panels.income.empty} />
+          {income.loading && <ChartSkeleton />}
+          {income.error && <SliceError onRetry={income.reload} />}
+          {income.data && <Suspense fallback={<ChartSkeleton />}><IncomeChart items={income.data.items} emptyLabel={locale.panels.income.empty} language={language} chartLabel={locale.accessibility.incomeChart} legendLabel={locale.accessibility.incomeLegend} rowsLabel={locale.accessibility.rows} /></Suspense>}
         </Panel>
         <Panel title={locale.panels.assets.title} eyebrow={locale.panels.assets.eyebrow}>
-          <BreakdownList items={data.assetsBySection} currency labelCategory="assetSections" emptyLabel={locale.panels.assets.empty} />
+          {assets.loading && <ChartSkeleton />}
+          {assets.error && <SliceError onRetry={assets.reload} />}
+          {assets.data && <Suspense fallback={<ChartSkeleton />}><AssetChart items={assets.data.items} emptyLabel={locale.panels.assets.empty} language={language} /></Suspense>}
         </Panel>
       </section>
 
       <section className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <Panel title={locale.panels.declarationTypes.title} eyebrow={locale.panels.declarationTypes.eyebrow}>
-          <div className="overflow-x-auto">
+          {declarations.loading && <ChartSkeleton table />}
+          {declarations.error && <SliceError onRetry={declarations.reload} />}
+          {declarations.data && <div className="overflow-x-auto">
             <table className="w-full min-w-[22rem] text-left text-sm">
               <thead className="border-b border-slate-200 text-xs uppercase tracking-[0.14em] text-slate-400"><tr><th className="pb-3 font-bold">{locale.panels.declarationTypes.type}</th><th className="pb-3 text-right font-bold">{locale.panels.declarationTypes.rows}</th></tr></thead>
-              <tbody className="divide-y divide-slate-100">{data.declarationsByType.map((item) => <tr key={item.label}><td className="py-3 font-semibold text-slate-700">{translateDataLabel(language, "declarationTypes", item.label)}</td><td className="py-3 text-right font-bold text-ink">{formatNumber(item.rows, language)}</td></tr>)}</tbody>
+              <tbody className="divide-y divide-slate-100">{declarations.data.items.map((item) => <tr key={item.label}><td className="py-3 font-semibold text-slate-700">{translateDataLabel(language, "declarationTypes", item.label)}</td><td className="py-3 text-right font-bold text-ink">{formatNumber(item.rows, language)}</td></tr>)}</tbody>
             </table>
-            {data.declarationsByType.length === 0 && <p className="py-6 text-sm text-slate-500">{locale.panels.declarationTypes.empty}</p>}
-          </div>
+            {declarations.data.items.length === 0 && <p className="py-6 text-sm text-slate-500">{locale.panels.declarationTypes.empty}</p>}
+          </div>}
         </Panel>
         <Panel title={locale.panels.snapshotMeaning.title} eyebrow={locale.panels.snapshotMeaning.eyebrow}>
           <div className="space-y-4 text-sm leading-6 text-slate-600">
             <p>{locale.panels.snapshotMeaning.counts}</p>
             <p>{locale.panels.snapshotMeaning.amounts}</p>
-            <p className="rounded-2xl bg-lime/30 p-4 font-semibold text-ink">{locale.panels.snapshotMeaning.lastGenerated}: {formatDateTime(data.generatedAt, language)}</p>
+            <p className="rounded-2xl bg-lime/30 p-4 font-semibold text-ink">
+              {locale.panels.snapshotMeaning.lastGenerated}: {overview.loading ? <span className="loading-shell inline-block h-4 w-32 rounded-full align-middle" /> : overview.data ? formatDateTime(overview.data.generatedAt, language) : locale.hero.notAvailable}
+            </p>
           </div>
         </Panel>
       </section>

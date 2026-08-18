@@ -18,6 +18,13 @@ except ImportError:  # pragma: no cover - fixture-only repository tests use the 
 
 from service import authorized, error_payload, response, run_dashboard
 
+SLICE_ROUTES = {
+    "/v1/dashboard/overview": "overview",
+    "/v1/dashboard/income": "income",
+    "/v1/dashboard/assets": "assets",
+    "/v1/dashboard/declarations": "declarations",
+}
+
 
 def not_found() -> tuple[str, int, dict[str, str]]:
     """Return a generic response for paths outside the bridge contract."""
@@ -43,12 +50,16 @@ def is_health_request(request: Any) -> bool:
     return request.path == "/healthz" and request.method == "GET"
 
 
+def dashboard_view(request: Any) -> str | None:
+    """Return the fixed query view for a public dashboard slice."""
+
+    return SLICE_ROUTES.get(request.path)
+
+
 def is_dashboard_request(request: Any) -> bool:
-    """Identify the sole data route before checking method and credentials."""
+    """Identify a supported data route before checking method and credentials."""
 
-    # Keeping this predicate separate makes the public route inventory obvious.
-
-    return request.path == "/v1/dashboard"
+    return dashboard_view(request) is not None
 
 
 def dashboard_route(request: Any) -> tuple[str, int, dict[str, str]]:
@@ -62,11 +73,11 @@ def dashboard_route(request: Any) -> tuple[str, int, dict[str, str]]:
         return method_not_allowed()
     if not authorized(request, os.environ.get("BRIDGE_TOKEN", "")):
         return response(error_payload("UNAUTHORIZED", "Unauthorized"), 401)
-    return run_dashboard()
+    return run_dashboard(dashboard_view(request) or "overview")
 
 
 @functions_framework.http
 def dashboard(request: Any) -> tuple[str, int, dict[str, str]]:
-    """Serve only health and aggregate dashboard endpoints."""
+    """Serve only health and independent aggregate dashboard endpoints."""
 
     return dashboard_route(request)

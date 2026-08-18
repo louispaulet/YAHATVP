@@ -7,24 +7,42 @@ const dashboard = {
   snapshotDate: "2026-08-18",
   generatedAt: "2026-08-18T08:00:00Z",
   tables: { declarations: 2, people: 2, incomes: 3, assets: 4 },
-  incomeByStream: [
+};
+
+const income = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  items: [
     { label: "mandate_remuneration", rows: 2, totalValue: 120000 },
     { label: "revenu_mandat", rows: 1, totalValue: 30000 },
   ],
-  assetsBySection: [{ label: "immeubleDto", rows: 4, totalValue: 80000 }],
-  declarationsByType: [{ label: "Déclaration d'intérêts", rows: 2 }],
+};
+
+const assets = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  items: [{ label: "immeubleDto", rows: 4, totalValue: 80000 }],
+};
+
+const declarations = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  items: [{ label: "Déclaration d'intérêts", rows: 2 }],
 };
 
 describe("dashboard application", () => {
   beforeEach(() => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify(dashboard), { status: 200 })));
+    vi.stubGlobal("fetch", vi.fn().mockImplementation((url: string) => {
+      const payload = url.endsWith("/overview") ? dashboard : url.endsWith("/income") ? income : url.endsWith("/assets") ? assets : declarations;
+      return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+    }));
   });
 
   it("renders aggregate metrics and breakdowns", async () => {
     render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
     expect(await screen.findByText("Declarations")).toBeInTheDocument();
     expect(screen.getByText("Income, by stream")).toBeInTheDocument();
-    expect(screen.getByText("Mandate remuneration")).toBeInTheDocument();
+    expect(await screen.findByText("Mandate remuneration")).toBeInTheDocument();
     expect(screen.getByText("Mandate income")).toBeInTheDocument();
     expect(screen.getByText("Real estate")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Income totals by stream/i })).toBeInTheDocument();

@@ -44,6 +44,46 @@ h3 {
   box-shadow: 0 10px 30px rgb(23 35 31 / 0.04);
 }
 
+.loading-shell {
+  background: linear-gradient(110deg, #e2e8f0 22%, #f8fafc 42%, #e2e8f0 62%);
+  background-size: 200% 100%;
+  animation: shell-blink 2.8s ease-in-out infinite;
+}
+
+.loading-shell-dark {
+  background: rgb(255 255 255 / 0.28);
+  animation: shell-blink-dark 2.8s ease-in-out infinite;
+}
+
+@keyframes shell-blink {
+  0%,
+  100% {
+    opacity: 0.58;
+    background-position: 100% 0;
+  }
+  50% {
+    opacity: 1;
+    background-position: 0 0;
+  }
+}
+
+@keyframes shell-blink-dark {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-shell,
+  .loading-shell-dark {
+    animation: none;
+  }
+}
+
 .hero-grid {
   background-image: radial-gradient(circle at 80% 20%, rgb(217 249 157 / 0.17), transparent 28%), radial-gradient(circle at 96% 90%, rgb(142 215 232 / 0.16), transparent 25%);
 }

@@ -562,19 +562,22 @@ pipeline and reads only aggregate data from the four curated BigQuery tables:
 
 ```text
 GitHub Pages React app
-        │ GET /api/dashboard
+        │ GET /api/dashboard/{slice}
         ▼
 Cloudflare Worker
-        │ authenticated aggregate request
+        │ authenticated aggregate request per slice
         ▼
 Read-only Cloud Run bridge ─── BigQuery curated tables
 ```
 
 The public API does not expose arbitrary SQL, raw rows, addresses, contact
 fields, or other personal fields. The bridge selects the latest shared
-`snapshot_date`, returns table counts, income-stream totals, asset-section
-totals, and declaration-type counts. The Worker adds CORS and a short cache
-header so the weekly source does not require a query on every page refresh.
+`snapshot_date` and exposes four fixed read-only slices: `overview`, `income`,
+`assets`, and `declarations`. The Worker adds CORS and a short cache header to
+each slice, so one slow aggregate cannot hold the rest of the page hostage.
+The frontend starts all four requests independently, preserves each panel’s
+layout with a slow-blinking loading shell, and lazy-loads the interactive
+[Recharts](https://recharts.org/) module for the income and asset plots.
 
 ### Local dashboard checks
 
@@ -617,9 +620,11 @@ different resources.
 The initial deployment is available at
 [GitHub Pages](https://louispaulet.github.io/YAHATVP/) and uses the Worker API
 at `https://hatvp-transparency-api.louispaulet13.workers.dev`. The deployed
-Worker health check and aggregate endpoint returned HTTP 200 after deployment;
-the bridge remains protected by its shared token and is not a public data
-endpoint.
+Worker health check and aggregate endpoint returned HTTP 200 after the initial
+deployment; the bridge remains protected by its shared token and is not a
+public data endpoint. After deploying this slice-based API, verify
+`/api/dashboard/overview`, `/api/dashboard/income`,
+`/api/dashboard/assets`, and `/api/dashboard/declarations` individually.
 
 ## Google Cloud deployment
 

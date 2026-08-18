@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-08-18 — Load dashboard plots independently
+
+### Changed
+
+- Split the dashboard API into independent `overview`, `income`, `assets`, and
+  `declarations` routes through the Cloudflare Worker and read-only BigQuery
+  bridge; each route runs one fixed aggregate query and receives its own cache
+  policy.
+- Removed the page-wide loading gate in favor of panel-level, slow-blinking
+  loading shells and retryable errors, so the dashboard stays useful while
+  individual slices are in flight.
+- Replaced the CSS-only income pie and asset bars with lazy-loaded Recharts
+  charts featuring responsive sizing, animated transitions, tooltips, and
+  accessible value lists.
+
+### Verified
+
+- Frontend tests: 8 passed; production Vite build passes with the chart code in
+  a deferred chunk (initial bundle 255.65 kB, 80.51 kB gzip).
+- Worker tests: 6 passed; Worker typecheck passes.
+- BigQuery bridge fixture tests: 23 passed; Ruff lint and formatting pass.
+
 ## 2026-08-18 — Add generated HATVP brand mark
 
 ### Added

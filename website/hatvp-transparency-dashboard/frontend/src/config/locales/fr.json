@@ -17,6 +17,9 @@
     "builtFrom": "Construit à partir des déclarations publiques de la HATVP.",
     "project": "Voir le projet sur GitHub"
   },
+  "loading": {
+    "label": "Chargement des données du tableau de bord"
+  },
   "hero": {
     "eyebrow": "Les données publiques, plus lisibles",
     "title": "Une vue plus claire des déclarations publiques.",
@@ -104,6 +107,7 @@
     "noData": "Aucune donnée n’est encore disponible.",
     "tryAgain": "Réessayer",
     "load": "Les données du tableau de bord n’ont pas pu être chargées.",
+    "sliceLoad": "Ce panneau n’a pas pu être chargé.",
     "notFound": "Page introuvable.",
     "backToOverview": "Retour à la vue d’ensemble"
   },

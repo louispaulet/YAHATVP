@@ -17,6 +17,9 @@
     "builtFrom": "Built from public HATVP declarations.",
     "project": "View project on GitHub"
   },
+  "loading": {
+    "label": "Loading dashboard data"
+  },
   "hero": {
     "eyebrow": "Public data, made clearer",
     "title": "A clearer view of public declarations.",
@@ -104,6 +107,7 @@
     "noData": "No data is available yet.",
     "tryAgain": "Try again",
     "load": "Dashboard data could not be loaded.",
+    "sliceLoad": "This panel could not be loaded.",
     "notFound": "Page not found.",
     "backToOverview": "Back to overview"
   },

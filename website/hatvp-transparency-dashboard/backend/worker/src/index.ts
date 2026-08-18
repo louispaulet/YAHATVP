@@ -1,8 +1,17 @@
-import type { DashboardResponse, WorkerEnv } from "./types";
+import type {
+  DashboardBreakdownResponse,
+  DashboardOverviewResponse,
+  WorkerEnv,
+} from "./types";
 
-const DASHBOARD_PATH = "/api/dashboard";
 const HEALTH_PATH = "/healthz";
 const CACHE_CONTROL = "public, max-age=300, s-maxage=600";
+const DASHBOARD_SLICE_ROUTES = {
+  "/api/dashboard/overview": "/v1/dashboard/overview",
+  "/api/dashboard/income": "/v1/dashboard/income",
+  "/api/dashboard/assets": "/v1/dashboard/assets",
+  "/api/dashboard/declarations": "/v1/dashboard/declarations",
+} as const;
 
 type Fetcher = typeof fetch;
 
@@ -43,22 +52,27 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function isDashboardResponse(value: unknown): value is DashboardResponse {
+function isDashboardOverviewResponse(value: unknown): value is DashboardOverviewResponse {
   if (!isRecord(value) || typeof value.generatedAt !== "string") return false;
   if (!(value.snapshotDate === null || typeof value.snapshotDate === "string")) return false;
   const tables = value.tables;
-  if (!isRecord(tables)) return false;
-  const tableNames = ["declarations", "people", "incomes", "assets"];
-  if (!tableNames.every((name) => typeof tables[name] === "number")) return false;
-  return ["incomeByStream", "assetsBySection", "declarationsByType"].every(
-    (key) => Array.isArray(value[key]),
+  return isRecord(tables) && ["declarations", "people", "incomes", "assets"].every(
+    (name) => typeof tables[name] === "number",
   );
 }
 
-async function proxyDashboard(
+function isDashboardBreakdownResponse(value: unknown): value is DashboardBreakdownResponse {
+  if (!isRecord(value) || typeof value.generatedAt !== "string") return false;
+  if (!(value.snapshotDate === null || typeof value.snapshotDate === "string")) return false;
+  return Array.isArray(value.items);
+}
+
+async function proxySlice(
   request: Request,
   env: WorkerEnv,
   fetcher: Fetcher,
+  upstreamPath: string,
+  validate: (value: unknown) => boolean,
 ): Promise<Response> {
   if (!env.BRIDGE_URL || !env.BRIDGE_TOKEN) {
     return jsonResponse(request, env, errorPayload("CONFIGURATION_ERROR", "API is not configured"), 500);
@@ -66,7 +80,7 @@ async function proxyDashboard(
 
   let upstream: Response;
   try {
-    const target = new URL("/v1/dashboard", env.BRIDGE_URL).toString();
+    const target = new URL(upstreamPath, env.BRIDGE_URL).toString();
     upstream = await fetcher(target, {
       method: "GET",
       headers: { Authorization: `Bearer ${env.BRIDGE_TOKEN}`, Accept: "application/json" },
@@ -85,7 +99,7 @@ async function proxyDashboard(
   } catch {
     return jsonResponse(request, env, errorPayload("INVALID_UPSTREAM_RESPONSE", "Dashboard data is invalid"), 502);
   }
-  if (!isDashboardResponse(payload)) {
+  if (!validate(payload)) {
     return jsonResponse(request, env, errorPayload("INVALID_UPSTREAM_RESPONSE", "Dashboard data is invalid"), 502);
   }
   return jsonResponse(request, env, payload, 200, { "Cache-Control": CACHE_CONTROL });
@@ -101,13 +115,17 @@ export async function handleRequest(
   if (url.pathname === HEALTH_PATH && request.method === "GET") {
     return jsonResponse(request, env, { ok: true });
   }
-  if (url.pathname === DASHBOARD_PATH && request.method === "OPTIONS") {
+  const slicePath = DASHBOARD_SLICE_ROUTES[url.pathname as keyof typeof DASHBOARD_SLICE_ROUTES];
+  if (slicePath && request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders(request, env) });
   }
-  if (url.pathname === DASHBOARD_PATH && request.method === "GET") {
-    return proxyDashboard(request, env, fetcher);
+  if (slicePath && request.method === "GET") {
+    const validate = slicePath.endsWith("/overview")
+      ? isDashboardOverviewResponse
+      : isDashboardBreakdownResponse;
+    return proxySlice(request, env, fetcher, slicePath, validate);
   }
-  if (url.pathname === DASHBOARD_PATH) {
+  if (slicePath) {
     return jsonResponse(request, env, errorPayload("METHOD_NOT_ALLOWED", "Use GET for dashboard data"), 405);
   }
   return jsonResponse(request, env, errorPayload("NOT_FOUND", "Route not found"), 404);
