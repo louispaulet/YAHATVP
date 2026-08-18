@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-08-18 — Implement the Silver and Gold analytical layers
+
+### Changed
+
+- Added explicit historical Silver Parquet/BigQuery artifacts with anomaly
+  evidence, field-level metric eligibility, deterministic registry links, and
+  retry-safe source-row identity.
+- Added latest-version Gold artifacts with declarant/role/period ordering,
+  child-row alignment, lifecycle state propagation, and current-metric filters.
+- Added retained-Bronze backfill, anomaly-registry persistence, and a late-state
+  gate so `state/latest.json` advances only after Bronze, Silver, Gold, registry,
+  and optional BigQuery loads succeed.
+- Migrated the dashboard bridge and explanatory copy from transitional curated
+  tables to the Gold contract; historical investigations remain Silver/registry
+  oriented.
+
+### Verified
+
+- Full Python suite: 140 passed; Ruff check/format, package build, and module
+  line-budget checks passed.
+- Forced current-source local run completed with `SUCCESS_WITH_WARNINGS`, zero
+  quality errors, Bronze/Silver/Gold counts of 6,611/6,611/74,791/1,157,
+  Gold counts of 6,605/6,605/74,730/1,157, and 3,042 registry rows. The
+  unchanged replay returned `NO_CHANGE`.
+- Dashboard bridge: 31 tests passed. Frontend: 18 tests passed and Vite build
+  passed. Worker: 8 tests passed and TypeScript typecheck passed.
+- Full source hashes, partition counts, deterministic replay fingerprints, and
+  local-only validation scope are recorded in
+  `reports/03-validation/2026-08-18-silver-gold-validation.md`.
+
 ## 2026-08-18 — Turn declaration detail into a readable interface
 
 ### Changed

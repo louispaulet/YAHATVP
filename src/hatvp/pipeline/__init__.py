@@ -9,10 +9,12 @@ from zoneinfo import ZoneInfo
 
 from ..config import Settings
 from ..download import DownloadedFile, download_to_path
+from ..layers import load_bronze_history, load_registry
 from ..parser import parse_sources
 from ..quality import QualityResult, run_quality_checks
 from ..storage import ArtifactStore
-from .artifacts import archive_raw, write_report, write_tables
+from .artifacts import archive_raw, write_report
+from .flow import build_layers
 from .result import finish_run, log_no_change
 from .state import (
     PipelineFailure,
@@ -20,8 +22,8 @@ from .state import (
     load_state,
     reuse_snapshot_metadata,
     same_snapshot,
-    write_state,
 )
+from .state_update import write_success_state
 from .steps import (
     default_store,
     download_sources,
@@ -55,6 +57,8 @@ def run_pipeline(
     snapshot = snapshot_date_provider()
     started = time.perf_counter()
     previous = load_state(store) if not dry_run else {}
+    history = load_bronze_history(store) if not dry_run else {}
+    registry = load_registry(store) if not dry_run else []
     with tempfile.TemporaryDirectory(prefix="hatvp-run-") as directory:
         working_dir = Path(directory)
         downloaded = download_sources(settings, working_dir, downloader)
@@ -78,22 +82,12 @@ def run_pipeline(
             snapshot_date=snapshot,
         )
         write_report(store, snapshot, quality, dry_run)
-        files = write_tables(store, tables, snapshot, working_dir, dry_run)
         if quality.has_errors:
             raise PipelineFailure(
                 f"Quality checks failed: {quality.report['quality']['errors']} error(s)"
             )
+        files = build_layers(store, tables, history, registry, snapshot, working_dir, dry_run)
         load_bigquery(settings, files, snapshot, dry_run, bq_loader)
         if not dry_run:
-            write_state(
-                store,
-                {
-                    "snapshot_date": snapshot,
-                    "fetched_at": metadata["fetched_at"],
-                    "xml_sha256": downloaded["declarations.xml"].sha256,
-                    "csv_sha256": downloaded["liste.csv"].sha256,
-                    "pipeline_git_sha": settings.pipeline_git_sha,
-                    "pipeline_version": settings.pipeline_version,
-                },
-            )
+            write_success_state(store, snapshot, metadata, downloaded, settings)
         return finish_run(snapshot, started, quality)

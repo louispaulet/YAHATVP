@@ -32,7 +32,7 @@ def build_declaration_query(project: str, dataset: str) -> str:
     prefix = dataset_prefix(project, dataset)
     fields = declaration_struct()
     return f"""WITH latest AS (
-  SELECT MAX(snapshot_date) AS snapshot_date FROM {prefix}.declarations
+  SELECT MAX(snapshot_date) AS snapshot_date FROM {prefix}.gold_declarations
 )
 SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
 CURRENT_TIMESTAMP() AS generated_at,
@@ -40,8 +40,8 @@ TO_JSON_STRING(STRUCT(
   {fields}
 )) AS result_json
 FROM latest l
-JOIN {prefix}.declarations d ON d.snapshot_date = l.snapshot_date
-LEFT JOIN {prefix}.people p
+JOIN {prefix}.gold_declarations d ON d.snapshot_date = l.snapshot_date
+LEFT JOIN {prefix}.gold_people p
   ON p.declaration_uuid = d.declaration_uuid
   AND p.snapshot_date = d.snapshot_date
 WHERE d.declaration_uuid = @declaration_uuid

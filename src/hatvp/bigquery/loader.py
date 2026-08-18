@@ -15,7 +15,9 @@ def validate_table_files(
 ) -> tuple[str, ...]:
     """Validate the selected load set before creating any staging table."""
 
-    selected = tuple(table_names)
+    from . import validate_load_selection
+
+    selected = validate_load_selection(table_names)
     missing = [name for name in selected if name not in table_files]
     if missing:
         raise ValueError(f"Missing required BigQuery table files: {', '.join(missing)}")

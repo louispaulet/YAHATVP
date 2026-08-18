@@ -63,7 +63,7 @@
     "snapshotMeaning": {
       "title": "Ce que signifie cet instantané",
       "eyebrow": "Lire les données",
-      "counts": "Les décomptes se limitent au dernier instantané réussi partagé par les tables sélectionnées.",
+      "counts": "Les décomptes se limitent au dernier instantané réussi partagé par les tables Gold.",
       "amounts": "Les montants conservent les valeurs numériques normalisées par le pipeline d’ingestion. Ils constituent des indicateurs et ne remplacent pas les déclarations sources.",
       "lastGenerated": "Dernière génération"
     }
@@ -72,7 +72,7 @@
     "eyebrow": "À propos des données",
     "title": "Une petite fenêtre sur un jeu de données public.",
     "paragraphs": [
-      "Ce tableau de bord est construit à partir du pipeline de données ouvertes de la HATVP. Le pipeline conserve les fichiers sources, normalise les enregistrements, contrôle leur qualité et publie quatre tables BigQuery sélectionnées.",
+      "Ce tableau de bord est construit à partir du pipeline de données ouvertes de la HATVP. Le pipeline conserve les fichiers sources, normalise les enregistrements, contrôle leur qualité et publie quatre tables BigQuery Gold.",
       "La vue d’ensemble expose uniquement des agrégats. Les coordonnées personnelles et les lignes brutes des déclarations ne font pas partie de cette API publique."
     ],
     "sourcePrefix": "Pour consulter la source officielle et le contexte complet des déclarations, utilisez les liens officiels de la HATVP ci-dessous.",
@@ -113,7 +113,7 @@
       "description": "Consultez le code du tableau de bord, le pipeline d’ingestion et la documentation.",
       "href": "https://github.com/louispaulet/YAHATVP/tree/main"
     },
-    "curatedTables": "Tables sélectionnées",
+    "curatedTables": "Tables Gold",
     "curatedTablesDetail": "déclarations, personnes, revenus, patrimoine",
     "updateRhythm": "Rythme de mise à jour",
     "updateRhythmValue": "Hebdomadaire",
@@ -122,7 +122,7 @@
   "explore": {
     "eyebrow": "Explorer les données",
     "title": "De nouvelles façons d’explorer arrivent bientôt.",
-    "description": "Cet espace accueillera des vues plus détaillées des données HATVP sélectionnées, pour suivre une déclaration de sa source jusqu’à son agrégat.",
+    "description": "Cet espace accueillera des vues plus détaillées des données HATVP Gold, pour suivre une déclaration de sa source jusqu’à son agrégat.",
     "status": "Page temporaire",
     "next": "De nouveaux outils d’exploration seront ajoutés lors d’une prochaine mise à jour."
   },

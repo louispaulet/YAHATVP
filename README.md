@@ -7,16 +7,16 @@ datasets.
 > Project status: the local end-to-end path is implemented and has been exercised
 > against the current public HATVP files. The Cloud Run deployment is in place,
 > and the weekly `hatvp-ingestion-weekly` Scheduler trigger runs the real
-> ingestion job at 07:00 Europe/Paris. BigQuery is enabled for the initial
-> `declarations`, `people`, `incomes`, and `assets` Bronze tables; the remaining
-> normalized tables remain GCS-only until a later expansion.
+> ingestion job at 07:00 Europe/Paris. BigQuery keeps the version-complete
+> `declarations`, `people`, `incomes`, and `assets` Bronze tables and now loads
+> anomaly-annotated Silver, latest-version Gold, and the anomaly registry.
 
 ## Goal
 
 The pipeline downloads the two public HATVP datasets, detects changes using
-SHA-256 hashes, preserves immutable raw snapshots, produces normalized Parquet
-datasets, reports data-quality issues, and optionally publishes Bronze tables
-to BigQuery.
+SHA-256 hashes, preserves immutable raw snapshots, produces Bronze, Silver, and
+Gold Parquet datasets, reports data-quality issues, and optionally publishes
+every analytical layer to BigQuery.
 
 The pipeline is deliberately small. It runs once per week as a Cloud Run Job;
 Cloud Scheduler is only the trigger. GitHub Actions is used for CI/CD and
@@ -38,7 +38,7 @@ flowchart TB
     parquet["Parquet to GCS"]
     anomalies["Anomalies to GCS"]
     report["Quality report to GCS"]
-    bigquery["Optional BigQuery Bronze tables"]
+    bigquery["Optional BigQuery Bronze / Silver / Gold tables"]
     state["Update state/latest.json last"]
     status["Emit status<br/>NO_CHANGE / SUCCESS /<br/>SUCCESS_WITH_WARNINGS / FAILED"]
     github["GitHub Actions +<br/>Workload Identity Federation"]
@@ -146,6 +146,13 @@ hatvp-pipeline/
 │   │   ├── result.py
 │   │   ├── state.py
 │   │   └── steps.py
+│   ├── layers/
+│   │   ├── __init__.py            # analytical-layer façade
+│   │   ├── anomaly*.py            # HATVP-specific anomaly rules
+│   │   ├── gold*.py               # latest-version selection
+│   │   ├── history.py             # retained Bronze backfill
+│   │   ├── registry*.py           # anomaly lifecycle registry
+│   │   └── silver*.py             # anomaly metadata and eligibility
 │   ├── quality/
 │   │   ├── __init__.py            # stable quality façade
 │   │   ├── checks.py
@@ -178,9 +185,10 @@ hatvp-pipeline/
 
 Parser navigation, streaming, CSV, declaration/person, mandate/remuneration,
 income, finance, and activity components live in the `parser/` package.
-Pipeline orchestration and its state, artifacts, results, steps, and BigQuery
-integration live in `pipeline/`. Quality checks live in `quality/`, source-linked
-review generation lives in `triage/`, Bronze BigQuery loading lives in
+Pipeline orchestration and its state, artifacts, results, steps, layer flow, and
+BigQuery integration live in `pipeline/`. Bronze-to-Silver-to-Gold rules live in
+`layers/`. Quality checks live in `quality/`, source-linked review generation
+lives in `triage/`, Bronze BigQuery loading lives in
 `bigquery/`, storage adapters live in `storage/`, downloads live in `download/`,
 and Parquet/table contracts live in `tables/`. Package `__init__.py` files are
 the small façades used by the application; the focused modules below them are
@@ -228,10 +236,10 @@ gs://<bucket>/hatvp/
 │   ├── declarations.xml
 │   ├── liste.csv
 │   └── metadata.json
-├── silver/declarations/snapshot_date=YYYY-MM-DD/data.parquet
-├── silver/mandate_remunerations/snapshot_date=YYYY-MM-DD/data.parquet
-├── silver/incomes/snapshot_date=YYYY-MM-DD/data.parquet
-├── silver/assets/snapshot_date=YYYY-MM-DD/data.parquet
+├── bronze/<table>/snapshot_date=YYYY-MM-DD/data.parquet
+├── silver/{declarations,people,incomes,assets}/snapshot_date=YYYY-MM-DD/data.parquet
+├── gold/{declarations,people,incomes,assets}/snapshot_date=YYYY-MM-DD/data.parquet
+├── anomaly_registry/snapshot_date=YYYY-MM-DD/data.parquet
 ├── quarantine/snapshot_date=YYYY-MM-DD/anomalies.parquet
 ├── quality/snapshot_date=YYYY-MM-DD/report.json
 └── state/latest.json
@@ -254,8 +262,8 @@ partial failure.
 }
 ```
 
-A failed download, parse, normalization, quality check, Parquet write, or
-BigQuery load must never advance this state.
+A failed download, parse, normalization, quality check, Parquet write, anomaly
+registry write, or BigQuery load must never advance this state.
 
 ### Normalized data
 
@@ -507,26 +515,36 @@ catastrophic row-count reductions, immutable raw snapshots, BigQuery failure
 gating, required XML structure, and state remaining unchanged after a failed
 pipeline.
 
-## BigQuery Bronze layer
+## BigQuery Bronze, Silver, and Gold layers
 
-BigQuery is optional and currently contains the version-complete Bronze copy.
-GCS remains the archive and source of truth. The application must work with
-`HATVP_ENABLE_BIGQUERY=false`.
+BigQuery is optional. GCS remains the immutable archive and source of truth, and
+the application must work with `HATVP_ENABLE_BIGQUERY=false`.
 
-The initial Bronze layer publishes only `declarations`, `people`, `incomes`,
-and `assets`. Other normalized tables remain available in GCS and can be added
-after a focused schema review. Every Bronze table includes
-`snapshot_date` as a `DATE` and is partitioned by that column. BigQuery loading
-is part of the success gate: if a required load fails, do not advance
-`state/latest.json`.
+The physical BigQuery contract is:
+
+| Layer | Tables | Grain |
+| --- | --- | --- |
+| Bronze | `declarations`, `people`, `incomes`, `assets` | Every observed source occurrence and child value, including amendments and repeated UUIDs. |
+| Silver | `silver_declarations`, `silver_people`, `silver_incomes`, `silver_assets` | The same historical Bronze grain plus anomaly rule IDs, registry links, evidence, status, and field-level metric eligibility. |
+| Gold | `gold_declarations`, `gold_people`, `gold_incomes`, `gold_assets` | The latest applicable declaration per stable declarant, role/mandate, and period; child rows join to that declaration version. |
+| Registry | `anomaly_registry` | One deterministic anomaly key with first/last-seen dates and explainable lifecycle status. |
+
+Every physical table includes `snapshot_date` and is partitioned by that column.
+BigQuery loading is part of the success gate: if Bronze, Silver, Gold, or the
+registry load fails, do not advance `state/latest.json`.
 
 Bronze keeps one row per observed declaration occurrence and does not collapse
 initial, amended, superseding, or repeated-UUID records. Each row carries a
 deterministic `bronze_record_key`, the stable source identifier, declaration
 version/amendment metadata where available, exact source hash and URL/object,
 typed source snapshot date, parser/pipeline versions, source location, and raw
-record JSON. See the [Bronze contract](reports/05-schema/2026-08-18-bronze-contract.md)
-for the table grains, observed HATVP fields, and future Silver/Gold boundary.
+record JSON. Silver preserves those fields and adds `anomaly_status`,
+`anomaly_rule_ids`, `anomaly_registry_ids`, `anomaly_evidence_json`,
+`metric_eligible`, and `field_metric_eligibility_json`; it never replaces an
+observed value. Gold carries the same evidence and adds
+`is_latest_declaration` and `active_in_gold`. See the [Bronze contract](reports/05-schema/2026-08-18-bronze-contract.md)
+and [Silver/Gold validation report](reports/03-validation/2026-08-18-silver-gold-validation.md)
+for the field mapping and acceptance evidence.
 
 For example, inspect all historical occurrences without deduplicating UUIDs:
 
@@ -537,6 +555,23 @@ FROM `PROJECT.hatvp.declarations`
 WHERE declaration_uuid = 'SOURCE_UUID'
 ORDER BY snapshot_date, date_depot, bronze_record_key;
 ```
+
+Current metrics must use Gold eligibility explicitly; historical and source-
+correction investigations use Silver or `anomaly_registry`:
+
+```sql
+SELECT income_stream, SUM(normalized_value) AS eligible_value
+FROM `PROJECT.hatvp.gold_incomes`
+WHERE snapshot_date = (SELECT MAX(snapshot_date) FROM `PROJECT.hatvp.gold_incomes`)
+  AND metric_eligible
+  AND active_in_gold
+GROUP BY income_stream;
+```
+
+On every run, the layer flow reads every retained Bronze partition before
+building the current Silver partition and Gold selection. A legacy `silver/`
+partition is accepted as a read-only Bronze backfill source for snapshots
+created before the explicit Bronze path existed; raw bytes are never changed.
 
 For progressively harder read-only examples and checked-in result CSVs, see the
 [BigQuery tutorial](tutorial/README.md).
@@ -578,8 +613,8 @@ WHERE column_name = 'snapshot_date';
 
 The repository also contains a deliberately small public dashboard under
 `website/hatvp-transparency-dashboard/`. It is separate from the ingestion
-pipeline and reads aggregate data from the four Bronze BigQuery tables:
-`declarations`, `people`, `incomes`, and `assets`. Its declaration search can
+pipeline and reads current aggregates from the four Gold BigQuery tables:
+`gold_declarations`, `gold_people`, `gold_incomes`, and `gold_assets`. Its declaration search can
 open one matching public declaration and display a schema-aware interface for
 that declaration's source XML node from the immutable GCS snapshot. The detail
 view keeps a collapsed raw-XML audit section for source verification while
@@ -596,13 +631,15 @@ GitHub Pages React app
 Cloudflare Worker
         │ authenticated aggregate request per slice
         ▼
-Read-only Cloud Run bridge ─── BigQuery Bronze tables
+Read-only Cloud Run bridge ─── BigQuery Gold tables
                          └── immutable GCS XML snapshot
 ```
 
 The public API does not expose arbitrary SQL or contact/address fields.
-The bridge selects the latest shared `snapshot_date` and exposes four fixed
-read-only slices: `overview`, `income`, `assets`, and `declarations`. The
+The bridge selects the latest shared Gold `snapshot_date` and exposes four fixed
+read-only slices: `overview`, `income`, `assets`, and `declarations`. Its
+metric queries filter by Gold's explicit `metric_eligible` and `active_in_gold`
+fields; they do not recreate anomaly logic in the dashboard. The
 parameterized search matches public declarant and declaration metadata plus
 published income/asset labels. A declaration detail route accepts only a public
 declaration UUID, reads the corresponding immutable `declarations.xml` object,
@@ -967,5 +1004,6 @@ Keep the implementation specific to HATVP, with clear boundaries between:
 
 Prefer deterministic, testable functions over a generic data-engineering
 framework. The first milestone is a minimal end-to-end local run backed by
-fixtures. The initial GCS-backed and Bronze BigQuery paths are now validated.
-Keep additional BigQuery tables behind a focused schema and quality review.
+fixtures. The GCS-backed Bronze, Silver, Gold, and registry paths are now
+validated; future BigQuery layers remain behind a focused schema and quality
+review.

@@ -17,7 +17,7 @@ from search_fields import (
 
 
 def build_search_query(project: str, dataset: str) -> str:
-    """Build a parameterized search over public curated declaration fields."""
+    """Build a parameterized search over public Gold declaration fields."""
 
     prefix = dataset_prefix(project, dataset)
     declaration_match = any_predicates(string_predicates(DECLARATION_FIELDS))
@@ -29,7 +29,7 @@ def build_search_query(project: str, dataset: str) -> str:
         ]
     )
     return f"""WITH latest AS (
-  SELECT MAX(snapshot_date) AS snapshot_date FROM {prefix}.declarations
+  SELECT MAX(snapshot_date) AS snapshot_date FROM {prefix}.gold_declarations
 ),
 search AS (
   SELECT NORMALIZE_AND_CASEFOLD(@search_term) AS term
@@ -40,10 +40,10 @@ matched AS (
     d.declaration_type_label, d.mandat_label, d.mandat_type_label,
     d.mandat_category_label, d.organ_label, d.organ_declaration_label,
     d.date_depot, d.declaration_modificative
-  FROM {prefix}.declarations d
+  FROM {prefix}.gold_declarations d
   CROSS JOIN latest l
   CROSS JOIN search s
-  LEFT JOIN {prefix}.people p
+  LEFT JOIN {prefix}.gold_people p
     ON p.declaration_uuid = d.declaration_uuid
     AND p.snapshot_date = d.snapshot_date
   WHERE d.snapshot_date = l.snapshot_date

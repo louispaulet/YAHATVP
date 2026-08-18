@@ -29,6 +29,15 @@ class LocalArtifactStore:
     def read_bytes(self, relative_path: str) -> bytes:
         return self._path(relative_path).read_bytes()
 
+    def list_paths(self, relative_prefix: str) -> list[str]:
+        """List files below one logical prefix in deterministic order."""
+
+        root = self._path(relative_prefix)
+        if not root.exists():
+            return []
+        base = self._path("")
+        return sorted(str(path.relative_to(base)) for path in root.rglob("*") if path.is_file())
+
     def put_bytes(
         self,
         relative_path: str,

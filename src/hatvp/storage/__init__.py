@@ -17,6 +17,8 @@ class ArtifactStore(Protocol):
 
     def read_bytes(self, relative_path: str) -> bytes: ...
 
+    def list_paths(self, relative_prefix: str) -> list[str]: ...
+
     def put_bytes(
         self,
         relative_path: str,
