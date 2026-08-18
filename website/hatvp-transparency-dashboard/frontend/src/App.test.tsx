@@ -44,10 +44,14 @@ describe("dashboard application", () => {
   it("renders aggregate metrics and breakdowns", async () => {
     render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
     expect(await screen.findByText("Declarations")).toBeInTheDocument();
+    expect(screen.getByText("unique declarants")).toBeInTheDocument();
     expect(screen.getByText("Average annual income vs assets")).toBeInTheDocument();
     expect(await screen.findByText("Average annual income")).toBeInTheDocument();
     expect(screen.getByText("Assets", { selector: "p" })).toBeInTheDocument();
     expect(screen.getByText("€75,000")).toBeInTheDocument();
+    expect(screen.getByText("Average annual income")).toHaveClass("break-words");
+    expect(screen.getByText("Average annual income")).not.toHaveClass("truncate");
+    expect(screen.getByText("€75,000")).toHaveClass("whitespace-nowrap");
     expect(screen.getAllByText("€80,000")).toHaveLength(2);
     expect(screen.getByText(/Average annual income: €75,000/)).toBeInTheDocument();
     expect(screen.getByText("Real estate")).toBeInTheDocument();
@@ -83,6 +87,7 @@ describe("dashboard application", () => {
     expect(await screen.findByText("Real estate")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "French" }));
     expect(screen.getByText("Vue d’ensemble")).toBeInTheDocument();
+    expect(screen.getByText("déclarants uniques")).toBeInTheDocument();
     expect(screen.getByText("Immobilier")).toBeInTheDocument();
     expect(screen.getByText("Revenu annuel moyen vs patrimoine")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Revenu annuel moyen et patrimoine total/i })).toBeInTheDocument();
