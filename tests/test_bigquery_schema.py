@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import polars as pl
 import pytest
 
 from hatvp.bigquery import curated_table_names, validate_table_files, validate_table_selection
@@ -17,6 +18,7 @@ from hatvp.bigquery.sql import (
     snapshot_parameter_name,
     table_id,
 )
+from hatvp.layers.registry_schema import registry_schema
 from tests.bigquery_support import FakeField
 
 
@@ -56,6 +58,10 @@ def test_schema_field_and_staging_names_are_compatible() -> None:
     assert field_type_sql(FakeField("name")) == "STRING"
     assert staging_name("assets") == "_hatvp_staging_assets"
     assert curated_load_defaults() == curated_table_names()
+
+
+def test_registry_partition_field_is_a_bigquery_date() -> None:
+    assert registry_schema()["snapshot_date"] == pl.Date
 
 
 def test_selection_preserves_requested_order_for_partial_reloads(tmp_path: Path) -> None:

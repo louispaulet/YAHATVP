@@ -128,6 +128,6 @@ jobs:
             --service-account="$HATVP_RUNTIME_SERVICE_ACCOUNT" \
             --tasks=1 \
             --max-retries=1 \
-            --memory=2Gi \
+            --memory=4Gi \
             --task-timeout=30m \
             --set-env-vars="HATVP_BUCKET=${HATVP_BUCKET},HATVP_PREFIX=hatvp,HATVP_ENABLE_BIGQUERY=true,HATVP_BIGQUERY_PROJECT=${GCP_PROJECT_ID},HATVP_BIGQUERY_DATASET=hatvp,HATVP_BIGQUERY_LOCATION=${GCP_REGION},PIPELINE_GIT_SHA=${GITHUB_SHA},PIPELINE_VERSION=${GITHUB_SHA}"

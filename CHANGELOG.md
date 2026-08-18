@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-19 — Release v1.0 dashboard and analytical pipeline
+
+### Deployed
+
+- Deployed the current ingestion image and forced a production replay with the
+  Silver/Gold analytical layers enabled.
+- Deployed Cloud Run bridge revision `hatvp-dashboard-api-00010-rw9` and
+  Cloudflare Worker version `156d241d-e978-4306-973d-eada3ac58700`.
+- Published the Vite frontend to the GitHub Pages custom domain
+  `https://yahatvp.thefrenchartist.dev/`.
+
+### Verified
+
+- Backend Worker health returned HTTP 200 at `/healthz`, and the public
+  dashboard routes were smoke-tested against the deployed Gold tables.
+- Backend fixture checks passed: 8 Worker tests, Worker typecheck, and 31
+  bridge tests; frontend checks passed with 18 tests and a production build.
+- Increased the ingestion Cloud Run Job memory from 2 GiB to 4 GiB after the
+  first forced replay was terminated by an out-of-memory event before Gold
+  materialization.
+
 ## 2026-08-18 — Implement the Silver and Gold analytical layers
 
 ### Changed

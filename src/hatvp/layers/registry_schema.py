@@ -13,10 +13,11 @@ def registry_schema() -> dict[str, object]:
         "expected_value_or_range evidence record_ref first_seen last_seen superseded_by status "
         "declaration_id declaration_version source_snapshot_date source_format "
         "source_uri_or_object "
-        "source_location candidate_value_or_range detected_at seen_snapshots snapshot_date"
+        "source_location candidate_value_or_range detected_at seen_snapshots"
     ).split()
     return {
         **{name: pl.String for name in text_fields},
+        "snapshot_date": pl.Date,
         "is_latest_declaration": pl.Boolean,
         "previously_reported": pl.Boolean,
         "metric_eligible": pl.Boolean,
