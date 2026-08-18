@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-18 — Merge dashboard and deploy all services
+
+### Deployed
+
+- Merged PR #13 into the dashboard base branch and PR #14 into `main`, leaving
+  no open pull requests.
+- Deployed Cloud Run bridge revision `hatvp-dashboard-api-00005-5rm` and
+  Cloudflare Worker version `027342cf-bc6f-4b36-9164-59766840565e`.
+- Published the frontend to GitHub Pages with the live Worker API URL.
+- GitHub Actions run `32123761635` deployed the ingestion image for commit
+  `ccaf8fdf3ba9bba05dcf207b4c0c51574482e389`.
+
+### Verified
+
+- Worker health and all four dashboard slices returned HTTP 200 with the
+  `2026-08-18` snapshot; the production CORS header and cache policy were
+  present, and unauthenticated bridge data requests returned HTTP 401.
+- GitHub Pages returned HTTP 200.
+- Cloud Run execution `hatvp-ingestion-5klps` completed successfully with
+  `succeededCount=1` in 1m6.22s.
+
 ## 2026-08-18 — Load dashboard plots independently
 
 ### Changed
