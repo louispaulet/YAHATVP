@@ -16,7 +16,19 @@ export function getLocale(language: Language): Locale {
 
 export function translateDataLabel(language: Language, category: DataLabelCategory, value: string): string {
   const labels = getLocale(language).labels[category] as Record<string, string>;
-  return labels[value] ?? humanizeDataLabel(value);
+  if (labels[value]) return labels[value];
+
+  const normalizedValue = normalizeLabelKey(value);
+  const matchingEntry = Object.entries(labels).find(([key]) => normalizeLabelKey(key) === normalizedValue);
+  return matchingEntry?.[1] ?? humanizeDataLabel(value);
+}
+
+function normalizeLabelKey(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
 }
 
 function humanizeDataLabel(value: string): string {

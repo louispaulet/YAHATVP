@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-18 — Harden declaration-type translations
+
+### Fixed
+
+- Made declaration-type locale lookup insensitive to source-label casing,
+  accents, apostrophes, spaces, and punctuation, so legacy values such as
+  `DéClaration D'IntéRêTs` resolve to the configured human-readable wording.
+- Added regression coverage for all nine declaration types in English and the
+  French fallback path.
+
+### Verified
+
+- Frontend tests and the production Vite build pass.
+
 ## 2026-08-18 — Localize dashboard labels
 
 ### Changed

@@ -267,6 +267,7 @@ records, and zero quality errors.
 - [x] Run a live dashboard smoke test against the deployed Worker and review the public aggregate output.
 - [x] Render the two-stream income comparison as an accessible pie chart with a list fallback for other breakdown sizes.
 - [x] Add English/French locale configuration, a language switcher, and readable translations for dynamic dashboard labels.
+- [x] Harden declaration-type translation lookup for source-label casing and punctuation variants.
 
 Deployment evidence (2026-08-18): Cloud Run bridge revision
 `hatvp-dashboard-api-00003-xzr` and Worker version
