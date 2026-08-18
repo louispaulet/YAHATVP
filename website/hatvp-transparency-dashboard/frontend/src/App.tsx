@@ -66,8 +66,8 @@ function useResource<T>(loader: (signal: AbortSignal) => Promise<T>): ResourceSt
 
 function navClass({ isActive }: { isActive: boolean }): string {
   return isActive
-    ? "rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white"
-    : "rounded-full px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-white hover:text-ink";
+    ? "relative px-1 py-2 text-sm font-semibold text-ink transition after:absolute after:inset-x-1 after:-bottom-[0.35rem] after:h-0.5 after:rounded-full after:bg-emerald focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald"
+    : "relative px-1 py-2 text-sm font-semibold text-slate-500 transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald";
 }
 
 const logoSrc = `${import.meta.env.BASE_URL}hatvp-mark.webp`;
@@ -102,7 +102,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-canvas text-ink">
       <header className="border-b border-slate-200/80 bg-canvas/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <NavLink to="/" className="flex items-center gap-3">
             <img className="size-10 rounded-2xl object-cover" src={logoSrc} alt="" aria-hidden="true" />
             <span>
@@ -110,9 +110,10 @@ function Layout({ children }: { children: React.ReactNode }) {
               <span className="block text-sm font-semibold">{locale.brand.name}</span>
             </span>
           </NavLink>
-          <div className="flex items-center gap-2">
-            <nav className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100/70 p-1">
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 sm:justify-end">
+            <nav aria-label={locale.nav.label} className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-6">
               <NavLink to="/" end className={navClass}>{locale.nav.overview}</NavLink>
+              <NavLink to="/explore" className={navClass}>{locale.nav.explore}</NavLink>
               <NavLink to="/about" className={navClass}>{locale.nav.about}</NavLink>
             </nav>
             <LanguageSwitcher />
@@ -331,6 +332,21 @@ function AboutPage() {
   );
 }
 
+function ExplorePage() {
+  const { locale } = useI18n();
+  return (
+    <div className="mx-auto max-w-3xl px-5 py-16 lg:px-8 lg:py-24">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.explore.eyebrow}</p>
+      <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">{locale.explore.title}</h1>
+      <p className="mt-8 max-w-2xl text-base leading-8 text-slate-600">{locale.explore.description}</p>
+      <div className="dashboard-card mt-10 border-dashed p-6 sm:p-8">
+        <p className="text-sm font-bold uppercase tracking-[0.14em] text-slate-400">{locale.explore.status}</p>
+        <p className="mt-3 text-lg font-semibold text-ink">{locale.explore.next}</p>
+      </div>
+    </div>
+  );
+}
+
 function NotFoundPage() {
   const { locale } = useI18n();
   return <div className="mx-auto max-w-2xl px-5 py-24 text-center lg:px-8"><h1 className="text-4xl font-black">{locale.errors.notFound}</h1><NavLink className="mt-6 inline-block rounded-full bg-ink px-5 py-3 text-sm font-bold text-white" to="/">{locale.errors.backToOverview}</NavLink></div>;
@@ -350,7 +366,7 @@ export function App() {
 
   return (
     <I18nContext.Provider value={{ language, locale, setLanguage }}>
-      <Layout><Routes><Route path="/" element={<DashboardPage />} /><Route path="/about" element={<AboutPage />} /><Route path="*" element={<NotFoundPage />} /></Routes></Layout>
+      <Layout><Routes><Route path="/" element={<DashboardPage />} /><Route path="/explore" element={<ExplorePage />} /><Route path="/about" element={<AboutPage />} /><Route path="*" element={<NotFoundPage />} /></Routes></Layout>
     </I18nContext.Provider>
   );
 }

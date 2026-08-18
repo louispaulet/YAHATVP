@@ -10,7 +10,9 @@
     "name": "Tableau de transparence"
   },
   "nav": {
+    "label": "Navigation principale",
     "overview": "Vue d’ensemble",
+    "explore": "Explorer les données",
     "about": "À propos des données"
   },
   "footer": {
@@ -115,6 +117,13 @@
     "updateRhythm": "Rythme de mise à jour",
     "updateRhythmValue": "Hebdomadaire",
     "updateRhythmDetail": "selon le pipeline d’ingestion"
+  },
+  "explore": {
+    "eyebrow": "Explorer les données",
+    "title": "De nouvelles façons d’explorer arrivent bientôt.",
+    "description": "Cet espace accueillera des vues plus détaillées des données HATVP sélectionnées, pour suivre une déclaration de sa source jusqu’à son agrégat.",
+    "status": "Page temporaire",
+    "next": "De nouveaux outils d’exploration seront ajoutés lors d’une prochaine mise à jour."
   },
   "errors": {
     "title": "Le tableau de bord fait une pause.",
