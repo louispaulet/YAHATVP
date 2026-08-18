@@ -12,6 +12,7 @@
   "nav": {
     "label": "Navigation principale",
     "overview": "Vue d’ensemble",
+    "search": "Rechercher une déclaration",
     "explore": "Explorer les données",
     "about": "À propos des données"
   },
@@ -124,6 +125,45 @@
     "description": "Cet espace accueillera des vues plus détaillées des données HATVP sélectionnées, pour suivre une déclaration de sa source jusqu’à son agrégat.",
     "status": "Page temporaire",
     "next": "De nouveaux outils d’exploration seront ajoutés lors d’une prochaine mise à jour."
+  },
+  "search": {
+    "eyebrow": "Recherche de déclarations",
+    "title": "Trouvez une déclaration avec ce que vous savez.",
+    "description": "Recherchez dans le dernier instantané public de la HATVP par nom du déclarant, type de déclaration, mandat, organisme, identifiant, date ou montant déclaré.",
+    "inputLabel": "Rechercher dans les déclarations publiques",
+    "placeholder": "Nom, mandat, organisme, identifiant, montant…",
+    "submit": "Rechercher",
+    "hint": "La recherche ignore les accents et trouve aussi les correspondances partielles. Les coordonnées et adresses ne sont jamais recherchées ni affichées.",
+    "emptyTitle": "Commencez par un nom ou un mot-clé",
+    "emptyDescription": "Essayez un nom comme « Dupont », un mandat, un organisme, un identifiant de déclaration ou un montant.",
+    "resultEyebrow": "Déclaration publique",
+    "unknownDeclarant": "Nom du déclarant non publié",
+    "fields": {
+      "mandate": "Mandat",
+      "organ": "Organisme",
+      "date": "Date de dépôt",
+      "identifier": "Identifiant"
+    },
+    "notAvailable": "Indisponible",
+    "noResultsEyebrow": "Aucun résultat",
+    "noResults": "Aucune correspondance pour « {query} ». Essayez un nom plus court ou un autre champ public.",
+    "resultsEyebrow": "Résultats de recherche",
+    "resultsFound": "{count} déclarations trouvées",
+    "snapshot": "Instantané {date}",
+    "viewDeclaration": "Ouvrir la déclaration et le XML source"
+  },
+  "declaration": {
+    "back": "Retour à la recherche de déclarations",
+    "eyebrow": "Détail de la déclaration",
+    "description": "Une vue reliée à la source des métadonnées publiques et du nœud XML correspondant dans l’instantané immuable.",
+    "fields": {
+      "type": "Type de déclaration"
+    },
+    "sourceEyebrow": "XML source",
+    "sourceTitle": "La déclaration telle que publiée",
+    "sourceDescription": "Voici le nœud <declaration> correspondant dans le dernier instantané XML HATVP immuable. Les mentions de non-publication restent visibles telles que fournies par la source.",
+    "characters": "caractères",
+    "rawXmlLabel": "XML brut de la déclaration"
   },
   "errors": {
     "title": "Le tableau de bord fait une pause.",

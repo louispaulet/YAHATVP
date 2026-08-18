@@ -4,10 +4,38 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { assets, dashboard, declarations, income } from "./test-fixtures";
 
+const search = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  resultCount: 1,
+  results: [{
+    declarationUuid: "fixture-uuid-1",
+    civilite: "M.",
+    firstName: "Alice",
+    lastName: "DUPONT",
+    declarationType: "Déclaration d'intérêts",
+    mandate: "Élu local",
+    mandateType: "Élu municipal",
+    mandateCategory: "Local",
+    organ: "Paris",
+    organDeclaration: null,
+    dateDeposited: "2026-01-01",
+    isAmended: "false",
+  }],
+};
+
+const declaration = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  declaration: search.results[0],
+  rawXml: "<declaration>\n  <uuid>fixture-uuid-1</uuid>\n</declaration>",
+};
+
 describe("dashboard application", () => {
   beforeEach(() => {
     vi.stubGlobal("fetch", vi.fn().mockImplementation((url: string) => {
-      const payload = url.endsWith("/overview") ? dashboard : url.endsWith("/income") ? income : url.endsWith("/assets") ? assets : declarations;
+      const path = new URL(url).pathname;
+      const payload = path.endsWith("/overview") ? dashboard : path.endsWith("/income") ? income : path.endsWith("/assets") ? assets : path.endsWith("/search") ? search : path.includes("/declarations/") ? declaration : declarations;
       return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
     }));
   });
@@ -53,6 +81,17 @@ describe("dashboard application", () => {
     expect(screen.getByRole("navigation", { name: "Primary navigation" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Data explorer" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("More ways to explore are on the way.")).toBeInTheDocument();
+  });
+
+  it("searches declarations and opens the source XML detail page", async () => {
+    render(<MemoryRouter initialEntries={["/search?q=Alice"]}><App /></MemoryRouter>);
+    expect(await screen.findByText("M. Alice DUPONT")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Alice")).toBeInTheDocument();
+    const detailLink = screen.getByRole("link", { name: "Open declaration and source XML" });
+    expect(detailLink).toHaveAttribute("href", "/declarations/fixture-uuid-1");
+    fireEvent.click(detailLink);
+    expect(await screen.findByText("The declaration as published")).toBeInTheDocument();
+    expect(screen.getByLabelText("Raw declaration XML")).toHaveTextContent("fixture-uuid-1");
   });
 
   it("switches to French and translates configured data labels", async () => {

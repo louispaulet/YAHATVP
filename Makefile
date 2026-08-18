@@ -9,6 +9,8 @@ FRONTEND_DIR := $(DASHBOARD_DIR)/frontend
 GCP_PROJECT_ID ?= yahatvp-pipeline-eu
 GCP_REGION ?= europe-west1
 BQ_DATASET ?= hatvp
+HATVP_BUCKET ?= yahatvp-pipeline-eu-data
+HATVP_PREFIX ?= hatvp
 BRIDGE_SERVICE ?= hatvp-dashboard-api
 BRIDGE_SECRET_NAME ?= hatvp-dashboard-bridge-token
 READER_SERVICE_ACCOUNT ?= hatvp-dashboard-reader
@@ -41,9 +43,10 @@ bridge-deploy:
 		gcloud iam service-accounts create "$(READER_SERVICE_ACCOUNT)" --project="$(GCP_PROJECT_ID)" --display-name="HATVP dashboard BigQuery reader"; \
 	fi
 	gcloud projects add-iam-policy-binding "$(GCP_PROJECT_ID)" --member="serviceAccount:$(READER_SERVICE_ACCOUNT)@$(GCP_PROJECT_ID).iam.gserviceaccount.com" --role="roles/bigquery.jobUser" --quiet >/dev/null
+	gcloud storage buckets add-iam-policy-binding "gs://$(HATVP_BUCKET)" --member="serviceAccount:$(READER_SERVICE_ACCOUNT)@$(GCP_PROJECT_ID).iam.gserviceaccount.com" --role="roles/storage.objectViewer" --quiet >/dev/null
 	bq --project_id="$(GCP_PROJECT_ID)" --location="$(GCP_REGION)" query --use_legacy_sql=false --quiet "GRANT \`roles/bigquery.dataViewer\` ON SCHEMA \`$(GCP_PROJECT_ID).$(BQ_DATASET)\` TO \"serviceAccount:$(READER_SERVICE_ACCOUNT)@$(GCP_PROJECT_ID).iam.gserviceaccount.com\""
 	gcloud secrets add-iam-policy-binding "$(BRIDGE_SECRET_NAME)" --project="$(GCP_PROJECT_ID)" --member="serviceAccount:$(READER_SERVICE_ACCOUNT)@$(GCP_PROJECT_ID).iam.gserviceaccount.com" --role="roles/secretmanager.secretAccessor" --quiet >/dev/null
-	gcloud run deploy "$(BRIDGE_SERVICE)" --source="$(BRIDGE_DIR)" --project="$(GCP_PROJECT_ID)" --region="$(GCP_REGION)" --service-account="$(READER_SERVICE_ACCOUNT)@$(GCP_PROJECT_ID).iam.gserviceaccount.com" --allow-unauthenticated --memory=512Mi --set-env-vars="BQ_PROJECT_ID=$(GCP_PROJECT_ID),BQ_DATASET=$(BQ_DATASET),BQ_LOCATION=$(GCP_REGION)" --set-secrets="BRIDGE_TOKEN=$(BRIDGE_SECRET_NAME):latest"
+	gcloud run deploy "$(BRIDGE_SERVICE)" --source="$(BRIDGE_DIR)" --project="$(GCP_PROJECT_ID)" --region="$(GCP_REGION)" --service-account="$(READER_SERVICE_ACCOUNT)@$(GCP_PROJECT_ID).iam.gserviceaccount.com" --allow-unauthenticated --memory=512Mi --set-env-vars="BQ_PROJECT_ID=$(GCP_PROJECT_ID),BQ_DATASET=$(BQ_DATASET),BQ_LOCATION=$(GCP_REGION),HATVP_BUCKET=$(HATVP_BUCKET),HATVP_PREFIX=$(HATVP_PREFIX)" --set-secrets="BRIDGE_TOKEN=$(BRIDGE_SECRET_NAME):latest"
 
 backend-deploy: bridge-deploy
 	@BRIDGE_URL="$$(gcloud run services describe "$(BRIDGE_SERVICE)" --project="$(GCP_PROJECT_ID)" --region="$(GCP_REGION)" --format='value(status.url)')"; \

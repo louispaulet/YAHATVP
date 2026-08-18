@@ -1,10 +1,12 @@
 import { Route, Routes } from "react-router-dom";
+import { Layout } from "./components/Layout";
 import { I18nProvider } from "./context/I18nContext";
 import { AboutPage } from "./pages/AboutPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { DeclarationPage } from "./pages/DeclarationPage";
 import { ExplorePage } from "./pages/ExplorePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
-import { Layout } from "./components/Layout";
+import { SearchPage } from "./pages/SearchPage";
 
 export function App() {
   return (
@@ -12,6 +14,8 @@ export function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<DashboardPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/declarations/:uuid" element={<DeclarationPage />} />
           <Route path="/explore" element={<ExplorePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="*" element={<NotFoundPage />} />

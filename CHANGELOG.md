@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-08-18 — Add declaration search and source XML detail pages
+
+### Added
+
+- Added a localized `/search` page linked from the navbar that searches public
+  declarant/declaration metadata plus curated income and asset labels.
+- Added declaration detail routes that read one matching `<declaration>` node
+  from the immutable GCS XML snapshot and display it in a dedicated escaped
+  source viewer.
+- Kept curated contact and address fields out of search and the public metadata
+  payload; added the bridge's bucket-reader deployment configuration.
+
+### Verified
+
+- Bridge fixture tests: 30 passed, including parameterized search, UUID-based
+  XML extraction, and private-field exclusion.
+- Worker tests: 8 passed and TypeScript typecheck passed.
+- Frontend tests: 13 passed and the production Vite build passed.
+
 ## 2026-08-18 — Modularize the dashboard frontend
 
 ### Changed
