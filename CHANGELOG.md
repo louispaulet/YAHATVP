@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-08-18 — Publish the dashboard custom domain and balance branding
+
+### Changed
+
+- Published the dashboard at `https://yahatvp.thefrenchartist.dev/` with a
+  repository `CNAME` and GitHub Pages HTTPS enforcement.
+- Replaced the navbar mark and favicon with the ⚖️ balance emoji.
+- Configured the Worker CORS origin and frontend deployment defaults for the
+  custom domain.
+
+### Verified
+
+- Cloud Run bridge revision `hatvp-dashboard-api-00007-pw7` and Worker version
+  `c939a4fe-9afc-4097-9fa9-c059d1161e47` are serving.
+- The custom-domain page returned HTTP 200, the deployed HTML references
+  `favicon.svg`, and the live favicon contains ⚖️.
+- GitHub Pages reports an approved certificate with `https_enforced=true`; the
+  Worker overview slice returned HTTP 200 with the custom-domain CORS origin.
+
 ## 2026-08-18 — Expand dashboard navigation
 
 ### Changed

@@ -280,7 +280,7 @@ records, and zero quality errors.
 - [x] Compare total income and asset amounts in the dashboard pie chart.
 - [x] Compare average annual reported income with total assets and explain the calculation.
 - [x] Use compact, locale-aware formatting for large dashboard values.
-- [ ] Publish and smoke-test the dashboard at `yahatvp.thefrenchartist.dev`
+- [x] Publish and smoke-test the dashboard at `yahatvp.thefrenchartist.dev`
   with the GitHub Pages custom domain and HTTPS enabled.
 
 Deployment evidence (2026-08-18): Cloud Run bridge revision
@@ -298,6 +298,13 @@ Annual-income comparison deployment evidence (2026-08-18): Cloud Run revision
 returns `yearCount=17` and `totalValue=1243594880.8`; the asset slice returns
 `totalValue=124440950`. GitHub Pages returned HTTP 200 with the expected
 production API configuration.
+
+Custom-domain deployment evidence (2026-08-18): Cloud Run bridge revision
+`hatvp-dashboard-api-00007-pw7` and Worker version
+`c939a4fe-9afc-4097-9fa9-c059d1161e47` are serving. GitHub Pages is configured
+for `yahatvp.thefrenchartist.dev` with an approved certificate and enforced
+HTTPS; the page returned HTTP 200, references the deployed `favicon.svg`, and
+the Worker overview slice returned HTTP 200 with the custom-domain CORS header.
 
 ## 11. BigQuery tutorial
 
