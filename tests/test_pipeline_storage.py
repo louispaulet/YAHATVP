@@ -6,7 +6,7 @@ import pytest
 from google.api_core.exceptions import PreconditionFailed
 
 from hatvp import main as main_module
-from hatvp.bigquery import CURATED_TABLES
+from hatvp.bigquery import ALL_TABLES
 from hatvp.main import run_pipeline
 from hatvp.storage import GCSArtifactStore, artifact_path, artifact_uri, is_immutable_artifact
 from tests.pipeline_support import fixture_downloader, settings_with_bigquery, warning_status
@@ -49,7 +49,9 @@ def test_gcs_immutable_write_is_idempotent_for_same_bytes_and_rejects_changes() 
     assert store.read_bytes("raw/snapshot_date=2026-08-16/liste.csv") == b"original"
 
 
-def test_bigquery_receives_only_curated_tables(tmp_path: Path, monkeypatch) -> None:
+def test_bigquery_receives_bronze_silver_gold_and_registry_tables(
+    tmp_path: Path, monkeypatch
+) -> None:
     captured: dict[str, object] = {}
 
     def capture_bigquery(**kwargs: object) -> None:
@@ -60,9 +62,9 @@ def test_bigquery_receives_only_curated_tables(tmp_path: Path, monkeypatch) -> N
         run_pipeline(settings_with_bigquery(tmp_path / "output"), downloader=fixture_downloader)
     )
 
-    assert captured["table_names"] == CURATED_TABLES
+    assert captured["table_names"] == ALL_TABLES
     assert captured["location"] == "europe-west1"
-    assert set(captured["table_files"]) >= set(CURATED_TABLES)
+    assert set(captured["table_files"]) >= set(ALL_TABLES)
     assert captured["gcs_uris"] is None
 
 

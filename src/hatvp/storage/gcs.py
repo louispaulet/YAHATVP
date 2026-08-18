@@ -35,6 +35,15 @@ class GCSArtifactStore:
     def read_bytes(self, relative_path: str) -> bytes:
         return self._blob(relative_path).download_as_bytes()
 
+    def list_paths(self, relative_prefix: str) -> list[str]:
+        """List logical object paths below one immutable archive prefix."""
+
+        prefix = self._key(relative_prefix)
+        base = f"{self.prefix}/" if self.prefix else ""
+        return sorted(
+            blob.name.removeprefix(base) for blob in self.bucket.list_blobs(prefix=prefix)
+        )
+
     def put_bytes(
         self,
         relative_path: str,
