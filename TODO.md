@@ -209,10 +209,10 @@ timezone: Europe/Paris
 - [x] Document the current Bronze table schemas and example queries.
 - [x] Rebuild the Bronze `incomes` partition from both observed revenue
   streams and verify the annual `mandatElectifDto` rows in BigQuery.
-- [ ] Keep the Bronze layer version-complete: retain every declaration version
+- [x] Keep the Bronze layer version-complete: retain every declaration version
   present in every source snapshot and never collapse initial and amended
   declarations into one Bronze row.
-- [ ] Preserve the stable source identifiers, declaration-version metadata,
+- [x] Preserve the stable source identifiers, declaration-version metadata,
   snapshot provenance, source values, and raw record evidence needed to compare
   versions later.
 
@@ -380,21 +380,21 @@ metric query excludes it.
   layer for this design; do not treat them as the final Gold output.
 - [x] Keep the current exact-snapshot loading and partition replacement
   guarantees while the downstream layers are added.
-- [ ] Inspect the observed BigQuery schemas and declaration-version fields
+- [x] Inspect the observed BigQuery schemas and declaration-version fields
   before choosing physical names for the new layers. Prefer an explicit,
   stable convention such as separate Bronze/Silver/Gold datasets or clearly
   prefixed tables; do not rename the existing Bronze tables until readers and
   dashboard queries have a migration path.
-- [ ] Confirm the Bronze grain for each table and document how a declaration,
+- [x] Confirm the Bronze grain for each table and document how a declaration,
   declarant, role, period, amendment, and source snapshot are identified from
   the actual HATVP schema.
-- [ ] Preserve all source versions across snapshots, including initial,
+- [x] Preserve all source versions across snapshots, including initial,
   amended, and superseding declarations. A later declaration must not erase
   the earlier Bronze record.
-- [ ] Keep source values, normalized values, raw record JSON where available,
+- [x] Keep source values, normalized values, raw record JSON where available,
   source file/format, source URL or object, source snapshot date, stable IDs,
   and parser/pipeline versions available to Silver and the anomaly evidence.
-- [ ] Treat the existing GCS raw archive as immutable provenance behind the
+- [x] Treat the existing GCS raw archive as immutable provenance behind the
   Bronze input. Never use anomaly processing as a reason to overwrite raw XML,
   CSV, or other source evidence.
 
@@ -666,7 +666,7 @@ reviewed_at
 
 ### 12.7 Implementation, backfill, and acceptance checks
 
-- [ ] Add a schema/version design note before changing the physical BigQuery
+- [x] Add a schema/version design note before changing the physical BigQuery
   layout. Include the Bronze-to-Silver field mapping, Gold grain, identity and
   amendment ordering, anomaly registry key, and retention policy.
 - [ ] Implement the anomaly rules behind small, testable HATVP-specific

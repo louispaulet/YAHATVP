@@ -1,5 +1,7 @@
 """Acceptance tests for the public parser façade and observed fixture schema."""
 
+import json
+
 from hatvp.parser import parser_config, parser_source_tables, parser_table_names
 from tests.parser_support import csv_rows, has_provenance, nonempty_tables, xml_tables
 
@@ -71,3 +73,21 @@ def test_people_rows_keep_public_identity_fields_even_when_optional() -> None:
     assert row["prenom"] == "Alice"
     assert row["nom"] == "DUPONT"
     assert "email" in row
+
+
+def test_bronze_keeps_amended_occurrences_and_source_evidence() -> None:
+    declarations = xml_tables("versioned_declarations.xml")["declarations"]
+
+    assert len(declarations) == 2
+    assert {row["declaration_uuid"] for row in declarations} == {"versioned-declaration"}
+    assert len({row["bronze_record_key"] for row in declarations}) == 2
+    assert {row["declaration_modificative"] for row in declarations} == {"false", "true"}
+    assert all(row["source_snapshot_date"] == "2026-08-16" for row in declarations)
+    assert json.loads(declarations[0]["raw_record_json"])["uuid"] == "versioned-declaration"
+
+
+def test_parser_metadata_links_rows_to_immutable_raw_source() -> None:
+    row = xml_tables()["declarations"][0]
+    assert row["source_format"] == "xml"
+    assert row["source_object"].endswith("declarations.xml")
+    assert row["parser_version"] == "1"
