@@ -57,7 +57,7 @@ describe("dashboard application", () => {
     expect(screen.getByText("Real estate")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Average annual income and asset totals/i })).toBeInTheDocument();
     expect(screen.getByText("Declaration types")).toBeInTheDocument();
-    expect(document.querySelector("header img")).toHaveAttribute("src", expect.stringMatching(/hatvp-mark\.webp$/));
+    expect(screen.getByText("⚖️", { selector: "header span" })).toHaveClass("size-10");
   });
 
   it("renders the about page through the router", () => {

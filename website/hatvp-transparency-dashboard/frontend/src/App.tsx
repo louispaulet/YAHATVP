@@ -67,7 +67,6 @@ function navClass({ isActive }: { isActive: boolean }): string {
     : "relative px-1 py-2 text-sm font-semibold text-slate-500 transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald";
 }
 
-const logoSrc = `${import.meta.env.BASE_URL}hatvp-mark.webp`;
 const IncomeAssetsChart = lazy(() => import("./charts").then(({ IncomeAssetsChart: Chart }) => ({ default: Chart })));
 const AssetChart = lazy(() => import("./charts").then(({ AssetChart: Chart }) => ({ default: Chart })));
 
@@ -101,7 +100,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       <header className="border-b border-slate-200/80 bg-canvas/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <NavLink to="/" className="flex items-center gap-3">
-            <img className="size-10 rounded-2xl object-cover" src={logoSrc} alt="" aria-hidden="true" />
+            <span className="flex size-10 items-center justify-center rounded-2xl bg-emerald/10 text-2xl leading-none" aria-hidden="true">⚖️</span>
             <span>
               <span className="block text-xs font-bold uppercase tracking-[0.22em] text-slate-500">HATVP</span>
               <span className="block text-sm font-semibold">{locale.brand.name}</span>
