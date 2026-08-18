@@ -72,16 +72,25 @@
       "links": [
         {
           "label": "Open data de la HATVP",
+          "kind": "redirect",
+          "type": "Page externe",
+          "action": "Ouvrir la page source",
           "description": "Point d’accès officiel aux déclarations publiques.",
           "href": "https://www.hatvp.fr/open-data/"
         },
         {
           "label": "Index des déclarations (CSV)",
+          "kind": "download",
+          "type": "Téléchargement direct",
+          "action": "Télécharger le CSV",
           "description": "Liste des déclarations publiées utilisée par le pipeline.",
           "href": "https://www.hatvp.fr/livraison/opendata/liste.csv"
         },
         {
           "label": "Flux des déclarations (XML)",
+          "kind": "download",
+          "type": "Téléchargement direct",
+          "action": "Télécharger le XML",
           "description": "Contenu des déclarations publié et utilisé par le pipeline.",
           "href": "https://www.hatvp.fr/livraison/merge/declarations.xml"
         }

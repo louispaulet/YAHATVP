@@ -272,6 +272,7 @@ records, and zero quality errors.
 - [x] Add a sticky footer with a translated link to the YAHATVP GitHub project.
 - [x] Add a translated About-page link to the YAHATVP GitHub project.
 - [x] Add a generated WebP HATVP mark to the navbar and browser favicon.
+- [x] Distinguish the external HATVP page from the direct CSV/XML downloads on the About page.
 
 Deployment evidence (2026-08-18): Cloud Run bridge revision
 `hatvp-dashboard-api-00003-xzr` and Worker version
