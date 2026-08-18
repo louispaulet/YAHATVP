@@ -16,6 +16,9 @@
 
 - Frontend tests cover the default English view and switching to French;
   production Vite build passes.
+- Published the frontend build to `gh-pages` (deployment commit `2d0f000`);
+  the GitHub Pages root returned HTTP 200 and the branch contains the new
+  localized bundle.
 
 ## 2026-08-18 — Add two-stream income pie chart
 
