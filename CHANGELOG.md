@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-19 — Show calendar durations for open issues
+
+### Changed
+
+- Updated the quality-issues table to display unresolved time as calendar years,
+  months, and days instead of a raw day count, using Europe/Madrid calendar
+  dates to match the source contact dates.
+
+### Verified
+
+- Frontend fixture suite passes with 19 tests and the Vite production build
+  succeeds; the fixed-date test covers multi-unit and same-day durations.
+
 ## 2026-08-19 — Add a privacy-safe HATVP quality issues page
 
 ### Added

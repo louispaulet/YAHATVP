@@ -146,7 +146,14 @@
     "noLink": "No direct link",
     "notSolved": "Not solved",
     "solvedLabel": "Solved",
-    "days": "days"
+    "durationUnits": {
+      "year": "year",
+      "years": "years",
+      "month": "month",
+      "months": "months",
+      "day": "day",
+      "days": "days"
+    }
   },
   "search": {
     "eyebrow": "Declaration search",

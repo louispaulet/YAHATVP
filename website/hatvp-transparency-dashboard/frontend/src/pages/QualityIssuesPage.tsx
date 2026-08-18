@@ -10,12 +10,58 @@ function formatDate(value: string, language: string): string {
   }).format(new Date(`${value}T00:00:00Z`));
 }
 
-function formatOpenDuration(value: string, language: string, dayLabel: string): string {
-  const start = Date.parse(`${value}T00:00:00Z`);
-  const now = new Date();
-  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-  const days = Math.max(0, Math.floor((today - start) / 86_400_000));
-  return `${new Intl.NumberFormat(language === "fr" ? "fr-FR" : "en-GB").format(days)} ${dayLabel}`;
+type DurationUnits = {
+  year: string;
+  years: string;
+  month: string;
+  months: string;
+  day: string;
+  days: string;
+};
+
+function daysInMonth(year: number, month: number): number {
+  return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+}
+
+function addCalendarYears(date: Date, years: number): Date {
+  const year = date.getUTCFullYear() + years;
+  const month = date.getUTCMonth();
+  return new Date(Date.UTC(year, month, Math.min(date.getUTCDate(), daysInMonth(year, month))));
+}
+
+function addCalendarMonths(date: Date, months: number): Date {
+  const absoluteMonth = date.getUTCFullYear() * 12 + date.getUTCMonth() + months;
+  const year = Math.floor(absoluteMonth / 12);
+  const month = absoluteMonth % 12;
+  return new Date(Date.UTC(year, month, Math.min(date.getUTCDate(), daysInMonth(year, month))));
+}
+
+function currentMadridDate(): Date {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en", {
+    timeZone: "Europe/Madrid",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).formatToParts(new Date()).map(({ type, value }) => [type, value]));
+  return new Date(Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day)));
+}
+
+function formatOpenDuration(value: string, language: string, units: DurationUnits): string {
+  const start = new Date(`${value}T00:00:00Z`);
+  const end = currentMadridDate();
+  if (end <= start) return `0 ${units.days}`;
+  const number = new Intl.NumberFormat(language === "fr" ? "fr-FR" : "en-GB");
+  let years = end.getUTCFullYear() - start.getUTCFullYear();
+  let cursor = addCalendarYears(start, years);
+  if (cursor > end) cursor = addCalendarYears(start, --years);
+  let months = (end.getUTCFullYear() - cursor.getUTCFullYear()) * 12 + end.getUTCMonth() - cursor.getUTCMonth();
+  let monthCursor = addCalendarMonths(cursor, months);
+  if (monthCursor > end) monthCursor = addCalendarMonths(cursor, --months);
+  const days = Math.floor((end.getTime() - monthCursor.getTime()) / 86_400_000);
+  const parts = years ? [`${number.format(years)} ${years === 1 ? units.year : units.years}`] : [];
+  if (months) parts.push(`${number.format(months)} ${months === 1 ? units.month : units.months}`);
+  if (days || !parts.length) parts.push(`${number.format(days)} ${days === 1 ? units.day : units.days}`);
+  return parts.join(", ");
 }
 
 function IssueLinks({ links, label, noLink }: { links: string[]; label: string; noLink: string }) {
@@ -31,7 +77,7 @@ export function QualityIssuesPage() {
   const { language, locale } = useI18n();
   const solvedCount = issues.filter((issue) => issue.solved).length;
   const openCount = issues.length - solvedCount;
-  const duration = (issue: QualityIssue) => formatOpenDuration(issue.contactDate, language, locale.qualityIssues.days);
+  const duration = (issue: QualityIssue) => formatOpenDuration(issue.contactDate, language, locale.qualityIssues.durationUnits);
 
   return <div className="mx-auto max-w-7xl px-5 py-12 lg:px-8 lg:py-16">
     <section className="hero-grid overflow-hidden rounded-[2rem] bg-ink px-6 py-9 text-white shadow-soft sm:px-10 sm:py-11">

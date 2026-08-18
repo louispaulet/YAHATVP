@@ -146,7 +146,14 @@
     "noLink": "Aucun lien direct",
     "notSolved": "Non résolu",
     "solvedLabel": "Résolu",
-    "days": "jours"
+    "durationUnits": {
+      "year": "an",
+      "years": "ans",
+      "month": "mois",
+      "months": "mois",
+      "day": "jour",
+      "days": "jours"
+    }
   },
   "search": {
     "eyebrow": "Recherche de déclarations",

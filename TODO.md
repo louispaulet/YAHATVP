@@ -340,7 +340,7 @@ audit history.
 
 Static quality-register evidence (2026-08-19): the frontend fixture suite passes
 with 19 tests, the production build succeeds, the local page renders ten rows
-with zero solved issues, and the mobile layout has no horizontal overflow.
+with zero solved issues, calendar durations, and no mobile page overflow.
 
 Deployment evidence (2026-08-18): Cloud Run bridge revision
 `hatvp-dashboard-api-00003-xzr` and Worker version
