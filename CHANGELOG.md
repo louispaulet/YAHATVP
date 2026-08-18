@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-08-18 — Review HATVP schema and raw snapshot immutability
+
+### Changed
+
+- Added a schema review report covering the current HATVP CSV/XML inventory,
+  configured parser boundary, and four observed but intentionally unmodeled XML
+  sections.
+- Added a fixture for those observed source sections and a parser safety test;
+  no normalization logic was changed.
+- Marked the schema-review, fixture-guardrail, and historical-raw-immutability
+  items complete in `TODO.md`.
+
+### Verified
+
+- The current CSV remains a 16-column semicolon-delimited file with both
+  configured identity columns; the latest XML has root `declarations` and
+  6,611 direct `declaration` records.
+- GCS bucket versioning and immutable generation preconditions are enabled, and
+  raw XML/CSV sizes and MD5 checksums match across the three archived snapshots.
+- Existing triage tests cover duplicate UUIDs with trailing-whitespace semantic
+  equality; the new schema fixture parses without inventing unsupported rows.
+
 ## 2026-08-18 — Complete weekly operational monitoring review
 
 ### Changed
