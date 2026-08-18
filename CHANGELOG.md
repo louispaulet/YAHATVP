@@ -10,16 +10,23 @@
   Cloudflare Worker version `156d241d-e978-4306-973d-eada3ac58700`.
 - Published the Vite frontend to the GitHub Pages custom domain
   `https://yahatvp.thefrenchartist.dev/`.
+- Increased the ingestion Cloud Run Job memory from 2 GiB to 4 GiB and made
+  the anomaly-registry `snapshot_date` a typed date for BigQuery partitioning.
 
 ### Verified
 
-- Backend Worker health returned HTTP 200 at `/healthz`, and the public
-  dashboard routes were smoke-tested against the deployed Gold tables.
+- GitHub Actions run [32194636486](https://github.com/louispaulet/YAHATVP/actions/runs/32194636486)
+  passed the full Python test, lint, format, and package-build workflow and
+  deployed the `71f2a77` ingestion image.
+- Forced execution `hatvp-ingestion-6hpsr` completed with
+  `SUCCESS_WITH_WARNINGS`; the snapshot loaded 6,611/6,611/74,791/1,157
+  Bronze rows, 6,611/6,611/74,791/1,157 Silver rows,
+  6,605/6,605/74,730/1,157 Gold rows, and 3,042 anomaly-registry rows.
+- Worker health and the overview, income, assets, declarations, and search
+  routes returned HTTP 200 for snapshot `2026-08-19`; the custom-domain
+  frontend also returned HTTP 200.
 - Backend fixture checks passed: 8 Worker tests, Worker typecheck, and 31
   bridge tests; frontend checks passed with 18 tests and a production build.
-- Increased the ingestion Cloud Run Job memory from 2 GiB to 4 GiB after the
-  first forced replay was terminated by an out-of-memory event before Gold
-  materialization.
 
 ## 2026-08-18 — Implement the Silver and Gold analytical layers
 
