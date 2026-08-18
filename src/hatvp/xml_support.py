@@ -77,3 +77,23 @@ def date_fields(values: dict[str, str | None], field: str) -> tuple[str | None, 
 
 def raw_record(values: dict[str, Any]) -> str:
     return json.dumps(values, ensure_ascii=False, sort_keys=True, default=str)
+
+
+def element_record(element: etree._Element | None) -> str | None:
+    return raw_record(_element_value(element)) if element is not None else None
+
+
+def _element_value(element: etree._Element) -> Any:
+    if not len(element):
+        return raw_text(element.text)
+    values: dict[str, Any] = {}
+    for child_element in element:
+        name = local_name(child_element.tag)
+        value = _element_value(child_element)
+        if name not in values:
+            values[name] = value
+        elif isinstance(values[name], list):
+            values[name].append(value)
+        else:
+            values[name] = [values[name], value]
+    return values

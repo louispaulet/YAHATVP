@@ -46,6 +46,27 @@ def build_metadata(
             }
             for item in downloaded.values()
         ],
+        "source_metadata": bronze_source_metadata(settings, snapshot_date, downloaded),
+    }
+
+
+def bronze_source_metadata(
+    settings: Any, snapshot_date: str, downloaded: dict[str, DownloadedFile]
+) -> dict[str, dict[str, Any]]:
+    """Describe the immutable raw object backing each Bronze source row."""
+
+    def object_uri(name: str) -> str:
+        path = f"{settings.hatvp_prefix}/raw/snapshot_date={snapshot_date}/{name}"
+        return f"gs://{settings.hatvp_bucket}/{path}" if settings.hatvp_bucket else path
+
+    return {
+        name: {
+            "url": source.url,
+            "sha256": source.sha256,
+            "source_object": object_uri(name),
+            "pipeline_version": settings.pipeline_version,
+        }
+        for name, source in downloaded.items()
     }
 
 
@@ -59,6 +80,7 @@ def reuse_snapshot_metadata(
     old = {item.get("name"): item.get("sha256") for item in existing.get("files", [])}
     new = {item.get("name"): item.get("sha256") for item in metadata.get("files", [])}
     if old == new:
+        existing.setdefault("source_metadata", metadata.get("source_metadata", {}))
         return existing
     raise PipelineFailure(
         f"Immutable raw snapshot {snapshot_date} already exists with different source hashes"

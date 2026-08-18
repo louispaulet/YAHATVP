@@ -2,41 +2,45 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from pathlib import Path
+from typing import Any
 
 from lxml import etree
 
 from ..config import load_pipeline_config
-from ..models import ParseContext, Row, TableSet
+from ..models import Row, TableSet
 from ..xml_support import local_name
 from .declarations import declaration_row
 from .dispatch import append_declaration
+from .provenance import context_for
+
+TABLE_NAMES = (
+    "liste",
+    "declarations",
+    "people",
+    "mandates",
+    "mandate_remunerations",
+    "activities",
+    "participations",
+    "incomes",
+    "assets",
+    "liabilities",
+)
 
 
 def empty_tables() -> TableSet:
-    return {
-        name: []
-        for name in (
-            "liste",
-            "declarations",
-            "people",
-            "mandates",
-            "mandate_remunerations",
-            "activities",
-            "participations",
-            "incomes",
-            "assets",
-            "liabilities",
-        )
-    }
+    return {name: [] for name in TABLE_NAMES}
 
 
 def parse_xml(
-    path: Path, snapshot_date: str, declaration_parser: Callable[..., Row] = declaration_row
+    path: Path,
+    snapshot_date: str,
+    declaration_parser: Callable[..., Row] = declaration_row,
+    source_metadata: Mapping[str, Any] | None = None,
 ) -> TableSet:
     config = load_pipeline_config().parser
-    context = ParseContext(snapshot_date)
+    context = context_for(snapshot_date, "declarations.xml", "xml", str(path), source_metadata)
     tables = empty_tables()
     context_reader = etree.iterparse(
         str(path),
@@ -58,7 +62,9 @@ def parse_xml(
             if local_name(element.tag) != "declaration":
                 continue
             declaration_count += 1
-            append_declaration(tables, element, context, config, declaration_parser)
+            append_declaration(
+                tables, element, context, config, declaration_parser, declaration_count - 1
+            )
             _clear(element)
     except etree.XMLSyntaxError as exc:
         raise ValueError(f"HATVP XML is malformed: {exc}") from exc
