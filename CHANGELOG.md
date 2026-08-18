@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-18 — Prevent source-card badge overflow
+
+### Fixed
+
+- Allowed official-source card headers to wrap and constrained download badges
+  to the card width, preventing the “Direct download” labels from painting
+  outside their cards at narrow responsive widths.
+
+### Verified
+
+- Frontend unit tests and the production Vite build pass.
+
 ## 2026-08-18 — Annualize dashboard income comparison
 
 ### Changed
