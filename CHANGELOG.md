@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-18 — Modularize the dashboard frontend
+
+### Changed
+
+- Split the React application shell, pages, layout, language switcher, panels,
+  feedback states, data displays, and chart modules into focused files.
+- Added `I18nContext` and `useResource` modules so localization state and
+  cancellable API loading are reusable outside the route entrypoint.
+- Kept every dashboard TypeScript source file below the 100-line review budget
+  and preserved the existing routes, translations, loading states, and chart
+  behavior.
+
+### Verified
+
+- `npm test` passes with 12 tests across four frontend test files.
+- `npm run build` passes with the TypeScript check and production Vite build.
+
 ## 2026-08-18 — Publish the dashboard custom domain and balance branding
 
 ### Changed
