@@ -288,6 +288,13 @@ and aggregate counts of 6,611 declarations, 6,611 people, 74,791 incomes, and
 Chrome verification also confirmed the production CORS header and successful
 dashboard rendering after Worker version `b2450c38-cc3a-48d8-8f46-81b6a5b396e1`.
 
+Annual-income comparison deployment evidence (2026-08-18): Cloud Run revision
+`hatvp-dashboard-api-00006-gjl` and Worker version
+`79c8519a-5ef6-4739-84ce-2ff5efffa759` are serving. The live income slice
+returns `yearCount=17` and `totalValue=1243594880.8`; the asset slice returns
+`totalValue=124440950`. GitHub Pages returned HTTP 200 with the expected
+production API configuration.
+
 ## 11. BigQuery tutorial
 
 - [x] Add ten atomic BigQuery tutorial queries with matching CSV results for the

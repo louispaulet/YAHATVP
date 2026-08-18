@@ -16,6 +16,15 @@
 - The current snapshot contains 17 distinct income years (2010–2026), producing
   an average annual income of €73,152,640.05 and a 37.0% income / 63.0% asset
   comparison split.
+- `make frontend-test`, `make backend-test`, `uv run pytest`, Ruff, formatting,
+  and `uv build` all pass; the new income and asset queries also pass BigQuery
+  dry-run validation.
+- Deployed Cloud Run revision `hatvp-dashboard-api-00006-gjl` and Cloudflare
+  Worker version `79c8519a-5ef6-4739-84ce-2ff5efffa759` with the new aggregate
+  fields, then published the frontend to GitHub Pages.
+- Live smoke tests returned `yearCount: 17`, income total `1243594880.8`, asset
+  total `124440950`, HTTP 200 from GitHub Pages, and the expected production
+  CORS/cache headers.
 
 ## 2026-08-18 — Compare dashboard incomes and assets
 
