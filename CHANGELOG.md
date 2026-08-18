@@ -10,6 +10,9 @@
 ### Verified
 
 - Frontend tests and the production Vite build pass.
+- Published the About-page project link to `gh-pages` (deployment commit
+  `a803a62`); the GitHub Pages About route returned HTTP 200 and served both
+  translated project-link labels with the requested repository URL.
 
 ## 2026-08-18 — Add sticky project footer
 
