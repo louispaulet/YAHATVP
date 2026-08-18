@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-18 — Compact large dashboard values
+
+### Changed
+
+- Centralized dashboard number and currency formatting so charts, legends,
+  axes, tooltips, metrics, explanatory copy, and accessible descriptions share
+  the same readability rule.
+- Displayed large monetary values with compact locale-aware units such as
+  `€65.6M` and `€506.1K`, while keeping the underlying aggregate values and
+  ordinary row counts unchanged.
+
+### Verified
+
+- `make frontend-test` passes: 4 frontend test files and 11 tests, followed by
+  a successful TypeScript/Vite production build; `make backend-test`, the 127
+  Python tests, Ruff lint/format checks, and `uv build` also pass.
+
 ## 2026-08-18 — Annualize dashboard income comparison
 
 ### Changed

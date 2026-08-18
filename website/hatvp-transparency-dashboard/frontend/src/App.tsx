@@ -2,6 +2,7 @@ import { createContext, lazy, Suspense, useContext, useEffect, useState } from "
 import { NavLink, Route, Routes } from "react-router-dom";
 import { fetchAssets, fetchDeclarations, fetchIncome, fetchOverview } from "./api";
 import { defaultLanguage, getLocale, languages, translateDataLabel, type Language, type Locale } from "./config/i18n";
+import { formatNumber } from "./formatters";
 import type { DashboardBreakdownResponse, DashboardOverviewResponse } from "./types";
 
 interface I18nContextValue {
@@ -16,10 +17,6 @@ function useI18n(): I18nContextValue {
   const context = useContext(I18nContext);
   if (!context) throw new Error("useI18n must be used within the I18n provider");
   return context;
-}
-
-function formatNumber(value: number, language: Language): string {
-  return new Intl.NumberFormat(language === "fr" ? "fr-FR" : "en-GB").format(value);
 }
 
 function formatDateTime(value: string, language: Language): string {
