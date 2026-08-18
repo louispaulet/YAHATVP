@@ -49,6 +49,9 @@ describe("dashboard application", () => {
     expect(await screen.findByText("Average annual income")).toBeInTheDocument();
     expect(screen.getByText("Assets", { selector: "p" })).toBeInTheDocument();
     expect(screen.getByText("€75,000")).toBeInTheDocument();
+    expect(screen.getByText("Average annual income")).toHaveClass("break-words");
+    expect(screen.getByText("Average annual income")).not.toHaveClass("truncate");
+    expect(screen.getByText("€75,000")).toHaveClass("whitespace-nowrap");
     expect(screen.getAllByText("€80,000")).toHaveLength(2);
     expect(screen.getByText(/Average annual income: €75,000/)).toBeInTheDocument();
     expect(screen.getByText("Real estate")).toBeInTheDocument();
