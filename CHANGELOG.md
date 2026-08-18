@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-18 — Complete weekly operational monitoring review
+
+### Changed
+
+- Added the source-linked weekly monitoring report for snapshots `2026-08-16`
+  through `2026-08-18`.
+- Documented recurring duplicate declaration UUID groups and prepared a
+  source-correction follow-up packet without changing source or normalized data.
+- Marked the weekly quality-report, duplicate-recurrence, and row-count/null-rate
+  monitoring items complete in `TODO.md`.
+
+### Verified
+
+- The `2026-08-17` and `2026-08-18` reports have identical monitored row counts
+  and null rates, zero quality errors, and no flagged-record regression.
+- The six duplicate UUID groups recur twice each in all three raw XML snapshots;
+  five are canonically identical and one has identical semantic content with a
+  one-byte canonical difference consistent with trailing whitespace.
+- BigQuery partition counts and Cloud Logging quality telemetry were checked for
+  the two latest snapshots.
+
 ## 2026-08-18 — Publish the dashboard custom domain and balance branding
 
 ### Changed
