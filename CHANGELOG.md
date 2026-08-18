@@ -13,6 +13,8 @@
 ### Verified
 
 - Frontend tests and the production Vite build pass.
+- Published the corrected frontend to `gh-pages` (deployment commit
+  `3210a4d`); the GitHub Pages root returned HTTP 200.
 
 ## 2026-08-18 — Localize dashboard labels
 
