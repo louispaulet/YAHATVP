@@ -1,5 +1,48 @@
 # Changelog
 
+## 2026-08-18 — Review HATVP schema and raw snapshot immutability
+
+### Changed
+
+- Added a schema review report covering the current HATVP CSV/XML inventory,
+  configured parser boundary, and four observed but intentionally unmodeled XML
+  sections.
+- Added a fixture for those observed source sections and a parser safety test;
+  no normalization logic was changed.
+- Marked the schema-review, fixture-guardrail, and historical-raw-immutability
+  items complete in `TODO.md`.
+
+### Verified
+
+- The current CSV remains a 16-column semicolon-delimited file with both
+  configured identity columns; the latest XML has root `declarations` and
+  6,611 direct `declaration` records.
+- GCS bucket versioning and immutable generation preconditions are enabled, and
+  raw XML/CSV sizes and MD5 checksums match across the three archived snapshots.
+- Existing triage tests cover duplicate UUIDs with trailing-whitespace semantic
+  equality; the new schema fixture parses without inventing unsupported rows.
+
+## 2026-08-18 — Complete weekly operational monitoring review
+
+### Changed
+
+- Added the source-linked weekly monitoring report for snapshots `2026-08-16`
+  through `2026-08-18`.
+- Documented recurring duplicate declaration UUID groups and prepared a
+  source-correction follow-up packet without changing source or normalized data.
+- Marked the weekly quality-report, duplicate-recurrence, and row-count/null-rate
+  monitoring items complete in `TODO.md`.
+
+### Verified
+
+- The `2026-08-17` and `2026-08-18` reports have identical monitored row counts
+  and null rates, zero quality errors, and no flagged-record regression.
+- The six duplicate UUID groups recur twice each in all three raw XML snapshots;
+  five are canonically identical and one has identical semantic content with a
+  one-byte canonical difference consistent with trailing whitespace.
+- BigQuery partition counts and Cloud Logging quality telemetry were checked for
+  the two latest snapshots.
+
 ## 2026-08-18 — Publish the dashboard custom domain and balance branding
 
 ### Changed

@@ -72,3 +72,13 @@ def test_real_declaration_person_parser_preserves_missing_optional_identity() ->
     assert row["nom"] is None
     assert row["prenom"] is None
     assert row["snapshot_date"] == "2026-08-16"
+
+
+def test_observed_unmodeled_source_sections_remain_parse_safe() -> None:
+    tables = xml_tables("schema_review.xml")
+
+    assert declaration_ids(tables) == {"fixture-schema-review"}
+    assert len(tables["people"]) == 1
+    assert not tables["incomes"]
+    assert not tables["assets"]
+    assert not tables["activities"]
