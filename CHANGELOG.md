@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-08-19 — Merge open dashboard PRs and redeploy the frontend
+
+### Deployed
+
+- Merged PR [#28](https://github.com/louispaulet/YAHATVP/pull/28) at
+  `499abae` and PR [#29](https://github.com/louispaulet/YAHATVP/pull/29) at
+  `fa93e55`, resolving each branch against the current `main` first.
+- Published the `fa93e55` frontend with `make frontend-deploy` to the
+  `gh-pages` head `b2a1d3f`, using the existing Worker API URL and preserving
+  the custom domain `https://yahatvp.thefrenchartist.dev/`.
+- The merge-triggered GitHub Actions run
+  [32198881494](https://github.com/louispaulet/YAHATVP/actions/runs/32198881494)
+  passed tests, deployment configuration, image build/push, and Cloud Run Job
+  deployment for `hatvp-ingestion` at image tag `fa93e55`.
+
+### Verified
+
+- Local dashboard preflight passed: backend tests (8 Worker tests and 31 bridge
+  tests), frontend tests (19), and frontend production build.
+- Worker health and dashboard routes returned HTTP 200, and both GitHub Pages
+  fallback and custom-domain HTML served the fresh `index-5U5WzxJB.js` bundle.
+- No forced ingestion replay was run because the merged changes are frontend
+  only; the automatic main-branch deployment was sufficient.
+
 ## 2026-08-19 — Show calendar durations for open issues
 
 ### Changed
