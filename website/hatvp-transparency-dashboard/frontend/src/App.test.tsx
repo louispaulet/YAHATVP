@@ -44,10 +44,14 @@ describe("dashboard application", () => {
   it("renders aggregate metrics and breakdowns", async () => {
     render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
     expect(await screen.findByText("Declarations")).toBeInTheDocument();
+    expect(screen.getByText("unique declarants")).toBeInTheDocument();
     expect(screen.getByText("Average annual income vs assets")).toBeInTheDocument();
     expect(await screen.findByText("Average annual income")).toBeInTheDocument();
     expect(screen.getByText("Assets", { selector: "p" })).toBeInTheDocument();
     expect(screen.getByText("€75K")).toBeInTheDocument();
+    expect(screen.getByText("Average annual income")).toHaveClass("break-words");
+    expect(screen.getByText("Average annual income")).not.toHaveClass("truncate");
+    expect(screen.getByText("€75K")).toHaveClass("whitespace-nowrap");
     expect(screen.getAllByText("€80K")).toHaveLength(2);
     expect(screen.getByText(/Average annual income: €75K/)).toBeInTheDocument();
     expect(screen.getByText("Real estate")).toBeInTheDocument();
@@ -68,6 +72,12 @@ describe("dashboard application", () => {
     expect(screen.getByRole("link", { name: /Download CSV/ })).toHaveAttribute("download", "");
     expect(screen.getByRole("link", { name: /Download CSV/ })).not.toHaveAttribute("target");
     expect(screen.getByRole("link", { name: /Download XML/ })).toHaveAttribute("download", "");
+    const downloadBadges = screen.getAllByText("Direct download");
+    expect(downloadBadges).toHaveLength(2);
+    downloadBadges.forEach((badge) => {
+      expect(badge).toHaveClass("max-w-full");
+      expect(badge.parentElement).toHaveClass("flex-wrap");
+    });
     expect(screen.getByRole("link", { name: "View project on GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
     expect(screen.getByRole("link", { name: /Explore YAHATVP on GitHub/ })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
   });
@@ -77,6 +87,7 @@ describe("dashboard application", () => {
     expect(await screen.findByText("Real estate")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "French" }));
     expect(screen.getByText("Vue d’ensemble")).toBeInTheDocument();
+    expect(screen.getByText("déclarants uniques")).toBeInTheDocument();
     expect(screen.getByText("Immobilier")).toBeInTheDocument();
     expect(screen.getByText("Revenu annuel moyen vs patrimoine")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Revenu annuel moyen et patrimoine total/i })).toBeInTheDocument();

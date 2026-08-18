@@ -30,7 +30,7 @@
   },
   "metrics": {
     "declarations": { "label": "Declarations", "detail": "latest snapshot" },
-    "people": { "label": "People", "detail": "declarant records" },
+    "people": { "label": "People", "detail": "unique declarants" },
     "incomes": { "label": "Income rows", "detail": "declared values" },
     "assets": { "label": "Asset rows", "detail": "observed assets" }
   },

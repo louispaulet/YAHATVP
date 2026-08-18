@@ -63,14 +63,14 @@ export function IncomeAssetsChart({ incomeItems, assetItems, incomeTotal, assetT
             const percentage = total > 0 ? (item.value / total) * 100 : 100 / chartData.length;
             return (
               <div key={item.label} className="flex items-start justify-between gap-4">
-                <div className="flex min-w-0 items-start gap-2.5">
+                <div className="flex min-w-0 flex-1 items-start gap-2.5">
                   <span aria-hidden="true" className="mt-1.5 size-3 shrink-0 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }} />
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-slate-700">{item.displayLabel}</p>
+                    <p className="break-words text-sm font-semibold leading-5 text-slate-700">{item.displayLabel}</p>
                     <p className="mt-1 text-xs text-slate-400">{formatNumber(item.rows, language)} {rowsLabel} · {percentage.toFixed(1)}%</p>
                   </div>
                 </div>
-                <span className="shrink-0 text-right text-sm font-bold text-ink">{formatCurrency(item.value, language)}</span>
+                <span className="shrink-0 whitespace-nowrap text-right text-sm font-bold text-ink">{formatCurrency(item.value, language)}</span>
               </div>
             );
           })}
