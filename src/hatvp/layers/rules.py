@@ -59,15 +59,16 @@ def concatenated_rule(value: float, previous: list[float], raw: str | None) -> l
     ]
 
 
-def implausible_birth(value: str | None, reference: str | None = None) -> bool:
+def implausible_birth(
+    value: str | None, reference: str | None = None, max_age_years: int = 100
+) -> bool:
     """Flag impossible dates and dates incompatible with an adult office holder."""
 
     if not value:
         return False
     try:
         born = date.fromisoformat(value)
-        today = date.today()
-        reference_date = date.fromisoformat(reference) if reference else today
+        reference_date = date.fromisoformat(reference) if reference else date.today()
     except ValueError:
         return True
     age = (
@@ -75,7 +76,7 @@ def implausible_birth(value: str | None, reference: str | None = None) -> bool:
         - born.year
         - ((reference_date.month, reference_date.day) < (born.month, born.day))
     )
-    return born > today or born.year < 1900 or age < 18
+    return born > reference_date or born.year < 1900 or age < 18 or age > max_age_years
 
 
 def conflicting_sources(row: dict[str, Any]) -> list[dict[str, Any]]:

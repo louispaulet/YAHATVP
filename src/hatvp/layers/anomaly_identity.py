@@ -5,15 +5,21 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any
 
+from ..config import Settings
 from .anomaly_support import declarant_key, occurrence
 from .rules import implausible_birth
 
 
 def identity_anomalies(
-    rows: list[dict[str, Any]], parents: dict[str, dict[str, Any]]
+    rows: list[dict[str, Any]],
+    parents: dict[str, dict[str, Any]],
+    max_age_years: int | None = None,
 ) -> list[dict[str, Any]]:
     """Flag missing identity keys, impossible dates, and conflicting birth dates."""
 
+    threshold = (
+        max_age_years if max_age_years is not None else Settings().hatvp_person_dob_max_age_years
+    )
     results: list[dict[str, Any]] = []
     seen: defaultdict[str, set[str]] = defaultdict(set)
     for row in rows:
@@ -29,7 +35,7 @@ def identity_anomalies(
                     {"reason": "no stable source identifier"},
                 )
             )
-        if implausible_birth(row.get("date_naissance"), parent.get("date_depot")):
+        if implausible_birth(row.get("date_naissance"), parent.get("date_depot"), threshold):
             results.append(
                 occurrence(
                     "PERSON_DOB_IMPLAUSIBLE",

@@ -10,6 +10,7 @@ runtime:
   download_connect_timeout_seconds: 15.0
   download_read_timeout_seconds: 180.0
   download_retries: 3
+  person_dob_max_age_years: 100
 parser:
   xml_root: declarations
   allowed_top_level_children: [declaration, declarations]

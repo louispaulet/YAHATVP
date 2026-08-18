@@ -14,6 +14,7 @@ def test_packaged_yaml_provides_runtime_and_parser_defaults() -> None:
     assert config.version == 1
     assert config.runtime_value("hatvp_prefix") == "hatvp"
     assert config.runtime_value("download_retries") >= 1
+    assert config.runtime_value("person_dob_max_age_years") == 100
     assert config.parser.xml_root == "declarations"
     assert config.parser.csv_delimiter == ";"
     assert "declaration" in config.parser.allowed_top_level_children
@@ -24,12 +25,14 @@ def test_settings_environment_overrides_packaged_yaml(monkeypatch) -> None:
     monkeypatch.setenv("HATVP_PREFIX", "fixture-prefix")
     monkeypatch.setenv("DOWNLOAD_RETRIES", "4")
     monkeypatch.setenv("HATVP_ENABLE_BIGQUERY", "true")
+    monkeypatch.setenv("HATVP_PERSON_DOB_MAX_AGE_YEARS", "90")
 
     settings = Settings()
 
     assert settings.hatvp_prefix == "fixture-prefix"
     assert settings.download_retries == 4
     assert settings.hatvp_enable_bigquery is True
+    assert settings.hatvp_person_dob_max_age_years == 90
 
 
 def test_cli_style_model_copy_has_highest_precedence(monkeypatch) -> None:

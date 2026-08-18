@@ -17,6 +17,7 @@ def detect_anomalies(
     tables: dict[str, list[dict[str, Any]]],
     history: dict[str, list[dict[str, Any]]],
     registry: list[dict[str, Any]] | None = None,
+    dob_max_age_years: int | None = None,
 ) -> list[dict[str, Any]]:
     """Run all source-preserving rules over current rows plus historical context."""
 
@@ -28,7 +29,7 @@ def detect_anomalies(
     current_numeric = _tag_rows(tables, NUMERIC_TABLES)
     items = numeric_anomalies(numeric_rows, parents)
     items.extend(conflict_anomalies(income_rows, parents))
-    items.extend(identity_anomalies(people_rows, parents))
+    items.extend(identity_anomalies(people_rows, parents, dob_max_age_years))
     items.extend(source_anomalies(current_numeric, parents))
     return _deduplicate(items, registry or [])
 
@@ -44,18 +45,20 @@ def _deduplicate(
 ) -> list[dict[str, Any]]:
     known = {item.get("anomaly_key") for item in registry}
     states = {item.get("anomaly_key"): item.get("status") for item in registry}
-    unique: dict[tuple[str, str], dict[str, Any]] = {}
+    unique: dict[tuple[str, str, str], dict[str, Any]] = {}
     for item in items:
         item["anomaly_key"] = _anomaly_key(item)
         item["previously_reported"] = item["anomaly_key"] in known
-        unique[(item["record_ref"], item["rule_id"])] = item
+        unique[(item["record_ref"], item["rule_id"], "")] = item
         if item["previously_reported"]:
             rule = (
                 "ANOMALY_REGRESSION"
                 if states.get(item["anomaly_key"]) in {"superseded", "resolved"}
                 else "ANOMALY_KNOWN"
             )
-            unique[(item["record_ref"], rule)] = dict(item, rule_id=rule)
+            unique[(item["record_ref"], rule, item["rule_id"])] = dict(
+                item, rule_id=rule, original_rule_id=item["rule_id"]
+            )
     return list(unique.values())
 
 

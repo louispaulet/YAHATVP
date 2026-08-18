@@ -1,5 +1,48 @@
 # Changelog
 
+## 2026-08-19 — Add direct anomaly lifecycle regression tests
+
+### Added
+
+- Added direct unit coverage for `implausible_birth` reference-date and
+  configurable maximum-age boundaries, including future-date behavior.
+- Added an explicit `ANOMALY_REGRESSION` registry test proving the original
+  `PERSON_DOB_IMPLAUSIBLE` rule, regression status, occurrence count, and
+  first/last-seen metadata remain intact.
+
+### Verified
+
+- Focused anomaly, configuration, and module-budget checks pass: 24 tests;
+  the full repository suite passes with 146 tests.
+- Reconciled `TODO.md` section 12.7 with the completed direct unit coverage.
+
+## 2026-08-19 — Fix DOB plausibility and anomaly registry rule identity
+
+### Fixed
+
+- Added the YAML-backed `person_dob_max_age_years` setting, typed through
+  `Settings` and overridable with `HATVP_PERSON_DOB_MAX_AGE_YEARS`; the default
+  maximum age is 100 years at the reference date.
+- Kept the original anomaly `rule_id` in registry rows when
+  `ANOMALY_KNOWN`/`ANOMALY_REGRESSION` lifecycle occurrences are re-emitted;
+  lifecycle status, `previously_reported`, `first_seen`, `last_seen`,
+  `occurrence_count`, and snapshot idempotency remain intact.
+- Kept all observed DOB values unchanged and retained overlapping DOB lifecycle
+  signals when more than one rule applies to a source row.
+
+### Verified
+
+- Fixture regressions prove a 101-year-old is flagged, an 80-year-old is not,
+  the observed date remains unchanged, and a previously reported anomaly keeps
+  its original rule with stable first/last-seen and occurrence metadata.
+- Reconciled `TODO.md` section 12.7 with explicit completed items for the
+  configurable DOB threshold and original registry rule preservation.
+- Local validation passes: `uv sync --locked`, 144 tests, Ruff check/format,
+  `uv build`, and the live-source local dry-run, which completed with
+  `SUCCESS_WITH_WARNINGS` for snapshot `2026-08-19` and zero quality errors.
+- This change is validated locally only. Production BigQuery impact requires
+  a later Cloud Run replay; no deployment was performed here.
+
 ## 2026-08-19 — Add the repository-local deployment skill
 
 ### Added
