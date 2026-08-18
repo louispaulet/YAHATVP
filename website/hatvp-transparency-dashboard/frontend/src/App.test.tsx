@@ -29,6 +29,7 @@ describe("dashboard application", () => {
     expect(screen.getByText("Real estate")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Income totals by stream/i })).toBeInTheDocument();
     expect(screen.getByText("Declaration types")).toBeInTheDocument();
+    expect(document.querySelector("header img")).toHaveAttribute("src", expect.stringMatching(/hatvp-mark\.webp$/));
   });
 
   it("renders the about page through the router", () => {

@@ -48,6 +48,8 @@ function navClass({ isActive }: { isActive: boolean }): string {
     : "rounded-full px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-white hover:text-ink";
 }
 
+const logoSrc = `${import.meta.env.BASE_URL}hatvp-mark.webp`;
+
 function LanguageSwitcher() {
   const { language, locale, setLanguage } = useI18n();
 
@@ -78,9 +80,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       <header className="border-b border-slate-200/80 bg-canvas/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
           <NavLink to="/" className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-2xl bg-ink text-lg font-black text-lime">
-              H
-            </span>
+            <img className="size-10 rounded-2xl object-cover" src={logoSrc} alt="" aria-hidden="true" />
             <span>
               <span className="block text-xs font-bold uppercase tracking-[0.22em] text-slate-500">HATVP</span>
               <span className="block text-sm font-semibold">{locale.brand.name}</span>

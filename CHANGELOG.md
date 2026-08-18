@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-18 — Add generated HATVP brand mark
+
+### Added
+
+- Added a generated 256px WebP HATVP mark with transparent outer pixels.
+- Replaced the navbar’s CSS-only badge and added the mark as the browser
+  favicon.
+
+### Verified
+
+- Frontend tests and the production Vite build pass.
+
 ## 2026-08-18 — Link About page to project source
 
 ### Added
