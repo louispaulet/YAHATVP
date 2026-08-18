@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-19 — Add the repository-local deployment skill
+
+### Added
+
+- Added `skills/yahatvp-deployment/SKILL.md` with the repeatable YAHATVP
+  preflight, Cloud Run/Cloudflare/GitHub Pages deployment, Gold replay safety,
+  smoke-test, changelog, commit, and tag workflow.
+- Linked the skill from the README dashboard deployment section for future
+  authorized releases.
+
+### Verified
+
+- The skill-creator `quick_validate.py` check passes, and `git diff --check`
+  passes.
+
 ## 2026-08-19 — Release v1.0 dashboard and analytical pipeline
 
 ### Deployed

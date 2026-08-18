@@ -686,6 +686,11 @@ existing `wrangler login` session for the Worker. No service-account JSON key is
 needed or accepted. Set a random shared bridge token once, then deploy the
 backend:
 
+For the complete authorized release sequence, use the repository-local
+[YAHATVP deployment skill](skills/yahatvp-deployment/SKILL.md). It captures the
+preflight checks, dashboard deployment targets, Gold replay guard, smoke-test
+routes, changelog evidence, and tag/push order.
+
 ```bash
 export BRIDGE_TOKEN="<random-token>"
 make backend-secrets
