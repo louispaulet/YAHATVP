@@ -23,6 +23,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 sm:justify-end">
             <nav aria-label={locale.nav.label} className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-6">
               <NavLink to="/" end className={navClass}>{locale.nav.overview}</NavLink>
+              <NavLink to="/search" className={navClass}>{locale.nav.search}</NavLink>
               <NavLink to="/explore" className={navClass}>{locale.nav.explore}</NavLink>
               <NavLink to="/about" className={navClass}>{locale.nav.about}</NavLink>
             </nav>

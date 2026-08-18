@@ -79,6 +79,7 @@ describe("dashboard application", () => {
   it("renders the placeholder page in the expanded navigation", () => {
     render(<MemoryRouter initialEntries={["/explore"]}><App /></MemoryRouter>);
     expect(screen.getByRole("navigation", { name: "Primary navigation" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Search declarations" })).toHaveAttribute("href", "/search");
     expect(screen.getByRole("link", { name: "Data explorer" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("More ways to explore are on the way.")).toBeInTheDocument();
   });
