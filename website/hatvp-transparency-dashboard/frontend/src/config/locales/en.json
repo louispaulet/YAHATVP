@@ -75,16 +75,25 @@
       "links": [
         {
           "label": "HATVP open data",
+          "kind": "redirect",
+          "type": "External page",
+          "action": "Open source page",
           "description": "Official entry point for public declarations.",
           "href": "https://www.hatvp.fr/open-data/"
         },
         {
           "label": "Declaration index (CSV)",
+          "kind": "download",
+          "type": "Direct download",
+          "action": "Download CSV",
           "description": "List of published declarations consumed by the pipeline.",
           "href": "https://www.hatvp.fr/livraison/opendata/liste.csv"
         },
         {
           "label": "Declarations feed (XML)",
+          "kind": "download",
+          "type": "Direct download",
+          "action": "Download XML",
           "description": "Published declaration content consumed by the pipeline.",
           "href": "https://www.hatvp.fr/livraison/merge/declarations.xml"
         }

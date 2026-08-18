@@ -22,6 +22,20 @@
 - Worker tests: 6 passed; Worker typecheck passes.
 - BigQuery bridge fixture tests: 23 passed; Ruff lint and formatting pass.
 
+## 2026-08-18 — Clarify official source actions
+
+### Changed
+
+- Updated the dashboard About page so the HATVP open-data page is presented as
+  an external-page action, while the CSV and XML feeds are presented as direct
+  downloads.
+- Added translated action labels, distinct icons, download semantics, and
+  aligned card actions for the English and French interfaces.
+
+### Verified
+
+- Frontend unit tests and the production Vite build pass.
+
 ## 2026-08-18 — Add generated HATVP brand mark
 
 ### Added
