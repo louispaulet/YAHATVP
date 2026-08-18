@@ -35,10 +35,12 @@
     "assets": { "label": "Asset rows", "detail": "observed assets" }
   },
   "panels": {
-    "income": {
-      "title": "Income, by stream",
+    "comparison": {
+      "title": "Incomes vs assets",
       "eyebrow": "Declared amounts",
-      "empty": "No income rows were found in this snapshot."
+      "empty": "No income or asset rows were found in this snapshot.",
+      "income": "Incomes",
+      "assets": "Assets"
     },
     "assets": {
       "title": "Assets, by section",
@@ -121,15 +123,11 @@
     "backToOverview": "Back to overview"
   },
   "accessibility": {
-    "incomeChart": "Income totals by stream",
-    "incomeLegend": "Income stream legend",
+    "comparisonChart": "Income and asset totals",
+    "comparisonLegend": "Income and asset totals legend",
     "rows": "rows"
   },
   "labels": {
-    "incomeStreams": {
-      "mandate_remuneration": "Mandate remuneration",
-      "revenu_mandat": "Mandate income"
-    },
     "assetSections": {
       "immeubleDto": "Real estate",
       "assuranceVieDto": "Life insurance",

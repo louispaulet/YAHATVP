@@ -71,7 +71,7 @@ function navClass({ isActive }: { isActive: boolean }): string {
 }
 
 const logoSrc = `${import.meta.env.BASE_URL}hatvp-mark.webp`;
-const IncomeChart = lazy(() => import("./charts").then(({ IncomeChart: Chart }) => ({ default: Chart })));
+const IncomeAssetsChart = lazy(() => import("./charts").then(({ IncomeAssetsChart: Chart }) => ({ default: Chart })));
 const AssetChart = lazy(() => import("./charts").then(({ AssetChart: Chart }) => ({ default: Chart })));
 
 function LanguageSwitcher() {
@@ -262,10 +262,10 @@ function DashboardPage() {
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-2">
-        <Panel title={locale.panels.income.title} eyebrow={locale.panels.income.eyebrow}>
-          {income.loading && <ChartSkeleton />}
-          {income.error && <SliceError onRetry={income.reload} />}
-          {income.data && <Suspense fallback={<ChartSkeleton />}><IncomeChart items={income.data.items} emptyLabel={locale.panels.income.empty} language={language} chartLabel={locale.accessibility.incomeChart} legendLabel={locale.accessibility.incomeLegend} rowsLabel={locale.accessibility.rows} /></Suspense>}
+        <Panel title={locale.panels.comparison.title} eyebrow={locale.panels.comparison.eyebrow}>
+          {(income.loading || assets.loading) && <ChartSkeleton />}
+          {(income.error || assets.error) && <SliceError onRetry={() => { if (income.error) income.reload(); if (assets.error) assets.reload(); }} />}
+          {income.data && assets.data && <Suspense fallback={<ChartSkeleton />}><IncomeAssetsChart incomeItems={income.data.items} assetItems={assets.data.items} emptyLabel={locale.panels.comparison.empty} language={language} chartLabel={locale.accessibility.comparisonChart} legendLabel={locale.accessibility.comparisonLegend} rowsLabel={locale.accessibility.rows} incomeLabel={locale.panels.comparison.income} assetsLabel={locale.panels.comparison.assets} /></Suspense>}
         </Panel>
         <Panel title={locale.panels.assets.title} eyebrow={locale.panels.assets.eyebrow}>
           {assets.loading && <ChartSkeleton />}

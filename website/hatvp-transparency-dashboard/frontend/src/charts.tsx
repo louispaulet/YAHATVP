@@ -17,24 +17,33 @@ function formatCurrency(value: number, language: Language): string {
   }).format(value);
 }
 
-interface IncomeChartProps {
-  items: BreakdownItem[];
+interface IncomeAssetsChartProps {
+  incomeItems: BreakdownItem[];
+  assetItems: BreakdownItem[];
   emptyLabel: string;
   language: Language;
   chartLabel: string;
   legendLabel: string;
   rowsLabel: string;
+  incomeLabel: string;
+  assetsLabel: string;
 }
 
-export function IncomeChart({ items, emptyLabel, language, chartLabel, legendLabel, rowsLabel }: IncomeChartProps) {
-  if (items.length === 0) return <p className="py-8 text-sm text-slate-500">{emptyLabel}</p>;
-  const values = items.map((item) => Math.max(0, item.totalValue ?? item.rows));
-  const total = values.reduce((sum, value) => sum + value, 0);
-  const chartData = items.map((item, index) => ({
-    ...item,
-    displayLabel: translateDataLabel(language, "incomeStreams", item.label),
-    value: values[index],
-  }));
+function sumBreakdownValues(items: BreakdownItem[]): number {
+  return items.reduce((sum, item) => sum + Math.max(0, item.totalValue ?? item.rows), 0);
+}
+
+function sumBreakdownRows(items: BreakdownItem[]): number {
+  return items.reduce((sum, item) => sum + item.rows, 0);
+}
+
+export function IncomeAssetsChart({ incomeItems, assetItems, emptyLabel, language, chartLabel, legendLabel, rowsLabel, incomeLabel, assetsLabel }: IncomeAssetsChartProps) {
+  if (incomeItems.length === 0 && assetItems.length === 0) return <p className="py-8 text-sm text-slate-500">{emptyLabel}</p>;
+  const chartData = [
+    { label: "income", displayLabel: incomeLabel, rows: sumBreakdownRows(incomeItems), value: sumBreakdownValues(incomeItems) },
+    { label: "assets", displayLabel: assetsLabel, rows: sumBreakdownRows(assetItems), value: sumBreakdownValues(assetItems) },
+  ];
+  const total = chartData.reduce((sum, item) => sum + item.value, 0);
   const chartDescription = chartData
     .map((item) => `${item.displayLabel} ${formatCurrency(item.value, language)}`)
     .join("; ");

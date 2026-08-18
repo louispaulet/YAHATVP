@@ -580,7 +580,8 @@ fields, or other personal fields. The bridge selects the latest shared
 each slice, so one slow aggregate cannot hold the rest of the page hostage.
 The frontend starts all four requests independently, preserves each panel’s
 layout with a slow-blinking loading shell, and lazy-loads the interactive
-[Recharts](https://recharts.org/) module for the income and asset plots.
+[Recharts](https://recharts.org/) module for the income-versus-asset comparison
+and asset plot.
 
 ### Local dashboard checks
 

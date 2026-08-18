@@ -276,6 +276,7 @@ records, and zero quality errors.
 - [x] Add a generated WebP HATVP mark to the navbar and browser favicon.
 - [x] Distinguish the external HATVP page from the direct CSV/XML downloads on the About page.
 - [x] Keep the asset chart legend inside its panel at desktop widths.
+- [x] Compare total income and asset amounts in the dashboard pie chart.
 
 Deployment evidence (2026-08-18): Cloud Run bridge revision
 `hatvp-dashboard-api-00003-xzr` and Worker version

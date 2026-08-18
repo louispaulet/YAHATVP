@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-18 — Compare dashboard incomes and assets
+
+### Changed
+
+- Revised the dashboard donut chart to compare total income amounts against
+  total asset amounts, with row counts, percentages, and translated labels.
+- Kept the asset-by-section bar chart as the detailed asset breakdown.
+
+### Verified
+
+- `make frontend-test` passes with the English and French comparison labels and
+  accessible chart description covered by the frontend fixture tests.
+
 ## 2026-08-18 — Fix dashboard asset-panel overflow
 
 ### Changed
