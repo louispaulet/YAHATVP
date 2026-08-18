@@ -7,7 +7,10 @@ const dashboard = {
   snapshotDate: "2026-08-18",
   generatedAt: "2026-08-18T08:00:00Z",
   tables: { declarations: 2, people: 2, incomes: 3, assets: 4 },
-  incomeByStream: [{ label: "mandate_remuneration", rows: 3, totalValue: 120000 }],
+  incomeByStream: [
+    { label: "mandate_remuneration", rows: 2, totalValue: 120000 },
+    { label: "revenu_mandat", rows: 1, totalValue: 30000 },
+  ],
   assetsBySection: [{ label: "bank_accounts", rows: 4, totalValue: 80000 }],
   declarationsByType: [{ label: "mandat", rows: 2 }],
 };
@@ -22,6 +25,8 @@ describe("dashboard application", () => {
     expect(await screen.findByText("Declarations")).toBeInTheDocument();
     expect(screen.getByText("Income, by stream")).toBeInTheDocument();
     expect(screen.getByText("Mandate Remuneration")).toBeInTheDocument();
+    expect(screen.getByText("Revenu Mandat")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Income totals by stream/i })).toBeInTheDocument();
     expect(screen.getByText("Declaration types")).toBeInTheDocument();
   });
 

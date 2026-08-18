@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-18 — Add two-stream income pie chart
+
+### Changed
+
+- Updated the dashboard's `Income, by stream` panel to use a two-slice pie chart
+  when exactly two income streams are present, with labeled amounts, row counts,
+  percentages, and an accessible chart description.
+- Kept the existing breakdown list for empty, single-stream, or larger
+  comparisons.
+
+### Verified
+
+- Frontend fixture tests and the production Vite build pass.
+
 ## 2026-08-18 — Fix live dashboard CORS
 
 ### Fixed

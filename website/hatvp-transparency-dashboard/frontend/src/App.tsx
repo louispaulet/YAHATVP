@@ -97,6 +97,69 @@ function BreakdownList({ items, currency, emptyLabel }: { items: BreakdownItem[]
   );
 }
 
+const pieColors = ["var(--color-emerald)", "var(--color-sky)"];
+
+function IncomePieChart({ items, emptyLabel }: { items: BreakdownItem[]; emptyLabel: string }) {
+  if (items.length === 0) return <p className="py-8 text-sm text-slate-500">{emptyLabel}</p>;
+
+  const values = items.map((item) => Math.max(0, item.totalValue ?? item.rows));
+  const total = values.reduce((sum, value) => sum + value, 0);
+  let cursor = 0;
+  const segments = values.map((value, index) => {
+    const share = total > 0 ? value / total : 1 / values.length;
+    const start = cursor;
+    cursor += share * 100;
+    return `${pieColors[index % pieColors.length]} ${start}% ${cursor}%`;
+  });
+  const chartLabel = items
+    .map((item, index) => {
+      const percentage = total > 0 ? (values[index] / total) * 100 : 100 / values.length;
+      return `${displayLabel(item.label)} ${formatCurrency(values[index])}, ${percentage.toFixed(1)}%`;
+    })
+    .join("; ");
+
+  return (
+    <div className="flex flex-col items-center gap-7 sm:flex-row sm:items-center">
+      <div
+        aria-label={`Income totals by stream: ${chartLabel}`}
+        className="size-44 shrink-0 rounded-full shadow-inner ring-8 ring-white sm:size-52"
+        role="img"
+        style={{ background: `conic-gradient(${segments.join(", ")})` }}
+      />
+      <div className="w-full min-w-0 space-y-4" aria-label="Income stream legend">
+        {items.map((item, index) => {
+          const amount = values[index];
+          const percentage = total > 0 ? (amount / total) * 100 : 100 / values.length;
+          return (
+            <div key={item.label} className="flex items-start justify-between gap-4">
+              <div className="flex min-w-0 items-start gap-2.5">
+                <span
+                  aria-hidden="true"
+                  className="mt-1.5 size-3 shrink-0 rounded-full"
+                  style={{ backgroundColor: pieColors[index % pieColors.length] }}
+                />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-slate-700">{displayLabel(item.label)}</p>
+                  <p className="mt-1 text-xs text-slate-400">{formatNumber(item.rows)} rows · {percentage.toFixed(1)}%</p>
+                </div>
+              </div>
+              <span className="shrink-0 text-right text-sm font-bold text-ink">{formatCurrency(amount)}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function IncomeBreakdown({ items, emptyLabel }: { items: BreakdownItem[]; emptyLabel: string }) {
+  return items.length === 2 ? (
+    <IncomePieChart items={items} emptyLabel={emptyLabel} />
+  ) : (
+    <BreakdownList items={items} currency emptyLabel={emptyLabel} />
+  );
+}
+
 function Panel({ title, eyebrow, children }: { title: string; eyebrow: string; children: React.ReactNode }) {
   return (
     <section className="dashboard-card p-6 sm:p-7">
@@ -169,7 +232,7 @@ function DashboardPage() {
 
       <section className="mt-8 grid gap-6 lg:grid-cols-2">
         <Panel title="Income, by stream" eyebrow="Declared amounts">
-          <BreakdownList items={data.incomeByStream} currency emptyLabel="No income rows were found in this snapshot." />
+          <IncomeBreakdown items={data.incomeByStream} emptyLabel="No income rows were found in this snapshot." />
         </Panel>
         <Panel title="Assets, by section" eyebrow="Observed values">
           <BreakdownList items={data.assetsBySection} currency emptyLabel="No asset rows were found in this snapshot." />
