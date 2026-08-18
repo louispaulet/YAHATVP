@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-18 — Expose declaration search in navigation
+
+### Fixed
+
+- Added the translated “Search declarations” link to the dashboard navigation;
+  the `/search` route was already deployed but was previously only reachable by
+  entering its hash URL directly.
+
+### Verified
+
+- Frontend tests and production build pass with 13 tests.
+- Live browser verification shows the navigation link and opens the search page
+  at `#/search` with its heading and search input.
+
 ## 2026-08-18 — Deploy declaration search and source XML viewer
 
 ### Fixed
