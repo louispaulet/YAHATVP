@@ -1,21 +1,10 @@
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { translateDataLabel } from "./config/i18n";
 import type { Language } from "./config/i18n";
+import { formatCurrency, formatNumber } from "./formatters";
 import type { BreakdownItem } from "./types";
 
 const chartColors = ["#1f9d75", "#54b8d0", "#8c76c7", "#d0a640"];
-
-function formatNumber(value: number, language: Language): string {
-  return new Intl.NumberFormat(language === "fr" ? "fr-FR" : "en-GB").format(value);
-}
-
-function formatCurrency(value: number, language: Language): string {
-  return new Intl.NumberFormat(language === "fr" ? "fr-FR" : "en-GB", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 interface IncomeAssetsChartProps {
   incomeItems: BreakdownItem[];

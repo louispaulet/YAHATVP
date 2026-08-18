@@ -48,12 +48,12 @@ describe("dashboard application", () => {
     expect(screen.getByText("Average annual income vs assets")).toBeInTheDocument();
     expect(await screen.findByText("Average annual income")).toBeInTheDocument();
     expect(screen.getByText("Assets", { selector: "p" })).toBeInTheDocument();
-    expect(screen.getByText("€75,000")).toBeInTheDocument();
+    expect(screen.getByText("€75K")).toBeInTheDocument();
     expect(screen.getByText("Average annual income")).toHaveClass("break-words");
     expect(screen.getByText("Average annual income")).not.toHaveClass("truncate");
-    expect(screen.getByText("€75,000")).toHaveClass("whitespace-nowrap");
-    expect(screen.getAllByText("€80,000")).toHaveLength(2);
-    expect(screen.getByText(/Average annual income: €75,000/)).toBeInTheDocument();
+    expect(screen.getByText("€75K")).toHaveClass("whitespace-nowrap");
+    expect(screen.getAllByText("€80K")).toHaveLength(2);
+    expect(screen.getByText(/Average annual income: €75K/)).toBeInTheDocument();
     expect(screen.getByText("Real estate")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Average annual income and asset totals/i })).toBeInTheDocument();
     expect(screen.getByText("Declaration types")).toBeInTheDocument();
