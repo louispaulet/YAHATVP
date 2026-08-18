@@ -620,7 +620,12 @@ that declaration's source XML node from the immutable GCS snapshot. The detail
 view keeps a collapsed raw-XML audit section for source verification while
 rendering the observed metadata, identity, mandates, annual amounts, interests,
 activities, assets, liabilities, attachments, and empty source sections in
-readable cards and charts.
+readable cards and charts. The frontend also includes a static `/quality-issues`
+page backed by `src/data/qualityIssues.json`; this is a redacted register with
+only issue type, contact date, public HATVP link(s), and solved state. The page
+calculates each unresolved issue's open duration from its contact date and the
+current Europe/Madrid calendar date, displaying years, months, and days. The
+source CSVs and correspondence fields are not stored in the repository.
 
 ```text
 GitHub Pages React app

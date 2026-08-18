@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-08-19 — Show calendar durations for open issues
+
+### Changed
+
+- Updated the quality-issues table to display unresolved time as calendar years,
+  months, and days instead of a raw day count, using Europe/Madrid calendar
+  dates to match the source contact dates.
+
+### Verified
+
+- Frontend fixture suite passes with 19 tests and the Vite production build
+  succeeds; the fixed-date test covers multi-unit and same-day durations.
+
+## 2026-08-19 — Add a privacy-safe HATVP quality issues page
+
+### Added
+
+- Added a localized `/quality-issues` dashboard page backed by a static local
+  JSON register containing only issue type, contact date, public HATVP links,
+  and solved state; unresolved durations are calculated from contact dates.
+- Kept source CSVs, emails, message contents, HATVP replies, Gmail URLs, and
+  message identifiers out of the repository.
+
+### Verified
+
+- Frontend fixture suite passes with 19 tests and the Vite production build
+  succeeds.
+- The local page renders 10 unresolved rows, and the mobile smoke check reports
+  no horizontal overflow.
+
 ## 2026-08-19 — Stabilize About-page source cards in both languages
 
 ### Fixed

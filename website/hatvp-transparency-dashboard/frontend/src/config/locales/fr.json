@@ -14,7 +14,8 @@
     "overview": "Vue d’ensemble",
     "search": "Rechercher une déclaration",
     "explore": "Explorer les données",
-    "about": "À propos des données"
+    "about": "À propos des données",
+    "qualityIssues": "Signalements"
   },
   "footer": {
     "builtFrom": "Construit à partir des déclarations publiques de la HATVP.",
@@ -125,6 +126,34 @@
     "description": "Cet espace accueillera des vues plus détaillées des données HATVP Gold, pour suivre une déclaration de sa source jusqu’à son agrégat.",
     "status": "Page temporaire",
     "next": "De nouveaux outils d’exploration seront ajoutés lors d’une prochaine mise à jour."
+  },
+  "qualityIssues": {
+    "eyebrow": "Suivi de la qualité des données",
+    "title": "Les problèmes signalés à la HATVP.",
+    "description": "Un registre public et expurgé des problèmes de qualité signalés à la HATVP. Il contient uniquement le type de problème, la date de contact, les liens publics de la HATVP et le statut de résolution.",
+    "privacyNote": "Les e-mails, le contenu des messages et les réponses de la HATVP sont volontairement exclus de cette page.",
+    "reported": "Problèmes signalés",
+    "solved": "Résolus",
+    "open": "Problèmes ouverts",
+    "columns": {
+      "issueType": "Type de problème",
+      "contactDate": "Contact HATVP",
+      "declaration": "Déclaration / lien source",
+      "status": "Résolu ?",
+      "duration": "Ouvert depuis"
+    },
+    "openLink": "Ouvrir le lien",
+    "noLink": "Aucun lien direct",
+    "notSolved": "Non résolu",
+    "solvedLabel": "Résolu",
+    "durationUnits": {
+      "year": "an",
+      "years": "ans",
+      "month": "mois",
+      "months": "mois",
+      "day": "jour",
+      "days": "jours"
+    }
   },
   "search": {
     "eyebrow": "Recherche de déclarations",

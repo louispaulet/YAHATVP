@@ -335,6 +335,14 @@ audit history.
   activities, interests, assets, liabilities, attachments, empty sections, and
   a collapsed raw-XML audit view; cover five live schema variants with fixture
   and responsive regression tests.
+- [x] Add the localized static `/quality-issues` register from a minimal local
+  JSON file, keeping only issue type, contact date, public HATVP links, and
+  solved state; calculate unresolved duration from the contact date and exclude
+  the source CSVs and correspondence.
+
+Static quality-register evidence (2026-08-19): the frontend fixture suite passes
+with 19 tests, the production build succeeds, the local page renders ten rows
+with zero solved issues, calendar durations, and no mobile page overflow.
 
 Deployment evidence (2026-08-18): Cloud Run bridge revision
 `hatvp-dashboard-api-00003-xzr` and Worker version

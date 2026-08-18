@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { declarationXmlFixtures } from "./declaration-fixtures";
 import { assets, dashboard, declarations, income } from "./test-fixtures";
@@ -33,6 +33,8 @@ const declaration = {
 };
 
 describe("dashboard application", () => {
+  afterEach(() => vi.useRealTimers());
+
   beforeEach(() => {
     vi.stubGlobal("fetch", vi.fn().mockImplementation((url: string) => {
       const path = new URL(url).pathname;
@@ -90,6 +92,21 @@ describe("dashboard application", () => {
     expect(screen.getByRole("link", { name: "Search declarations" })).toHaveAttribute("href", "/search");
     expect(screen.getByRole("link", { name: "Data explorer" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("More ways to explore are on the way.")).toBeInTheDocument();
+  });
+
+  it("renders the redacted HATVP quality issue register", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-19T12:00:00Z"));
+    render(<MemoryRouter initialEntries={["/quality-issues"]}><App /></MemoryRouter>);
+    expect(screen.getByText("Issues reported to HATVP.")).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Issue type" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Open for" })).toBeInTheDocument();
+    expect(screen.getAllByText("Not solved")).toHaveLength(10);
+    expect(screen.getByText("3 years, 1 month, 29 days")).toBeInTheDocument();
+    expect(screen.getAllByText("2 years, 1 month, 22 days")).toHaveLength(4);
+    expect(screen.getAllByText("0 days")).toHaveLength(2);
+    expect(screen.getAllByRole("link", { name: "Open link ↗" })[0]).toHaveAttribute("href", "https://www.hatvp.fr/fiche-nominative/?declarant=vigier-jean-francois-17617");
+    expect(screen.getByRole("link", { name: "Reported issues" })).toHaveAttribute("aria-current", "page");
   });
 
   it("searches declarations and opens the source XML detail page", async () => {
