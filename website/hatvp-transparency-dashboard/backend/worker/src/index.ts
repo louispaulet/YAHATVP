@@ -1,6 +1,8 @@
 import type {
   DashboardBreakdownResponse,
+  DashboardDeclarationResponse,
   DashboardOverviewResponse,
+  DashboardSearchResponse,
   WorkerEnv,
 } from "./types";
 
@@ -11,7 +13,9 @@ const DASHBOARD_SLICE_ROUTES = {
   "/api/dashboard/income": "/v1/dashboard/income",
   "/api/dashboard/assets": "/v1/dashboard/assets",
   "/api/dashboard/declarations": "/v1/dashboard/declarations",
+  "/api/dashboard/search": "/v1/dashboard/search",
 } as const;
+const DASHBOARD_DECLARATION_PREFIX = "/api/dashboard/declarations/";
 
 type Fetcher = typeof fetch;
 
@@ -67,12 +71,36 @@ function isDashboardBreakdownResponse(value: unknown): value is DashboardBreakdo
   return Array.isArray(value.items);
 }
 
+function isDashboardSearchResponse(value: unknown): value is DashboardSearchResponse {
+  if (!isRecord(value) || typeof value.generatedAt !== "string") return false;
+  if (!(value.snapshotDate === null || typeof value.snapshotDate === "string")) return false;
+  return Array.isArray(value.results) && typeof value.resultCount === "number";
+}
+
+function isDashboardDeclarationResponse(value: unknown): value is DashboardDeclarationResponse {
+  if (!isRecord(value) || typeof value.generatedAt !== "string" || typeof value.rawXml !== "string") return false;
+  if (!(value.snapshotDate === null || typeof value.snapshotDate === "string")) return false;
+  return isRecord(value.declaration) && typeof value.declaration.declarationUuid === "string";
+}
+
+function declarationId(pathname: string): string | null {
+  if (!pathname.startsWith(DASHBOARD_DECLARATION_PREFIX)) return null;
+  const value = pathname.slice(DASHBOARD_DECLARATION_PREFIX.length);
+  if (!value || value.includes("/")) return null;
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return null;
+  }
+}
+
 async function proxySlice(
   request: Request,
   env: WorkerEnv,
   fetcher: Fetcher,
   upstreamPath: string,
   validate: (value: unknown) => boolean,
+  upstreamSearch = "",
 ): Promise<Response> {
   if (!env.BRIDGE_URL || !env.BRIDGE_TOKEN) {
     return jsonResponse(request, env, errorPayload("CONFIGURATION_ERROR", "API is not configured"), 500);
@@ -80,8 +108,9 @@ async function proxySlice(
 
   let upstream: Response;
   try {
-    const target = new URL(upstreamPath, env.BRIDGE_URL).toString();
-    upstream = await fetcher(target, {
+    const target = new URL(upstreamPath, env.BRIDGE_URL);
+    target.search = upstreamSearch;
+    upstream = await fetcher(target.toString(), {
       method: "GET",
       headers: { Authorization: `Bearer ${env.BRIDGE_TOKEN}`, Accept: "application/json" },
     });
@@ -122,8 +151,27 @@ export async function handleRequest(
   if (slicePath && request.method === "GET") {
     const validate = slicePath.endsWith("/overview")
       ? isDashboardOverviewResponse
-      : isDashboardBreakdownResponse;
-    return proxySlice(request, env, fetcher, slicePath, validate);
+      : slicePath.endsWith("/search")
+        ? isDashboardSearchResponse
+        : isDashboardBreakdownResponse;
+    const search = slicePath.endsWith("/search") ? new URL(request.url).search : "";
+    return proxySlice(request, env, fetcher, slicePath, validate, search);
+  }
+  const id = declarationId(url.pathname);
+  if (id && request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders(request, env) });
+  }
+  if (id && request.method === "GET") {
+    return proxySlice(
+      request,
+      env,
+      fetcher,
+      `/v1/dashboard/declarations/${encodeURIComponent(id)}`,
+      isDashboardDeclarationResponse,
+    );
+  }
+  if (url.pathname.startsWith(DASHBOARD_DECLARATION_PREFIX)) {
+    return jsonResponse(request, env, errorPayload("NOT_FOUND", "Route not found"), 404);
   }
   if (slicePath) {
     return jsonResponse(request, env, errorPayload("METHOD_NOT_ALLOWED", "Use GET for dashboard data"), 405);

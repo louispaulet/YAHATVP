@@ -2,32 +2,15 @@
 
 from __future__ import annotations
 
-import re
-
-TABLES = ("declarations", "people", "incomes", "assets")
-# Keep the public query inventory explicit and reviewable.
-# No caller-supplied SQL fragments are accepted by this module.
-VIEWS = ("overview", "income", "assets", "declarations")
-IDENTIFIER = re.compile(r"^[A-Za-z0-9_-]+$")
-
-
-def validate_identifier(value: str) -> str:
-    """Allow only project and dataset identifiers supplied by deployment config."""
-
-    if not IDENTIFIER.fullmatch(value):
-        raise ValueError("Invalid BigQuery project or dataset identifier")
-    return value
+from query_support import TABLES, VIEWS, dataset_prefix, validate_identifier
 
 
 def build_query(project: str, dataset: str, view: str = "overview") -> str:
-    """Build one fixed, latest-snapshot query for an independent dashboard slice.
-
-    Each view has its own aggregate payload so the frontend can load it alone.
-    """
+    """Build one fixed, latest-snapshot query for an independent dashboard slice."""
 
     if view not in VIEWS:
         raise ValueError("Invalid dashboard query view")
-    prefix = f"`{validate_identifier(project)}.{validate_identifier(dataset)}`"
+    prefix = dataset_prefix(project, dataset)
     latest = (
         f"WITH latest AS (SELECT MAX(snapshot_date) AS snapshot_date FROM {prefix}.declarations)\n"
     )
@@ -83,3 +66,6 @@ COUNT(*) AS row_count
 FROM {prefix}.declarations t CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
 GROUP BY label ORDER BY row_count DESC, label LIMIT 12)) AS items_json FROM latest l"""
     return latest + body
+
+
+__all__ = ["TABLES", "VIEWS", "build_query", "validate_identifier"]

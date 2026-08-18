@@ -1,9 +1,9 @@
 import { createContext, lazy, Suspense, useContext, useEffect, useState } from "react";
-import { NavLink, Route, Routes } from "react-router-dom";
-import { fetchAssets, fetchDeclarations, fetchIncome, fetchOverview } from "./api";
+import { NavLink, Route, Routes, useParams, useSearchParams } from "react-router-dom";
+import { fetchAssets, fetchDeclaration, fetchDeclarations, fetchIncome, fetchOverview, fetchSearch } from "./api";
 import { defaultLanguage, getLocale, languages, translateDataLabel, type Language, type Locale } from "./config/i18n";
 import { formatNumber } from "./formatters";
-import type { DashboardBreakdownResponse, DashboardOverviewResponse } from "./types";
+import type { DashboardBreakdownResponse, DashboardDeclarationResponse, DashboardOverviewResponse, DashboardSearchResponse, DeclarationSearchResult } from "./types";
 
 interface I18nContextValue {
   language: Language;
@@ -61,6 +61,60 @@ function useResource<T>(loader: (signal: AbortSignal) => Promise<T>): ResourceSt
   return { ...state, reload: () => setAttempt((value) => value + 1) };
 }
 
+function useSearchResource(query: string): ResourceState<DashboardSearchResponse> {
+  const [attempt, setAttempt] = useState(0);
+  const [state, setState] = useState<Omit<ResourceState<DashboardSearchResponse>, "reload">>({
+    data: null,
+    error: false,
+    loading: false,
+  });
+
+  useEffect(() => {
+    if (!query) {
+      setState({ data: null, error: false, loading: false });
+      return;
+    }
+    const controller = new AbortController();
+    setState((current) => ({ ...current, loading: true, error: false }));
+    fetchSearch(query, controller.signal)
+      .then((data) => setState({ data, error: false, loading: false }))
+      .catch((reason: unknown) => {
+        if (reason instanceof DOMException && reason.name === "AbortError") return;
+        setState((current) => ({ ...current, error: true, loading: false }));
+      });
+    return () => controller.abort();
+  }, [attempt, query]);
+
+  return { ...state, reload: () => setAttempt((value) => value + 1) };
+}
+
+function useDeclarationResource(uuid: string): ResourceState<DashboardDeclarationResponse> {
+  const [attempt, setAttempt] = useState(0);
+  const [state, setState] = useState<Omit<ResourceState<DashboardDeclarationResponse>, "reload">>({
+    data: null,
+    error: false,
+    loading: false,
+  });
+
+  useEffect(() => {
+    if (!uuid) {
+      setState({ data: null, error: false, loading: false });
+      return;
+    }
+    const controller = new AbortController();
+    setState((current) => ({ ...current, loading: true, error: false }));
+    fetchDeclaration(uuid, controller.signal)
+      .then((data) => setState({ data, error: false, loading: false }))
+      .catch((reason: unknown) => {
+        if (reason instanceof DOMException && reason.name === "AbortError") return;
+        setState((current) => ({ ...current, error: true, loading: false }));
+      });
+    return () => controller.abort();
+  }, [attempt, uuid]);
+
+  return { ...state, reload: () => setAttempt((value) => value + 1) };
+}
+
 function navClass({ isActive }: { isActive: boolean }): string {
   return isActive
     ? "relative px-1 py-2 text-sm font-semibold text-ink transition after:absolute after:inset-x-1 after:-bottom-[0.35rem] after:h-0.5 after:rounded-full after:bg-emerald focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald"
@@ -109,6 +163,7 @@ function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 sm:justify-end">
             <nav aria-label={locale.nav.label} className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-6">
               <NavLink to="/" end className={navClass}>{locale.nav.overview}</NavLink>
+              <NavLink to="/search" className={navClass}>{locale.nav.search}</NavLink>
               <NavLink to="/explore" className={navClass}>{locale.nav.explore}</NavLink>
               <NavLink to="/about" className={navClass}>{locale.nav.about}</NavLink>
             </nav>
@@ -343,6 +398,152 @@ function ExplorePage() {
   );
 }
 
+function searchValue(value: string | null, fallback: string): string {
+  return value?.trim() || fallback;
+}
+
+function declarationName(result: DeclarationSearchResult, fallback: string): string {
+  return [result.civilite, result.firstName, result.lastName].filter(Boolean).join(" ") || fallback;
+}
+
+function SearchResultCard({ result }: { result: DeclarationSearchResult }) {
+  const { language, locale } = useI18n();
+  const name = declarationName(result, locale.search.unknownDeclarant);
+  const date = result.dateDeposited
+    ? new Date(`${result.dateDeposited}T00:00:00`).toLocaleDateString(language === "fr" ? "fr-FR" : "en-GB")
+    : locale.search.notAvailable;
+  const declarationType = result.declarationType
+    ? translateDataLabel(language, "declarationTypes", result.declarationType)
+    : locale.search.notAvailable;
+
+  return (
+    <article className="dashboard-card p-5 transition hover:border-emerald/40 hover:shadow-soft sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald">{locale.search.resultEyebrow}</p>
+          <h2 className="mt-2 text-xl font-black tracking-tight text-ink">{name}</h2>
+        </div>
+        <span className="max-w-full rounded-full bg-lime/60 px-3 py-1.5 text-xs font-bold leading-5 text-ink sm:text-right">{declarationType}</span>
+      </div>
+      <dl className="mt-6 grid gap-x-5 gap-y-4 border-t border-slate-100 pt-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.mandate}</dt>
+          <dd className="mt-1 text-sm font-semibold text-slate-700">{searchValue(result.mandate, locale.search.notAvailable)}</dd>
+        </div>
+        <div>
+          <dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.organ}</dt>
+          <dd className="mt-1 text-sm font-semibold text-slate-700">{searchValue(result.organ || result.organDeclaration, locale.search.notAvailable)}</dd>
+        </div>
+        <div>
+          <dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.date}</dt>
+          <dd className="mt-1 text-sm font-semibold text-slate-700">{date}</dd>
+        </div>
+        <div>
+          <dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.identifier}</dt>
+          <dd className="mt-1 break-all font-mono text-xs font-semibold text-slate-700">{searchValue(result.declarationUuid, locale.search.notAvailable)}</dd>
+        </div>
+      </dl>
+      {result.declarationUuid && <NavLink to={`/declarations/${encodeURIComponent(result.declarationUuid)}`} className="mt-5 flex items-center justify-between border-t border-slate-100 pt-5 text-sm font-bold text-emerald transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald"><span>{locale.search.viewDeclaration}</span><span aria-hidden="true">↗</span></NavLink>}
+    </article>
+  );
+}
+
+function SearchPage() {
+  const { language, locale } = useI18n();
+  const [params, setParams] = useSearchParams();
+  const query = params.get("q")?.trim() ?? "";
+  const [input, setInput] = useState(query);
+  const search = useSearchResource(query);
+
+  useEffect(() => setInput(query), [query]);
+
+  function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const nextQuery = input.trim();
+    setParams(nextQuery ? { q: nextQuery } : {});
+  }
+
+  return (
+    <div className="mx-auto max-w-5xl px-5 py-12 lg:px-8 lg:py-16">
+      <section className="hero-grid overflow-hidden rounded-[2rem] bg-ink px-6 py-9 text-white shadow-soft sm:px-10 sm:py-11">
+        <p className="relative z-10 text-xs font-bold uppercase tracking-[0.18em] text-lime">{locale.search.eyebrow}</p>
+        <h1 className="relative z-10 mt-4 max-w-3xl text-4xl font-black leading-[1.04] tracking-[-0.04em] sm:text-5xl">{locale.search.title}</h1>
+        <p className="relative z-10 mt-5 max-w-2xl text-base leading-7 text-slate-300">{locale.search.description}</p>
+      </section>
+
+      <section className="dashboard-card relative z-10 -mt-5 p-5 sm:p-6">
+        <form onSubmit={submit}>
+          <label htmlFor="declaration-search" className="text-sm font-bold text-ink">{locale.search.inputLabel}</label>
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+            <div className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 transition focus-within:border-emerald focus-within:ring-4 focus-within:ring-emerald/10">
+              <span aria-hidden="true" className="text-xl text-emerald">⌕</span>
+              <input
+                id="declaration-search"
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder={locale.search.placeholder}
+                maxLength={120}
+                className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-ink outline-none placeholder:font-normal placeholder:text-slate-400"
+              />
+            </div>
+            <button type="submit" className="rounded-2xl bg-emerald px-6 py-3 text-sm font-bold text-white transition hover:bg-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">
+              {locale.search.submit}
+            </button>
+          </div>
+          <p className="mt-3 text-xs leading-5 text-slate-500">{locale.search.hint}</p>
+        </form>
+      </section>
+
+      {!query && <section className="dashboard-card mt-8 border-dashed p-6 sm:p-8"><p className="text-sm font-bold uppercase tracking-[0.14em] text-slate-400">{locale.search.emptyTitle}</p><p className="mt-3 text-lg font-semibold text-ink">{locale.search.emptyDescription}</p></section>}
+      {query && search.loading && <section className="mt-8 space-y-4" aria-busy="true"><LoadingShell className="h-36 w-full rounded-[1.5rem]" /><LoadingShell className="h-36 w-full rounded-[1.5rem]" /></section>}
+      {query && search.error && <section className="mt-8"><SliceError onRetry={search.reload} /></section>}
+      {query && search.data && search.data.results.length === 0 && <section className="dashboard-card mt-8 border-dashed p-6 sm:p-8"><p className="text-sm font-bold uppercase tracking-[0.14em] text-slate-400">{locale.search.noResultsEyebrow}</p><p className="mt-3 text-lg font-semibold text-ink">{locale.search.noResults.replace("{query}", query)}</p></section>}
+      {query && search.data && search.data.results.length > 0 && <section className="mt-8"><div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.search.resultsEyebrow}</p><h2 className="mt-2 text-2xl font-black tracking-tight text-ink">{locale.search.resultsFound.replace("{count}", formatNumber(search.data.resultCount, language))}</h2></div><p className="text-xs text-slate-500">{locale.search.snapshot.replace("{date}", search.data.snapshotDate || locale.search.notAvailable)}</p></div><div className="space-y-4">{search.data.results.map((result, index) => <SearchResultCard key={`${result.declarationUuid}-${index}`} result={result} />)}</div></section>}
+    </div>
+  );
+}
+
+function DeclarationPage() {
+  const { language, locale } = useI18n();
+  const { uuid = "" } = useParams();
+  const declaration = useDeclarationResource(uuid);
+  const result = declaration.data?.declaration;
+  const name = result ? declarationName(result, locale.search.unknownDeclarant) : locale.search.unknownDeclarant;
+  const date = result?.dateDeposited
+    ? new Date(`${result.dateDeposited}T00:00:00`).toLocaleDateString(language === "fr" ? "fr-FR" : "en-GB")
+    : locale.search.notAvailable;
+
+  return (
+    <div className="mx-auto max-w-6xl px-5 py-12 lg:px-8 lg:py-16">
+      <NavLink to="/search" className="inline-flex items-center gap-2 text-sm font-bold text-emerald transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald"><span aria-hidden="true">←</span>{locale.declaration.back}</NavLink>
+      <section className="mt-7 overflow-hidden rounded-[2rem] bg-ink px-6 py-9 text-white shadow-soft sm:px-10 sm:py-11">
+        <p className="relative z-10 text-xs font-bold uppercase tracking-[0.18em] text-lime">{locale.declaration.eyebrow}</p>
+        {declaration.loading && <><LoadingShell className="relative z-10 mt-5 h-10 w-2/3 rounded-xl" /><LoadingShell className="loading-shell-dark relative z-10 mt-4 h-5 w-1/2 rounded-full" /></>}
+        {result && <><h1 className="relative z-10 mt-4 max-w-3xl text-4xl font-black leading-[1.04] tracking-[-0.04em] sm:text-5xl">{name}</h1><p className="relative z-10 mt-5 max-w-2xl text-base leading-7 text-slate-300">{locale.declaration.description}</p></>}
+      </section>
+
+      {declaration.error && <section className="mt-8"><SliceError onRetry={declaration.reload} /></section>}
+      {result && <>
+        <section className="dashboard-card relative z-10 -mt-5 p-5 sm:p-6">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.identifier}</p><p className="mt-1 break-all font-mono text-xs font-semibold text-slate-700">{searchValue(result.declarationUuid, locale.search.notAvailable)}</p></div>
+            <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.declaration.fields.type}</p><p className="mt-1 text-sm font-semibold text-slate-700">{searchValue(result.declarationType, locale.search.notAvailable)}</p></div>
+            <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.mandate}</p><p className="mt-1 text-sm font-semibold text-slate-700">{searchValue(result.mandate, locale.search.notAvailable)}</p></div>
+            <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.date}</p><p className="mt-1 text-sm font-semibold text-slate-700">{date}</p></div>
+          </div>
+        </section>
+        {declaration.data && <section className="dashboard-card mt-8 overflow-hidden">
+          <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6">
+            <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.sourceEyebrow}</p><h2 className="mt-2 text-2xl font-black tracking-tight text-ink">{locale.declaration.sourceTitle}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{locale.declaration.sourceDescription}</p></div>
+            <span className="shrink-0 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500">{formatNumber(declaration.data.rawXml.length, language)} {locale.declaration.characters}</span>
+          </div>
+          <pre aria-label={locale.declaration.rawXmlLabel} className="max-h-[70vh] overflow-auto bg-[#101815] p-5 text-xs leading-6 text-slate-200 sm:p-7"><code>{declaration.data.rawXml}</code></pre>
+        </section>}
+      </>}
+    </div>
+  );
+}
+
 function NotFoundPage() {
   const { locale } = useI18n();
   return <div className="mx-auto max-w-2xl px-5 py-24 text-center lg:px-8"><h1 className="text-4xl font-black">{locale.errors.notFound}</h1><NavLink className="mt-6 inline-block rounded-full bg-ink px-5 py-3 text-sm font-bold text-white" to="/">{locale.errors.backToOverview}</NavLink></div>;
@@ -362,7 +563,7 @@ export function App() {
 
   return (
     <I18nContext.Provider value={{ language, locale, setLanguage }}>
-      <Layout><Routes><Route path="/" element={<DashboardPage />} /><Route path="/explore" element={<ExplorePage />} /><Route path="/about" element={<AboutPage />} /><Route path="*" element={<NotFoundPage />} /></Routes></Layout>
+      <Layout><Routes><Route path="/" element={<DashboardPage />} /><Route path="/search" element={<SearchPage />} /><Route path="/declarations/:uuid" element={<DeclarationPage />} /><Route path="/explore" element={<ExplorePage />} /><Route path="/about" element={<AboutPage />} /><Route path="*" element={<NotFoundPage />} /></Routes></Layout>
     </I18nContext.Provider>
   );
 }

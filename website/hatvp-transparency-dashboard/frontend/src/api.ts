@@ -1,4 +1,4 @@
-import type { DashboardBreakdownResponse, DashboardOverviewResponse } from "./types";
+import type { DashboardBreakdownResponse, DashboardDeclarationResponse, DashboardOverviewResponse, DashboardSearchResponse } from "./types";
 
 const DEFAULT_API_URL = "http://localhost:8787";
 
@@ -28,6 +28,14 @@ function isBreakdownResponse(value: unknown): value is DashboardBreakdownRespons
     (value.yearCount === undefined || typeof value.yearCount === "number");
 }
 
+function isSearchResponse(value: unknown): value is DashboardSearchResponse {
+  return isMeta(value) && Array.isArray(value.results) && typeof value.resultCount === "number";
+}
+
+function isDeclarationResponse(value: unknown): value is DashboardDeclarationResponse {
+  return isMeta(value) && typeof value.rawXml === "string" && typeof value.declaration === "object" && value.declaration !== null;
+}
+
 async function fetchJson<T>(path: string, validate: (value: unknown) => value is T, signal?: AbortSignal): Promise<T> {
   const baseUrl = import.meta.env.VITE_API_BASE_URL || DEFAULT_API_URL;
   const response = await fetch(`${baseUrl.replace(/\/$/, "")}${path}`, {
@@ -54,4 +62,12 @@ export function fetchAssets(signal?: AbortSignal): Promise<DashboardBreakdownRes
 
 export function fetchDeclarations(signal?: AbortSignal): Promise<DashboardBreakdownResponse> {
   return fetchJson("/api/dashboard/declarations", isBreakdownResponse, signal);
+}
+
+export function fetchSearch(query: string, signal?: AbortSignal): Promise<DashboardSearchResponse> {
+  return fetchJson(`/api/dashboard/search?q=${encodeURIComponent(query)}`, isSearchResponse, signal);
+}
+
+export function fetchDeclaration(uuid: string, signal?: AbortSignal): Promise<DashboardDeclarationResponse> {
+  return fetchJson(`/api/dashboard/declarations/${encodeURIComponent(uuid)}`, isDeclarationResponse, signal);
 }

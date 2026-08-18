@@ -14,6 +14,20 @@ const overview: DashboardOverviewResponse = {
   tables: { declarations: 2, people: 2, incomes: 3, assets: 4 },
 };
 
+const search = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  resultCount: 0,
+  results: [],
+};
+
+const declaration = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  declaration: { declarationUuid: "fixture-uuid-1" },
+  rawXml: "<declaration><uuid>fixture-uuid-1</uuid></declaration>",
+};
+
 function request(path: string, init?: RequestInit): Request {
   return new Request(`https://api.example.test${path}`, init);
 }
@@ -83,5 +97,35 @@ describe("dashboard Worker", () => {
       expect(response.status).toBe(200);
     }
     expect(fetcher).toHaveBeenCalledTimes(3);
+  });
+
+  it("forwards a declaration search query", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify(search), { status: 200 }),
+    );
+    const response = await handleRequest(request("/api/dashboard/search?q=Dupont"), env, fetcher);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(search);
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://bridge.example.test/v1/dashboard/search?q=Dupont",
+      expect.anything(),
+    );
+  });
+
+  it("proxies a declaration detail route to the bridge", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify(declaration), { status: 200 }),
+    );
+    const response = await handleRequest(
+      request("/api/dashboard/declarations/fixture-uuid-1"),
+      env,
+      fetcher,
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(declaration);
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://bridge.example.test/v1/dashboard/declarations/fixture-uuid-1",
+      expect.anything(),
+    );
   });
 });

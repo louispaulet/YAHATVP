@@ -1,5 +1,10 @@
 import pytest
-from query import TABLES, VIEWS, build_query, validate_identifier
+from query import (
+    TABLES,
+    VIEWS,
+    build_query,
+    validate_identifier,
+)
 
 
 def test_query_is_fixed_to_curated_tables_and_latest_snapshot():

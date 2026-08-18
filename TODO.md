@@ -282,6 +282,13 @@ records, and zero quality errors.
 - [x] Use compact, locale-aware formatting for large dashboard values.
 - [x] Publish and smoke-test the dashboard at `yahatvp.thefrenchartist.dev`
   with the GitHub Pages custom domain and HTTPS enabled.
+- [x] Add a localized declaration search page with parameterized public-field
+  matching and result links to source XML detail pages.
+- [x] Read one matched declaration node from the immutable GCS XML snapshot and
+  render it in a dedicated escaped source viewer; fixture coverage includes the
+  UUID match and private-field exclusion.
+- [ ] Deploy the search/XML bridge, Worker, and frontend changes after merge and
+  smoke-test a live declaration search plus source XML detail route.
 
 Deployment evidence (2026-08-18): Cloud Run bridge revision
 `hatvp-dashboard-api-00003-xzr` and Worker version

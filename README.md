@@ -560,24 +560,32 @@ WHERE column_name = 'snapshot_date';
 
 The repository also contains a deliberately small public dashboard under
 `website/hatvp-transparency-dashboard/`. It is separate from the ingestion
-pipeline and reads only aggregate data from the four curated BigQuery tables:
-`declarations`, `people`, `incomes`, and `assets`.
+pipeline and reads aggregate data from the four curated BigQuery tables:
+`declarations`, `people`, `incomes`, and `assets`. Its declaration search can
+open one matching public declaration and display that declaration's source XML
+node from the immutable GCS snapshot.
 
 ```text
 GitHub Pages React app
         │ GET /api/dashboard/{slice}
+        │ GET /api/dashboard/search?q=...
+        │ GET /api/dashboard/declarations/{uuid}
         ▼
 Cloudflare Worker
         │ authenticated aggregate request per slice
         ▼
 Read-only Cloud Run bridge ─── BigQuery curated tables
+                         └── immutable GCS XML snapshot
 ```
 
-The public API does not expose arbitrary SQL, raw rows, addresses, contact
-fields, or other personal fields. The bridge selects the latest shared
-`snapshot_date` and exposes four fixed read-only slices: `overview`, `income`,
-`assets`, and `declarations`. The Worker adds CORS and a short cache header to
-each slice, so one slow aggregate cannot hold the rest of the page hostage.
+The public API does not expose arbitrary SQL or curated contact/address fields.
+The bridge selects the latest shared `snapshot_date` and exposes four fixed
+read-only slices: `overview`, `income`, `assets`, and `declarations`. The
+parameterized search matches public declarant and declaration metadata plus
+curated income/asset labels. A declaration detail route accepts only a public
+declaration UUID, reads the corresponding immutable `declarations.xml` object,
+and returns the matching `<declaration>` node; the full feed is never sent to
+the browser. The Worker adds CORS and a short cache header to each public route.
 The frontend starts all four requests independently, preserves each panel’s
 layout with a slow-blinking loading shell, and lazy-loads the interactive
 [Recharts](https://recharts.org/) module for the average-annual-income versus
@@ -619,12 +627,14 @@ make frontend-deploy VITE_API_BASE_URL="<WORKER_URL>"
 ```
 
 The Makefile creates or reuses the `hatvp-dashboard-reader` service account,
-grants it BigQuery job execution plus dataset-level read-only access, deploys
-the bridge with Secret Manager, and then deploys the Worker with the resolved
-bridge URL. `frontend-deploy` builds the Vite app and publishes `dist/` to the
-`gh-pages` branch using the `gh-pages` npm module. Override `GCP_PROJECT_ID`,
-`GCP_REGION`, `BQ_DATASET`, `BRIDGE_SERVICE`, and `FRONTEND_ORIGIN` when using
-different resources.
+grants it BigQuery job execution, dataset-level read-only access, and
+object-viewer access to the dedicated HATVP bucket, deploys the bridge with
+Secret Manager and `HATVP_BUCKET`/`HATVP_PREFIX`, and then deploys the Worker
+with the resolved bridge URL. `frontend-deploy` builds the Vite app and
+publishes `dist/` to the `gh-pages` branch using the `gh-pages` npm module.
+Override `GCP_PROJECT_ID`, `GCP_REGION`, `BQ_DATASET`, `HATVP_BUCKET`,
+`HATVP_PREFIX`, `BRIDGE_SERVICE`, and `FRONTEND_ORIGIN` when using different
+resources.
 
 The frontend keeps `website/hatvp-transparency-dashboard/frontend/public/CNAME`
 in the build so every `gh-pages` publish preserves the custom domain
@@ -640,7 +650,10 @@ Worker health check and aggregate endpoint returned HTTP 200 after the initial
 deployment; the bridge remains protected by its shared token and is not a
 public data endpoint. After deploying this slice-based API, verify
 `/api/dashboard/overview`, `/api/dashboard/income`,
-`/api/dashboard/assets`, and `/api/dashboard/declarations` individually.
+`/api/dashboard/assets`, `/api/dashboard/declarations`, and the search/detail
+routes individually. The declaration detail smoke test should use a UUID from
+the latest search response and verify that the returned XML contains the same
+UUID.
 
 ## Google Cloud deployment
 
