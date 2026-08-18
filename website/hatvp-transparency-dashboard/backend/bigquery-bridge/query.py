@@ -38,7 +38,14 @@ TO_JSON_STRING(ARRAY(
   SELECT AS STRUCT table_name, row_count FROM (
     SELECT 'declarations' AS table_name, COUNT(*) AS row_count FROM {prefix}.declarations t
     CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
-    UNION ALL SELECT 'people', COUNT(*) FROM {prefix}.people t
+    UNION ALL SELECT 'people', COUNT(DISTINCT IF(
+      NULLIF(TRIM(t.nom), '') IS NULL AND NULLIF(TRIM(t.prenom), '') IS NULL,
+      NULL,
+      TO_JSON_STRING(STRUCT(
+        NORMALIZE_AND_CASEFOLD(NULLIF(TRIM(t.nom), '')) AS nom,
+        NORMALIZE_AND_CASEFOLD(NULLIF(TRIM(t.prenom), '')) AS prenom
+      ))
+    )) FROM {prefix}.people t
     CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
     UNION ALL SELECT 'incomes', COUNT(*) FROM {prefix}.incomes t
     CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date

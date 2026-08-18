@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-18 — Count unique dashboard declarants
+
+### Fixed
+
+- Changed the homepage People metric to count distinct non-empty `nom` +
+  `prenom` pairs within the latest snapshot instead of counting every
+  declaration-linked people row.
+- Clarified the metric detail as “unique declarants” in English and French.
+
+### Verified
+
+- Added BigQuery bridge coverage for case-insensitive, whitespace-trimmed name
+  pairs and missing-name handling.
+- The live `2026-08-18` snapshot resolves to 3,259 unique declarants versus
+  6,611 declaration-linked people rows.
+- `make backend-test` and `make frontend-test` pass.
+
 ## 2026-08-18 — Annualize dashboard income comparison
 
 ### Changed
