@@ -11,6 +11,9 @@
 ### Verified
 
 - Frontend tests and the production Vite build pass.
+- Published the footer update to `gh-pages` (deployment commit `d27770e`);
+  the GitHub Pages root returned HTTP 200 and served both translated footer
+  labels with the requested project URL.
 
 ## 2026-08-18 — Link dashboard to official HATVP sources
 
