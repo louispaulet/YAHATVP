@@ -1,0 +1,31 @@
+import type { Locale } from "../config/i18n";
+
+type SourceLink = Locale["about"]["sources"]["links"][number];
+
+export function SourceLinkCard({ link }: { link: SourceLink }) {
+  const isDownload = link.kind === "download";
+  const actionIcon = isDownload ? "↓" : "↗";
+  const cardClass = isDownload ? "hover:border-emerald/40 hover:shadow-soft" : "hover:border-slate-300 hover:shadow-soft";
+  const badgeClass = isDownload ? "bg-lime/60 text-ink" : "bg-slate-100 text-slate-500";
+  const iconClass = isDownload ? "bg-emerald text-white" : "bg-slate-100 text-slate-600";
+
+  return (
+    <a
+      className={`dashboard-card group flex h-full flex-col p-5 transition hover:-translate-y-0.5 ${cardClass}`}
+      href={link.href}
+      target={isDownload ? undefined : "_blank"}
+      rel={isDownload ? undefined : "noreferrer"}
+      download={isDownload ? "" : undefined}
+    >
+      <span className="flex flex-wrap items-start justify-between gap-3">
+        <span className="min-w-0 flex-1 text-sm font-bold text-ink">{link.label}</span>
+        <span className={`max-w-full rounded-full px-2.5 py-1 text-center text-[0.65rem] font-bold uppercase leading-5 tracking-[0.12em] ${badgeClass}`}>{link.type}</span>
+      </span>
+      <span className="mt-3 block text-sm leading-6 text-slate-500">{link.description}</span>
+      <span className="mt-auto flex items-center gap-2 border-t border-slate-100 pt-5 text-xs font-bold uppercase tracking-[0.12em] text-slate-700">
+        <span aria-hidden="true" className={`inline-flex size-7 items-center justify-center rounded-full text-base ${iconClass}`}>{actionIcon}</span>
+        {link.action}
+      </span>
+    </a>
+  );
+}

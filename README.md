@@ -596,6 +596,14 @@ amounts use compact, locale-aware units such as `€65.6M` and `€506.1K` when
 full values would be difficult to scan; the underlying aggregate values are
 unchanged.
 
+The frontend keeps the application shell in `src/App.tsx` and organizes the
+dashboard by responsibility: routed screens live in `src/pages/`, reusable UI
+and chart components live in `src/components/`, the language provider lives in
+`src/context/I18nContext.tsx`, and cancellable API loading lives in
+`src/hooks/useResource.ts`. Each TypeScript source file stays below the
+dashboard’s 100-line review budget, so page-level changes do not recreate the
+former application monolith.
+
 ### Local dashboard checks
 
 Install the two JavaScript workspaces and run their fixture-only checks:

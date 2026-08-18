@@ -44,3 +44,7 @@ export function formatCurrency(value: number, language: Language): string {
     maximumFractionDigits: 0,
   }).format(value);
 }
+
+export function formatDateTime(value: string, language: Language): string {
+  return new Date(value).toLocaleString(language === "fr" ? "fr-FR" : "en-GB");
+}
