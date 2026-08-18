@@ -301,6 +301,9 @@ historical raw snapshot was overwritten. Evidence:
 - [x] Use compact, locale-aware formatting for large dashboard values.
 - [x] Publish and smoke-test the dashboard at `yahatvp.thefrenchartist.dev`
   with the GitHub Pages custom domain and HTTPS enabled.
+- [x] Split the frontend monolith into focused pages, components, i18n context,
+  and a cancellable resource hook while keeping each TypeScript source file
+  below the 100-line review budget.
 
 Deployment evidence (2026-08-18): Cloud Run bridge revision
 `hatvp-dashboard-api-00003-xzr` and Worker version

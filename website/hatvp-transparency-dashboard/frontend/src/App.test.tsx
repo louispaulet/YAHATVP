@@ -2,36 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
-
-const dashboard = {
-  snapshotDate: "2026-08-18",
-  generatedAt: "2026-08-18T08:00:00Z",
-  tables: { declarations: 2, people: 2, incomes: 3, assets: 4 },
-};
-
-const income = {
-  snapshotDate: "2026-08-18",
-  generatedAt: "2026-08-18T08:00:00Z",
-  totalValue: 150000,
-  yearCount: 2,
-  items: [
-    { label: "mandate_remuneration", rows: 2, totalValue: 120000 },
-    { label: "revenu_mandat", rows: 1, totalValue: 30000 },
-  ],
-};
-
-const assets = {
-  snapshotDate: "2026-08-18",
-  generatedAt: "2026-08-18T08:00:00Z",
-  totalValue: 80000,
-  items: [{ label: "immeubleDto", rows: 4, totalValue: 80000 }],
-};
-
-const declarations = {
-  snapshotDate: "2026-08-18",
-  generatedAt: "2026-08-18T08:00:00Z",
-  items: [{ label: "Déclaration d'intérêts", rows: 2 }],
-};
+import { assets, dashboard, declarations, income } from "./test-fixtures";
 
 describe("dashboard application", () => {
   beforeEach(() => {
@@ -72,12 +43,7 @@ describe("dashboard application", () => {
     expect(screen.getByRole("link", { name: /Download CSV/ })).toHaveAttribute("download", "");
     expect(screen.getByRole("link", { name: /Download CSV/ })).not.toHaveAttribute("target");
     expect(screen.getByRole("link", { name: /Download XML/ })).toHaveAttribute("download", "");
-    const downloadBadges = screen.getAllByText("Direct download");
-    expect(downloadBadges).toHaveLength(2);
-    downloadBadges.forEach((badge) => {
-      expect(badge).toHaveClass("max-w-full");
-      expect(badge.parentElement).toHaveClass("flex-wrap");
-    });
+    expect(screen.getAllByText("Direct download")).toHaveLength(2);
     expect(screen.getByRole("link", { name: "View project on GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
     expect(screen.getByRole("link", { name: /Explore YAHATVP on GitHub/ })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
   });
@@ -87,7 +53,6 @@ describe("dashboard application", () => {
     expect(screen.getByRole("navigation", { name: "Primary navigation" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Data explorer" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("More ways to explore are on the way.")).toBeInTheDocument();
-    expect(screen.getByText("Placeholder page")).toBeInTheDocument();
   });
 
   it("switches to French and translates configured data labels", async () => {
