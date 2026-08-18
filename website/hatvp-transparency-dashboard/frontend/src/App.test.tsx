@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
+import { declarationXmlFixtures } from "./declaration-fixtures";
 import { assets, dashboard, declarations, income } from "./test-fixtures";
 
 const search = {
@@ -28,7 +29,7 @@ const declaration = {
   snapshotDate: "2026-08-18",
   generatedAt: "2026-08-18T08:00:00Z",
   declaration: search.results[0],
-  rawXml: "<declaration>\n  <uuid>fixture-uuid-1</uuid>\n</declaration>",
+  rawXml: declarationXmlFixtures[0],
 };
 
 describe("dashboard application", () => {
@@ -92,6 +93,11 @@ describe("dashboard application", () => {
     expect(detailLink).toHaveAttribute("href", "/declarations/fixture-uuid-1");
     fireEvent.click(detailLink);
     expect(await screen.findByText("The declaration as published")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "What this declaration contains" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Elected mandates" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Bank accounts" })).toBeInTheDocument();
+    expect(screen.getByText("50 000,00")).toBeInTheDocument();
+    expect(screen.getByText("published fields rendered")).toBeInTheDocument();
     expect(screen.getByLabelText("Raw declaration XML")).toHaveTextContent("fixture-uuid-1");
   });
 

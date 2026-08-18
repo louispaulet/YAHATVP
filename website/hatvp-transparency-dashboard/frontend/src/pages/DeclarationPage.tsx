@@ -5,7 +5,7 @@ import { declarationDate, declarationName, searchValue } from "../components/dec
 import { ChartSkeleton, SliceError } from "../components/Feedback";
 import { useI18n } from "../context/I18nContext";
 import { useLookupResource } from "../hooks/useLookupResource";
-import { formatNumber } from "../formatters";
+import { DeclarationView } from "../components/DeclarationView";
 
 export function DeclarationPage() {
   const { language, locale } = useI18n();
@@ -23,7 +23,7 @@ export function DeclarationPage() {
       {declaration.error && <section className="mt-8"><SliceError onRetry={declaration.reload} /></section>}
       {result && <>
         <section className="dashboard-card relative z-10 -mt-5 p-5 sm:p-6"><div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4"><div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.identifier}</p><p className="mt-1 break-all font-mono text-xs font-semibold text-slate-700">{searchValue(result.declarationUuid, locale.search.notAvailable)}</p></div><div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.declaration.fields.type}</p><p className="mt-1 text-sm font-semibold text-slate-700">{searchValue(result.declarationType, locale.search.notAvailable)}</p></div><div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.mandate}</p><p className="mt-1 text-sm font-semibold text-slate-700">{searchValue(result.mandate, locale.search.notAvailable)}</p></div><div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.date}</p><p className="mt-1 text-sm font-semibold text-slate-700">{date}</p></div></div></section>
-        {declaration.data && <section className="dashboard-card mt-8 overflow-hidden"><div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.sourceEyebrow}</p><h2 className="mt-2 text-2xl font-black tracking-tight text-ink">{locale.declaration.sourceTitle}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{locale.declaration.sourceDescription}</p></div><span className="shrink-0 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500">{formatNumber(declaration.data.rawXml.length, language)} {locale.declaration.characters}</span></div><pre aria-label={locale.declaration.rawXmlLabel} className="max-h-[70vh] overflow-auto bg-[#101815] p-5 text-xs leading-6 text-slate-200 sm:p-7"><code>{declaration.data.rawXml}</code></pre></section>}
+        {declaration.data && <DeclarationView rawXml={declaration.data.rawXml} language={language} locale={locale} />}
       </>}
     </div>
   );

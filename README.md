@@ -562,8 +562,12 @@ The repository also contains a deliberately small public dashboard under
 `website/hatvp-transparency-dashboard/`. It is separate from the ingestion
 pipeline and reads aggregate data from the four curated BigQuery tables:
 `declarations`, `people`, `incomes`, and `assets`. Its declaration search can
-open one matching public declaration and display that declaration's source XML
-node from the immutable GCS snapshot.
+open one matching public declaration and display a schema-aware interface for
+that declaration's source XML node from the immutable GCS snapshot. The detail
+view keeps a collapsed raw-XML audit section for source verification while
+rendering the observed metadata, identity, mandates, annual amounts, interests,
+activities, assets, liabilities, attachments, and empty source sections in
+readable cards and charts.
 
 ```text
 GitHub Pages React app
