@@ -1,4 +1,11 @@
-import type { DashboardBreakdownResponse, DashboardDeclarationResponse, DashboardOverviewResponse, DashboardSearchResponse } from "./types";
+import type {
+  AgeAnalysisResponse,
+  DashboardBreakdownResponse,
+  DashboardDeclarationResponse,
+  DashboardOverviewResponse,
+  DashboardSearchResponse,
+  SimpleAnalysisResponse,
+} from "./types";
 
 const DEFAULT_API_URL = "http://localhost:8787";
 
@@ -36,6 +43,17 @@ function isDeclarationResponse(value: unknown): value is DashboardDeclarationRes
   return isMeta(value) && typeof value.rawXml === "string" && typeof value.declaration === "object" && value.declaration !== null;
 }
 
+function isSimpleAnalysisResponse(value: unknown): value is SimpleAnalysisResponse {
+  return isMeta(value) && Array.isArray(value.youngest) && Array.isArray(value.oldest)
+    && Array.isArray(value.ageBins);
+}
+
+function isAgeAnalysisResponse(value: unknown): value is AgeAnalysisResponse {
+  return isMeta(value) && isRecord(value.person) && Array.isArray(value.matches)
+    && Array.isArray(value.incomeByYear) && Array.isArray(value.occupationsByYear)
+    && Array.isArray(value.assetTimeline);
+}
+
 async function fetchJson<T>(path: string, validate: (value: unknown) => value is T, signal?: AbortSignal): Promise<T> {
   const baseUrl = import.meta.env.VITE_API_BASE_URL || DEFAULT_API_URL;
   const response = await fetch(`${baseUrl.replace(/\/$/, "")}${path}`, {
@@ -70,4 +88,12 @@ export function fetchSearch(query: string, signal?: AbortSignal): Promise<Dashbo
 
 export function fetchDeclaration(uuid: string, signal?: AbortSignal): Promise<DashboardDeclarationResponse> {
   return fetchJson(`/api/dashboard/declarations/${encodeURIComponent(uuid)}`, isDeclarationResponse, signal);
+}
+
+export function fetchSimpleAnalysis(signal?: AbortSignal): Promise<SimpleAnalysisResponse> {
+  return fetchJson("/api/dashboard/simple-analysis", isSimpleAnalysisResponse, signal);
+}
+
+export function fetchAgeAnalysis(query: string, signal?: AbortSignal): Promise<AgeAnalysisResponse> {
+  return fetchJson(`/api/dashboard/age-analysis?q=${encodeURIComponent(query)}`, isAgeAnalysisResponse, signal);
 }

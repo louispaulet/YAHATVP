@@ -1,6 +1,8 @@
 import type {
   DashboardBreakdownResponse,
   DashboardDeclarationResponse,
+  AgeAnalysisResponse,
+  SimpleAnalysisResponse,
   DashboardOverviewResponse,
   DashboardSearchResponse,
   WorkerEnv,
@@ -14,6 +16,8 @@ const DASHBOARD_SLICE_ROUTES = {
   "/api/dashboard/assets": "/v1/dashboard/assets",
   "/api/dashboard/declarations": "/v1/dashboard/declarations",
   "/api/dashboard/search": "/v1/dashboard/search",
+  "/api/dashboard/simple-analysis": "/v1/dashboard/simple-analysis",
+  "/api/dashboard/age-analysis": "/v1/dashboard/age-analysis",
 } as const;
 const DASHBOARD_DECLARATION_PREFIX = "/api/dashboard/declarations/";
 
@@ -81,6 +85,18 @@ function isDashboardDeclarationResponse(value: unknown): value is DashboardDecla
   if (!isRecord(value) || typeof value.generatedAt !== "string" || typeof value.rawXml !== "string") return false;
   if (!(value.snapshotDate === null || typeof value.snapshotDate === "string")) return false;
   return isRecord(value.declaration) && typeof value.declaration.declarationUuid === "string";
+}
+
+function isDashboardSimpleAnalysisResponse(value: unknown): value is SimpleAnalysisResponse {
+  if (!isRecord(value) || typeof value.generatedAt !== "string") return false;
+  return Array.isArray(value.youngest) && Array.isArray(value.oldest) && Array.isArray(value.ageBins);
+}
+
+function isDashboardAgeAnalysisResponse(value: unknown): value is AgeAnalysisResponse {
+  if (!isRecord(value) || typeof value.generatedAt !== "string") return false;
+  return isRecord(value.person) && Array.isArray(value.matches)
+    && Array.isArray(value.incomeByYear) && Array.isArray(value.occupationsByYear)
+    && Array.isArray(value.assetTimeline);
 }
 
 function declarationId(pathname: string): string | null {
@@ -153,8 +169,12 @@ export async function handleRequest(
       ? isDashboardOverviewResponse
       : slicePath.endsWith("/search")
         ? isDashboardSearchResponse
+        : slicePath.endsWith("/simple-analysis")
+          ? isDashboardSimpleAnalysisResponse
+          : slicePath.endsWith("/age-analysis")
+            ? isDashboardAgeAnalysisResponse
         : isDashboardBreakdownResponse;
-    const search = slicePath.endsWith("/search") ? new URL(request.url).search : "";
+    const search = slicePath.endsWith("/search") || slicePath.endsWith("/age-analysis") ? new URL(request.url).search : "";
     return proxySlice(request, env, fetcher, slicePath, validate, search);
   }
   const id = declarationId(url.pathname);

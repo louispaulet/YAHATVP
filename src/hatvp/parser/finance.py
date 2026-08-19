@@ -7,7 +7,7 @@ from typing import Any
 from lxml import etree
 
 from ..models import ParseContext, ParserConfig
-from ..normalize import normalize_text, parse_french_number
+from ..normalize import normalize_text, parse_french_number, parse_year
 from ..xml_support import (
     child,
     first_value,
@@ -30,6 +30,14 @@ def asset_rows(
         for index, item in enumerate(item_groups(child(element, section_name))):
             fields = flatten_leaf_values(item)
             raw_value = first_value(fields, *values)
+            acquisition_raw = first_value(
+                fields,
+                "dateAcquisition",
+                "dateAchat",
+                "anneeAcquisition",
+                "dateSouscription",
+                "dateDetention",
+            )
             rows.append(
                 {
                     "declaration_uuid": uuid,
@@ -39,6 +47,8 @@ def asset_rows(
                     "asset_name": normalize_text(first_value(fields, *names)),
                     "raw_value": raw_value,
                     "normalized_value": parse_french_number(raw_value),
+                    "asset_acquisition_year_raw": acquisition_raw,
+                    "asset_acquisition_year": parse_year(acquisition_raw),
                     "quality_status": "OK",
                     "quality_reason": None,
                     "raw_record_json": raw_record(fields),

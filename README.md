@@ -353,13 +353,13 @@ parsed numeric value; parsing does not imply that a value is valid.
 | --- | --- | --- |
 | `liste` | One row per CSV source listing record. | Source CSV columns, `snapshot_date`, `source_file` |
 | `declarations` | One row per XML declaration. | `declaration_uuid`, deposit and mandate dates, declaration type, mandate and organ labels |
-| `people` | One declarant row per declaration. | Name, contact, birth date, and address fields |
+| `people` | One declarant row per declaration. | Name, contact, source DOB, typed `date_naissance_date`, `date_naissance_year`, and explicit DOB quality status |
 | `mandates` | One row per general or elected-mandate section item. | `source_section`, description, dates, employer, remuneration |
 | `mandate_remunerations` | One row per annual remuneration value nested in an elected mandate item. | `source_item_index`, description, remuneration basis, `remuneration_year`, `raw_value`, `normalized_value` |
 | `activities` | One row per professional, consulting, spouse, volunteer, or collaborator activity. | `source_section`, description, employer, dates, remuneration |
 | `participations` | One row per financial or management participation. | Company, valuation, capital held, number of shares, raw record |
 | `incomes` | One row per populated declared income category, annual professional-activity remuneration value, or annual elected-mandate remuneration value. Empty category slots are excluded; `income_stream` distinguishes the source stream. | `income_stream`, `income_year`, `income_type`, `raw_value`, `normalized_value`, spouse value |
-| `assets` | One row per observed asset DTO item, including bank accounts, insurance, securities, vehicles, and foreign assets. | `source_section`, asset name, `raw_value`, `normalized_value`, quality fields |
+| `assets` | One row per observed asset DTO item, including bank accounts, insurance, securities, vehicles, and foreign assets. | `source_section`, asset name, `raw_value`, `normalized_value`, source-preserving `asset_acquisition_year_raw`, and `asset_acquisition_year` |
 | `liabilities` | One row per declared debt or liability item. | `source_section`, description, `raw_value`, `normalized_value`, raw record |
 
 ### First production snapshot quality triage
@@ -627,7 +627,7 @@ that declaration's source XML node from the immutable GCS snapshot. The detail
 view keeps a collapsed raw-XML audit section for source verification while
 rendering the observed metadata, identity, mandates, annual amounts, interests,
 activities, assets, liabilities, attachments, and empty source sections in
-readable cards and charts. The frontend also includes a static `/quality-issues`
+readable cards and charts. The frontend also includes `/analysis` for DOB leaderboards and five-year salary bins, plus `/age-analysis` for a declarant-specific annual timeline. It defaults to Sébastien Lecornu and supports accent-insensitive name search. The static `/quality-issues`
 page backed by `src/data/qualityIssues.json`; this is a redacted register with
 only issue type, contact date, public HATVP link(s), and solved state. The page
 calculates each unresolved issue's open duration from its contact date and the
@@ -648,8 +648,9 @@ Read-only Cloud Run bridge ─── BigQuery Gold tables
 ```
 
 The public API does not expose arbitrary SQL or contact/address fields.
-The bridge selects the latest shared Gold `snapshot_date` and exposes four fixed
-read-only slices: `overview`, `income`, `assets`, and `declarations`. Its
+The bridge selects the latest shared Gold `snapshot_date` and exposes fixed
+read-only slices: `overview`, `income`, `assets`, `declarations`,
+`simple-analysis`, and `age-analysis?q=...`. Its
 metric queries filter by Gold's explicit `metric_eligible` and `active_in_gold`
 fields; they do not recreate anomaly logic in the dashboard. The
 parameterized search matches public declarant and declaration metadata plus
@@ -732,10 +733,13 @@ The initial deployment is available at
 at `https://hatvp-transparency-api.louispaulet13.workers.dev`. The deployed
 Worker health check and aggregate endpoint returned HTTP 200 after the initial
 deployment; the bridge remains protected by its shared token and is not a
-public data endpoint. After deploying this slice-based API, verify
+public data endpoint. After adding the DOB fields, run the ingestion replay
+first so the new Gold columns exist, then deploy the bridge, Worker, and
+frontend. Verify
 `/api/dashboard/overview`, `/api/dashboard/income`,
-`/api/dashboard/assets`, `/api/dashboard/declarations`, and the search/detail
-routes individually. The declaration detail smoke test should use a UUID from
+`/api/dashboard/assets`, `/api/dashboard/declarations`,
+`/api/dashboard/simple-analysis`, `/api/dashboard/age-analysis?q=...`, and the
+search/detail routes individually. The declaration detail smoke test should use a UUID from
 the latest search response and verify that the returned XML contains the same
 UUID.
 

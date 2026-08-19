@@ -7,6 +7,7 @@ from collections import defaultdict
 from typing import Any
 
 from .anomaly_support import record_ref
+from .dob_quality import quality_fields
 
 
 def occurrences_by_ref(
@@ -40,7 +41,7 @@ def annotate_row(
     regression = any(item.get("status") == "regression" for item in items)
     status = "clean" if not items else ("regression" if regression else "active")
     eligibility = field_eligibility(table, items)
-    return {
+    metadata = {
         **row,
         "declarant_key": row.get("declaration_uuid")
         or parent.get("declaration_uuid")
@@ -67,6 +68,9 @@ def annotate_row(
             None,
         ),
     }
+    if table == "people":
+        metadata.update(quality_fields(row, items))
+    return metadata
 
 
 def field_eligibility(table: str, items: list[dict[str, Any]]) -> dict[str, bool]:
@@ -85,8 +89,6 @@ def annotate_tables(
     parents: dict[str, dict[str, Any]],
     grouped: dict[str, list[dict[str, Any]]],
 ) -> dict[str, list[dict[str, Any]]]:
-    """Annotate a mapping without changing source row ordering."""
-
     return {
         name: [
             annotate_row(name, row, parents, grouped.get(record_ref(name, row), [])) for row in rows

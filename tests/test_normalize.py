@@ -7,6 +7,7 @@ from hatvp.normalize import (
     normalize_text,
     parse_date,
     parse_french_number,
+    parse_year,
     raw_text,
 )
 
@@ -22,6 +23,8 @@ def test_missing_values_and_dates() -> None:
     assert normalize_text("  Élu   local ") == "Élu local"
     assert parse_date("01/12/2025 08:30:00") == "2025-12-01"
     assert parse_date("01/2025") == "2025-01-01"
+    assert parse_year("2007") == 2007
+    assert parse_year("21/05/2012") == 2012
 
 
 def test_raw_text_collapses_whitespace_without_missing_marker_logic() -> None:
