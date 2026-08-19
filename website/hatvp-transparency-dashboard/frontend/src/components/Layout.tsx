@@ -24,7 +24,6 @@ export function Layout({ children }: { children: ReactNode }) {
             <nav aria-label={locale.nav.label} className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-6">
               <NavLink to="/" end className={navClass}>{locale.nav.overview}</NavLink>
               <NavLink to="/search" className={navClass}>{locale.nav.search}</NavLink>
-              <NavLink to="/explore" className={navClass}>{locale.nav.explore}</NavLink>
               <NavLink to="/analysis" className={navClass}>{locale.nav.analysis}</NavLink>
               <NavLink to="/age-analysis" className={navClass}>{locale.nav.ageAnalysis}</NavLink>
               <NavLink to="/about" className={navClass}>{locale.nav.about}</NavLink>
