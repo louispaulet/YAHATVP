@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-08-19 — Merge open dashboard PRs and redeploy production
+
+### Merged
+
+- Marked draft PRs [#34](https://github.com/louispaulet/YAHATVP/pull/34),
+  [#33](https://github.com/louispaulet/YAHATVP/pull/33), and
+  [#32](https://github.com/louispaulet/YAHATVP/pull/32) ready and merged them
+  into `main` at `5e4258b`, `32272ad`, and `ac2996b`. Resolved the overlapping
+  `CHANGELOG.md` conflicts on the PR branches before merging.
+
+### Deployed and verified
+
+- GitHub Actions run
+  [32292468778](https://github.com/louispaulet/YAHATVP/actions/runs/32292468778)
+  passed tests, deployment configuration, image build/push, and Cloud Run Job
+  deployment for `main` commit `ac2996b`.
+- Forced execution `hatvp-ingestion-r52xn` completed with
+  `SUCCESS_WITH_WARNINGS`, 0 quality errors, 4,031 warnings, 6,238 retained
+  flags, and `bigquery_load_complete` for all 13 Bronze, Silver, Gold, and
+  anomaly-registry tables. `state/latest.json` advanced to snapshot
+  `2026-08-19` with pipeline SHA `ac2996b`.
+- Deployed Cloud Run bridge revision `hatvp-dashboard-api-00013-cxj`, Worker
+  version `45894537-802b-4a9b-9d8a-884eb50077b4`, and the frontend to
+  `https://yahatvp.thefrenchartist.dev/`.
+- Production smoke tests returned HTTP 200 for health, overview, income,
+  assets, declarations, gender, simple-analysis, search, accented
+  `Sébastien Lecornu` age-analysis, declaration XML detail, and the custom
+  frontend. All dashboard responses reported snapshot `2026-08-19`; the detail
+  XML contained the searched declaration UUID.
+
 ## 2026-08-19 — Refine salary age analysis and leaderboard readability
 
 ### Changed

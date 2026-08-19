@@ -41,6 +41,12 @@ documented and complete.
 - [x] Open, mark ready, and merge PR #31 from the feature branch.
 - [x] After merge, replay ingestion before dashboard deployment so the new Gold columns are present in BigQuery.
 - [x] Deploy the BigQuery bridge, Cloudflare Worker, and frontend for the new analysis pages.
+- [x] Mark ready, resolve, and merge open PRs #34, #33, and #32 into `main`.
+- [x] Deploy main commit `ac2996b` through GitHub Actions run `32292468778`.
+- [x] Force-replay `hatvp-ingestion-r52xn`; verify all 13 layer tables and
+  `state/latest.json` advanced with `SUCCESS_WITH_WARNINGS` and zero quality errors.
+- [x] Redeploy the bridge, Worker, and frontend; verify the production health,
+  aggregate, analysis, search/detail, and custom-domain routes return HTTP 200.
 
 ## Google Cloud project details (completed)
 
