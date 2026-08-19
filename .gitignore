@@ -226,4 +226,6 @@ website/hatvp-transparency-dashboard/**/node_modules/
 website/hatvp-transparency-dashboard/**/dist/
 website/hatvp-transparency-dashboard/**/.wrangler/
 website/hatvp-transparency-dashboard/**/.dev.vars
+# Wrangler local cache (account metadata, OAuth state)
+.wrangler/
 website/hatvp-transparency-dashboard/frontend/.env.local
