@@ -20,6 +20,15 @@
 - Visual review covered the refreshed homepage at desktop width; local API
   data requests are unavailable without the separately running Worker.
 
+## 2026-08-19 — Remove the not-yet-ready explorer from navigation
+
+### Changed
+
+- Removed the `/explore` placeholder link from the dashboard navbar to free
+  space for the currently available pages.
+- Kept the direct `/explore` route and its coverage intact for future work.
+
+
 ## 2026-08-19 — Repair declarant income and asset history
 
 ### Changed
