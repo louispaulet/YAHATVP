@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-08-19 — Add gender aggregates to the transparency homepage
+
+### Added
+
+- Derived a bounded `gender` field from the observed XML `civilite` values and
+  carried it into the source-preserving people Parquet, Silver, Gold, and
+  BigQuery table contract without changing the original `civilite` value.
+- Added a fixed `/gender` bridge and Worker slice with the male/female ratio
+  and gender counts by Gold mandate position.
+- Added localized homepage pie and bar charts with an explicit note when
+  missing or unmapped civilité values are excluded from the ratio.
+
+### Verified
+
+- The full Python suite passes with 158 tests, bridge tests pass with 40 cases,
+  frontend tests pass with 23 cases and a production Vite build, and Worker
+  tests pass with 10 cases plus TypeScript typecheck.
+
 ## 2026-08-19 — Merge analysis PRs and complete production release
 
 ### Merged

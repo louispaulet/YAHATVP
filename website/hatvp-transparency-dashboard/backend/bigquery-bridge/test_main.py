@@ -52,6 +52,24 @@ def items_row():
     }
 
 
+def gender_row():
+    return {
+        "snapshot_date": "2026-08-18",
+        "generated_at": "2026-08-18T08:00:00+00:00",
+        "gender_json": json.dumps(
+            [
+                {"label": "male", "row_count": 7},
+                {"label": "female", "row_count": 5},
+            ]
+        ),
+        "positions_json": json.dumps(
+            [
+                {"label": "Maire", "male_count": 4, "female_count": 2, "unknown_count": 1},
+            ]
+        ),
+    }
+
+
 def test_bridge_requires_bearer_token(monkeypatch):
     monkeypatch.setenv("BRIDGE_TOKEN", "secret")
     result = main.dashboard(request(headers={"Authorization": "Bearer wrong"}))
@@ -86,6 +104,20 @@ def test_bridge_returns_breakdown_slice(monkeypatch):
     assert result[1] == 200
     assert body(result)["items"][0]["totalValue"] == 12.0
     assert (body(result)["totalValue"], body(result)["yearCount"]) == (12.0, 3)
+
+
+def test_bridge_returns_gender_slice(monkeypatch):
+    monkeypatch.setenv("BRIDGE_TOKEN", "secret")
+    monkeypatch.setenv("BQ_PROJECT_ID", "project")
+    monkeypatch.setenv("BQ_DATASET", "hatvp")
+    monkeypatch.setattr(service, "client", lambda: Client([gender_row()]))
+
+    result = main.dashboard(request(path="/v1/dashboard/gender", headers=AUTH))
+
+    assert result[1] == 200
+    assert body(result)["gender"][0] == {"label": "male", "rows": 7}
+    assert body(result)["unknownRows"] == 0
+    assert body(result)["positions"][0]["female"] == 2
 
 
 def test_bridge_reports_empty_result_without_leaking_query_details(monkeypatch):

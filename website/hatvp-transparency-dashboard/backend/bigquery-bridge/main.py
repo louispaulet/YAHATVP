@@ -30,6 +30,7 @@ SLICE_ROUTES = {
     "/v1/dashboard/income": "income",
     "/v1/dashboard/assets": "assets",
     "/v1/dashboard/declarations": "declarations",
+    "/v1/dashboard/gender": "gender",
     "/v1/dashboard/search": "search",
     "/v1/dashboard/simple-analysis": "simple-analysis",
     "/v1/dashboard/age-analysis": "age-analysis",

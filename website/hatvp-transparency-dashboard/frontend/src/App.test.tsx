@@ -3,7 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { declarationXmlFixtures } from "./declaration-fixtures";
-import { ageAnalysis, assets, dashboard, declarations, income, simpleAnalysis } from "./test-fixtures";
+import { ageAnalysis, assets, dashboard, declarations, gender, income, simpleAnalysis } from "./test-fixtures";
 
 const search = {
   snapshotDate: "2026-08-18",
@@ -38,7 +38,7 @@ describe("dashboard application", () => {
   beforeEach(() => {
     vi.stubGlobal("fetch", vi.fn().mockImplementation((url: string) => {
       const path = new URL(url).pathname;
-      const payload = path.endsWith("/overview") ? dashboard : path.endsWith("/income") ? income : path.endsWith("/assets") ? assets : path.endsWith("/search") ? search : path.endsWith("/simple-analysis") ? simpleAnalysis : path.endsWith("/age-analysis") ? ageAnalysis : path.includes("/declarations/") ? declaration : declarations;
+      const payload = path.endsWith("/overview") ? dashboard : path.endsWith("/income") ? income : path.endsWith("/assets") ? assets : path.endsWith("/gender") ? gender : path.endsWith("/search") ? search : path.endsWith("/simple-analysis") ? simpleAnalysis : path.endsWith("/age-analysis") ? ageAnalysis : path.includes("/declarations/") ? declaration : declarations;
       return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
     }));
   });
@@ -59,6 +59,9 @@ describe("dashboard application", () => {
     expect(screen.getByText("Real estate")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Average annual income and asset totals/i })).toBeInTheDocument();
     expect(screen.getByText("Declaration types")).toBeInTheDocument();
+    expect(screen.getByText("Gender balance")).toBeInTheDocument();
+    expect(screen.getByText("Gender by job position")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Male-to-female ratio/i })).toBeInTheDocument();
     expect(screen.getByText("⚖️", { selector: "header span" })).toHaveClass("size-10");
   });
 
