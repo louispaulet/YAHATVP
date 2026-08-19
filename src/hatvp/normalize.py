@@ -88,3 +88,13 @@ def parse_year(value: str | None) -> int | None:
     if parsed:
         return int(parsed[:4])
     return int(raw) if re.fullmatch(r"\d{4}", raw) else None
+
+
+def birth_fields(value: str | None) -> dict[str, object]:
+    """Return typed DOB fields while leaving the canonical text field separate."""
+
+    parsed = parse_date(value)
+    return {
+        "date_naissance_date": parsed,
+        "date_naissance_year": parse_year(value),
+    }

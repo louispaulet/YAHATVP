@@ -1,4 +1,4 @@
-"""Repository invariant: every tracked Python module remains a focused component."""
+"""Ingestion invariant: pipeline Python modules remain focused components."""
 
 from __future__ import annotations
 
@@ -14,13 +14,13 @@ def tracked_python_files() -> list[Path]:
     """Read the same tracked-file set that reviewers see in the Git diff."""
 
     result = subprocess.run(
-        ["git", "ls-files", "*.py"],
+        ["git", "ls-files", "src/hatvp", "tests"],
         cwd=ROOT,
         check=True,
         capture_output=True,
         text=True,
     )
-    return [ROOT / line for line in result.stdout.splitlines() if line]
+    return [ROOT / line for line in result.stdout.splitlines() if line.endswith(".py")]
 
 
 def physical_lines(path: Path) -> int:

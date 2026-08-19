@@ -89,8 +89,6 @@ def annotate_tables(
     parents: dict[str, dict[str, Any]],
     grouped: dict[str, list[dict[str, Any]]],
 ) -> dict[str, list[dict[str, Any]]]:
-    """Annotate a mapping without changing source row ordering."""
-
     return {
         name: [
             annotate_row(name, row, parents, grouped.get(record_ref(name, row), [])) for row in rows

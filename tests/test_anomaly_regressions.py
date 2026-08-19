@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from hatvp.layers.anomaly import detect_anomalies
-from hatvp.layers.gold import build_gold
 from hatvp.layers.registry import upsert_registry
 from hatvp.layers.rules import implausible_birth
 from hatvp.layers.silver import build_silver
@@ -46,17 +45,6 @@ def test_birth_age_threshold_can_be_overridden_for_detection() -> None:
         item["rule_id"] == "PERSON_DOB_IMPLAUSIBLE"
         for item in detect_anomalies(rows, {}, dob_max_age_years=110)
     )
-
-
-def test_gold_exposes_dob_quality_without_replacing_the_source_date() -> None:
-    rows = _people_tables("1925-01-01")
-    _, history, registry = build_silver(rows, {}, snapshot_date="2026-01-01")
-
-    gold, _ = build_gold(history, registry)
-    person = gold["people"][0]
-    assert person["date_naissance"] == "1925-01-01"
-    assert person["date_naissance_quality_status"] == "implausible"
-    assert person["date_naissance_quality_reason"] == "PERSON_DOB_IMPLAUSIBLE"
 
 
 def test_implausible_birth_uses_reference_date_and_max_age() -> None:

@@ -31,6 +31,12 @@ documented and complete.
 - [x] Group prefixed Python modules into domain packages and document the complete layout in the main README.
 - [x] Deploy the refactored domain-package image and complete a forced production GCS/BigQuery replay.
 - [x] Keep comparison-chart legend labels visible when the chart panel is narrow.
+- [x] Add source-preserving typed DOB fields and explicit DOB quality status to Gold people rows.
+- [x] Add source-preserving asset acquisition year fields for time-based analysis.
+- [x] Add the simple DOB/salary analysis page with youngest/oldest leaderboards and five-year age bins.
+- [x] Add the declarant age/year page with a Lecornu example, name search, annual income sources, occupations, and asset timeline.
+- [x] Cover the new pipeline, bridge, Worker, and frontend contracts with fixture/unit tests.
+- [ ] After merge, replay ingestion before dashboard deployment so the new Gold columns are present in BigQuery.
 
 ## Google Cloud project details (completed)
 
