@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-19 — Improve declaration search usability
+
+### Changed
+
+- Strengthened the search input's focus treatment and added an explicit reset action.
+- Added localized quick-start search examples and a clearer result summary that preserves the searched term and snapshot context.
+
+### Verified locally
+
+- Frontend tests cover the quick-start and reset flow; the production build completes successfully.
+
 ## 2026-08-19 — Repair declarant income and asset history
 
 ### Changed

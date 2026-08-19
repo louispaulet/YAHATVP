@@ -291,9 +291,13 @@
     "inputLabel": "Search across public declarations",
     "placeholder": "Name, mandate, organisation, declaration ID, amount…",
     "submit": "Search",
+    "clear": "Clear",
+    "searchTip": "Press Enter to search",
     "hint": "Search is accent-insensitive and matches partial words. Contact details and addresses are never searched or shown.",
     "emptyTitle": "Start with a name or keyword",
     "emptyDescription": "Try a surname such as “Dupont”, a mandate, an organisation, a declaration identifier, or an amount.",
+    "examplesLabel": "Try an example search",
+    "examples": ["Dupont", "Élu local", "Paris"],
     "resultEyebrow": "Public declaration",
     "unknownDeclarant": "Declarant name not published",
     "fields": {
@@ -307,6 +311,7 @@
     "noResults": "Nothing matched “{query}”. Try a shorter name or another public field.",
     "resultsEyebrow": "Search results",
     "resultsFound": "{count} declarations found",
+    "queryLabel": "Results for “{query}”",
     "snapshot": "Snapshot {date}",
     "viewDeclaration": "Open declaration and source XML"
   },

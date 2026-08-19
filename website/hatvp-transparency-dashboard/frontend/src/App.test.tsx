@@ -172,6 +172,15 @@ describe("dashboard application", () => {
     expect(screen.getByLabelText("Raw declaration XML")).toHaveTextContent("fixture-uuid-1");
   });
 
+  it("offers quick-start searches and lets people clear a search", async () => {
+    render(<MemoryRouter initialEntries={["/search"]}><App /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button", { name: "Dupont" }));
+    expect(await screen.findByText("M. Alice DUPONT")).toBeInTheDocument();
+    expect(screen.getByText("Results for “Dupont”")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Clear" }));
+    expect(screen.getByText("Start with a name or keyword")).toBeInTheDocument();
+  });
+
   it("switches to French and translates configured data labels", async () => {
     render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
     expect(await screen.findByText("Real estate")).toBeInTheDocument();
