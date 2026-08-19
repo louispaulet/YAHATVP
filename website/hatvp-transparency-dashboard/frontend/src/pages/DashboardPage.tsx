@@ -19,7 +19,7 @@ export function DashboardPage() {
   const gender = useResource<DashboardGenderResponse>(fetchGender);
 
   return (
-    <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-14">
+    <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8 lg:py-12">
       <DashboardHero overview={overview.data} loading={overview.loading} />
       <DashboardMetrics resource={overview} language={language} />
       <DashboardCharts income={income} assets={assets} gender={gender} language={language} />

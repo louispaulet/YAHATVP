@@ -8,7 +8,7 @@
   --color-lime: #d9f99d;
   --color-sky: #8ed7e8;
   --color-violet: #b8a5e8;
-  --shadow-soft: 0 24px 70px rgba(23, 35, 31, 0.16);
+  --shadow-soft: 0 24px 70px rgba(23, 35, 31, 0.18);
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
 }
@@ -38,10 +38,10 @@ h3 {
 }
 
 .dashboard-card {
-  border: 1px solid rgb(226 232 240 / 0.9);
+  border: 1px solid rgb(226 232 240 / 0.95);
   border-radius: 1.5rem;
-  background: rgb(255 255 255 / 0.86);
-  box-shadow: 0 10px 30px rgb(23 35 31 / 0.04);
+  background: rgb(255 255 255 / 0.94);
+  box-shadow: 0 12px 34px rgb(23 35 31 / 0.045);
 }
 
 .source-link-card {
