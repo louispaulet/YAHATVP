@@ -105,3 +105,59 @@ h3 {
 .hero-grid {
   background-image: radial-gradient(circle at 80% 20%, rgb(217 249 157 / 0.17), transparent 28%), radial-gradient(circle at 96% 90%, rgb(142 215 232 / 0.16), transparent 25%);
 }
+
+.analysis-overview-grid {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.analysis-chart-hero {
+  min-width: 0;
+  border-top: 1px solid rgb(226 232 240);
+  padding-top: 1.5rem;
+}
+
+.analysis-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgb(203 213 225);
+  border-radius: 9999px;
+  background: white;
+  padding: 0.5rem 0.75rem;
+  color: #17231f;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.analysis-toggle:focus-within {
+  outline: 2px solid #1f9d75;
+  outline-offset: 3px;
+}
+
+.analysis-leaderboard + .analysis-leaderboard {
+  border-top: 1px solid rgb(226 232 240);
+  padding-top: 2.5rem;
+}
+
+@media (min-width: 1024px) {
+  .analysis-overview-grid {
+    grid-template-columns: minmax(17rem, 0.72fr) minmax(0, 1.28fr);
+    align-items: end;
+  }
+
+  .analysis-chart-hero {
+    border-top: 0;
+    border-left: 1px solid rgb(226 232 240);
+    padding-top: 0;
+    padding-left: 3.5rem;
+  }
+
+  .analysis-leaderboard + .analysis-leaderboard {
+    border-top: 0;
+    border-left: 1px solid rgb(226 232 240);
+    padding-top: 0;
+    padding-left: 3.5rem;
+  }
+}
