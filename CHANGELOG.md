@@ -25,6 +25,8 @@
   five-year salary chart, Lecornu profile, annual income, occupations, asset
   timeline, and accent-insensitive search rendered without console warnings or
   horizontal overflow.
+- Opened draft PR [#31](https://github.com/louispaulet/YAHATVP/pull/31) from
+  `agent/age-analysis-dob-quality` for review.
 - Production replay and dashboard deployment remain intentionally deferred to
   the post-merge release sequence because the new Gold columns must exist before
   the analysis queries are deployed.
