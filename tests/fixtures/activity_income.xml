@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<declarations>
+  <declaration>
+    <dateDepot>19/08/2026 08:30:00</dateDepot>
+    <uuid>fixture-activity-income</uuid>
+    <origine>ADEL</origine>
+    <complete>true</complete>
+    <declarationVersion>20171221</declarationVersion>
+    <activProfCinqDerniereDto>
+      <items>
+        <items>
+          <motif><id>CREATION</id><label/></motif>
+          <commentaire>[Données non publiées]</commentaire>
+          <description>Ministre des armées</description>
+          <employeur>Ministère des Armées</employeur>
+          <remuneration>
+            <brutNet>Net</brutNet>
+            <montant>
+              <montant><annee>2024</annee><montant>111 393</montant></montant>
+              <montant><annee>2025</annee><montant>83 502</montant></montant>
+            </montant>
+          </remuneration>
+          <dateDebut>05/2022</dateDebut>
+          <dateFin>09/2025</dateFin>
+        </items>
+        <items>
+          <motif><id>CREATION</id><label/></motif>
+          <description>Une activité sans montant publié</description>
+          <employeur>[Données non publiées]</employeur>
+          <remuneration/>
+          <dateDebut>01/2025</dateDebut>
+          <dateFin>02/2026</dateFin>
+        </items>
+      </items>
+      <neant>false</neant>
+    </activProfCinqDerniereDto>
+  </declaration>
+</declarations>

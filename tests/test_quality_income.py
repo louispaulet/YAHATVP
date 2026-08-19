@@ -64,14 +64,26 @@ def test_unified_income_coverage_reports_each_source_stream() -> None:
             "spouse_raw_value": None,
         }
     )
+    value["incomes"].append(
+        {
+            "declaration_uuid": "b",
+            "source_section": "activProfCinqDerniereDto",
+            "income_year": "2025",
+            "raw_value": "83 502",
+            "normalized_value": 83_502.0,
+            "spouse_raw_value": None,
+        }
+    )
 
     result = run_quality_checks(value, snapshot_date="2026-08-16")
 
     assert result.report["checks"]["income_rows_by_stream"] == {
+        "activity_remuneration": 1,
         "mandate_remuneration": 1,
         "unknown": 1,
     }
     assert result.report["checks"]["income_declarations_by_stream"] == {
+        "activity_remuneration": 1,
         "mandate_remuneration": 1,
         "unknown": 1,
     }

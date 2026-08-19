@@ -11,13 +11,13 @@ from ..normalize import normalize_text, parse_french_number
 from ..xml_support import (
     child,
     date_fields,
-    first_key_containing,
     first_value,
     flatten_leaf_values,
     item_groups,
     normalized_child_text,
     raw_record,
 )
+from .mandate_fields import remuneration_entries
 
 
 def activity_rows(
@@ -28,6 +28,7 @@ def activity_rows(
     for section_name in config.sections["activities"]:
         for index, item in enumerate(item_groups(child(element, section_name))):
             values = flatten_leaf_values(item)
+            entries = remuneration_entries(item)
             start_raw, start = date_fields(values, "dateDebut")
             end_raw, end = date_fields(values, "dateFin")
             rows.append(
@@ -46,7 +47,7 @@ def activity_rows(
                     "date_debut": start,
                     "date_fin_raw": end_raw,
                     "date_fin": end,
-                    "remuneration_raw": first_key_containing(values, "remuneration", "montant"),
+                    "remuneration_raw": entries[0]["raw_value"] if entries else None,
                     "raw_record_json": raw_record(values),
                 }
             )

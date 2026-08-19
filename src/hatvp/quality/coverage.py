@@ -1,5 +1,3 @@
-"""Coverage metrics and previous-count comparisons for quality reports."""
-
 from __future__ import annotations
 
 from collections import Counter
@@ -67,6 +65,7 @@ def income_stream(row: dict[str, Any]) -> str:
     return row.get("income_stream") or {
         "revenuMandatDto": "revenu_mandat",
         "mandatElectifDto": "mandate_remuneration",
+        "activProfCinqDerniereDto": "activity_remuneration",
     }.get(row.get("source_section"), "unknown")
 
 

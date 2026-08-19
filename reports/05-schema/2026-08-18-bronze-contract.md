@@ -22,7 +22,7 @@ step.
 | --- | --- | --- |
 | `declarations` | One row per direct XML `<declaration>` occurrence in one source snapshot. | `declaration_uuid` is the stable source UUID when present; `bronze_record_key` distinguishes repeated occurrences. `date_depot`, `declaration_modificative`, `date_derniere_declaration_raw`, `declaration_version`, mandate dates, role, and organ fields remain attached to the row. |
 | `people` | One declarant record belonging to one declaration occurrence. | Join to the parent with `bronze_record_key`; `declaration_uuid` is retained but is not assumed unique. Name and date fields are source observations, not an identity replacement. |
-| `incomes` | One populated declared-income category or one annual `mandatElectifDto` remuneration value. | Join to the parent with `bronze_record_key`; `source_section`, `source_item_index`, `income_category_index`, `remuneration_index`, and `income_year` identify the observed child value. |
+| `incomes` | One populated declared-income category, one annual `activProfCinqDerniereDto` remuneration value, or one annual `mandatElectifDto` remuneration value. | Join to the parent with `bronze_record_key`; `source_section`, `income_stream`, `source_item_index`, `income_category_index`, `remuneration_index`, and `income_year` identify the observed child value. |
 | `assets` | One observed asset DTO item. | Join to the parent with `bronze_record_key`; `source_section` and `source_item_index` identify the source item, while `raw_value` and `normalized_value` remain side by side. |
 
 The source field `declarationVersion` is retained verbatim as

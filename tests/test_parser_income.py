@@ -2,6 +2,7 @@
 
 import json
 
+from hatvp.parser.activity_income import activity_income_years, is_activity_income_row
 from hatvp.parser.income import income_row_count
 from hatvp.parser.income_fields import (
     income_has_numeric_value,
@@ -73,6 +74,20 @@ def test_income_field_helpers_read_both_declared_values() -> None:
     assert income_numeric_pair(row) == (12000.0, None)
     assert income_has_numeric_value(row)
     assert json.loads(row["raw_record_json"])["revenuElu"] == "12 000,00"
+
+
+def test_professional_activity_remuneration_enters_incomes_per_source_year() -> None:
+    tables = xml_tables("activity_income.xml")
+    rows = [row for row in tables["incomes"] if is_activity_income_row(row)]
+
+    assert len(rows) == 2
+    assert activity_income_years(rows) == ["2024", "2025"]
+    assert [row["normalized_value"] for row in rows] == [111393.0, 83502.0]
+    assert raw_record(rows[0])["remuneration"]["amounts"] == [
+        {"annee": "2024", "montant": "111 393"},
+        {"annee": "2025", "montant": "83 502"},
+    ]
+    assert tables["activities"][0]["remuneration_raw"] == "111 393"
 
 
 def test_mandate_rows_retain_all_annual_raw_source_values() -> None:

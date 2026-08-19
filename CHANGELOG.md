@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-08-19 — Include recent professional-activity remuneration in incomes
+
+### Fixed
+
+- Added `income_stream=activity_remuneration` rows for every annual amount in
+  the configured `activProfCinqDerniereDto` section, including explicit zeroes.
+- Preserved the source activity description, employer, dates, remuneration
+  basis, and complete annual amount list in each row's raw evidence.
+- Fixed the activity summary row to expose an amount rather than the nested
+  source year when remuneration is present.
+
+### Verified
+
+- The live Sébastien Lecornu declaration contains six recent professional
+  activities with 15 annual remuneration values; the fixture regression keeps
+  every multi-year value as a separate normalized income row.
+- Focused parser and income-quality tests pass, including source-stream counts
+  and raw-record reconciliation.
+
 ## 2026-08-19 — Merge open dashboard PRs and redeploy the frontend
 
 ### Deployed

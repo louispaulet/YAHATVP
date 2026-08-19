@@ -24,6 +24,8 @@ parser:
       - activProfConjointDto
       - fonctionBenevoleDto
       - activCollaborateursDto
+    income_activities:
+      - activProfCinqDerniereDto
     participations: [participationDirigeantDto, participationFinanciereDto]
     assets:
       - immeubleDto

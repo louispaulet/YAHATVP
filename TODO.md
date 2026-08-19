@@ -67,6 +67,7 @@ Workload Identity Federation, not a stored key.
 - [x] Add explicit catastrophic row-count reduction checks against the previous successful report.
 - [x] Add explicit required top-level XML structure checks before normalization.
 - [x] Exclude empty income category slots and report source-aware income coverage.
+- [x] Include every annual `activProfCinqDerniereDto` remuneration in the unified income table.
 - [x] Preserve every annual `mandatElectifDto` remuneration in a dedicated normalized table.
 - [x] Add a live declaration XML/parsed-data bundle for manual review and exclude placeholder-only DTO rows.
 - [x] Add a `revenuMandatDto` income outlier report with source-to-parser reconciliation.

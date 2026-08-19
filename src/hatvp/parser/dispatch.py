@@ -11,6 +11,7 @@ from lxml import etree
 from ..models import ParseContext, Row, TableSet
 from ..xml_support import child, normalized_child_text
 from .activities import activity_rows, participation_rows
+from .activity_income import activity_income_rows
 from .declarations import person_row
 from .finance import asset_rows, liability_rows
 from .income import income_rows, mandate_income_rows
@@ -54,6 +55,7 @@ def append_declaration(
     tables["activities"].extend(activity_rows(element, local_context, config))
     tables["participations"].extend(participation_rows(element, local_context, config))
     tables["incomes"].extend(income_rows(element, local_context, config))
+    tables["incomes"].extend(activity_income_rows(element, local_context, config))
     tables["incomes"].extend(mandate_income_rows(element, local_context, config))
     tables["assets"].extend(asset_rows(element, local_context, config))
     tables["liabilities"].extend(liability_rows(element, local_context, config))
