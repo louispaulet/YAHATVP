@@ -291,9 +291,13 @@
     "inputLabel": "Rechercher dans les déclarations publiques",
     "placeholder": "Nom, mandat, organisme, identifiant, montant…",
     "submit": "Rechercher",
+    "clear": "Effacer",
+    "searchTip": "Appuyez sur Entrée pour rechercher",
     "hint": "La recherche ignore les accents et trouve aussi les correspondances partielles. Les coordonnées et adresses ne sont jamais recherchées ni affichées.",
     "emptyTitle": "Commencez par un nom ou un mot-clé",
     "emptyDescription": "Essayez un nom comme « Dupont », un mandat, un organisme, un identifiant de déclaration ou un montant.",
+    "examplesLabel": "Essayez une recherche",
+    "examples": ["Dupont", "Élu local", "Paris"],
     "resultEyebrow": "Déclaration publique",
     "unknownDeclarant": "Nom du déclarant non publié",
     "fields": {
@@ -307,6 +311,7 @@
     "noResults": "Aucune correspondance pour « {query} ». Essayez un nom plus court ou un autre champ public.",
     "resultsEyebrow": "Résultats de recherche",
     "resultsFound": "{count} déclarations trouvées",
+    "queryLabel": "Résultats pour « {query} »",
     "snapshot": "Instantané {date}",
     "viewDeclaration": "Ouvrir la déclaration et le XML source"
   },

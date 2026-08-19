@@ -54,6 +54,7 @@ documented and complete.
 - [x] Preserve asset event dates, precision, and source fields through Bronze,
   Silver, Gold, and the schema-evolution contract; verify Lecornu's 2002 value
   is a 21 January life-insurance subscription at age 15, not a 2002 filing.
+- [x] Improve declaration search with clearer focus and result states, quick-start examples, and a reset action.
 - [ ] Deploy and force-replay the repaired timeline release; record the main
   workflow, ingestion execution, 13-table load, state advancement, bridge
   revision, Worker version, frontend publish, and final Chrome audit.
