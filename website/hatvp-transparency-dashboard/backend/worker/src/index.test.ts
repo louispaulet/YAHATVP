@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { handleRequest } from "./index";
-import type { DashboardOverviewResponse, WorkerEnv } from "./types";
+import type { AgeAnalysisResponse, DashboardOverviewResponse, SimpleAnalysisResponse, WorkerEnv } from "./types";
 
 const env: WorkerEnv = {
   BRIDGE_URL: "https://bridge.example.test",
@@ -26,6 +26,34 @@ const declaration = {
   generatedAt: "2026-08-18T08:00:00Z",
   declaration: { declarationUuid: "fixture-uuid-1" },
   rawXml: "<declaration><uuid>fixture-uuid-1</uuid></declaration>",
+};
+
+const simpleAnalysis: SimpleAnalysisResponse = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  referenceDate: "2026-08-18",
+  youngest: [],
+  oldest: [],
+  ageBins: [],
+};
+
+const ageAnalysis: AgeAnalysisResponse = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  person: {
+    personKey: "fixture",
+    primaryUuid: "fixture-uuid-1",
+    firstName: "Alice",
+    lastName: "DUPONT",
+    dateOfBirth: "1980-03-02",
+    ageYears: 46,
+    qualityStatus: "valid",
+    declarationCount: 1,
+  },
+  matches: [],
+  incomeByYear: [],
+  occupationsByYear: [],
+  assetTimeline: [],
 };
 
 function request(path: string, init?: RequestInit): Request {
@@ -125,6 +153,19 @@ describe("dashboard Worker", () => {
     expect(await response.json()).toEqual(declaration);
     expect(fetcher).toHaveBeenCalledWith(
       "https://bridge.example.test/v1/dashboard/declarations/fixture-uuid-1",
+      expect.anything(),
+    );
+  });
+
+  it("proxies both analytical routes and forwards the declarant query", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockImplementation((url) => {
+      const payload = url.includes("age-analysis") ? ageAnalysis : simpleAnalysis;
+      return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+    });
+    expect((await handleRequest(request("/api/dashboard/simple-analysis"), env, fetcher)).status).toBe(200);
+    expect((await handleRequest(request("/api/dashboard/age-analysis?q=Lecornu"), env, fetcher)).status).toBe(200);
+    expect(fetcher).toHaveBeenLastCalledWith(
+      "https://bridge.example.test/v1/dashboard/age-analysis?q=Lecornu",
       expect.anything(),
     );
   });

@@ -4,6 +4,7 @@ import os
 from typing import Any
 
 from aggregate_payloads import dashboard_payload, row_value
+from analysis_payloads import age_analysis_payload, simple_analysis_payload
 from bridge_runtime import (
     configured_bucket,
     configured_prefix,
@@ -13,6 +14,7 @@ from bridge_runtime import (
     storage_client,
 )
 from query import build_query
+from query_analysis import build_age_analysis_query, build_simple_analysis_query
 from query_declaration import build_declaration_query
 from query_search import build_search_query
 from raw_xml import read_declaration_xml
@@ -51,6 +53,37 @@ def run_dashboard(view: str = "overview") -> tuple[str, int, dict[str, str]]:
         return response(dashboard_payload(rows[0], view), 200)
     except Exception:
         return response(error_payload("QUERY_FAILED", "Dashboard data is unavailable"), 502)
+
+
+def run_simple_analysis() -> tuple[str, int, dict[str, str]]:
+    """Return the latest DOB leaderboard and salary age-bin aggregates."""
+
+    try:
+        query = build_simple_analysis_query(os.environ["BQ_PROJECT_ID"], os.environ["BQ_DATASET"])
+        rows = query_rows(query)
+        if not rows or row_value(rows[0], "snapshot_date") is None:
+            return response(error_payload("NO_DATA", "No dashboard snapshot is available"), 404)
+        return response(simple_analysis_payload(rows[0]), 200)
+    except Exception:
+        return response(error_payload("QUERY_FAILED", "Age analysis is unavailable"), 502)
+
+
+def run_age_analysis(search_term: str) -> tuple[str, int, dict[str, str]]:
+    """Return source-preserving annual analysis for one matched declarant."""
+
+    try:
+        from google.cloud import bigquery
+
+        config = bigquery.QueryJobConfig(
+            query_parameters=[bigquery.ScalarQueryParameter("search_term", "STRING", search_term)]
+        )
+        query = build_age_analysis_query(os.environ["BQ_PROJECT_ID"], os.environ["BQ_DATASET"])
+        rows = query_rows(query, config)
+        if not rows or row_value(rows[0], "snapshot_date") is None:
+            return response(error_payload("NOT_FOUND", "Declarant not found"), 404)
+        return response(age_analysis_payload(rows[0]), 200)
+    except Exception:
+        return response(error_payload("QUERY_FAILED", "Declarant analysis is unavailable"), 502)
 
 
 def run_search(search_term: str) -> tuple[str, int, dict[str, str]]:
