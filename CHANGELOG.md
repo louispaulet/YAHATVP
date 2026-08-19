@@ -11,6 +11,55 @@
 
 - Frontend tests cover the quick-start and reset flow; the production build completes successfully.
 
+## 2026-08-19 — Redesign the simple analysis dashboard
+
+### Changed
+
+- Reworked the public simple-analysis page into a chart-led editorial layout:
+  the average/median salary comparison now leads the page, DOB leaderboards
+  are paired in one evidence section, and age-bin details are compact and
+  scannable rather than repetitive cards.
+- Retained all existing data, localisation, review labels, charts, and the
+  zero-salary control. Added a development-only Vite API proxy switch to
+  visually verify the frontend against the deployed read-only API.
+
+### Verified
+
+- Frontend fixture suite: 24 tests passed. TypeScript production build passed.
+- Browser verification at 1440 × 1024 and 390 × 844 confirmed the loaded
+  English analysis route, responsive layout, and zero-salary control. The
+  selected design-to-implementation comparison is recorded in
+  `website/hatvp-transparency-dashboard/frontend/design-qa.md`.
+
+## 2026-08-19 — Refine dashboard homepage presentation
+
+### Changed
+
+- Rebalanced the dashboard navigation, hero, metric cards, and content spacing
+  for a more legible editorial hierarchy while retaining every existing
+  dashboard metric and data source.
+- Made asset and gender-by-position charts size themselves to their data,
+  widened the detailed gender panel, and separated chart summaries with clear
+  visual rules to prevent crowded labels and overlapping categories.
+- Corrected the snapshot loading markup so the loading indicator is no longer
+  nested inside a paragraph element.
+
+### Verification
+
+- `npm run build` completed successfully in
+  `website/hatvp-transparency-dashboard/frontend`.
+- Visual review covered the refreshed homepage at desktop width; local API
+  data requests are unavailable without the separately running Worker.
+
+## 2026-08-19 — Remove the not-yet-ready explorer from navigation
+
+### Changed
+
+- Removed the `/explore` placeholder link from the dashboard navbar to free
+  space for the currently available pages.
+- Kept the direct `/explore` route and its coverage intact for future work.
+
+
 ## 2026-08-19 — Repair declarant income and asset history
 
 ### Changed

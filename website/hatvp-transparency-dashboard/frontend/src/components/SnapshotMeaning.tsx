@@ -16,9 +16,9 @@ export function SnapshotMeaning({ overview, loading, language }: SnapshotMeaning
     <div className="space-y-4 text-sm leading-6 text-slate-600">
       <p>{locale.panels.snapshotMeaning.counts}</p>
       <p>{locale.panels.snapshotMeaning.amounts}</p>
-      <p className="rounded-2xl bg-lime/30 p-4 font-semibold text-ink">
+      <div className="rounded-2xl bg-lime/30 p-4 font-semibold text-ink">
         {locale.panels.snapshotMeaning.lastGenerated}: {loading ? <LoadingShell className="inline-block h-4 w-32 rounded-full align-middle" /> : overview ? formatDateTime(overview.generatedAt, language) : locale.hero.notAvailable}
-      </p>
+      </div>
     </div>
   );
 }
