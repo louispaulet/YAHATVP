@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from query_support import dataset_prefix, table
+from query_support import accent_fold, dataset_prefix, table
 
 
 def _age(reference: str, birth: str) -> str:
@@ -22,6 +22,8 @@ def build_simple_analysis_query(project: str, dataset: str) -> str:
     people = table(prefix, "people")
     incomes = table(prefix, "incomes")
     current_age = _age("l.snapshot_date", "p.date_naissance_date")
+    normalized_first_name = accent_fold("COALESCE(p.prenom, '')")
+    normalized_last_name = accent_fold("COALESCE(p.nom, '')")
     return f"""WITH latest AS (
   SELECT MAX(snapshot_date) AS snapshot_date FROM {declarations}
 ), people_base AS (
@@ -35,8 +37,8 @@ def build_simple_analysis_query(project: str, dataset: str) -> str:
   WHERE p.snapshot_date = l.snapshot_date
     AND p.date_naissance_date IS NOT NULL
   QUALIFY ROW_NUMBER() OVER (
-    PARTITION BY NORMALIZE_AND_CASEFOLD(COALESCE(p.prenom, '')),
-      NORMALIZE_AND_CASEFOLD(COALESCE(p.nom, '')), p.date_naissance_date
+    PARTITION BY {normalized_first_name},
+      {normalized_last_name}, p.date_naissance_date
     ORDER BY d.date_depot DESC, p.declaration_uuid
   ) = 1
 ), income_age AS (
@@ -91,26 +93,30 @@ def build_age_analysis_query(project: str, dataset: str) -> str:
     incomes = table(prefix, "incomes")
     assets = table(prefix, "assets")
     age_at_snapshot = _age("l.snapshot_date", "p.date_naissance_date")
+    search_term = accent_fold("@search_term")
+    first_name = accent_fold("COALESCE(p.prenom, '')")
+    last_name = accent_fold("COALESCE(p.nom, '')")
+    full_name = accent_fold("CONCAT(COALESCE(p.prenom, ''), ' ', COALESCE(p.nom, ''))")
+    group_name = accent_fold("CONCAT(COALESCE(prenom, ''), ' ', COALESCE(nom, ''))")
     return f"""WITH latest AS (
   SELECT MAX(snapshot_date) AS snapshot_date FROM {declarations}
 ), search AS (
-  SELECT NORMALIZE_AND_CASEFOLD(@search_term) AS term
+  SELECT {search_term} AS term
 ), person_rows AS (
   SELECT p.declaration_uuid, p.prenom, p.nom, p.date_naissance,
     p.date_naissance_date, p.date_naissance_quality_status,
     d.mandat_label, d.organ_label, ({age_at_snapshot}) AS age_years,
-    CONCAT(NORMALIZE_AND_CASEFOLD(COALESCE(p.prenom, '')), '|',
-      NORMALIZE_AND_CASEFOLD(COALESCE(p.nom, '')), '|',
+    CONCAT({first_name}, '|',
+      {last_name}, '|',
       COALESCE(CAST(p.date_naissance_date AS STRING), '')) AS person_key
   FROM {people} p
   JOIN {declarations} d ON d.declaration_uuid = p.declaration_uuid
     AND d.snapshot_date = p.snapshot_date
   CROSS JOIN latest l CROSS JOIN search s
   WHERE p.snapshot_date = l.snapshot_date
-    AND (STRPOS(NORMALIZE_AND_CASEFOLD(COALESCE(p.prenom, '')), s.term) > 0
-      OR STRPOS(NORMALIZE_AND_CASEFOLD(COALESCE(p.nom, '')), s.term) > 0
-      OR STRPOS(NORMALIZE_AND_CASEFOLD(CONCAT(COALESCE(p.prenom, ''), ' ',
-        COALESCE(p.nom, ''))), s.term) > 0)
+    AND (STRPOS({first_name}, s.term) > 0
+      OR STRPOS({last_name}, s.term) > 0
+      OR STRPOS({full_name}, s.term) > 0)
 ), person_groups AS (
   SELECT person_key, ANY_VALUE(prenom) AS prenom, ANY_VALUE(nom) AS nom,
     ANY_VALUE(date_naissance) AS date_naissance,
@@ -118,8 +124,7 @@ def build_age_analysis_query(project: str, dataset: str) -> str:
     ANY_VALUE(date_naissance_quality_status) AS date_naissance_quality_status,
     ANY_VALUE(age_years) AS age_years, COUNT(DISTINCT declaration_uuid) AS declaration_count,
     MIN(declaration_uuid) AS primary_uuid,
-    MAX(IF(NORMALIZE_AND_CASEFOLD(CONCAT(COALESCE(prenom, ''), ' ',
-      COALESCE(nom, ''))) = s.term, 1, 0)) AS exact_match
+    MAX(IF({group_name} = s.term, 1, 0)) AS exact_match
   FROM person_rows CROSS JOIN search s
   GROUP BY person_key
 ), selected_person AS (

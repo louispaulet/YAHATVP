@@ -42,7 +42,12 @@ def search_row():
 
 def test_search_query_is_parameterized_and_public():
     query = build_search_query("project", "dataset")
-    assert "@search_term" in query
+    assert (
+        "REGEXP_REPLACE(NORMALIZE_AND_CASEFOLD(@search_term, NFD), r'\\p{M}', '') AS term" in query
+    )
+    assert (
+        "REGEXP_REPLACE(NORMALIZE_AND_CASEFOLD(COALESCE(p.nom, ''), NFD), r'\\p{M}', '')" in query
+    )
     assert "p.nom" in query and "d.mandat_label" in query
     assert "i.income_stream" in query and "a.asset_name" in query
     assert "LIMIT 50" in query
