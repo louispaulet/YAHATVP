@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-19 — Normalize mixed registry snapshot dates before Parquet writes
+
+### Fixed
+
+- Normalize `date` and `datetime` values to ISO date text before Polars builds
+  typed Parquet frames, allowing historical registry rows and current string
+  snapshot dates to coexist safely.
+
+### Verified
+
+- Added a mixed string/date registry fixture regression; the full Python suite
+  passes with 148 tests, Ruff passes, and the package builds successfully.
+- The first production replay exposed this issue before any Bronze, Silver,
+  Gold, or registry load completed; a fresh forced replay remains required after
+  the redeployed fix.
+
 ## 2026-08-19 — Include recent professional-activity remuneration in incomes
 
 ### Fixed

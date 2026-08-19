@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -37,10 +38,28 @@ def _frame(
     rows: list[dict[str, Any]], columns: list[str], schema: dict[str, object]
 ) -> pl.DataFrame:
     if rows:
-        return pl.DataFrame(rows, infer_schema_length=None)
+        return pl.DataFrame(_coerce_date_values(rows, schema), infer_schema_length=None)
     return pl.DataFrame(
         {column: pl.Series(column, [], dtype=schema.get(column, pl.Null)) for column in columns}
     )
+
+
+def _coerce_date_values(
+    rows: list[dict[str, Any]], schema: dict[str, object]
+) -> list[dict[str, Any]]:
+    return [
+        {
+            key: _date_text(value) if schema.get(key) == pl.Date else value
+            for key, value in row.items()
+        }
+        for row in rows
+    ]
+
+
+def _date_text(value: Any) -> Any:
+    if isinstance(value, datetime):
+        return value.date().isoformat()
+    return value.isoformat() if isinstance(value, date) else value
 
 
 def normalized_columns(required: list[str], schema: dict[str, object]) -> list[str]:

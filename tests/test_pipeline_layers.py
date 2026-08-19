@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import hashlib
+from datetime import date
 from pathlib import Path
 
 import polars as pl
 
 from hatvp import main as main_module
+from hatvp.layers.registry_schema import registry_schema
 from hatvp.main import run_pipeline
+from hatvp.tables import write_parquet
 from tests.pipeline_support import fixture_downloader, settings, state_path
 
 
@@ -74,3 +77,18 @@ def test_registry_partition_retains_stable_keys_and_evidence(tmp_path: Path, mon
 
     assert {"anomaly_id", "anomaly_key", "evidence", "seen_snapshots"} <= set(registry.columns)
     assert registry["anomaly_key"].n_unique() == registry.height
+
+
+def test_registry_writer_normalizes_historical_date_values(tmp_path: Path) -> None:
+    path = tmp_path / "mixed-registry.parquet"
+    rows = [
+        {"anomaly_key": "old", "snapshot_date": "2026-08-18"},
+        {"anomaly_key": "new", "snapshot_date": date(2026, 8, 19)},
+    ]
+
+    write_parquet(rows, path, list(registry_schema()), registry_schema())
+
+    assert pl.read_parquet(path)["snapshot_date"].to_list() == [
+        date(2026, 8, 18),
+        date(2026, 8, 19),
+    ]
