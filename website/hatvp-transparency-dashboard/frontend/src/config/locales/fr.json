@@ -154,11 +154,18 @@
     "salaryTitle": "Distribution des revenus par âge",
     "salaryEyebrow": "Tranches de cinq ans",
     "salaryDescription": "Revenu normalisé moyen et médian des déclarants, regroupé par âge au cours de l’année de revenu. Les anomalies actives de revenu sont exclues des statistiques mais conservées dans les tables reliées à la source.",
+    "excludeZeroSalary": "Exclure les revenus à 0 €",
     "average": "Revenu moyen",
     "median": "Revenu médian",
     "rows": "lignes de revenus",
     "emptySalary": "Aucune ligne de revenu éligible ne combine une date de naissance et une année exploitables.",
     "chartLabel": "Revenu moyen et médian par tranche d’âge de cinq ans",
+    "zeroSalaryTitle": "Déclarations à 0 € par âge",
+    "zeroSalaryEyebrow": "Décompte des revenus nuls",
+    "zeroSalaryDescription": "Nombre de déclarations avec un revenu normalisé de 0 € dans chaque tranche d’âge de cinq ans. L’analyse se limite aux âges de 18 à 100 ans.",
+    "zeroSalaryCount": "lignes à 0 €",
+    "emptyZeroSalary": "Aucune ligne de revenu à 0 € ne combine une date de naissance et une année exploitables.",
+    "zeroSalaryChartLabel": "Nombre de déclarations à 0 € par tranche d’âge de cinq ans",
     "anomalyNote": "Les signalements sont des indices à revoir, pas des corrections de la date publiée."
   },
   "ageAnalysis": {

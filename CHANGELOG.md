@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-08-19 — Refine salary age analysis and leaderboard readability
+
+### Changed
+
+- Restricted salary age-bin statistics and zero-salary counts to ages 18–100;
+  DOB leaderboards continue to retain and label implausible ages.
+- Added a checked-by-default localized “exclude 0€ salary” control, with an
+  all-values toggle for comparison, and added a zero-salary count chart using
+  the same five-year age bins.
+- Removed the leaderboard’s horizontal scroll dependency by using visible,
+  wrapping fixed-width columns so implausible DOB review badges remain readable.
+
+### Verified
+
+- Bridge tests: 37 passed; frontend tests: 22 passed; Vite production build
+  passed; Chrome local fixture checks passed in English and French at desktop
+  and 390px widths with no horizontal overflow or console warnings/errors.
+
 ## 2026-08-19 — Merge analysis PRs and complete production release
 
 ### Merged

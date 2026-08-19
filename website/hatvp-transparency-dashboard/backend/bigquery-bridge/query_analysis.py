@@ -51,20 +51,46 @@ def build_simple_analysis_query(project: str, dataset: str) -> str:
     AND COALESCE(i.metric_eligible, TRUE)
     AND p.date_naissance_date IS NOT NULL
     AND SAFE_CAST(i.income_year AS INT64) IS NOT NULL
-), age_rows AS (
+), all_age_rows AS (
   SELECT DIV(age_years, 5) * 5 AS age_bin_start, normalized_value
   FROM income_age
-  WHERE age_years >= 0
+  WHERE age_years BETWEEN 18 AND 100
+), salary_age_rows AS (
+  SELECT age_bin_start, normalized_value
+  FROM all_age_rows
+  WHERE normalized_value != 0
+), age_bin_domain AS (
+  SELECT DISTINCT age_bin_start FROM all_age_rows
 ), age_stats AS (
   SELECT age_bin_start, COUNT(*) AS row_count, AVG(normalized_value) AS average_value
-  FROM age_rows GROUP BY age_bin_start
+  FROM salary_age_rows GROUP BY age_bin_start
 ), age_medians AS (
   SELECT DISTINCT age_bin_start,
     PERCENTILE_CONT(normalized_value, 0.5) OVER (PARTITION BY age_bin_start) AS median_value
-  FROM age_rows
+  FROM salary_age_rows
 ), age_bins AS (
-  SELECT s.age_bin_start, s.row_count, s.average_value, m.median_value
-  FROM age_stats s JOIN age_medians m USING (age_bin_start)
+  SELECT b.age_bin_start, COALESCE(s.row_count, 0) AS row_count,
+    COALESCE(s.average_value, 0) AS average_value, COALESCE(m.median_value, 0) AS median_value
+  FROM age_bin_domain b
+  LEFT JOIN age_stats s USING (age_bin_start)
+  LEFT JOIN age_medians m USING (age_bin_start)
+), all_age_stats AS (
+  SELECT age_bin_start, COUNT(*) AS row_count, AVG(normalized_value) AS average_value
+  FROM all_age_rows GROUP BY age_bin_start
+), all_age_medians AS (
+  SELECT DISTINCT age_bin_start,
+    PERCENTILE_CONT(normalized_value, 0.5) OVER (PARTITION BY age_bin_start) AS median_value
+  FROM all_age_rows
+), age_bins_including_zero AS (
+  SELECT b.age_bin_start, s.row_count, s.average_value, m.median_value
+  FROM age_bin_domain b
+  JOIN all_age_stats s USING (age_bin_start)
+  JOIN all_age_medians m USING (age_bin_start)
+), zero_salary_bins AS (
+  SELECT b.age_bin_start, COUNTIF(a.normalized_value = 0) AS row_count
+  FROM age_bin_domain b
+  LEFT JOIN all_age_rows a USING (age_bin_start)
+  GROUP BY b.age_bin_start
 )
 SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
   CURRENT_TIMESTAMP() AS generated_at,
@@ -78,7 +104,17 @@ SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
     SELECT AS STRUCT age_bin_start, FORMAT('%d–%d', age_bin_start, age_bin_start + 4) AS label,
       row_count, average_value, median_value
     FROM age_bins ORDER BY age_bin_start
-  )) AS age_bins_json
+  )) AS age_bins_json,
+  TO_JSON_STRING(ARRAY(
+    SELECT AS STRUCT age_bin_start, FORMAT('%d–%d', age_bin_start, age_bin_start + 4) AS label,
+      row_count, average_value, median_value
+    FROM age_bins_including_zero ORDER BY age_bin_start
+  )) AS age_bins_including_zero_json,
+  TO_JSON_STRING(ARRAY(
+    SELECT AS STRUCT age_bin_start, FORMAT('%d–%d', age_bin_start, age_bin_start + 4) AS label,
+      row_count
+    FROM zero_salary_bins ORDER BY age_bin_start
+  )) AS zero_salary_bins_json
 FROM latest l"""
 
 

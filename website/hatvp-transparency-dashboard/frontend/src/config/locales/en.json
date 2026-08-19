@@ -154,11 +154,18 @@
     "salaryTitle": "Salary distribution by age",
     "salaryEyebrow": "Five-year age bins",
     "salaryDescription": "Average and median normalized declarant income, grouped by age at the income year. Active income anomalies are excluded from the statistics but retained in the source-linked tables.",
+    "excludeZeroSalary": "Exclude 0€ salary",
     "average": "Average salary",
     "median": "Median salary",
     "rows": "salary rows",
     "emptySalary": "No eligible salary rows have a usable DOB and year.",
     "chartLabel": "Average and median salary by five-year age bin",
+    "zeroSalaryTitle": "0€ salary declarations by age",
+    "zeroSalaryEyebrow": "Zero-salary counts",
+    "zeroSalaryDescription": "Count of declarations with a normalized 0€ salary in each five-year age bin. The age window is limited to 18–100 for this analysis.",
+    "zeroSalaryCount": "0€ salary rows",
+    "emptyZeroSalary": "No 0€ salary rows have a usable DOB and year.",
+    "zeroSalaryChartLabel": "Count of 0€ salary declarations by five-year age bin",
     "anomalyNote": "Anomaly labels are signals for review, not corrections to the published DOB."
   },
   "ageAnalysis": {

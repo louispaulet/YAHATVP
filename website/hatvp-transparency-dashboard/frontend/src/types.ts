@@ -78,6 +78,18 @@ export interface SimpleAnalysisResponse {
     averageSalary: number;
     medianSalary: number;
   }>;
+  ageBinsIncludingZero: Array<{
+    label: string;
+    ageBinStart: number;
+    rows: number;
+    averageSalary: number;
+    medianSalary: number;
+  }>;
+  zeroSalaryBins: Array<{
+    label: string;
+    ageBinStart: number;
+    rows: number;
+  }>;
 }
 
 export interface AgeAnalysisPerson {

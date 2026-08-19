@@ -101,6 +101,12 @@ describe("dashboard application", () => {
     expect(screen.getByText("Young Person")).toBeInTheDocument();
     expect(screen.getByText("Salary distribution by age")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "Average and median salary by five-year age bin" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Exclude 0€ salary" })).toBeChecked();
+    expect(screen.getByRole("img", { name: "Count of 0€ salary declarations by five-year age bin" })).toBeInTheDocument();
+    expect(screen.getAllByText("Review: implausible").every((badge) => badge.classList.contains("break-words"))).toBe(true);
+    expect(screen.getAllByRole("table")[0]).not.toHaveClass("min-w-[40rem]");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Exclude 0€ salary" }));
+    expect(screen.getByText("€13.3K / €15K")).toBeInTheDocument();
   });
 
   it("renders the Lecornu age and year analysis page", async () => {

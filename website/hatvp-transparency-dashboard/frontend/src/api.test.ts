@@ -32,7 +32,7 @@ describe("dashboard API client", () => {
   });
 
   it("loads both analysis slices with the expected query", async () => {
-    const simple = { snapshotDate: "2026-08-18", generatedAt: "now", referenceDate: "2026-08-18", youngest: [], oldest: [], ageBins: [] };
+    const simple = { snapshotDate: "2026-08-18", generatedAt: "now", referenceDate: "2026-08-18", youngest: [], oldest: [], ageBins: [], ageBinsIncludingZero: [], zeroSalaryBins: [] };
     const age = { snapshotDate: "2026-08-18", generatedAt: "now", person: {}, matches: [], incomeByYear: [], occupationsByYear: [], assetTimeline: [] };
     const fetchMock = vi.fn().mockImplementation((url: string) => Promise.resolve(new Response(JSON.stringify(url.includes("simple-analysis") ? simple : age), { status: 200 })));
     vi.stubGlobal("fetch", fetchMock);
