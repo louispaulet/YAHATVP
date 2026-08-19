@@ -8,7 +8,7 @@ from typing import Any
 
 from ..models import ParseContext, Row
 
-PARSER_VERSION = "1"
+PARSER_VERSION = "2"
 
 
 def context_for(

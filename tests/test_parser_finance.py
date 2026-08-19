@@ -34,6 +34,7 @@ def test_finance_rows_preserve_source_positions_and_values() -> None:
     assert asset["source_section"] == "immeubleDto"
     assert asset["source_item_index"] == 0
     assert asset["raw_value"] == "250 000,00"
+    assert asset["asset_acquisition_year"] == 2007
     assert liability["source_section"] == "passifDto"
     assert liability["raw_value"] == "10 000,00"
 

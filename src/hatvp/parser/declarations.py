@@ -1,13 +1,11 @@
 """Declaration, person, and general-mandate parsers."""
 
-from __future__ import annotations
-
 from typing import Any
 
 from lxml import etree
 
 from ..models import ParseContext, ParserConfig
-from ..normalize import parse_date
+from ..normalize import birth_fields, parse_date
 from ..xml_support import child, element_record, item_groups, normalized_child_text, raw_child_text
 from .declaration_support import income_item_has_value
 from .mandates import mandate_rows
@@ -69,13 +67,15 @@ def person_row(element: etree._Element, context: ParseContext) -> dict[str, Any]
     person = child(general, "declarant")
     address = child(person, "adresseDec")
     birth_raw = raw_child_text(person, "dateNaissance")
+    birth = parse_date(birth_raw)
     fields = {
         "civilite": normalized_child_text(person, "civilite"),
         "nom": normalized_child_text(person, "nom"),
         "prenom": normalized_child_text(person, "prenom"),
         "email": normalized_child_text(person, "email"),
         "date_naissance_raw": birth_raw,
-        "date_naissance": parse_date(birth_raw),
+        "date_naissance": birth,
+        **birth_fields(birth_raw),
         "telephone_dec": normalized_child_text(person, "telephoneDec"),
         "raw_record_json": element_record(person),
     }

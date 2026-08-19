@@ -3,7 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { declarationXmlFixtures } from "./declaration-fixtures";
-import { assets, dashboard, declarations, income } from "./test-fixtures";
+import { ageAnalysis, assets, dashboard, declarations, income, simpleAnalysis } from "./test-fixtures";
 
 const search = {
   snapshotDate: "2026-08-18",
@@ -38,7 +38,7 @@ describe("dashboard application", () => {
   beforeEach(() => {
     vi.stubGlobal("fetch", vi.fn().mockImplementation((url: string) => {
       const path = new URL(url).pathname;
-      const payload = path.endsWith("/overview") ? dashboard : path.endsWith("/income") ? income : path.endsWith("/assets") ? assets : path.endsWith("/search") ? search : path.includes("/declarations/") ? declaration : declarations;
+      const payload = path.endsWith("/overview") ? dashboard : path.endsWith("/income") ? income : path.endsWith("/assets") ? assets : path.endsWith("/search") ? search : path.endsWith("/simple-analysis") ? simpleAnalysis : path.endsWith("/age-analysis") ? ageAnalysis : path.includes("/declarations/") ? declaration : declarations;
       return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
     }));
   });
@@ -92,6 +92,24 @@ describe("dashboard application", () => {
     expect(screen.getByRole("link", { name: "Search declarations" })).toHaveAttribute("href", "/search");
     expect(screen.getByRole("link", { name: "Data explorer" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("More ways to explore are on the way.")).toBeInTheDocument();
+  });
+
+  it("renders the simple DOB and salary analysis page", async () => {
+    render(<MemoryRouter initialEntries={["/analysis"]}><App /></MemoryRouter>);
+    expect(await screen.findByText("Age, pay, and the shape of the dataset.")).toBeInTheDocument();
+    expect(screen.getByText("Youngest declarants")).toBeInTheDocument();
+    expect(screen.getByText("Young Person")).toBeInTheDocument();
+    expect(screen.getByText("Salary distribution by age")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Average and median salary by five-year age bin" })).toBeInTheDocument();
+  });
+
+  it("renders the Lecornu age and year analysis page", async () => {
+    render(<MemoryRouter initialEntries={["/age-analysis"]}><App /></MemoryRouter>);
+    expect(await screen.findByText("Sébastien LECORNU")).toBeInTheDocument();
+    expect(screen.getByText("Income by year")).toBeInTheDocument();
+    expect(screen.getByText("Occupations by year")).toBeInTheDocument();
+    expect(screen.getByText("Asset acquisitions over time")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Sébastien Lecornu")).toBeInTheDocument();
   });
 
   it("renders the redacted HATVP quality issue register", () => {

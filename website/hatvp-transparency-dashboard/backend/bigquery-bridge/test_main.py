@@ -7,8 +7,8 @@ import service
 AUTH = {"Authorization": "Bearer secret"}
 
 
-def request(path="/v1/dashboard/overview", method="GET", headers=None):
-    return SimpleNamespace(path=path, method=method, headers=headers or {})
+def request(path="/v1/dashboard/overview", method="GET", headers=None, args=None):
+    return SimpleNamespace(path=path, method=method, headers=headers or {}, args=args or {})
 
 
 class Client:
@@ -17,7 +17,7 @@ class Client:
         self.queries = []
         self.location = None
 
-    def query(self, query, location=None):
+    def query(self, query, location=None, job_config=None):
         self.queries.append(query)
         self.location = location
         return SimpleNamespace(result=lambda: self.rows)
@@ -98,3 +98,36 @@ def test_bridge_reports_empty_result_without_leaking_query_details(monkeypatch):
 
     assert result[1] == 404
     assert body(result)["error"]["code"] == "NO_DATA"
+
+
+def test_bridge_rejects_an_empty_age_analysis_query(monkeypatch):
+    monkeypatch.setenv("BRIDGE_TOKEN", "secret")
+    result = main.dashboard(request(path="/v1/dashboard/age-analysis", headers=AUTH))
+
+    assert result[1] == 400
+    assert body(result)["error"]["code"] == "INVALID_QUERY"
+
+
+def test_bridge_returns_parameterized_age_analysis(monkeypatch):
+    row = {
+        "snapshot_date": "2026-08-18",
+        "generated_at": "2026-08-18T08:00:00+00:00",
+        "person_json": json.dumps({"prenom": "Sébastien", "nom": "LECORNU"}),
+        "matches_json": "[]",
+        "income_json": "[]",
+        "occupations_json": "[]",
+        "assets_json": "[]",
+    }
+    client = Client([row])
+    monkeypatch.setenv("BRIDGE_TOKEN", "secret")
+    monkeypatch.setenv("BQ_PROJECT_ID", "project")
+    monkeypatch.setenv("BQ_DATASET", "hatvp")
+    monkeypatch.setattr(service, "client", lambda: client)
+
+    result = main.dashboard(
+        request(path="/v1/dashboard/age-analysis", headers=AUTH, args={"q": "Lecornu"})
+    )
+
+    assert result[1] == 200
+    assert body(result)["person"]["lastName"] == "LECORNU"
+    assert "@search_term" in client.queries[0]

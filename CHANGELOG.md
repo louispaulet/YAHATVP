@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-08-19 — Add DOB quality and age/year analysis pages
+
+### Added
+
+- Added typed `date_naissance_date`, `date_naissance_year`, and explicit
+  `date_naissance_quality_status`/reason fields to the source-preserving
+  people rows carried into Silver and Gold. Raw DOB values remain unchanged;
+  implausible and conflicting values stay visible for review.
+- Added `asset_acquisition_year_raw` and `asset_acquisition_year` fields from
+  observed asset source fields, preserving the complete raw asset record.
+- Added fixed public bridge/Worker routes for snapshot-level
+  `/simple-analysis` and parameterized `/age-analysis?q=...` views.
+- Added localized `/analysis` and `/age-analysis` frontend pages. The first
+  includes youngest/oldest DOB leaderboards and five-year average/median salary
+  bins; the second defaults to Sébastien Lecornu and shows annual income
+  sources, occupations, and acquisition-year assets with declarant search.
+
+### Verified
+
+- 44 focused pipeline tests, 37 bridge tests, 22 frontend tests plus a Vite
+  production build, and 9 Worker tests plus TypeScript typecheck pass.
+- Chrome MCP verified `/analysis` and `/age-analysis` locally: the leaderboards,
+  five-year salary chart, Lecornu profile, annual income, occupations, asset
+  timeline, and accent-insensitive search rendered without console warnings or
+  horizontal overflow.
+- Opened draft PR [#31](https://github.com/louispaulet/YAHATVP/pull/31) from
+  `agent/age-analysis-dob-quality` for review.
+- Production replay and dashboard deployment remain intentionally deferred to
+  the post-merge release sequence because the new Gold columns must exist before
+  the analysis queries are deployed.
+
 ## 2026-08-19 — Complete forced production replay with activity remuneration
 
 ### Deployed

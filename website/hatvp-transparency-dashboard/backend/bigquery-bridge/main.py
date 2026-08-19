@@ -17,7 +17,13 @@ except ImportError:  # pragma: no cover - fixture-only repository tests use the 
     functions_framework = _FunctionsFramework()
 
 from bridge_runtime import authorized, error_payload, response
-from service import run_dashboard, run_declaration, run_search
+from service import (
+    run_age_analysis,
+    run_dashboard,
+    run_declaration,
+    run_search,
+    run_simple_analysis,
+)
 
 SLICE_ROUTES = {
     "/v1/dashboard/overview": "overview",
@@ -25,6 +31,8 @@ SLICE_ROUTES = {
     "/v1/dashboard/assets": "assets",
     "/v1/dashboard/declarations": "declarations",
     "/v1/dashboard/search": "search",
+    "/v1/dashboard/simple-analysis": "simple-analysis",
+    "/v1/dashboard/age-analysis": "age-analysis",
 }
 DECLARATION_ROUTE_PREFIX = "/v1/dashboard/declarations/"
 
@@ -81,6 +89,15 @@ def dashboard_route(request: Any) -> tuple[str, int, dict[str, str]]:
         if len(search_term) > 120:
             return response(error_payload("INVALID_QUERY", "Search term is too long"), 400)
         return run_search(search_term)
+    if dashboard_view(request) == "age-analysis":
+        search_term = str(getattr(request, "args", {}).get("q", "")).strip()
+        if not search_term:
+            return response(error_payload("INVALID_QUERY", "Enter a declarant name"), 400)
+        if len(search_term) > 120:
+            return response(error_payload("INVALID_QUERY", "Search term is too long"), 400)
+        return run_age_analysis(search_term)
+    if dashboard_view(request) == "simple-analysis":
+        return run_simple_analysis()
     if dashboard_view(request) == "declaration":
         identifier = declaration_uuid(request)
         if not identifier or "/" in identifier or len(identifier) > 120:

@@ -73,6 +73,9 @@ def test_people_rows_keep_public_identity_fields_even_when_optional() -> None:
     assert row["prenom"] == "Alice"
     assert row["nom"] == "DUPONT"
     assert "email" in row
+    assert row["date_naissance"] == "1980-03-02"
+    assert row["date_naissance_year"] == 1980
+    assert str(row["date_naissance_date"]) == "1980-03-02"
 
 
 def test_bronze_keeps_amended_occurrences_and_source_evidence() -> None:
@@ -90,4 +93,4 @@ def test_parser_metadata_links_rows_to_immutable_raw_source() -> None:
     row = xml_tables()["declarations"][0]
     assert row["source_format"] == "xml"
     assert row["source_object"].endswith("declarations.xml")
-    assert row["parser_version"] == "1"
+    assert row["parser_version"] == "2"
