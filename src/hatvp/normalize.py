@@ -76,3 +76,15 @@ def parse_date(value: str | None) -> str | None:
         except ValueError:
             continue
     return None
+
+
+def parse_year(value: str | None) -> int | None:
+    """Extract a four-digit year from a date, month, or year source value."""
+
+    raw = raw_text(value)
+    if raw is None:
+        return None
+    parsed = parse_date(raw)
+    if parsed:
+        return int(parsed[:4])
+    return int(raw) if re.fullmatch(r"\d{4}", raw) else None

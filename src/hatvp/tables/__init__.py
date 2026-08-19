@@ -28,7 +28,7 @@ def write_parquet(
             )
     for column, dtype in schema.items():
         expression = pl.col(column)
-        if column == "snapshot_date" and frame.schema[column] == pl.String:
+        if dtype == pl.Date and frame.schema[column] == pl.String:
             expression = expression.str.to_date(format="%Y-%m-%d", strict=True)
         frame = frame.with_columns(expression.cast(dtype, strict=True).alias(column))
     frame.write_parquet(path, compression="zstd")

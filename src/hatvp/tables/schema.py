@@ -48,9 +48,12 @@ PARQUET_SCHEMAS = {
             **_typed(
                 "declaration_uuid source_file civilite nom prenom email date_naissance_raw "
                 "date_naissance telephone_dec adresse_voie adresse_complement "
+                "date_naissance_quality_status date_naissance_quality_reason "
                 "adresse_code_postal adresse_ville adresse_pays quality_status quality_reason",
                 pl.String,
             ),
+            "date_naissance_date": pl.Date,
+            "date_naissance_year": pl.Int64,
             "snapshot_date": pl.Date,
         }
     ),
@@ -74,10 +77,11 @@ PARQUET_SCHEMAS = {
         {
             **_typed(
                 "declaration_uuid source_section asset_name raw_value quality_status "
-                "quality_reason raw_record_json",
+                "quality_reason asset_acquisition_year_raw raw_record_json",
                 pl.String,
             ),
             "source_item_index": pl.Int64,
+            "asset_acquisition_year": pl.Int64,
             "normalized_value": pl.Float64,
             "snapshot_date": pl.Date,
         }

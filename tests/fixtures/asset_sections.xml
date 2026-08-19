@@ -10,7 +10,7 @@
       </declarant>
     </general>
     <immeubleDto>
-      <items><items><nature>Maison</nature><valeurVenale>250 000,00</valeurVenale></items></items>
+      <items><items><nature>Maison</nature><dateAcquisition>2007</dateAcquisition><valeurVenale>250 000,00</valeurVenale></items></items>
     </immeubleDto>
     <sciDto>
       <items><items><denomination>SCI Exemple</denomination><valeur>45 000,00</valeur></items></items>
