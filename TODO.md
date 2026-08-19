@@ -55,6 +55,11 @@ documented and complete.
   Silver, Gold, and the schema-evolution contract; verify Lecornu's 2002 value
   is a 21 January life-insurance subscription at age 15, not a 2002 filing.
 - [x] Improve declaration search with clearer focus and result states, quick-start examples, and a reset action.
+- [x] Replace the explorer placeholder with a bilingual, source-linked
+  Highlights page for completed-year income changes, standout assets, and
+  amendment history.
+- [x] Pin frontend and Worker JavaScript dependencies to explicit compatible
+  ranges instead of unconstrained `latest` specifications.
 - [ ] Deploy and force-replay the repaired timeline release; record the main
   workflow, ingestion execution, 13-table load, state advancement, bridge
   revision, Worker version, frontend publish, and final Chrome audit.
@@ -378,6 +383,11 @@ audit history.
 - [x] Cover the real Lecornu-shaped payload in bridge, Worker, and frontend
   tests: seven income years, no occupation counts, no visible DTO jargon, exact
   age 15 for the 2002 subscription, and no cross-version asset duplication.
+- [x] Add a fixed `/v1/dashboard/highlights` bridge query and public Worker
+  route for the largest completed-year income changes, highest absolute asset
+  values, and most-amended identities without exposing contact data.
+- [x] Turn `/explore` into an editorial Highlights page with localized context,
+  review-state labels, and direct links to each immutable declaration source.
 
 Static quality-register evidence (2026-08-19): the frontend fixture suite passes
 with 19 tests, the production build succeeds, the local page renders ten rows
@@ -405,6 +415,17 @@ Custom-domain deployment evidence (2026-08-18): Cloud Run bridge revision
 for `yahatvp.thefrenchartist.dev` with an approved certificate and enforced
 HTTPS; the page returned HTTP 200, references the deployed `favicon.svg`, and
 the Worker overview slice returned HTTP 200 with the custom-domain CORS header.
+
+Highlights deployment evidence (2026-08-20): Cloud Run bridge revision
+`hatvp-dashboard-api-00015-vdp`, Worker version
+`750fdfb2-e9b6-497f-b4b9-a19483ceab98`, and GitHub Pages commit
+`5fd9e899520d7512db2081868e10752fc21e493e` are serving. The public Highlights
+route returned snapshot `2026-08-19` with 8 income changes, 8 asset records, and
+8 amended identities. Health, aggregate, analysis, search/detail, and
+Highlights smoke routes all returned HTTP 200. Production browser verification
+confirmed the new bundle, all 24 cards, source-detail navigation, bilingual
+copy, zero desktop overflow, and no console errors. No ingestion replay was
+performed for this dashboard-only release.
 
 ## 11. BigQuery tutorial
 

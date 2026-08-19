@@ -6,6 +6,7 @@ import type {
   DashboardOverviewResponse,
   DashboardSearchResponse,
   DashboardGenderResponse,
+  DashboardHighlightsResponse,
   WorkerEnv,
 } from "./types";
 
@@ -17,6 +18,7 @@ const DASHBOARD_SLICE_ROUTES = {
   "/api/dashboard/assets": "/v1/dashboard/assets",
   "/api/dashboard/declarations": "/v1/dashboard/declarations",
   "/api/dashboard/gender": "/v1/dashboard/gender",
+  "/api/dashboard/highlights": "/v1/dashboard/highlights",
   "/api/dashboard/search": "/v1/dashboard/search",
   "/api/dashboard/simple-analysis": "/v1/dashboard/simple-analysis",
   "/api/dashboard/age-analysis": "/v1/dashboard/age-analysis",
@@ -87,6 +89,19 @@ function isDashboardSearchResponse(value: unknown): value is DashboardSearchResp
   if (!isRecord(value) || typeof value.generatedAt !== "string") return false;
   if (!(value.snapshotDate === null || typeof value.snapshotDate === "string")) return false;
   return Array.isArray(value.results) && typeof value.resultCount === "number";
+}
+
+function isDashboardHighlightsResponse(value: unknown): value is DashboardHighlightsResponse {
+  if (!isRecord(value) || typeof value.generatedAt !== "string") return false;
+  if (!(value.snapshotDate === null || typeof value.snapshotDate === "string")) return false;
+  return Array.isArray(value.incomeChanges) && Array.isArray(value.unusualAssets)
+    && Array.isArray(value.amendedRecords)
+    && value.incomeChanges.every((item) => isRecord(item)
+      && typeof item.absoluteChange === "number" && typeof item.reviewRequired === "boolean")
+    && value.unusualAssets.every((item) => isRecord(item)
+      && typeof item.amount === "number" && typeof item.reviewRequired === "boolean")
+    && value.amendedRecords.every((item) => isRecord(item)
+      && typeof item.filingCount === "number" && typeof item.amendedCount === "number");
 }
 
 function isDashboardDeclarationResponse(value: unknown): value is DashboardDeclarationResponse {
@@ -185,6 +200,8 @@ export async function handleRequest(
       ? isDashboardOverviewResponse
       : slicePath.endsWith("/gender")
         ? isDashboardGenderResponse
+      : slicePath.endsWith("/highlights")
+        ? isDashboardHighlightsResponse
       : slicePath.endsWith("/search")
         ? isDashboardSearchResponse
         : slicePath.endsWith("/simple-analysis")

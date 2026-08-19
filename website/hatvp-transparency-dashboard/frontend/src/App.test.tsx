@@ -3,7 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { declarationXmlFixtures } from "./declaration-fixtures";
-import { ageAnalysis, assets, dashboard, declarations, gender, income, simpleAnalysis } from "./test-fixtures";
+import { ageAnalysis, assets, dashboard, declarations, gender, highlights, income, simpleAnalysis } from "./test-fixtures";
 
 const search = {
   snapshotDate: "2026-08-18",
@@ -39,7 +39,7 @@ describe("dashboard application", () => {
     window.localStorage.clear();
     vi.stubGlobal("fetch", vi.fn().mockImplementation((url: string) => {
       const path = new URL(url).pathname;
-      const payload = path.endsWith("/overview") ? dashboard : path.endsWith("/income") ? income : path.endsWith("/assets") ? assets : path.endsWith("/gender") ? gender : path.endsWith("/search") ? search : path.endsWith("/simple-analysis") ? simpleAnalysis : path.endsWith("/age-analysis") ? ageAnalysis : path.includes("/declarations/") ? declaration : declarations;
+      const payload = path.endsWith("/overview") ? dashboard : path.endsWith("/income") ? income : path.endsWith("/assets") ? assets : path.endsWith("/gender") ? gender : path.endsWith("/highlights") ? highlights : path.endsWith("/search") ? search : path.endsWith("/simple-analysis") ? simpleAnalysis : path.endsWith("/age-analysis") ? ageAnalysis : path.includes("/declarations/") ? declaration : declarations;
       return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
     }));
   });
@@ -49,6 +49,7 @@ describe("dashboard application", () => {
     expect(await screen.findByText("Declarations")).toBeInTheDocument();
     expect(screen.getByText("unique declarants")).toBeInTheDocument();
     expect(screen.getByText("Average annual income vs assets")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "See standout records" })).toHaveAttribute("href", "/explore");
     expect(await screen.findByText("Average annual income")).toBeInTheDocument();
     expect(screen.getByText("Assets", { selector: "p" })).toBeInTheDocument();
     expect(screen.getByText("€75K")).toBeInTheDocument();
@@ -90,12 +91,16 @@ describe("dashboard application", () => {
     expect(screen.getByRole("link", { name: /Explore YAHATVP on GitHub/ })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
   });
 
-  it("keeps the not-yet-ready explorer out of the primary navigation", () => {
+  it("turns the explorer placeholder into source-linked highlights", async () => {
     render(<MemoryRouter initialEntries={["/explore"]}><App /></MemoryRouter>);
     expect(screen.getByRole("navigation", { name: "Primary navigation" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Search declarations" })).toHaveAttribute("href", "/search");
-    expect(screen.queryByRole("link", { name: "Data explorer" })).not.toBeInTheDocument();
-    expect(screen.getByText("More ways to explore are on the way.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Highlights" })).toHaveAttribute("aria-current", "page");
+    expect(await screen.findByText("Largest declared income changes")).toBeInTheDocument();
+    expect(screen.getByText("Assets that stand out")).toBeInTheDocument();
+    expect(screen.getByText("Most amended public records")).toBeInTheDocument();
+    expect(screen.getByText("+€70K")).toBeInTheDocument();
+    expect(screen.getAllByText("Review flag")).toHaveLength(2);
+    expect(screen.getByRole("link", { name: "Open latest declaration" })).toHaveAttribute("href", "/declarations/fixture-uuid-1");
   });
 
   it("renders the simple DOB and salary analysis page", async () => {
@@ -191,7 +196,7 @@ describe("dashboard application", () => {
     expect(screen.getByText("Revenu annuel moyen vs patrimoine")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Revenu annuel moyen et patrimoine total/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Voir le projet sur GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
-    expect(screen.queryByRole("link", { name: "Explorer les données" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "À la une" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("link", { name: "À propos des données" }));
     expect(screen.getByText("Sources officielles")).toBeInTheDocument();
     const frenchDownloadBadges = screen.getAllByText("Téléchargement direct");

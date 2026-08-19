@@ -90,6 +90,13 @@ export interface SimpleAnalysisResponse {
 }
 
 export type { AgeAnalysisDeclaration, AgeAnalysisPerson, AgeAnalysisResponse } from "./age-analysis-types";
+export type {
+  AmendedRecordHighlight,
+  AssetHighlight,
+  DashboardHighlightsResponse,
+  HighlightIdentity,
+  IncomeChangeHighlight,
+} from "./highlight-types";
 
 export interface WorkerEnv {
   BRIDGE_URL: string;

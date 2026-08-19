@@ -1,5 +1,42 @@
 # Changelog
 
+## 2026-08-20 — Publish source-linked declaration highlights
+
+### Changed
+
+- Added a fixed read-only Highlights API slice for the largest consecutive
+  completed-year income changes, highest absolute asset values, and identities
+  with the most retained declaration versions. Identity and asset
+  deduplication use source-backed birth dates or UUID fallbacks rather than
+  name-only grouping; contact and address fields remain excluded.
+- Replaced the `/explore` placeholder with a bilingual editorial page that
+  explains each finding, carries review flags forward, and links every card to
+  the original declaration viewer. Added Highlights entry points to the main
+  navigation and homepage.
+- Replaced unconstrained frontend and Worker `latest` dependency declarations
+  with compatible ranges derived from the existing lockfiles.
+
+### Deployed
+
+- Deployed Cloud Run bridge revision `hatvp-dashboard-api-00015-vdp`,
+  Cloudflare Worker version `750fdfb2-e9b6-497f-b4b9-a19483ceab98`, and
+  GitHub Pages commit `5fd9e899520d7512db2081868e10752fc21e493e`.
+- Confirmed `https://yahatvp.thefrenchartist.dev` serves the new
+  `index-TKAfHDXA.js` bundle over HTTPS. No ingestion replay was performed.
+
+### Verified
+
+- The live Highlights route returned snapshot `2026-08-19` with 8 income
+  changes, 8 asset records, and 8 amended identities; the deployed health,
+  aggregate, analysis, search/detail, and Highlights routes returned HTTP 200.
+- Followed a production highlight into its real source declaration and verified
+  the rendered evidence. Desktop and mobile fixture checks covered English and
+  French layouts with no horizontal overflow or console errors; production
+  desktop rendered all 24 cards without overflow or console errors.
+- Bridge, Worker, and frontend suites passed with 43, 12, and 26 tests. The full
+  Python suite passed 158 tests; Ruff checks, package build, TypeScript checks,
+  Vite build, npm audits, and the live BigQuery Highlights query also passed.
+
 ## 2026-08-19 — Merge dashboard PRs and redeploy the frontend only
 
 ### Released

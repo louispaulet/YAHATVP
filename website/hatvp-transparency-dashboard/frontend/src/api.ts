@@ -3,6 +3,7 @@ import type {
   DashboardBreakdownResponse,
   DashboardDeclarationResponse,
   DashboardGenderResponse,
+  DashboardHighlightsResponse,
   DashboardOverviewResponse,
   DashboardSearchResponse,
   SimpleAnalysisResponse,
@@ -43,6 +44,18 @@ function isGenderResponse(value: unknown): value is DashboardGenderResponse {
 
 function isSearchResponse(value: unknown): value is DashboardSearchResponse {
   return isMeta(value) && Array.isArray(value.results) && typeof value.resultCount === "number";
+}
+
+function isHighlightsResponse(value: unknown): value is DashboardHighlightsResponse {
+  if (!isMeta(value)) return false;
+  return Array.isArray(value.incomeChanges) && Array.isArray(value.unusualAssets)
+    && Array.isArray(value.amendedRecords)
+    && value.incomeChanges.every((item) => isRecord(item)
+      && typeof item.absoluteChange === "number" && typeof item.reviewRequired === "boolean")
+    && value.unusualAssets.every((item) => isRecord(item)
+      && typeof item.amount === "number" && typeof item.reviewRequired === "boolean")
+    && value.amendedRecords.every((item) => isRecord(item)
+      && typeof item.filingCount === "number" && typeof item.amendedCount === "number");
 }
 
 function isDeclarationResponse(value: unknown): value is DashboardDeclarationResponse {
@@ -99,6 +112,10 @@ export function fetchDeclarations(signal?: AbortSignal): Promise<DashboardBreakd
 
 export function fetchGender(signal?: AbortSignal): Promise<DashboardGenderResponse> {
   return fetchJson("/api/dashboard/gender", isGenderResponse, signal);
+}
+
+export function fetchHighlights(signal?: AbortSignal): Promise<DashboardHighlightsResponse> {
+  return fetchJson("/api/dashboard/highlights", isHighlightsResponse, signal);
 }
 
 export function fetchSearch(query: string, signal?: AbortSignal): Promise<DashboardSearchResponse> {

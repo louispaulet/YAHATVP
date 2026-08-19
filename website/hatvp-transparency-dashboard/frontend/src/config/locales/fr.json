@@ -13,7 +13,7 @@
     "label": "Navigation principale",
     "overview": "Vue d’ensemble",
     "search": "Rechercher une déclaration",
-    "explore": "Explorer les données",
+    "explore": "À la une",
     "analysis": "Analyse simple",
     "ageAnalysis": "Âge / année",
     "about": "À propos des données",
@@ -32,7 +32,9 @@
     "description": "Explorez le dernier instantané HATVP sélectionné à travers quelques agrégats transparents et reliés à leurs sources.",
     "snapshot": "Instantané",
     "notAvailable": "indisponible",
-    "totalRows": "lignes au total"
+    "totalRows": "lignes au total",
+    "primaryAction": "Voir les faits marquants",
+    "secondaryAction": "Rechercher dans la source"
   },
   "metrics": {
     "declarations": { "label": "Déclarations", "detail": "dernier instantané" },
@@ -138,11 +140,29 @@
     "updateRhythmDetail": "selon le pipeline d’ingestion"
   },
   "explore": {
-    "eyebrow": "Explorer les données",
-    "title": "De nouvelles façons d’explorer arrivent bientôt.",
-    "description": "Cet espace accueillera des vues plus détaillées des données HATVP Gold, pour suivre une déclaration de sa source jusqu’à son agrégat.",
-    "status": "Page temporaire",
-    "next": "De nouveaux outils d’exploration seront ajoutés lors d’une prochaine mise à jour."
+    "eyebrow": "Ce qui ressort",
+    "title": "Les déclarations à regarder de plus près.",
+    "description": "Des pistes générées automatiquement à partir du dernier instantané public. Chaque résultat renvoie à la déclaration et chaque signalement reste visible. Ce sont des points de départ pour vérifier, pas des verdicts.",
+    "snapshot": "Instantané",
+    "method": "Critères fixes et reproductibles",
+    "incomeEyebrow": "Évolution annuelle",
+    "incomeTitle": "Plus fortes variations de revenus déclarés",
+    "incomeDescription": "Les plus grands écarts absolus entre deux années complètes consécutives dans une même déclaration. Les valeurs annuelles sont additionnées telles que publiées ; l’année en cours, incomplète, est exclue.",
+    "assetsEyebrow": "Plus grandes valeurs observées",
+    "assetsTitle": "Les éléments de patrimoine qui ressortent",
+    "assetsDescription": "Les valeurs patrimoniales normalisées les plus élevées en valeur absolue dans le dernier instantané Gold. Un badge signale une valeur source conservée mais exclue des agrégats éligibles.",
+    "amendedEyebrow": "Historique de publication",
+    "amendedTitle": "Les dossiers les plus souvent modifiés",
+    "amendedDescription": "Les déclarants comptant le plus de dépôts modificatifs dans l’historique Silver conservé. Un nombre élevé apporte du contexte ; il ne signifie pas qu’une déclaration était erronée.",
+    "review": "À vérifier",
+    "change": "Écart absolu",
+    "filings": "Dépôts",
+    "amendments": "Modificatifs",
+    "openDeclaration": "Ouvrir la déclaration et la source",
+    "openLatest": "Ouvrir la dernière déclaration",
+    "unknownName": "Nom non publié",
+    "unknownMandate": "Mandat non publié",
+    "unknownAsset": "Bien sans libellé"
   },
   "simpleAnalysis": {
     "eyebrow": "Analyse simple",

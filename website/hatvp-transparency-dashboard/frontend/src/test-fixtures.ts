@@ -24,6 +24,19 @@ export const declarations = {
   items: [{ label: "Déclaration d'intérêts", rows: 2 }],
 };
 
+export const highlights = {
+  snapshotDate: "2026-08-18", generatedAt: "2026-08-18T08:00:00Z",
+  incomeChanges: [{ declarationUuid: "fixture-uuid-1", firstName: "Alice", lastName: "DUPONT",
+    mandate: "Élu local", fromYear: 2023, toYear: 2024, fromAmount: 50_000,
+    toAmount: 120_000, absoluteChange: 70_000, ratio: 2.4, reviewRequired: true }],
+  unusualAssets: [{ declarationUuid: "fixture-uuid-1", firstName: "Alice", lastName: "DUPONT",
+    mandate: "Élu local", section: "immeubleDto", assetName: "Maison individuelle",
+    rawValue: "2 400 000", amount: 2_400_000, anomalyStatus: "active", reviewRequired: true }],
+  amendedRecords: [{ declarationUuid: "fixture-uuid-1", firstName: "Alice", lastName: "DUPONT",
+    mandate: "Élu local", filingCount: 5, amendedCount: 3,
+    firstFiled: "2022-01-01", latestFiled: "2026-01-01" }],
+};
+
 export const simpleAnalysis = {
   snapshotDate: "2026-08-18", generatedAt: "2026-08-18T08:00:00Z", referenceDate: "2026-08-18",
   youngest: [{ declarationUuid: "young", firstName: "Young", lastName: "Person", dateOfBirth: "2010-01-01", ageYears: 16, qualityStatus: "implausible", mandate: "Example", organ: "Example" }],

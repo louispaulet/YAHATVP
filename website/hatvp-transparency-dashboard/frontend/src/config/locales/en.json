@@ -13,7 +13,7 @@
     "label": "Primary navigation",
     "overview": "Overview",
     "search": "Search declarations",
-    "explore": "Data explorer",
+    "explore": "Highlights",
     "analysis": "Simple analysis",
     "ageAnalysis": "Age / year",
     "about": "About the data",
@@ -32,7 +32,9 @@
     "description": "Explore the latest Gold HATVP snapshot through a small set of transparent, source-linked aggregates.",
     "snapshot": "Snapshot",
     "notAvailable": "not available",
-    "totalRows": "total rows"
+    "totalRows": "total rows",
+    "primaryAction": "See standout records",
+    "secondaryAction": "Search the source"
   },
   "metrics": {
     "declarations": { "label": "Declarations", "detail": "latest snapshot" },
@@ -138,11 +140,29 @@
     "updateRhythmDetail": "following the ingestion pipeline"
   },
   "explore": {
-    "eyebrow": "Data explorer",
-    "title": "More ways to explore are on the way.",
-    "description": "This space is reserved for deeper views of the Gold HATVP data, with more ways to follow a declaration from its source to its aggregate.",
-    "status": "Placeholder page",
-    "next": "New exploration tools will appear here in a future update."
+    "eyebrow": "What stands out",
+    "title": "The declarations worth a closer look.",
+    "description": "Automatically generated leads from the latest public snapshot. Every record links back to the declaration, and every review flag stays visible. These are starting points for scrutiny, not verdicts.",
+    "snapshot": "Snapshot",
+    "method": "Fixed, reproducible criteria",
+    "incomeEyebrow": "Year-over-year movement",
+    "incomeTitle": "Largest declared income changes",
+    "incomeDescription": "The biggest absolute changes between consecutive completed years within one declaration. Annual values are summed exactly as reported; the current incomplete year is excluded.",
+    "assetsEyebrow": "Largest observed values",
+    "assetsTitle": "Assets that stand out",
+    "assetsDescription": "The highest absolute normalized asset values in the latest Gold snapshot. A review badge means the source value is preserved but excluded from eligible aggregate metrics.",
+    "amendedEyebrow": "Publication history",
+    "amendedTitle": "Most amended public records",
+    "amendedDescription": "Declarants with the largest number of amended filings in retained Silver history. A high count is context for investigation; it does not imply that a declaration was incorrect.",
+    "review": "Review flag",
+    "change": "Absolute change",
+    "filings": "Filings",
+    "amendments": "Amended",
+    "openDeclaration": "Open declaration and source",
+    "openLatest": "Open latest declaration",
+    "unknownName": "Name not published",
+    "unknownMandate": "Mandate not published",
+    "unknownAsset": "Unnamed asset"
   },
   "simpleAnalysis": {
     "eyebrow": "Simple analysis",

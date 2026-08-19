@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { handleRequest } from "./index";
-import type { AgeAnalysisResponse, DashboardGenderResponse, DashboardOverviewResponse, SimpleAnalysisResponse, WorkerEnv } from "./types";
+import type { AgeAnalysisResponse, DashboardGenderResponse, DashboardHighlightsResponse, DashboardOverviewResponse, SimpleAnalysisResponse, WorkerEnv } from "./types";
 
 const env: WorkerEnv = {
   BRIDGE_URL: "https://bridge.example.test",
@@ -20,6 +20,16 @@ const gender: DashboardGenderResponse = {
   gender: [{ label: "male", rows: 1 }, { label: "female", rows: 1 }],
   unknownRows: 0,
   positions: [{ label: "Maire", male: 1, female: 1, unknown: 0 }],
+};
+
+const highlights: DashboardHighlightsResponse = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  incomeChanges: [{ declarationUuid: "income-1", firstName: "Alice", lastName: "DUPONT",
+    mandate: "Mayor", fromYear: 2023, toYear: 2024, fromAmount: 50_000,
+    toAmount: 120_000, absoluteChange: 70_000, ratio: 2.4, reviewRequired: true }],
+  unusualAssets: [],
+  amendedRecords: [],
 };
 
 const search = {
@@ -134,6 +144,19 @@ describe("dashboard Worker", () => {
     expect(await response.json()).toEqual(gender);
     expect(fetcher).toHaveBeenCalledWith(
       "https://bridge.example.test/v1/dashboard/gender",
+      expect.anything(),
+    );
+  });
+
+  it("forwards and validates source-linked highlights", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify(highlights), { status: 200 }),
+    );
+    const response = await handleRequest(request("/api/dashboard/highlights"), env, fetcher);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(highlights);
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://bridge.example.test/v1/dashboard/highlights",
       expect.anything(),
     );
   });

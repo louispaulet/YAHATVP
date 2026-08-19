@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fetchAgeAnalysis, fetchAssets, fetchGender, fetchIncome, fetchOverview, fetchSimpleAnalysis } from "./api";
+import { fetchAgeAnalysis, fetchAssets, fetchGender, fetchHighlights, fetchIncome, fetchOverview, fetchSimpleAnalysis } from "./api";
 
 describe("dashboard API client", () => {
   beforeEach(() => vi.restoreAllMocks());
@@ -36,6 +36,21 @@ describe("dashboard API client", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify(response), { status: 200 })));
 
     await expect(fetchGender()).resolves.toEqual(response);
+  });
+
+  it("loads the source-linked highlights slice", async () => {
+    const response = { snapshotDate: "2026-08-18", generatedAt: "now",
+      incomeChanges: [], unusualAssets: [], amendedRecords: [] };
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(response), { status: 200 }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(fetchHighlights()).resolves.toEqual(response);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8787/api/dashboard/highlights",
+      expect.any(Object),
+    );
   });
 
   it("loads both analysis slices with the expected query", async () => {

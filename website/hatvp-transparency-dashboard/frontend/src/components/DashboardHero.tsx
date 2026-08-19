@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { formatNumber } from "../formatters";
 import { useI18n } from "../context/I18nContext";
 import type { DashboardOverviewResponse } from "../types";
@@ -14,6 +15,10 @@ export function DashboardHero({ overview, loading }: { overview: DashboardOvervi
           <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-lime"><span className="size-2 rounded-full bg-lime" /> {locale.hero.eyebrow}</div>
           <h1 className="mt-7 max-w-xl text-4xl font-black leading-[1.02] tracking-[-0.05em] sm:text-6xl">{locale.hero.title}</h1>
           <p className="mt-5 max-w-xl text-base leading-7 text-slate-300">{locale.hero.description}</p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link className="rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-ink transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lime" to="/explore">{locale.hero.primaryAction}</Link>
+            <Link className="rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lime" to="/search">{locale.hero.secondaryAction}</Link>
+          </div>
         </div>
         <div className="flex flex-wrap gap-3 text-sm lg:max-w-sm lg:justify-end">
         <span className="rounded-full bg-white/10 px-4 py-2 font-semibold text-slate-200">{locale.hero.snapshot} {loading ? <span className="loading-shell-dark inline-block h-4 w-24 rounded-full align-middle" /> : overview?.snapshotDate ?? locale.hero.notAvailable}</span>
