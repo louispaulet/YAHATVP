@@ -51,7 +51,8 @@ function isDeclarationResponse(value: unknown): value is DashboardDeclarationRes
 
 function isSimpleAnalysisResponse(value: unknown): value is SimpleAnalysisResponse {
   return isMeta(value) && Array.isArray(value.youngest) && Array.isArray(value.oldest)
-    && Array.isArray(value.ageBins);
+    && Array.isArray(value.ageBins) && Array.isArray(value.ageBinsIncludingZero)
+    && Array.isArray(value.zeroSalaryBins);
 }
 
 function isAgeAnalysisResponse(value: unknown): value is AgeAnalysisResponse {

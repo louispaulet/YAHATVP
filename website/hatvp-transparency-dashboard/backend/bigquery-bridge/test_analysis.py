@@ -9,15 +9,19 @@ def row(**values):
     return SimpleNamespace(**values)
 
 
-def test_simple_analysis_query_uses_typed_dob_and_keeps_anomalous_ages():
+def test_simple_analysis_query_filters_salary_ages_and_exposes_zero_counts():
     query = build_simple_analysis_query("project", "dataset")
 
     assert "date_naissance_date" in query
     assert "date_naissance_quality_status" in query
     assert "ORDER BY age_years" in query
     assert "PERCENTILE_CONT" in query
-    assert "FROM age_rows GROUP BY age_bin_start" in query
-    assert "FROM age_stats s JOIN age_medians m USING (age_bin_start)" in query
+    assert "WHERE age_years BETWEEN 18 AND 100" in query
+    assert "WHERE normalized_value != 0" in query
+    assert "FROM salary_age_rows GROUP BY age_bin_start" in query
+    assert "age_bins_including_zero_json" in query
+    assert "zero_salary_bins_json" in query
+    assert "COUNTIF(a.normalized_value = 0)" in query
     assert "metric_eligible" in query
     assert "raw_record_json" not in query
 
@@ -75,12 +79,28 @@ def test_simple_analysis_payload_maps_leaders_and_bins():
                     }
                 ]
             ),
+            age_bins_including_zero_json=json.dumps(
+                [
+                    {
+                        "label": "40–44",
+                        "age_bin_start": 40,
+                        "row_count": 3,
+                        "average_value": 13.333,
+                        "median_value": 15,
+                    }
+                ]
+            ),
+            zero_salary_bins_json=json.dumps(
+                [{"label": "40–44", "age_bin_start": 40, "row_count": 1}]
+            ),
         )
     )
 
     assert result["youngest"][0]["ageYears"] == 16
     assert result["youngest"][0]["qualityStatus"] == "implausible"
     assert result["ageBins"][0]["medianSalary"] == 15.0
+    assert result["ageBinsIncludingZero"][0]["rows"] == 3
+    assert result["zeroSalaryBins"][0]["rows"] == 1
 
 
 def test_age_analysis_payload_maps_sources_occupations_and_assets():

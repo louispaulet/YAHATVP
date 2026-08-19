@@ -41,6 +41,10 @@ def simple_analysis_payload(row: Any) -> dict[str, Any]:
         "youngest": [_leader(item) for item in leaders.get("youngest", [])],
         "oldest": [_leader(item) for item in leaders.get("oldest", [])],
         "ageBins": [_age_bin(item) for item in _json_array(row, "age_bins_json")],
+        "ageBinsIncludingZero": [
+            _age_bin(item) for item in _json_array(row, "age_bins_including_zero_json")
+        ],
+        "zeroSalaryBins": [_count_bin(item) for item in _json_array(row, "zero_salary_bins_json")],
     }
 
 
@@ -64,6 +68,14 @@ def _age_bin(item: dict[str, Any]) -> dict[str, Any]:
         "rows": int(item.get("row_count", 0) or 0),
         "averageSalary": float(item.get("average_value", 0) or 0),
         "medianSalary": float(item.get("median_value", 0) or 0),
+    }
+
+
+def _count_bin(item: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "label": item.get("label"),
+        "ageBinStart": int(item.get("age_bin_start", 0) or 0),
+        "rows": int(item.get("row_count", 0) or 0),
     }
 
 

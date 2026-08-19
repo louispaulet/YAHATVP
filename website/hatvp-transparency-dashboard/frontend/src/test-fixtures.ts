@@ -29,6 +29,8 @@ export const simpleAnalysis = {
   youngest: [{ declarationUuid: "young", firstName: "Young", lastName: "Person", dateOfBirth: "2010-01-01", ageYears: 16, qualityStatus: "implausible", mandate: "Example", organ: "Example" }],
   oldest: [{ declarationUuid: "old", firstName: "Old", lastName: "Person", dateOfBirth: "1905-01-01", ageYears: 121, qualityStatus: "implausible", mandate: "Example", organ: "Example" }],
   ageBins: [{ label: "40–44", ageBinStart: 40, rows: 2, averageSalary: 20000, medianSalary: 15000 }],
+  ageBinsIncludingZero: [{ label: "40–44", ageBinStart: 40, rows: 3, averageSalary: 13333, medianSalary: 15000 }],
+  zeroSalaryBins: [{ label: "40–44", ageBinStart: 40, rows: 1 }],
 };
 
 export const ageAnalysis = {
