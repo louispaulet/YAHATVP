@@ -81,14 +81,16 @@ def test_registry_partition_retains_stable_keys_and_evidence(tmp_path: Path, mon
 
 def test_registry_writer_normalizes_historical_date_values(tmp_path: Path) -> None:
     path = tmp_path / "mixed-registry.parquet"
+    values = [("old", "2026-08-18"), ("new", date(2026, 8, 19))]
     rows = [
-        {"anomaly_key": "old", "snapshot_date": "2026-08-18"},
-        {"anomaly_key": "new", "snapshot_date": date(2026, 8, 19)},
+        {"anomaly_key": key, "snapshot_date": value, "source_snapshot_date": value}
+        for key, value in values
     ]
 
     write_parquet(rows, path, list(registry_schema()), registry_schema())
 
-    assert pl.read_parquet(path)["snapshot_date"].to_list() == [
-        date(2026, 8, 18),
-        date(2026, 8, 19),
-    ]
+    frame = pl.read_parquet(path)
+    assert frame.select(["snapshot_date", "source_snapshot_date"]).to_dict(as_series=False) == {
+        "snapshot_date": [date(2026, 8, 18), date(2026, 8, 19)],
+        "source_snapshot_date": ["2026-08-18", "2026-08-19"],
+    }

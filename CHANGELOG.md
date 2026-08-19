@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-19 — Normalize date-valued provenance fields in registry rows
+
+### Fixed
+
+- Extended Parquet frame normalization to convert every date/datetime value to
+  ISO text before schema casting, including `source_snapshot_date`, whose
+  registry contract is textual rather than typed `DATE`.
+
+### Verified
+
+- The regression now covers mixed string/date values in both registry date
+  fields; the full Python suite passes with 148 tests, Ruff passes, and the
+  package builds successfully.
+- Production replay `hatvp-ingestion-f2gst` reached quality completion with
+  106,351 income rows and zero quality errors, then failed before layer loading
+  on this remaining registry field; another forced replay is required.
+
 ## 2026-08-19 — Normalize mixed registry snapshot dates before Parquet writes
 
 ### Fixed

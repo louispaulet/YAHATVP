@@ -38,18 +38,16 @@ def _frame(
     rows: list[dict[str, Any]], columns: list[str], schema: dict[str, object]
 ) -> pl.DataFrame:
     if rows:
-        return pl.DataFrame(_coerce_date_values(rows, schema), infer_schema_length=None)
+        return pl.DataFrame(_coerce_temporal_values(rows), infer_schema_length=None)
     return pl.DataFrame(
         {column: pl.Series(column, [], dtype=schema.get(column, pl.Null)) for column in columns}
     )
 
 
-def _coerce_date_values(
-    rows: list[dict[str, Any]], schema: dict[str, object]
-) -> list[dict[str, Any]]:
+def _coerce_temporal_values(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {
-            key: _date_text(value) if schema.get(key) == pl.Date else value
+            key: _date_text(value) if isinstance(value, (date, datetime)) else value
             for key, value in row.items()
         }
         for row in rows
