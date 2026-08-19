@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-19 — Refine dashboard homepage presentation
+
+### Changed
+
+- Rebalanced the dashboard navigation, hero, metric cards, and content spacing
+  for a more legible editorial hierarchy while retaining every existing
+  dashboard metric and data source.
+- Made asset and gender-by-position charts size themselves to their data,
+  widened the detailed gender panel, and separated chart summaries with clear
+  visual rules to prevent crowded labels and overlapping categories.
+- Corrected the snapshot loading markup so the loading indicator is no longer
+  nested inside a paragraph element.
+
+### Verification
+
+- `npm run build` completed successfully in
+  `website/hatvp-transparency-dashboard/frontend`.
+- Visual review covered the refreshed homepage at desktop width; local API
+  data requests are unavailable without the separately running Worker.
+
 ## 2026-08-19 — Remove the not-yet-ready explorer from navigation
 
 ### Changed
@@ -7,6 +27,7 @@
 - Removed the `/explore` placeholder link from the dashboard navbar to free
   space for the currently available pages.
 - Kept the direct `/explore` route and its coverage intact for future work.
+
 
 ## 2026-08-19 — Repair declarant income and asset history
 
