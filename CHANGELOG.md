@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-19 — Prepare a current HATVP anomaly handoff shortlist
+
+### Added
+
+- Added [`reports/06-hatvp/2026-08-19-hatvp-anomaly-shortlist.md`](reports/06-hatvp/2026-08-19-hatvp-anomaly-shortlist.md), a BigQuery-backed review of the 2026-08-19 anomaly registry and ten source-linked declarations selected for human HATVP follow-up.
+- Added the paired SQL reproduction file, including the all-declarations name+surname latest-version ordering, issue-register exclusions, deduplicated registry-to-Gold joins, and the exact audited shortlist.
+- Indexed the new handoff report in [`reports/00-index.md`](reports/00-index.md).
+
+### Verified
+
+- BigQuery profile: 5,026 registry rows, 5,024 linked to Gold, 1,832 active, and 3,194 internally previously reported.
+- Exclusion-aware candidate query: 701 deduplicated anomaly IDs across 637 latest normalized name+surname pairs.
+- All ten selected declaration UUIDs verified as `name_version_rank = 1`; the live hash-routed public `/#/quality-issues` page showed 10 open and 0 solved issues, and its linked names and issue families were excluded.
+
 ## 2026-08-19 — Add DOB quality and age/year analysis pages
 
 ### Added
