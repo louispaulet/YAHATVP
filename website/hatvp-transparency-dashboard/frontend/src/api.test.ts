@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fetchAssets, fetchIncome, fetchOverview } from "./api";
+import { fetchAgeAnalysis, fetchAssets, fetchIncome, fetchOverview, fetchSimpleAnalysis } from "./api";
 
 describe("dashboard API client", () => {
   beforeEach(() => vi.restoreAllMocks());
@@ -28,6 +28,20 @@ describe("dashboard API client", () => {
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
       "http://localhost:8787/api/dashboard/income",
       "http://localhost:8787/api/dashboard/assets",
+    ]);
+  });
+
+  it("loads both analysis slices with the expected query", async () => {
+    const simple = { snapshotDate: "2026-08-18", generatedAt: "now", referenceDate: "2026-08-18", youngest: [], oldest: [], ageBins: [] };
+    const age = { snapshotDate: "2026-08-18", generatedAt: "now", person: {}, matches: [], incomeByYear: [], occupationsByYear: [], assetTimeline: [] };
+    const fetchMock = vi.fn().mockImplementation((url: string) => Promise.resolve(new Response(JSON.stringify(url.includes("simple-analysis") ? simple : age), { status: 200 })));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(fetchSimpleAnalysis()).resolves.toEqual(simple);
+    await expect(fetchAgeAnalysis("Sébastien Lecornu")).resolves.toEqual(age);
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "http://localhost:8787/api/dashboard/simple-analysis",
+      "http://localhost:8787/api/dashboard/age-analysis?q=S%C3%A9bastien%20Lecornu",
     ]);
   });
 

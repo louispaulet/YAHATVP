@@ -159,7 +159,8 @@ describe("dashboard Worker", () => {
 
   it("proxies both analytical routes and forwards the declarant query", async () => {
     const fetcher = vi.fn<typeof fetch>().mockImplementation((url) => {
-      const payload = url.includes("age-analysis") ? ageAnalysis : simpleAnalysis;
+      const target = typeof url === "string" ? url : url instanceof URL ? url.toString() : url.url;
+      const payload = target.includes("age-analysis") ? ageAnalysis : simpleAnalysis;
       return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
     });
     expect((await handleRequest(request("/api/dashboard/simple-analysis"), env, fetcher)).status).toBe(200);
