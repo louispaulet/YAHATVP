@@ -66,10 +66,12 @@ def person_row(element: etree._Element, context: ParseContext) -> dict[str, Any]
     general = child(element, "general")
     person = child(general, "declarant")
     address = child(person, "adresseDec")
+    civilite = normalized_child_text(person, "civilite")
     birth_raw = raw_child_text(person, "dateNaissance")
     birth = parse_date(birth_raw)
     fields = {
-        "civilite": normalized_child_text(person, "civilite"),
+        "civilite": civilite,
+        "gender": {"M.": "male", "Mme": "female"}.get(civilite),
         "nom": normalized_child_text(person, "nom"),
         "prenom": normalized_child_text(person, "prenom"),
         "email": normalized_child_text(person, "email"),
@@ -93,7 +95,5 @@ def person_row(element: etree._Element, context: ParseContext) -> dict[str, Any]
     }
 
 
-def declaration_mandates(
-    element: etree._Element, context: ParseContext, config: ParserConfig
-) -> list[dict[str, Any]]:
+def declaration_mandates(element, context, config):
     return mandate_rows(element, context, config)

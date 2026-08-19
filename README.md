@@ -353,7 +353,7 @@ parsed numeric value; parsing does not imply that a value is valid.
 | --- | --- | --- |
 | `liste` | One row per CSV source listing record. | Source CSV columns, `snapshot_date`, `source_file` |
 | `declarations` | One row per XML declaration. | `declaration_uuid`, deposit and mandate dates, declaration type, mandate and organ labels |
-| `people` | One declarant row per declaration. | Name, contact, source DOB, typed `date_naissance_date`, `date_naissance_year`, and explicit DOB quality status |
+| `people` | One declarant row per declaration. | Name, contact, source `civilite`, derived `gender`, typed `date_naissance_date`, `date_naissance_year`, and explicit DOB quality status |
 | `mandates` | One row per general or elected-mandate section item. | `source_section`, description, dates, employer, remuneration |
 | `mandate_remunerations` | One row per annual remuneration value nested in an elected mandate item. | `source_item_index`, description, remuneration basis, `remuneration_year`, `raw_value`, `normalized_value` |
 | `activities` | One row per professional, consulting, spouse, volunteer, or collaborator activity. | `source_section`, description, employer, dates, remuneration |
@@ -650,7 +650,10 @@ Read-only Cloud Run bridge ─── BigQuery Gold tables
 The public API does not expose arbitrary SQL or contact/address fields.
 The bridge selects the latest shared Gold `snapshot_date` and exposes fixed
 read-only slices: `overview`, `income`, `assets`, `declarations`,
-`simple-analysis`, and `age-analysis?q=...`. Its
+`gender`, `simple-analysis`, and `age-analysis?q=...`. The `gender` slice
+returns the male/female ratio plus male and female counts by Gold mandate
+position; it derives the bounded `gender` value from the XML `civilite` field
+and excludes missing or unmapped titles from the ratio. Its
 metric queries filter by Gold's explicit `metric_eligible` and `active_in_gold`
 fields; they do not recreate anomaly logic in the dashboard. The
 parameterized search matches public declarant and declaration metadata plus

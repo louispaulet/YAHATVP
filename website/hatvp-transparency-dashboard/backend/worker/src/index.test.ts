@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { handleRequest } from "./index";
-import type { AgeAnalysisResponse, DashboardOverviewResponse, SimpleAnalysisResponse, WorkerEnv } from "./types";
+import type { AgeAnalysisResponse, DashboardGenderResponse, DashboardOverviewResponse, SimpleAnalysisResponse, WorkerEnv } from "./types";
 
 const env: WorkerEnv = {
   BRIDGE_URL: "https://bridge.example.test",
@@ -12,6 +12,14 @@ const overview: DashboardOverviewResponse = {
   snapshotDate: "2026-08-18",
   generatedAt: "2026-08-18T08:00:00Z",
   tables: { declarations: 2, people: 2, incomes: 3, assets: 4 },
+};
+
+const gender: DashboardGenderResponse = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  gender: [{ label: "male", rows: 1 }, { label: "female", rows: 1 }],
+  unknownRows: 0,
+  positions: [{ label: "Maire", male: 1, female: 1, unknown: 0 }],
 };
 
 const search = {
@@ -109,6 +117,19 @@ describe("dashboard Worker", () => {
     expect(await response.json()).toEqual({
       error: { code: "UPSTREAM_ERROR", message: "Dashboard data is unavailable" },
     });
+  });
+
+  it("forwards and validates the gender slice", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify(gender), { status: 200 }),
+    );
+    const response = await handleRequest(request("/api/dashboard/gender"), env, fetcher);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(gender);
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://bridge.example.test/v1/dashboard/gender",
+      expect.anything(),
+    );
   });
 
   it("rejects unsupported methods and routes", async () => {
