@@ -16,6 +16,8 @@ def test_simple_analysis_query_uses_typed_dob_and_keeps_anomalous_ages():
     assert "date_naissance_quality_status" in query
     assert "ORDER BY age_years" in query
     assert "PERCENTILE_CONT" in query
+    assert "FROM age_rows GROUP BY age_bin_start" in query
+    assert "FROM age_stats s JOIN age_medians m USING (age_bin_start)" in query
     assert "metric_eligible" in query
     assert "raw_record_json" not in query
 
@@ -27,6 +29,8 @@ def test_age_analysis_query_is_parameterized_and_includes_all_three_timelines():
     assert "income_by_year" in query
     assert "occupations_by_year" in query
     assert "asset_acquisition_year" in query
+    assert "EXTRACT(YEAR FROM sp.date_naissance_date)" in query
+    assert "sp.date_naissance_year" not in query
     assert "raw_record_json" not in query
     assert "adresse_" not in query
 

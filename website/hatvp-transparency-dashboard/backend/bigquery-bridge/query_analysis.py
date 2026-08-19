@@ -56,12 +56,15 @@ def build_simple_analysis_query(project: str, dataset: str) -> str:
   FROM income_age
   WHERE age_years >= 0
 ), age_stats AS (
-  SELECT age_bin_start, COUNT(*) AS row_count, AVG(normalized_value) AS average_value,
+  SELECT age_bin_start, COUNT(*) AS row_count, AVG(normalized_value) AS average_value
+  FROM age_rows GROUP BY age_bin_start
+), age_medians AS (
+  SELECT DISTINCT age_bin_start,
     PERCENTILE_CONT(normalized_value, 0.5) OVER (PARTITION BY age_bin_start) AS median_value
   FROM age_rows
 ), age_bins AS (
-  SELECT DISTINCT age_bin_start, row_count, average_value, median_value
-  FROM age_stats
+  SELECT s.age_bin_start, s.row_count, s.average_value, m.median_value
+  FROM age_stats s JOIN age_medians m USING (age_bin_start)
 )
 SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
   CURRENT_TIMESTAMP() AS generated_at,
@@ -165,8 +168,8 @@ def build_age_analysis_query(project: str, dataset: str) -> str:
   FROM occupation_rows WHERE year IS NOT NULL GROUP BY year
 ), asset_rows AS (
   SELECT a.asset_acquisition_year AS year, a.source_section, a.asset_name,
-    a.normalized_value, sp.date_naissance_year,
-    a.asset_acquisition_year - sp.date_naissance_year AS relative_age
+    a.normalized_value, EXTRACT(YEAR FROM sp.date_naissance_date) AS date_naissance_year,
+    a.asset_acquisition_year - EXTRACT(YEAR FROM sp.date_naissance_date) AS relative_age
   FROM {assets} a JOIN selected_declarations sd ON sd.declaration_uuid = a.declaration_uuid
   CROSS JOIN latest l CROSS JOIN selected_person sp
   WHERE a.snapshot_date = l.snapshot_date AND a.asset_acquisition_year IS NOT NULL
