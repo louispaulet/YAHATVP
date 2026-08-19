@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-08-19 — Merge analysis PRs and complete production release
+
+### Merged
+
+- Marked draft PRs [#31](https://github.com/louispaulet/YAHATVP/pull/31) and
+  [#30](https://github.com/louispaulet/YAHATVP/pull/30) ready for review and
+  merged them into `main` at `e0458ec` and `1ccd9d7`. Resolved the #30
+  `CHANGELOG.md` conflict by retaining both dated entries in
+  `e86e529` before pushing the branch update.
+
+### Deployed
+
+- GitHub Actions runs
+  [32270002248](https://github.com/louispaulet/YAHATVP/actions/runs/32270002248)
+  and [32271991606](https://github.com/louispaulet/YAHATVP/actions/runs/32271991606)
+  passed tests, deployment configuration, image build/push, and Cloud Run Job
+  deployment for `main` commits `1ccd9d7` and `93b9be1`.
+- Forced execution `hatvp-ingestion-8bgt4` completed successfully with
+  `SUCCESS_WITH_WARNINGS`, 0 quality errors, 6,238 retained flags, and all 13
+  Bronze, Silver, Gold, and anomaly-registry tables loaded. `state/latest.json`
+  advanced to snapshot `2026-08-19` with pipeline SHA `1ccd9d7`.
+- Deployed Cloud Run bridge revision `hatvp-dashboard-api-00012-bj8`, Worker
+  version `80ee49aa-3c37-45cd-8584-6bbe3a009f05`, and the frontend to
+  `https://yahatvp.thefrenchartist.dev/`.
+
+### Fixed and verified
+
+- Fixed the new BigQuery analysis SQL: grouped simple-analysis age bins before
+  calculating medians and derived asset relative age from the typed DOB date.
+  Added regression assertions; bridge tests (37), Worker tests (9), frontend
+  tests (22), TypeScript typecheck, Vite build, BigQuery dry-runs, and live
+  simple/age queries pass.
+- Public smoke tests return HTTP 200 for all dashboard slices, search/detail,
+  both analysis routes, Worker health, and the custom-domain hash routes; all
+  API responses report snapshot `2026-08-19`.
+
 ## 2026-08-19 — Prepare a current HATVP anomaly handoff shortlist
 
 ### Added
