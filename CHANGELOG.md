@@ -20,8 +20,10 @@
   build.
 - The existing Worker health route returned HTTP 200 and the overview route
   reported snapshot `2026-08-19`.
-- No bridge or Worker deployment and no ingestion replay were performed; this
-  release was frontend-only.
+- No bridge or Worker deployment and no ingestion replay were performed
+  manually. The existing `main` push workflow also completed its standard
+  ingestion image/Cloud Run Job deploy successfully in run
+  [32306032957](https://github.com/louispaulet/YAHATVP/actions/runs/32306032957).
 
 ## 2026-08-19 — Improve declaration search usability
 
