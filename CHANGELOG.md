@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-08-19 — Merge dashboard PRs and redeploy the frontend only
+
+### Released
+
+- Merged open PRs [#35](https://github.com/louispaulet/YAHATVP/pull/35),
+  [#36](https://github.com/louispaulet/YAHATVP/pull/36),
+  [#37](https://github.com/louispaulet/YAHATVP/pull/37), and
+  [#38](https://github.com/louispaulet/YAHATVP/pull/38), including the draft
+  PRs, into `main` one at a time. Conflicts in shared frontend files and
+  `CHANGELOG.md` were resolved on the PR branches before merging.
+- Published main commit `749ca37` to GitHub Pages; `gh-pages` advanced to
+  `7fbe2da`. The custom domain returned HTTP 200 and served the new
+  `index-jmw_vcBB.js` bundle.
+
+### Verified
+
+- `make frontend-test` passed with 25 frontend tests and a production Vite
+  build.
+- The existing Worker health route returned HTTP 200 and the overview route
+  reported snapshot `2026-08-19`.
+- No bridge or Worker deployment and no ingestion replay were performed; this
+  release was frontend-only.
+
 ## 2026-08-19 — Improve declaration search usability
 
 ### Changed
