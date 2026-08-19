@@ -13,6 +13,7 @@ use `YYYY-MM-DD-topic` so snapshots sort naturally within each topic.
 | [`03-validation/`](03-validation/) | Pipeline and curated-layer validation | [`2026-08-17-bigquery-and-income-validation.md`](03-validation/2026-08-17-bigquery-and-income-validation.md) consolidates the former BigQuery findings and income-coverage recovery notes. |
 | [`04-manual-review/`](04-manual-review/) | Small, source-linked declaration bundles | The `2026-08-17/6dcd326d-e076-4d7a-a428-15075a15dddd/` bundle contains a summary, selected XML, and parsed JSON for the Rachida Dati declaration. |
 | [`05-schema/`](05-schema/) | Source-schema and raw-archive reviews | [`2026-08-18-schema-review.md`](05-schema/2026-08-18-schema-review.md) records the source inventory and raw-object evidence; [`2026-08-18-bronze-contract.md`](05-schema/2026-08-18-bronze-contract.md) defines the version-complete BigQuery Bronze boundary. |
+| [`06-hatvp/`](06-hatvp/) | Current anomaly handoff candidates | [`2026-08-19-hatvp-anomaly-shortlist.md`](06-hatvp/2026-08-19-hatvp-anomaly-shortlist.md) documents the exclusion-aware BigQuery review and ten latest-per-name declarations selected for human HATVP follow-up; the paired SQL is reproducible evidence. |
 
 ## Recommended reading order
 
@@ -22,6 +23,7 @@ use `YYYY-MM-DD-topic` so snapshots sort naturally within each topic.
 3. Use the focused reports in `02-outliers/` for source-level investigations.
 4. Open a bundle in `04-manual-review/` only when a concrete declaration needs
    XML-to-normalized-row inspection.
+5. Read `06-hatvp/` when preparing a current, source-linked handoff to HATVP.
 
 ## Naming and provenance rules
 

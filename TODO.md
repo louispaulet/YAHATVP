@@ -730,6 +730,19 @@ Acceptance evidence is recorded in
 including the forced live-source run, unchanged replay, retained-Bronze
 backfill, layer counts, registry counts, and dashboard/build checks.
 
+## 12.8 HATVP anomaly handoff
+
+- [x] Query the 2026-08-19 BigQuery Gold and anomaly-registry snapshot and
+  preserve the SQL used for the review.
+- [x] Exclude current issue-register names, the generic same-period conflict
+  family, the DOB issue family, superseded-declaration flags, and registry rows
+  already marked `previously_reported`.
+- [x] Prepare ten source-linked declarations using the latest version per
+  normalized declarant name+surname and record the evidence in
+  [`reports/06-hatvp/2026-08-19-hatvp-anomaly-shortlist.md`](reports/06-hatvp/2026-08-19-hatvp-anomaly-shortlist.md).
+- [ ] Complete human source-document review and any external HATVP follow-up;
+  this repository report does not assert that a flagged value is erroneous.
+
 ## Later, only if needed
 
 - [ ] Add semantic/content hashes after the exact-byte hash path is stable.
