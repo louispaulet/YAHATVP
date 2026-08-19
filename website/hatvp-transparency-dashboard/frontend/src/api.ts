@@ -2,6 +2,7 @@ import type {
   AgeAnalysisResponse,
   DashboardBreakdownResponse,
   DashboardDeclarationResponse,
+  DashboardGenderResponse,
   DashboardOverviewResponse,
   DashboardSearchResponse,
   SimpleAnalysisResponse,
@@ -33,6 +34,11 @@ function isBreakdownResponse(value: unknown): value is DashboardBreakdownRespons
   if (!isMeta(value) || !Array.isArray(value.items)) return false;
   return (value.totalValue === undefined || typeof value.totalValue === "number") &&
     (value.yearCount === undefined || typeof value.yearCount === "number");
+}
+
+function isGenderResponse(value: unknown): value is DashboardGenderResponse {
+  return isMeta(value) && Array.isArray(value.gender) && typeof value.unknownRows === "number"
+    && Array.isArray(value.positions);
 }
 
 function isSearchResponse(value: unknown): value is DashboardSearchResponse {
@@ -81,6 +87,10 @@ export function fetchAssets(signal?: AbortSignal): Promise<DashboardBreakdownRes
 
 export function fetchDeclarations(signal?: AbortSignal): Promise<DashboardBreakdownResponse> {
   return fetchJson("/api/dashboard/declarations", isBreakdownResponse, signal);
+}
+
+export function fetchGender(signal?: AbortSignal): Promise<DashboardGenderResponse> {
+  return fetchJson("/api/dashboard/gender", isGenderResponse, signal);
 }
 
 export function fetchSearch(query: string, signal?: AbortSignal): Promise<DashboardSearchResponse> {

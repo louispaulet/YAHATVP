@@ -28,7 +28,7 @@ def test_each_slice_returns_snapshot_metadata_and_one_public_payload(view):
     query = build_query("project", "dataset", view)
     assert "snapshot_date" in query
     assert "generated_at" in query
-    assert "tables_json" in query or "items_json" in query
+    assert "tables_json" in query or "items_json" in query or "gender_json" in query
 
 
 def test_overview_counts_the_four_gold_tables():
@@ -61,6 +61,15 @@ def test_assets_groups_values_by_source_section():
     assert "source_section" in query
     assert "AS total_value" in query
     assert "LIMIT 12" in query
+
+
+def test_gender_groups_gold_people_and_mandate_positions():
+    query = build_query("project", "dataset", "gender")
+    assert "p.gender" in query
+    assert "COUNTIF(p.gender = 'male')" in query
+    assert "COUNTIF(p.gender = 'female')" in query
+    assert "d.mandat_label" in query
+    assert "positions_json" in query
 
 
 def test_declarations_groups_values_by_type():

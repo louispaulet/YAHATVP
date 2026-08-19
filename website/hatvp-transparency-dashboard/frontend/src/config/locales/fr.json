@@ -56,6 +56,21 @@
       "eyebrow": "Valeurs observées",
       "empty": "Aucune ligne de patrimoine n’a été trouvée dans cet instantané."
     },
+    "genderRatio": {
+      "title": "Répartition femmes-hommes",
+      "eyebrow": "Dérivée de la civilité",
+      "empty": "Aucune civilité masculine ou féminine n’a été trouvée dans cet instantané.",
+      "male": "Hommes",
+      "female": "Femmes",
+      "unknownNote": "{count} lignes avec une civilité manquante ou non reconnue sont exclues de ce ratio."
+    },
+    "genderPositions": {
+      "title": "Femmes et hommes par fonction",
+      "eyebrow": "Nombre de déclarants",
+      "empty": "Aucune fonction avec un genre connu n’a été trouvée dans cet instantané.",
+      "male": "Hommes",
+      "female": "Femmes"
+    },
     "declarationTypes": {
       "title": "Types de déclarations",
       "eyebrow": "Composition",
@@ -303,6 +318,9 @@
   "accessibility": {
     "comparisonChart": "Revenu annuel moyen et patrimoine total",
     "comparisonLegend": "Légende du revenu annuel moyen et du patrimoine total",
+    "genderRatioChart": "Ratio femmes-hommes",
+    "genderRatioLegend": "Légende du ratio femmes-hommes",
+    "genderPositionsChart": "Nombre de femmes et d’hommes par fonction",
     "rows": "lignes"
   },
   "labels": {

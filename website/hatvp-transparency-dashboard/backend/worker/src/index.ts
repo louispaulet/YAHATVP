@@ -5,6 +5,7 @@ import type {
   SimpleAnalysisResponse,
   DashboardOverviewResponse,
   DashboardSearchResponse,
+  DashboardGenderResponse,
   WorkerEnv,
 } from "./types";
 
@@ -15,6 +16,7 @@ const DASHBOARD_SLICE_ROUTES = {
   "/api/dashboard/income": "/v1/dashboard/income",
   "/api/dashboard/assets": "/v1/dashboard/assets",
   "/api/dashboard/declarations": "/v1/dashboard/declarations",
+  "/api/dashboard/gender": "/v1/dashboard/gender",
   "/api/dashboard/search": "/v1/dashboard/search",
   "/api/dashboard/simple-analysis": "/v1/dashboard/simple-analysis",
   "/api/dashboard/age-analysis": "/v1/dashboard/age-analysis",
@@ -73,6 +75,12 @@ function isDashboardBreakdownResponse(value: unknown): value is DashboardBreakdo
   if (!isRecord(value) || typeof value.generatedAt !== "string") return false;
   if (!(value.snapshotDate === null || typeof value.snapshotDate === "string")) return false;
   return Array.isArray(value.items);
+}
+
+function isDashboardGenderResponse(value: unknown): value is DashboardGenderResponse {
+  if (!isRecord(value) || typeof value.generatedAt !== "string") return false;
+  if (!(value.snapshotDate === null || typeof value.snapshotDate === "string")) return false;
+  return Array.isArray(value.gender) && typeof value.unknownRows === "number" && Array.isArray(value.positions);
 }
 
 function isDashboardSearchResponse(value: unknown): value is DashboardSearchResponse {
@@ -167,6 +175,8 @@ export async function handleRequest(
   if (slicePath && request.method === "GET") {
     const validate = slicePath.endsWith("/overview")
       ? isDashboardOverviewResponse
+      : slicePath.endsWith("/gender")
+        ? isDashboardGenderResponse
       : slicePath.endsWith("/search")
         ? isDashboardSearchResponse
         : slicePath.endsWith("/simple-analysis")

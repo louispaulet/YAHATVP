@@ -318,6 +318,8 @@ audit history.
 - [x] Run a live dashboard smoke test against the deployed Worker and review the public aggregate output.
 - [x] Split dashboard overview, income, assets, and declaration data into independently cacheable API slices.
 - [x] Add slow-blinking loading shells so the dashboard layout renders before any slice completes.
+- [x] Derive bounded gender values from XML `civilite` and carry them through Silver and Gold people tables.
+- [x] Add the homepage male/female ratio pie chart and gender-by-job-position bar chart through a fixed aggregate API slice.
 - [x] Use lazy-loaded Recharts pie and bar plots with animation, responsive sizing, tooltips, and accessible value lists.
 - [x] Add English/French locale configuration, a language switcher, and readable translations for dynamic dashboard labels.
 - [x] Harden declaration-type translation lookup for source-label casing and punctuation variants.
@@ -347,6 +349,8 @@ audit history.
   activities, interests, assets, liabilities, attachments, empty sections, and
   a collapsed raw-XML audit view; cover five live schema variants with fixture
   and responsive regression tests.
+- [x] Restore accent-insensitive BigQuery matching for the default age-analysis
+  query and declaration search; fixture tests cover the generated SQL.
 - [x] Add the localized static `/quality-issues` register from a minimal local
   JSON file, keeping only issue type, contact date, public HATVP links, and
   solved state; calculate unresolved duration from the contact date and exclude

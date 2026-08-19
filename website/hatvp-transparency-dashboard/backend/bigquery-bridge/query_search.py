@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from query_support import (
     SEARCH_LIMIT,
+    accent_fold,
     any_predicates,
     dataset_prefix,
 )
@@ -24,15 +25,15 @@ def build_search_query(project: str, dataset: str) -> str:
     searchable = "\n      ".join(
         [
             declaration_match,
-            child_match("incomes", "i", INCOME_FIELDS).format(prefix=prefix),
-            child_match("assets", "a", ASSET_FIELDS).format(prefix=prefix),
+            child_match("incomes", "i", INCOME_FIELDS).replace("{prefix}", prefix),
+            child_match("assets", "a", ASSET_FIELDS).replace("{prefix}", prefix),
         ]
     )
     return f"""WITH latest AS (
   SELECT MAX(snapshot_date) AS snapshot_date FROM {prefix}.gold_declarations
 ),
 search AS (
-  SELECT NORMALIZE_AND_CASEFOLD(@search_term) AS term
+  SELECT {accent_fold("@search_term")} AS term
 ),
 matched AS (
   SELECT DISTINCT

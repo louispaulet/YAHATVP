@@ -25,6 +25,21 @@ export interface DashboardBreakdownResponse {
   yearCount?: number;
 }
 
+export interface GenderPosition {
+  label: string;
+  male: number;
+  female: number;
+  unknown: number;
+}
+
+export interface DashboardGenderResponse {
+  snapshotDate: string | null;
+  generatedAt: string;
+  gender: BreakdownItem[];
+  unknownRows: number;
+  positions: GenderPosition[];
+}
+
 export interface DeclarationSearchResult {
   declarationUuid: string | null;
   civilite: string | null;

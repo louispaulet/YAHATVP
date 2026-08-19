@@ -29,7 +29,13 @@ def test_simple_analysis_query_filters_salary_ages_and_exposes_zero_counts():
 def test_age_analysis_query_is_parameterized_and_includes_all_three_timelines():
     query = build_age_analysis_query("project", "dataset")
 
-    assert "@search_term" in query
+    assert (
+        "REGEXP_REPLACE(NORMALIZE_AND_CASEFOLD(@search_term, NFD), r'\\p{M}', '') AS term" in query
+    )
+    assert (
+        "REGEXP_REPLACE(NORMALIZE_AND_CASEFOLD(COALESCE(p.prenom, ''), NFD), r'\\p{M}', '')"
+        in query
+    )
     assert "income_by_year" in query
     assert "occupations_by_year" in query
     assert "asset_acquisition_year" in query

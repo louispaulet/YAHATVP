@@ -13,6 +13,12 @@ export const assets = {
   items: [{ label: "immeubleDto", rows: 4, totalValue: 80000 }],
 };
 
+export const gender = {
+  snapshotDate: "2026-08-18", generatedAt: "2026-08-18T08:00:00Z", unknownRows: 0,
+  gender: [{ label: "male", rows: 1 }, { label: "female", rows: 1 }],
+  positions: [{ label: "Élu local", male: 1, female: 1, unknown: 0 }],
+};
+
 export const declarations = {
   snapshotDate: "2026-08-18", generatedAt: "2026-08-18T08:00:00Z",
   items: [{ label: "Déclaration d'intérêts", rows: 2 }],

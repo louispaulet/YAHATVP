@@ -60,6 +60,34 @@ GROUP BY label ORDER BY total_value DESC, label LIMIT 12)) AS items_json,
 COALESCE((SELECT SUM(normalized_value) FROM {assets} t
 WHERE t.snapshot_date = l.snapshot_date), 0) AS total_value
 FROM latest l"""
+    elif view == "gender":
+        body = f"""SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
+CURRENT_TIMESTAMP() AS generated_at,
+TO_JSON_STRING(ARRAY(
+  SELECT AS STRUCT label, row_count FROM (
+    SELECT COALESCE(NULLIF(p.gender, ''), 'unknown') AS label, COUNT(*) AS row_count
+    FROM {people} p CROSS JOIN latest l
+    WHERE p.snapshot_date = l.snapshot_date
+    GROUP BY label
+  ) ORDER BY CASE label WHEN 'male' THEN 1 WHEN 'female' THEN 2 ELSE 3 END, label
+)) AS gender_json,
+TO_JSON_STRING(ARRAY(
+  SELECT AS STRUCT label, male_count, female_count, unknown_count FROM (
+    SELECT COALESCE(NULLIF(d.mandat_label, ''), NULLIF(d.mandat_type_label, ''),
+      'unknown') AS label,
+      COUNTIF(p.gender = 'male') AS male_count,
+      COUNTIF(p.gender = 'female') AS female_count,
+      COUNTIF(p.gender IS NULL OR p.gender NOT IN ('male', 'female')) AS unknown_count
+    FROM {declarations} d
+    LEFT JOIN {people} p ON p.declaration_uuid = d.declaration_uuid
+      AND p.snapshot_date = d.snapshot_date
+    CROSS JOIN latest l
+    WHERE d.snapshot_date = l.snapshot_date
+    GROUP BY label
+    HAVING COUNTIF(p.gender = 'male') + COUNTIF(p.gender = 'female') > 0
+  ) ORDER BY male_count + female_count DESC, label LIMIT 20
+)) AS positions_json
+FROM latest l"""
     else:
         body = f"""SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
 CURRENT_TIMESTAMP() AS generated_at,

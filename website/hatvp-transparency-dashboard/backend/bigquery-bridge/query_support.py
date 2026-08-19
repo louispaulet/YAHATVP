@@ -6,7 +6,7 @@ import re
 from collections.abc import Iterable
 
 TABLES = ("declarations", "people", "incomes", "assets")
-VIEWS = ("overview", "income", "assets", "declarations")
+VIEWS = ("overview", "income", "assets", "declarations", "gender")
 SEARCH_LIMIT = 50
 IDENTIFIER = re.compile(r"^[A-Za-z0-9_-]+$")
 
@@ -40,10 +40,17 @@ def latest_cte(prefix: str) -> str:
     return f"WITH latest AS (SELECT MAX(snapshot_date) AS snapshot_date FROM {declarations})"
 
 
+def accent_fold(value: str) -> str:
+    """Return a BigQuery expression that compares text without accents."""
+
+    return f"REGEXP_REPLACE(NORMALIZE_AND_CASEFOLD({value}, NFD), r'\\p{{M}}', '')"
+
+
 def normalized_contains(field: str, term: str = "s.term") -> str:
     """Build a literal, accent-insensitive substring predicate."""
 
-    return f"STRPOS(NORMALIZE_AND_CASEFOLD(COALESCE({field}, '')), {term}) > 0"
+    value = f"COALESCE({field}, '')"
+    return f"STRPOS({accent_fold(value)}, {term}) > 0"
 
 
 def any_predicates(predicates: Iterable[str]) -> str:
@@ -70,6 +77,7 @@ __all__ = [
     "SEARCH_LIMIT",
     "TABLES",
     "VIEWS",
+    "accent_fold",
     "any_predicates",
     "dataset_prefix",
     "exists_text_match",

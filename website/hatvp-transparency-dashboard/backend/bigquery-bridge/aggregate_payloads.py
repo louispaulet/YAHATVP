@@ -53,6 +53,16 @@ def dashboard_payload(row: Any, view: str) -> dict[str, Any]:
         tables = {str(item["table_name"]): int(item["row_count"]) for item in table_items}
         payload["tables"] = {name: tables.get(name, 0) for name in TABLES}
         return payload
+    if view == "gender":
+        items = normalize_breakdown(parse_array(row_value(row, "gender_json")), False)
+        payload["gender"] = items
+        payload["unknownRows"] = sum(
+            item["rows"] for item in items if item["label"] not in {"male", "female"}
+        )
+        payload["positions"] = normalize_gender_positions(
+            parse_array(row_value(row, "positions_json"))
+        )
+        return payload
     payload["items"] = normalize_breakdown(
         parse_array(row_value(row, "items_json")), view != "declarations"
     )
@@ -61,6 +71,25 @@ def dashboard_payload(row: Any, view: str) -> dict[str, Any]:
     if view == "income":
         payload["yearCount"] = int(row_value(row, "year_count") or 0)
     return payload
+
+
+def normalize_gender_positions(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Convert position-by-gender aggregates into a public chart contract."""
+
+    positions: list[dict[str, Any]] = []
+    for item in items:
+        male = int(item.get("male_count", 0) or 0)
+        female = int(item.get("female_count", 0) or 0)
+        unknown = int(item.get("unknown_count", 0) or 0)
+        positions.append(
+            {
+                "label": str(item.get("label", "unknown")),
+                "male": male,
+                "female": female,
+                "unknown": unknown,
+            }
+        )
+    return positions
 
 
 def snapshot_payload(row: Any) -> dict[str, Any]:

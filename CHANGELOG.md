@@ -18,6 +18,44 @@
   passed; Chrome local fixture checks passed in English and French at desktop
   and 390px widths with no horizontal overflow or console warnings/errors.
 
+## 2026-08-19 — Fix accent-insensitive dashboard search
+
+### Fixed
+
+- Removed combining Unicode marks after BigQuery NFD normalization in the
+  shared dashboard search expression, so `Sébastien Lecornu` matches the HATVP
+  source spelling `Sebastien Lecornu` in the age-analysis route and declaration
+  search.
+
+### Verified
+
+- Bridge fixture tests assert the accent-folding SQL for both analysis and
+  declaration search. A read-only BigQuery execution against the current Gold
+  snapshot returned one Lecornu profile for `Sébastien Lecornu` and 45 matches
+  for the accented declaration-search term.
+- `make backend-test`, `make frontend-test`, `uv run pytest` (158 tests), Ruff,
+  format checks, and `uv build` pass. The live Worker reproduced the original
+  `NOT_FOUND` behavior before this source fix; production deployment remains
+  the post-merge release step.
+
+## 2026-08-19 — Add gender aggregates to the transparency homepage
+
+### Added
+
+- Derived a bounded `gender` field from the observed XML `civilite` values and
+  carried it into the source-preserving people Parquet, Silver, Gold, and
+  BigQuery table contract without changing the original `civilite` value.
+- Added a fixed `/gender` bridge and Worker slice with the male/female ratio
+  and gender counts by Gold mandate position.
+- Added localized homepage pie and bar charts with an explicit note when
+  missing or unmapped civilité values are excluded from the ratio.
+
+### Verified
+
+- The full Python suite passes with 158 tests, bridge tests pass with 40 cases,
+  frontend tests pass with 23 cases and a production Vite build, and Worker
+  tests pass with 10 cases plus TypeScript typecheck.
+
 ## 2026-08-19 — Merge analysis PRs and complete production release
 
 ### Merged

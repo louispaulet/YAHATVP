@@ -56,6 +56,21 @@
       "eyebrow": "Observed values",
       "empty": "No asset rows were found in this snapshot."
     },
+    "genderRatio": {
+      "title": "Gender balance",
+      "eyebrow": "Derived from civilité",
+      "empty": "No male or female gender values were found in this snapshot.",
+      "male": "Male",
+      "female": "Female",
+      "unknownNote": "{count} records with missing or unmapped civilité are excluded from this ratio."
+    },
+    "genderPositions": {
+      "title": "Gender by job position",
+      "eyebrow": "Declarant counts",
+      "empty": "No job positions with known gender were found in this snapshot.",
+      "male": "Male",
+      "female": "Female"
+    },
     "declarationTypes": {
       "title": "Declaration types",
       "eyebrow": "Composition",
@@ -303,6 +318,9 @@
   "accessibility": {
     "comparisonChart": "Average annual income and asset totals",
     "comparisonLegend": "Average annual income and asset totals legend",
+    "genderRatioChart": "Male-to-female ratio",
+    "genderRatioLegend": "Male-to-female ratio legend",
+    "genderPositionsChart": "Male and female counts by job position",
     "rows": "rows"
   },
   "labels": {
