@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-19 — Complete forced production replay with activity remuneration
+
+### Deployed
+
+- GitHub Actions run [32202288517](https://github.com/louispaulet/YAHATVP/actions/runs/32202288517) passed tests, deployment configuration, image build, and Cloud Run Job deployment for commit `004b206`.
+- Forced execution `hatvp-ingestion-8lnvd` ran with `--force` and completed successfully with `SUCCESS_WITH_WARNINGS`.
+
+### Verified
+
+- Quality completed with 106,351 income rows, 0 quality errors, 4,031 warnings,
+  and 6,238 retained review flags.
+- Cloud Logging emitted `bigquery_load_complete` for all 13 Bronze, Silver,
+  Gold, and anomaly-registry tables; the 2026-08-19 snapshot is present in
+  BigQuery, including 106,351 unified incomes and 5,026 registry rows.
+- `hatvp/state/latest.json` was updated at `2026-08-19T00:50:22Z` with
+  pipeline commit `004b206` only after the successful layer writes.
+
 ## 2026-08-19 — Normalize date-valued provenance fields in registry rows
 
 ### Fixed
