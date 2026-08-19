@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-19 — Redesign the simple analysis dashboard
+
+### Changed
+
+- Reworked the public simple-analysis page into a chart-led editorial layout:
+  the average/median salary comparison now leads the page, DOB leaderboards
+  are paired in one evidence section, and age-bin details are compact and
+  scannable rather than repetitive cards.
+- Retained all existing data, localisation, review labels, charts, and the
+  zero-salary control. Added a development-only Vite API proxy switch to
+  visually verify the frontend against the deployed read-only API.
+
+### Verified
+
+- Frontend fixture suite: 24 tests passed. TypeScript production build passed.
+- Browser verification at 1440 × 1024 and 390 × 844 confirmed the loaded
+  English analysis route, responsive layout, and zero-salary control. The
+  selected design-to-implementation comparison is recorded in
+  `website/hatvp-transparency-dashboard/frontend/design-qa.md`.
+
 ## 2026-08-19 — Repair declarant income and asset history
 
 ### Changed
