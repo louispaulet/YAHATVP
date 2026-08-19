@@ -22,7 +22,7 @@ export function DashboardCharts({ income, assets, gender, language }: DashboardC
   const { locale } = useI18n();
   return (
     <>
-      <section className="mt-8 grid gap-6 lg:grid-cols-2">
+      <section className="mt-8 grid gap-6 xl:grid-cols-2">
         <Panel title={locale.panels.comparison.title} eyebrow={locale.panels.comparison.eyebrow}>
         {(income.loading || assets.loading) && <ChartSkeleton />}
         {(income.error || assets.error) && <SliceError onRetry={() => { if (income.error) income.reload(); if (assets.error) assets.reload(); }} />}
@@ -34,7 +34,7 @@ export function DashboardCharts({ income, assets, gender, language }: DashboardC
         {assets.data && <Suspense fallback={<ChartSkeleton />}><AssetChart items={assets.data.items} emptyLabel={locale.panels.assets.empty} language={language} /></Suspense>}
         </Panel>
       </section>
-      <section className="mt-8 grid gap-6 lg:grid-cols-2">
+      <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(20rem,0.78fr)_minmax(0,1.22fr)]">
         <Panel title={locale.panels.genderRatio.title} eyebrow={locale.panels.genderRatio.eyebrow}>
         {gender.loading && <ChartSkeleton />}
         {gender.error && <SliceError onRetry={gender.reload} />}
