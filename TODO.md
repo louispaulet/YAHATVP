@@ -348,6 +348,8 @@ audit history.
   activities, interests, assets, liabilities, attachments, empty sections, and
   a collapsed raw-XML audit view; cover five live schema variants with fixture
   and responsive regression tests.
+- [x] Restore accent-insensitive BigQuery matching for the default age-analysis
+  query and declaration search; fixture tests cover the generated SQL.
 - [x] Add the localized static `/quality-issues` register from a minimal local
   JSON file, keeping only issue type, contact date, public HATVP links, and
   solved state; calculate unresolved duration from the contact date and exclude

@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-19 — Fix accent-insensitive dashboard search
+
+### Fixed
+
+- Removed combining Unicode marks after BigQuery NFD normalization in the
+  shared dashboard search expression, so `Sébastien Lecornu` matches the HATVP
+  source spelling `Sebastien Lecornu` in the age-analysis route and declaration
+  search.
+
+### Verified
+
+- Bridge fixture tests assert the accent-folding SQL for both analysis and
+  declaration search. A read-only BigQuery execution against the current Gold
+  snapshot returned one Lecornu profile for `Sébastien Lecornu` and 45 matches
+  for the accented declaration-search term.
+- `make backend-test`, `make frontend-test`, `uv run pytest` (158 tests), Ruff,
+  format checks, and `uv build` pass. The live Worker reproduced the original
+  `NOT_FOUND` behavior before this source fix; production deployment remains
+  the post-merge release step.
+
 ## 2026-08-19 — Add gender aggregates to the transparency homepage
 
 ### Added
