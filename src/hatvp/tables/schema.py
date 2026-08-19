@@ -46,7 +46,7 @@ PARQUET_SCHEMAS = {
     "people": _bronze(
         {
             **_typed(
-                "declaration_uuid source_file civilite nom prenom email date_naissance_raw "
+                "declaration_uuid source_file civilite gender nom prenom email date_naissance_raw "
                 "date_naissance telephone_dec adresse_voie adresse_complement "
                 "date_naissance_quality_status date_naissance_quality_reason "
                 "adresse_code_postal adresse_ville adresse_pays quality_status quality_reason",

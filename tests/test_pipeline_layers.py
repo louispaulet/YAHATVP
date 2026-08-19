@@ -59,11 +59,13 @@ def test_forced_layer_outputs_keep_source_and_anomaly_columns(tmp_path: Path, mo
     root = output / "hatvp"
     silver = pl.read_parquet(root / "silver/incomes/snapshot_date=2026-08-16/data.parquet")
     gold = pl.read_parquet(root / "gold/incomes/snapshot_date=2026-08-16/data.parquet")
+    gold_people = pl.read_parquet(root / "gold/people/snapshot_date=2026-08-16/data.parquet")
 
     assert {"raw_value", "normalized_value", "anomaly_rule_ids", "metric_eligible"} <= set(
         silver.columns
     )
     assert {"is_latest_declaration", "active_in_gold"} <= set(gold.columns)
+    assert "gender" in gold_people.columns
     assert silver.height >= gold.height
 
 

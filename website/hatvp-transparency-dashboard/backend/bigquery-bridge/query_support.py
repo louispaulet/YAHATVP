@@ -6,7 +6,7 @@ import re
 from collections.abc import Iterable
 
 TABLES = ("declarations", "people", "incomes", "assets")
-VIEWS = ("overview", "income", "assets", "declarations")
+VIEWS = ("overview", "income", "assets", "declarations", "gender")
 SEARCH_LIMIT = 50
 IDENTIFIER = re.compile(r"^[A-Za-z0-9_-]+$")
 

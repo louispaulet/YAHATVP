@@ -72,6 +72,8 @@ def test_people_rows_keep_public_identity_fields_even_when_optional() -> None:
     assert row["declaration_uuid"] == "fixture-uuid-1"
     assert row["prenom"] == "Alice"
     assert row["nom"] == "DUPONT"
+    assert row["gender"] == "male"
+    assert xml_tables()["people"][1]["gender"] == "female"
     assert "email" in row
     assert row["date_naissance"] == "1980-03-02"
     assert row["date_naissance_year"] == 1980
