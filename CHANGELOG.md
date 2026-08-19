@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-08-19 — Repair declarant income and asset history
+
+### Changed
+
+- Added source-preserving asset event dates, precision, and source-field names
+  through the Parquet, Silver, Gold, and BigQuery schema-evolution contract.
+- Rebuilt the declarant analysis on the latest Silver snapshot. Interest and
+  patrimonial declaration families are ranked independently; only the newest
+  declaration in each family contributes to the primary view, while every
+  earlier filing remains available through declaration history links.
+- Kept review-flagged annual income visible unchanged in this source-detail
+  view and combined each amount with its role, employer, period, net/gross
+  basis, eligibility, and review status. Removed the ambiguous occupation row
+  counts and cross-version `×N` display.
+- Replaced the repeated asset timeline with a localized latest-statement
+  inventory. DTO names are confined to an expandable provenance disclosure;
+  exact event dates show exact ages and year-only dates show age ranges.
+
+### Verified locally
+
+- The current Lecornu source has three interest and three patrimonial filings.
+  The latest interest filing contains seven populated income years; the latest
+  patrimonial filing contains nine assets without cross-version repetition.
+- The source value `21/01/2002` is `dateSouscription` for the BRED PEPARVIE
+  life-insurance policy, producing an exact subscription age of 15 rather than
+  a declaration event or a rounded age of 16.
+- `make backend-test frontend-test` passed with 11 Worker, 40 bridge, and 24
+  frontend tests plus both TypeScript builds. The complete Python suite passed
+  158 tests; Ruff, formatting, package builds, and the current-schema Silver
+  BigQuery dry-run also passed. Production replay and deployment remain the
+  release step recorded in `TODO.md`.
+
 ## 2026-08-19 — Merge open dashboard PRs and redeploy production
 
 ### Merged

@@ -59,9 +59,15 @@ const ageAnalysis: AgeAnalysisResponse = {
     declarationCount: 1,
   },
   matches: [],
+  declarationContext: {
+    interestCount: 1,
+    assetCount: 0,
+    latestInterest: null,
+    latestAssets: null,
+    history: [],
+  },
   incomeByYear: [],
-  occupationsByYear: [],
-  assetTimeline: [],
+  assetInventory: [],
 };
 
 function request(path: string, init?: RequestInit): Request {
@@ -190,5 +196,17 @@ describe("dashboard Worker", () => {
       "https://bridge.example.test/v1/dashboard/age-analysis?q=Lecornu",
       expect.anything(),
     );
+  });
+
+  it("rejects the obsolete occupation and repeated-asset age payload", async () => {
+    const legacy = { ...ageAnalysis, declarationContext: undefined, assetInventory: undefined,
+      occupationsByYear: [], assetTimeline: [] };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify(legacy), { status: 200 }),
+    );
+    const response = await handleRequest(
+      request("/api/dashboard/age-analysis?q=Lecornu"), env, fetcher,
+    );
+    expect(response.status).toBe(502);
   });
 });

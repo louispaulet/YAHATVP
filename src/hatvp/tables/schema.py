@@ -77,11 +77,13 @@ PARQUET_SCHEMAS = {
         {
             **_typed(
                 "declaration_uuid source_section asset_name raw_value quality_status "
-                "quality_reason asset_acquisition_year_raw raw_record_json",
+                "quality_reason asset_acquisition_year_raw asset_event_precision "
+                "asset_event_source_field raw_record_json",
                 pl.String,
             ),
             "source_item_index": pl.Int64,
             "asset_acquisition_year": pl.Int64,
+            "asset_event_date": pl.Date,
             "normalized_value": pl.Float64,
             "snapshot_date": pl.Date,
         }

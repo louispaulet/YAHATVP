@@ -107,35 +107,4 @@ export interface SimpleAnalysisResponse {
   }>;
 }
 
-export interface AgeAnalysisPerson {
-  personKey: string | null;
-  primaryUuid: string | null;
-  firstName: string | null;
-  lastName: string | null;
-  dateOfBirth: string | null;
-  ageYears: number | null;
-  qualityStatus: string | null;
-  declarationCount: number;
-}
-
-export interface AgeAnalysisResponse {
-  snapshotDate: string | null;
-  generatedAt: string;
-  person: AgeAnalysisPerson;
-  matches: AgeAnalysisPerson[];
-  incomeByYear: Array<{
-    year: number;
-    combinedAmount: number;
-    sources: Array<{ source: string | null; label: string | null; amount: number }>;
-  }>;
-  occupationsByYear: Array<{
-    year: number;
-    count: number;
-    occupations: Array<{ label: string | null; source: string | null; rows: number }>;
-  }>;
-  assetTimeline: Array<{
-    year: number;
-    relativeAge: number;
-    assets: Array<{ source: string | null; name: string | null; value: number | null }>;
-  }>;
-}
+export type { AgeAnalysisDeclaration, AgeAnalysisPerson, AgeAnalysisResponse } from "./age-analysis-types";

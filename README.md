@@ -359,7 +359,7 @@ parsed numeric value; parsing does not imply that a value is valid.
 | `activities` | One row per professional, consulting, spouse, volunteer, or collaborator activity. | `source_section`, description, employer, dates, remuneration |
 | `participations` | One row per financial or management participation. | Company, valuation, capital held, number of shares, raw record |
 | `incomes` | One row per populated declared income category, annual professional-activity remuneration value, or annual elected-mandate remuneration value. Empty category slots are excluded; `income_stream` distinguishes the source stream. | `income_stream`, `income_year`, `income_type`, `raw_value`, `normalized_value`, spouse value |
-| `assets` | One row per observed asset DTO item, including bank accounts, insurance, securities, vehicles, and foreign assets. | `source_section`, asset name, `raw_value`, `normalized_value`, source-preserving `asset_acquisition_year_raw`, and `asset_acquisition_year` |
+| `assets` | One row per observed asset DTO item, including bank accounts, insurance, securities, vehicles, and foreign assets. | `source_section`, asset name, `raw_value`, `normalized_value`, source-preserving `asset_acquisition_year_raw`, `asset_acquisition_year`, `asset_event_date`, `asset_event_precision`, and `asset_event_source_field` |
 | `liabilities` | One row per declared debt or liability item. | `source_section`, description, `raw_value`, `normalized_value`, raw record |
 
 ### First production snapshot quality triage
@@ -621,13 +621,22 @@ WHERE column_name = 'snapshot_date';
 The repository also contains a deliberately small public dashboard under
 `website/hatvp-transparency-dashboard/`. It is separate from the ingestion
 pipeline and reads current aggregates from the four Gold BigQuery tables:
-`gold_declarations`, `gold_people`, `gold_incomes`, and `gold_assets`. Its declaration search can
+`gold_declarations`, `gold_people`, `gold_incomes`, and `gold_assets`. The
+declarant-specific age analysis is the deliberate exception: it reads the
+latest Silver snapshot so it can retain declaration history, then independently
+ranks interest and patrimonial filings for the primary view. Its declaration search can
 open one matching public declaration and display a schema-aware interface for
 that declaration's source XML node from the immutable GCS snapshot. The detail
 view keeps a collapsed raw-XML audit section for source verification while
 rendering the observed metadata, identity, mandates, annual amounts, interests,
 activities, assets, liabilities, attachments, and empty source sections in
-readable cards and charts. The frontend also includes `/analysis` for DOB leaderboards and five-year salary bins, plus `/age-analysis` for a declarant-specific annual timeline. It defaults to Sébastien Lecornu and supports accent-insensitive name search. The static `/quality-issues`
+readable cards and charts. The frontend also includes `/analysis` for DOB
+leaderboards and five-year salary bins, plus `/age-analysis` for a
+declarant-specific source story. That view combines roles, employers, periods,
+and source-reported annual amounts from the newest interest declaration; shows
+each asset once from the newest patrimonial declaration; and keeps earlier
+versions in expandable history. It defaults to Sébastien Lecornu and supports
+accent-insensitive name search. The static `/quality-issues`
 page backed by `src/data/qualityIssues.json`; this is a redacted register with
 only issue type, contact date, public HATVP link(s), and solved state. The page
 calculates each unresolved issue's open duration from its contact date and the
@@ -643,19 +652,24 @@ GitHub Pages React app
 Cloudflare Worker
         │ authenticated aggregate request per slice
         ▼
-Read-only Cloud Run bridge ─── BigQuery Gold tables
-                         └── immutable GCS XML snapshot
+Read-only Cloud Run bridge ─┬─ BigQuery Gold aggregates
+                            ├─ latest Silver detail/history
+                            └─ immutable GCS XML snapshot
 ```
 
 The public API does not expose arbitrary SQL or contact/address fields.
-The bridge selects the latest shared Gold `snapshot_date` and exposes fixed
+The bridge selects the latest normalized `snapshot_date` and exposes fixed
 read-only slices: `overview`, `income`, `assets`, `declarations`,
 `gender`, `simple-analysis`, and `age-analysis?q=...`. The `gender` slice
 returns the male/female ratio plus male and female counts by Gold mandate
 position; it derives the bounded `gender` value from the XML `civilite` field
 and excludes missing or unmapped titles from the ratio. Its
 metric queries filter by Gold's explicit `metric_eligible` and `active_in_gold`
-fields; they do not recreate anomaly logic in the dashboard. The
+fields; they do not recreate anomaly logic in the dashboard. The age-analysis
+detail route uses Silver intentionally: only the newest declaration in each
+family contributes to income or the asset inventory, but flagged source amounts
+remain visible unchanged with their review metadata and prior filings remain
+auditable. The
 parameterized search matches public declarant and declaration metadata plus
 published income/asset labels. A declaration detail route accepts only a public
 declaration UUID, reads the corresponding immutable `declarations.xml` object,

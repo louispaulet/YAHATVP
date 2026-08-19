@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from lxml import etree
 
 from ..models import ParseContext, ParserConfig
-from ..normalize import normalize_text, parse_french_number, parse_year
+from ..normalize import normalize_text, parse_date, parse_french_number, parse_year
 from ..xml_support import (
     child,
     first_value,
@@ -16,6 +17,24 @@ from ..xml_support import (
     normalized_child_text,
     raw_record,
 )
+
+ASSET_EVENT_FIELDS = (
+    "dateAcquisition dateAchat anneeAcquisition dateSouscription dateDetention".split()
+)
+
+
+def _asset_event(fields: dict[str, Any]) -> tuple[Any, Any, Any, Any]:
+    for source in ASSET_EVENT_FIELDS:
+        raw = normalize_text(fields.get(source))
+        if raw:
+            if re.fullmatch(r"\d{4}", raw):
+                precision = "year"
+            elif re.fullmatch(r"(?:\d{2}/\d{4}|\d{4}-\d{2})", raw):
+                precision = "month"
+            else:
+                precision = "day" if parse_date(raw) else "unknown"
+            return raw, parse_date(raw) if precision == "day" else None, precision, source
+    return None, None, None, None
 
 
 def asset_rows(
@@ -30,14 +49,7 @@ def asset_rows(
         for index, item in enumerate(item_groups(child(element, section_name))):
             fields = flatten_leaf_values(item)
             raw_value = first_value(fields, *values)
-            acquisition_raw = first_value(
-                fields,
-                "dateAcquisition",
-                "dateAchat",
-                "anneeAcquisition",
-                "dateSouscription",
-                "dateDetention",
-            )
+            acquisition_raw, event_date, event_precision, event_source = _asset_event(fields)
             rows.append(
                 {
                     "declaration_uuid": uuid,
@@ -49,6 +61,9 @@ def asset_rows(
                     "normalized_value": parse_french_number(raw_value),
                     "asset_acquisition_year_raw": acquisition_raw,
                     "asset_acquisition_year": parse_year(acquisition_raw),
+                    "asset_event_date": event_date,
+                    "asset_event_precision": event_precision,
+                    "asset_event_source_field": event_source,
                     "quality_status": "OK",
                     "quality_reason": None,
                     "raw_record_json": raw_record(fields),

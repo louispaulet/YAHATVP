@@ -146,8 +146,10 @@ def test_bridge_returns_parameterized_age_analysis(monkeypatch):
         "generated_at": "2026-08-18T08:00:00+00:00",
         "person_json": json.dumps({"prenom": "Sébastien", "nom": "LECORNU"}),
         "matches_json": "[]",
+        "declaration_context_json": json.dumps(
+            {"interest_count": 1, "asset_count": 0, "history": []}
+        ),
         "income_json": "[]",
-        "occupations_json": "[]",
         "assets_json": "[]",
     }
     client = Client([row])

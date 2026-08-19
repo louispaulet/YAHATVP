@@ -51,8 +51,6 @@ def test_force_replay_writes_all_layers_and_unchanged_replay_is_no_change(
 
 
 def test_forced_layer_outputs_keep_source_and_anomaly_columns(tmp_path: Path, monkeypatch) -> None:
-    """The local artifact contract keeps values, evidence, and lifecycle flags."""
-
     output = tmp_path / "output"
     monkeypatch.setattr(main_module, "_snapshot_date", lambda: "2026-08-16")
     run_pipeline(settings(output), force=True, downloader=fixture_downloader)
@@ -60,12 +58,16 @@ def test_forced_layer_outputs_keep_source_and_anomaly_columns(tmp_path: Path, mo
     silver = pl.read_parquet(root / "silver/incomes/snapshot_date=2026-08-16/data.parquet")
     gold = pl.read_parquet(root / "gold/incomes/snapshot_date=2026-08-16/data.parquet")
     gold_people = pl.read_parquet(root / "gold/people/snapshot_date=2026-08-16/data.parquet")
-
+    gold_assets = pl.read_parquet(root / "gold/assets/snapshot_date=2026-08-16/data.parquet")
     assert {"raw_value", "normalized_value", "anomaly_rule_ids", "metric_eligible"} <= set(
         silver.columns
     )
     assert {"is_latest_declaration", "active_in_gold"} <= set(gold.columns)
     assert "gender" in gold_people.columns
+    assert {"asset_event_date", "asset_event_precision", "asset_event_source_field"} <= set(
+        gold_assets.columns
+    )
+    assert gold_assets.schema["asset_event_date"] == pl.Date
     assert silver.height >= gold.height
 
 

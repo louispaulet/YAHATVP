@@ -1,5 +1,7 @@
 """Fixture tests for asset and liability DTO components."""
 
+import json
+
 from hatvp.parser.finance import asset_rows, liability_rows
 from hatvp.xml_support import local_name
 from tests.parser_support import asset_sections, first_row, xml_tables
@@ -35,6 +37,14 @@ def test_finance_rows_preserve_source_positions_and_values() -> None:
     assert asset["source_item_index"] == 0
     assert asset["raw_value"] == "250 000,00"
     assert asset["asset_acquisition_year"] == 2007
+    assert asset["asset_event_date"] is None
+    assert asset["asset_event_precision"] == "year"
+    assert asset["asset_event_source_field"] == "dateAcquisition"
+    insurance = first_row(tables, "assets", source_section="assuranceVieDto")
+    assert insurance["asset_event_date"] == "2002-01-21"
+    assert insurance["asset_event_precision"] == "day"
+    assert insurance["asset_event_source_field"] == "dateSouscription"
+    assert json.loads(insurance["raw_record_json"])["dateSouscription"] == "21/01/2002"
     assert liability["source_section"] == "passifDto"
     assert liability["raw_value"] == "10 000,00"
 

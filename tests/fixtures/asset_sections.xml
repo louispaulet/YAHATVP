@@ -22,7 +22,7 @@
       <items><items><nomSociete>Société cotée</nomSociete><valeurActuelle>15 000,00</valeurActuelle></items></items>
     </valeursEnBourseDto>
     <assuranceVieDto>
-      <items><items><souscripteur>Fixture</souscripteur><valeurRachat>5 000,00</valeurRachat></items></items>
+      <items><items><souscripteur>Fixture</souscripteur><dateSouscription>21/01/2002</dateSouscription><valeurRachat>5 000,00</valeurRachat></items></items>
     </assuranceVieDto>
     <comptesBancaireDto>
       <items><items><typeCompte>Compte courant</typeCompte><etablissement>Banque</etablissement><valeur>12 000,00</valeur></items></items>

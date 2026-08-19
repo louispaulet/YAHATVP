@@ -102,9 +102,17 @@ function isDashboardSimpleAnalysisResponse(value: unknown): value is SimpleAnaly
 
 function isDashboardAgeAnalysisResponse(value: unknown): value is AgeAnalysisResponse {
   if (!isRecord(value) || typeof value.generatedAt !== "string") return false;
+  const context = value.declarationContext;
   return isRecord(value.person) && Array.isArray(value.matches)
-    && Array.isArray(value.incomeByYear) && Array.isArray(value.occupationsByYear)
-    && Array.isArray(value.assetTimeline);
+    && isRecord(context) && typeof context.interestCount === "number"
+    && typeof context.assetCount === "number" && Array.isArray(context.history)
+    && Array.isArray(value.incomeByYear) && value.incomeByYear.every((year) =>
+      isRecord(year) && typeof year.combinedAmount === "number" && Array.isArray(year.sources)
+      && year.sources.every((source) => isRecord(source) && typeof source.sourceId === "string"
+        && typeof source.amount === "number" && typeof source.metricEligible === "boolean"))
+    && Array.isArray(value.assetInventory) && value.assetInventory.every((asset) =>
+      isRecord(asset) && typeof asset.sourceId === "string" && typeof asset.kind === "string"
+      && typeof asset.metricEligible === "boolean");
 }
 
 function declarationId(pathname: string): string | null {

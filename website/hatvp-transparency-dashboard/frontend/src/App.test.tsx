@@ -36,6 +36,7 @@ describe("dashboard application", () => {
   afterEach(() => vi.useRealTimers());
 
   beforeEach(() => {
+    window.localStorage.clear();
     vi.stubGlobal("fetch", vi.fn().mockImplementation((url: string) => {
       const path = new URL(url).pathname;
       const payload = path.endsWith("/overview") ? dashboard : path.endsWith("/income") ? income : path.endsWith("/assets") ? assets : path.endsWith("/gender") ? gender : path.endsWith("/search") ? search : path.endsWith("/simple-analysis") ? simpleAnalysis : path.endsWith("/age-analysis") ? ageAnalysis : path.includes("/declarations/") ? declaration : declarations;
@@ -116,9 +117,28 @@ describe("dashboard application", () => {
     render(<MemoryRouter initialEntries={["/age-analysis"]}><App /></MemoryRouter>);
     expect(await screen.findByText("Sébastien LECORNU")).toBeInTheDocument();
     expect(screen.getByText("Income by year")).toBeInTheDocument();
-    expect(screen.getByText("Occupations by year")).toBeInTheDocument();
-    expect(screen.getByText("Asset acquisitions over time")).toBeInTheDocument();
+    expect(screen.getByText("These amounts are flagged for review")).toBeInTheDocument();
+    expect(screen.getByText("Two declaration families, selected independently")).toBeInTheDocument();
+    expect(screen.getByText("Latest asset inventory")).toBeInTheDocument();
+    expect(screen.getByText("Subscribed 21 Jan 2002 · age 15")).toBeInTheDocument();
+    expect(screen.getByText("French Ministry of Economy guidance ↗")).toBeInTheDocument();
+    expect(screen.getAllByText("€770K")).toHaveLength(1);
+    expect(screen.getAllByText("Terrain")).toHaveLength(1);
+    expect(screen.queryByText("Occupations by year")).not.toBeInTheDocument();
+    expect(screen.queryByText(/×3/)).not.toBeInTheDocument();
+    screen.getAllByText("assuranceVieDto").forEach((label) => expect(label).not.toBeVisible());
+    fireEvent.click(screen.getByText(/Show declaration history/));
+    expect(screen.getAllByText(/earlier version/)).toHaveLength(4);
     expect(screen.getByDisplayValue("Sébastien Lecornu")).toBeInTheDocument();
+  });
+
+  it("localizes the declarant story without exposing DTO labels in the main view", async () => {
+    render(<MemoryRouter initialEntries={["/age-analysis"]}><App /></MemoryRouter>);
+    expect(await screen.findByText("Latest asset inventory")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "French" }));
+    expect(screen.getByText("Dernier inventaire patrimonial")).toBeInTheDocument();
+    expect(screen.getByText("Souscrit le 21 janv. 2002 · âge 15")).toBeInTheDocument();
+    expect(screen.getByText("Assurance-vie")).toBeInTheDocument();
   });
 
   it("renders the redacted HATVP quality issue register", () => {

@@ -124,30 +124,33 @@ def build_age_analysis_query(project: str, dataset: str) -> str:
     """Build a parameterized latest-snapshot analysis for one public declarant."""
 
     prefix = dataset_prefix(project, dataset)
-    declarations = table(prefix, "declarations")
-    people = table(prefix, "people")
-    incomes = table(prefix, "incomes")
-    assets = table(prefix, "assets")
+    declarations = f"{prefix}.silver_declarations"
+    people = f"{prefix}.silver_people"
+    incomes = f"{prefix}.silver_incomes"
+    assets = f"{prefix}.silver_assets"
     age_at_snapshot = _age("l.snapshot_date", "p.date_naissance_date")
     search_term = accent_fold("@search_term")
     first_name = accent_fold("COALESCE(p.prenom, '')")
     last_name = accent_fold("COALESCE(p.nom, '')")
     full_name = accent_fold("CONCAT(COALESCE(p.prenom, ''), ' ', COALESCE(p.nom, ''))")
     group_name = accent_fold("CONCAT(COALESCE(prenom, ''), ' ', COALESCE(nom, ''))")
+    event_age = _age("a.asset_event_date", "sp.date_naissance_date")
     return f"""WITH latest AS (
   SELECT MAX(snapshot_date) AS snapshot_date FROM {declarations}
 ), search AS (
   SELECT {search_term} AS term
 ), person_rows AS (
-  SELECT p.declaration_uuid, p.prenom, p.nom, p.date_naissance,
+  SELECT p.snapshot_date, p.bronze_record_key, p.declaration_uuid,
+    p.prenom, p.nom, p.date_naissance,
     p.date_naissance_date, p.date_naissance_quality_status,
-    d.mandat_label, d.organ_label, ({age_at_snapshot}) AS age_years,
+    d.date_depot, d.declaration_modificative, d.declaration_type_id,
+    d.declaration_type_label, d.mandat_label, d.organ_label,
+    ({age_at_snapshot}) AS age_years,
     CONCAT({first_name}, '|',
       {last_name}, '|',
       COALESCE(CAST(p.date_naissance_date AS STRING), '')) AS person_key
   FROM {people} p
-  JOIN {declarations} d ON d.declaration_uuid = p.declaration_uuid
-    AND d.snapshot_date = p.snapshot_date
+  JOIN {declarations} d USING (snapshot_date, bronze_record_key, declaration_uuid)
   CROSS JOIN latest l CROSS JOIN search s
   WHERE p.snapshot_date = l.snapshot_date
     AND (STRPOS({first_name}, s.term) > 0
@@ -165,65 +168,93 @@ def build_age_analysis_query(project: str, dataset: str) -> str:
   GROUP BY person_key
 ), selected_person AS (
   SELECT * FROM person_groups ORDER BY exact_match DESC, declaration_count DESC, person_key LIMIT 1
-), selected_declarations AS (
-  SELECT DISTINCT pr.declaration_uuid
+), declaration_rows AS (
+  SELECT pr.*,
+    CASE WHEN STARTS_WITH(UPPER(pr.declaration_type_id), 'DI') THEN 'interest'
+      WHEN STARTS_WITH(UPPER(pr.declaration_type_id), 'DSP') THEN 'assets'
+      ELSE 'other' END AS declaration_family
   FROM person_rows pr JOIN selected_person sp USING (person_key)
+  QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY pr.declaration_uuid ORDER BY pr.bronze_record_key DESC
+  ) = 1
+), ranked_declarations AS (
+  SELECT *, ROW_NUMBER() OVER (
+    PARTITION BY declaration_family
+    ORDER BY date_depot DESC,
+      IF(LOWER(COALESCE(declaration_modificative, 'false')) IN ('true', '1', 'oui'), 1, 0) DESC,
+      declaration_uuid DESC
+  ) AS family_rank
+  FROM declaration_rows
+), latest_interest AS (
+  SELECT * FROM ranked_declarations WHERE declaration_family = 'interest' AND family_rank = 1
+), latest_assets AS (
+  SELECT * FROM ranked_declarations WHERE declaration_family = 'assets' AND family_rank = 1
 ), income_rows AS (
   SELECT SAFE_CAST(i.income_year AS INT64) AS year,
-    COALESCE(NULLIF(i.income_type, ''), i.income_stream, 'unknown') AS income_label,
-    COALESCE(NULLIF(i.source_section, ''), i.income_stream, 'unknown') AS source_label,
-    SUM(i.normalized_value) AS amount
-  FROM {incomes} i JOIN selected_declarations sd ON sd.declaration_uuid = i.declaration_uuid
+    CONCAT(i.declaration_uuid, ':', COALESCE(i.income_stream, ''), ':',
+      COALESCE(CAST(i.source_item_index AS STRING), ''), ':', COALESCE(i.income_year, ''), ':',
+      COALESCE(CAST(i.remuneration_index AS STRING), '')) AS source_id,
+    CASE WHEN i.income_stream = 'mandate_remuneration' THEN 'mandate'
+      WHEN i.income_stream = 'activity_remuneration' THEN 'activity'
+      ELSE 'income' END AS source_kind,
+    i.source_section, COALESCE(NULLIF(i.income_type, ''), i.income_stream, 'unknown') AS label,
+    JSON_VALUE(i.raw_record_json, '$.employeur') AS employer,
+    JSON_VALUE(i.raw_record_json, '$.dateDebut') AS start_date,
+    JSON_VALUE(i.raw_record_json, '$.dateFin') AS end_date,
+    JSON_VALUE(i.raw_record_json, '$.remuneration.brutNet') AS amount_basis,
+    i.normalized_value AS amount, COALESCE(i.metric_eligible, TRUE) AS metric_eligible,
+    COALESCE(NULLIF(i.anomaly_status, ''), 'ok') AS review_status
+  FROM {incomes} i
+  JOIN latest_interest li USING (snapshot_date, bronze_record_key, declaration_uuid)
   CROSS JOIN latest l
   WHERE i.snapshot_date = l.snapshot_date AND i.normalized_value IS NOT NULL
-    AND COALESCE(i.metric_eligible, TRUE) AND SAFE_CAST(i.income_year AS INT64) IS NOT NULL
-  GROUP BY year, income_label, source_label
+    AND SAFE_CAST(i.income_year AS INT64) IS NOT NULL
 ), income_by_year AS (
   SELECT year, SUM(amount) AS combined_amount,
-    ARRAY_AGG(STRUCT(source_label, income_label, amount) ORDER BY amount DESC) AS sources
+    ARRAY_AGG(STRUCT(source_id, source_kind, source_section, label, employer, start_date,
+      end_date, amount_basis, amount, metric_eligible, review_status)
+      ORDER BY amount DESC, label) AS sources
   FROM income_rows GROUP BY year
-), occupation_rows AS (
-  SELECT SAFE_CAST(i.income_year AS INT64) AS year,
-    COALESCE(NULLIF(i.income_type, ''), NULLIF(d.mandat_label, ''), 'unknown') AS label,
-    COALESCE(NULLIF(d.organ_label, ''), NULLIF(i.source_section, ''), 'HATVP') AS source,
-    COUNT(*) AS row_count
-  FROM {incomes} i
-  JOIN selected_declarations sd ON sd.declaration_uuid = i.declaration_uuid
-  JOIN {declarations} d ON d.declaration_uuid = i.declaration_uuid
-    AND d.snapshot_date = i.snapshot_date
-  CROSS JOIN latest l
-  WHERE i.snapshot_date = l.snapshot_date AND SAFE_CAST(i.income_year AS INT64) IS NOT NULL
-  GROUP BY year, label, source
-  UNION ALL
-  SELECT EXTRACT(YEAR FROM SAFE_CAST(COALESCE(d.date_debut_mandat, d.date_depot) AS DATE)) AS year,
-    COALESCE(NULLIF(d.mandat_label, ''), 'unknown') AS label,
-    COALESCE(NULLIF(d.organ_label, ''), 'HATVP') AS source, COUNT(*) AS row_count
-  FROM {declarations} d JOIN selected_declarations sd ON sd.declaration_uuid = d.declaration_uuid
-  CROSS JOIN latest l
-  WHERE d.snapshot_date = l.snapshot_date
-    AND SAFE_CAST(COALESCE(d.date_debut_mandat, d.date_depot) AS DATE) IS NOT NULL
-  GROUP BY year, label, source
-), occupations_by_year AS (
-  SELECT year, SUM(row_count) AS occupation_count,
-    ARRAY_AGG(STRUCT(label, source, row_count) ORDER BY row_count DESC, label) AS occupations
-  FROM occupation_rows WHERE year IS NOT NULL GROUP BY year
 ), asset_rows AS (
-  SELECT a.asset_acquisition_year AS year, a.source_section, a.asset_name,
-    a.normalized_value, EXTRACT(YEAR FROM sp.date_naissance_date) AS date_naissance_year,
-    a.asset_acquisition_year - EXTRACT(YEAR FROM sp.date_naissance_date) AS relative_age
-  FROM {assets} a JOIN selected_declarations sd ON sd.declaration_uuid = a.declaration_uuid
+  SELECT CONCAT(a.declaration_uuid, ':', a.source_section, ':',
+      CAST(a.source_item_index AS STRING)) AS source_id,
+    a.source_section AS kind,
+    CASE WHEN a.source_section = 'assuranceVieDto'
+        THEN COALESCE(JSON_VALUE(a.raw_record_json, '$.etablissement'), a.asset_name)
+      WHEN a.source_section = 'comptesBancaireDto' THEN CONCAT(
+        COALESCE(JSON_VALUE(a.raw_record_json, '$.typeCompte'), a.asset_name, 'Compte'),
+        COALESCE(CONCAT(' · ', JSON_VALUE(a.raw_record_json, '$.etablissement')), ''))
+      ELSE a.asset_name END AS name,
+    a.normalized_value AS value,
+    a.asset_acquisition_year AS event_year, a.asset_acquisition_year_raw AS event_date_raw,
+    a.asset_event_date AS event_date, a.asset_event_precision AS event_precision,
+    a.asset_event_source_field AS event_source_field,
+    CASE WHEN a.asset_event_source_field = 'dateSouscription' THEN 'subscription'
+      WHEN a.asset_event_source_field IN ('dateAcquisition', 'dateAchat', 'anneeAcquisition')
+        THEN 'acquisition'
+      WHEN a.asset_event_source_field = 'dateDetention' THEN 'holding'
+      ELSE NULL END AS event_kind,
+    CASE WHEN a.asset_event_precision = 'day' AND a.asset_event_date IS NOT NULL
+      AND sp.date_naissance_date IS NOT NULL THEN ({event_age}) ELSE NULL END AS age_years,
+    CASE WHEN a.asset_acquisition_year IS NOT NULL AND a.asset_event_precision != 'day'
+      THEN a.asset_acquisition_year - EXTRACT(YEAR FROM sp.date_naissance_date) - 1 ELSE NULL
+      END AS age_range_min,
+    CASE WHEN a.asset_acquisition_year IS NOT NULL AND a.asset_event_precision != 'day'
+      THEN a.asset_acquisition_year - EXTRACT(YEAR FROM sp.date_naissance_date) ELSE NULL
+      END AS age_range_max,
+    la.date_depot AS declared_at, COALESCE(a.metric_eligible, TRUE) AS metric_eligible,
+    COALESCE(NULLIF(a.anomaly_status, ''), 'ok') AS review_status
+  FROM {assets} a JOIN latest_assets la USING (snapshot_date, bronze_record_key, declaration_uuid)
   CROSS JOIN latest l CROSS JOIN selected_person sp
-  WHERE a.snapshot_date = l.snapshot_date AND a.asset_acquisition_year IS NOT NULL
-), assets_by_year AS (
-  SELECT year, ANY_VALUE(relative_age) AS relative_age,
-    ARRAY_AGG(STRUCT(source_section, asset_name, normalized_value)
-      ORDER BY normalized_value DESC) AS assets
-  FROM asset_rows GROUP BY year
+  WHERE a.snapshot_date = l.snapshot_date
 )
 SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
   CURRENT_TIMESTAMP() AS generated_at,
   TO_JSON_STRING(STRUCT(
-    sp.person_key, sp.primary_uuid, sp.prenom, sp.nom, sp.date_naissance,
+    sp.person_key,
+    COALESCE((SELECT declaration_uuid FROM latest_interest),
+      (SELECT declaration_uuid FROM latest_assets), sp.primary_uuid) AS primary_uuid,
+    sp.prenom, sp.nom, sp.date_naissance,
     sp.age_years, sp.date_naissance_quality_status, sp.declaration_count
   )) AS person_json,
   TO_JSON_STRING(ARRAY(
@@ -231,10 +262,28 @@ SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
       age_years, date_naissance_quality_status, declaration_count
     FROM person_groups ORDER BY exact_match DESC, declaration_count DESC, person_key LIMIT 20
   )) AS matches_json,
+  TO_JSON_STRING(STRUCT(
+    (SELECT COUNTIF(declaration_family = 'interest') FROM ranked_declarations) AS interest_count,
+    (SELECT COUNTIF(declaration_family = 'assets') FROM ranked_declarations) AS asset_count,
+    (SELECT AS STRUCT declaration_uuid, date_depot, declaration_type_id,
+      declaration_type_label, declaration_modificative, mandat_label, organ_label
+      FROM latest_interest) AS latest_interest,
+    (SELECT AS STRUCT declaration_uuid, date_depot, declaration_type_id,
+      declaration_type_label, declaration_modificative, mandat_label, organ_label
+      FROM latest_assets) AS latest_assets,
+    ARRAY(SELECT AS STRUCT rd.declaration_uuid, rd.date_depot, rd.declaration_type_id,
+      rd.declaration_type_label, rd.declaration_modificative, rd.mandat_label, rd.organ_label,
+      rd.declaration_family, rd.family_rank = 1 AS is_selected,
+      (SELECT COUNT(*) FROM {incomes} i WHERE i.snapshot_date = rd.snapshot_date
+        AND i.bronze_record_key = rd.bronze_record_key) AS income_row_count,
+      (SELECT COUNT(*) FROM {assets} a WHERE a.snapshot_date = rd.snapshot_date
+        AND a.bronze_record_key = rd.bronze_record_key) AS asset_row_count
+      FROM ranked_declarations rd ORDER BY rd.date_depot DESC, rd.declaration_uuid DESC
+    ) AS history
+  )) AS declaration_context_json,
   TO_JSON_STRING(ARRAY(SELECT AS STRUCT * FROM income_by_year ORDER BY year)) AS income_json,
-  TO_JSON_STRING(ARRAY(SELECT AS STRUCT * FROM occupations_by_year
-    ORDER BY year)) AS occupations_json,
-  TO_JSON_STRING(ARRAY(SELECT AS STRUCT * FROM assets_by_year ORDER BY year)) AS assets_json
+  TO_JSON_STRING(ARRAY(SELECT AS STRUCT * FROM asset_rows
+    ORDER BY event_year, kind, name, source_id)) AS assets_json
 FROM latest l CROSS JOIN selected_person sp"""
 
 

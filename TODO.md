@@ -47,6 +47,16 @@ documented and complete.
   `state/latest.json` advanced with `SUCCESS_WITH_WARNINGS` and zero quality errors.
 - [x] Redeploy the bridge, Worker, and frontend; verify the production health,
   aggregate, analysis, search/detail, and custom-domain routes return HTTP 200.
+- [x] Repair the declarant timeline semantic model: rank interest and
+  patrimonial filings independently, expose prior versions, show flagged source
+  income unchanged, and replace the repeated timeline with the latest asset
+  inventory.
+- [x] Preserve asset event dates, precision, and source fields through Bronze,
+  Silver, Gold, and the schema-evolution contract; verify Lecornu's 2002 value
+  is a 21 January life-insurance subscription at age 15, not a 2002 filing.
+- [ ] Deploy and force-replay the repaired timeline release; record the main
+  workflow, ingestion execution, 13-table load, state advancement, bridge
+  revision, Worker version, frontend publish, and final Chrome audit.
 
 ## Google Cloud project details (completed)
 
@@ -361,6 +371,12 @@ audit history.
   JSON file, keeping only issue type, contact date, public HATVP links, and
   solved state; calculate unresolved duration from the contact date and exclude
   the source CSVs and correspondence.
+- [x] Replace the declarant age timeline's cross-version sums and repeated DTO
+  cards with independently selected declaration families, source-reported
+  income stories, localized asset groups, and expandable declaration history.
+- [x] Cover the real Lecornu-shaped payload in bridge, Worker, and frontend
+  tests: seven income years, no occupation counts, no visible DTO jargon, exact
+  age 15 for the 2002 subscription, and no cross-version asset duplication.
 
 Static quality-register evidence (2026-08-19): the frontend fixture suite passes
 with 19 tests, the production build succeeds, the local page renders ten rows

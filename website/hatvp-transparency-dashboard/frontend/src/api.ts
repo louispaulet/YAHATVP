@@ -56,9 +56,17 @@ function isSimpleAnalysisResponse(value: unknown): value is SimpleAnalysisRespon
 }
 
 function isAgeAnalysisResponse(value: unknown): value is AgeAnalysisResponse {
-  return isMeta(value) && isRecord(value.person) && Array.isArray(value.matches)
-    && Array.isArray(value.incomeByYear) && Array.isArray(value.occupationsByYear)
-    && Array.isArray(value.assetTimeline);
+  if (!isMeta(value) || !isRecord(value.person) || !Array.isArray(value.matches)) return false;
+  const context = value.declarationContext;
+  return isRecord(context) && typeof context.interestCount === "number"
+    && typeof context.assetCount === "number" && Array.isArray(context.history)
+    && Array.isArray(value.incomeByYear) && value.incomeByYear.every((year) =>
+      isRecord(year) && typeof year.combinedAmount === "number" && Array.isArray(year.sources)
+      && year.sources.every((source) => isRecord(source) && typeof source.sourceId === "string"
+        && typeof source.amount === "number" && typeof source.metricEligible === "boolean"))
+    && Array.isArray(value.assetInventory) && value.assetInventory.every((asset) =>
+      isRecord(asset) && typeof asset.sourceId === "string" && typeof asset.kind === "string"
+      && typeof asset.metricEligible === "boolean");
 }
 
 async function fetchJson<T>(path: string, validate: (value: unknown) => value is T, signal?: AbortSignal): Promise<T> {
