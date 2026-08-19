@@ -36,6 +36,10 @@
 - Bridge, Worker, and frontend suites passed with 43, 12, and 26 tests. The full
   Python suite passed 158 tests; Ruff checks, package build, TypeScript checks,
   Vite build, npm audits, and the live BigQuery Highlights query also passed.
+- Main workflow run
+  [32310774561](https://github.com/louispaulet/YAHATVP/actions/runs/32310774561)
+  passed tests, deployment configuration, image build/push, and Cloud Run Job
+  deployment for commit `ed027a7`.
 
 ## 2026-08-19 — Merge dashboard PRs and redeploy the frontend only
 

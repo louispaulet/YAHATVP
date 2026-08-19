@@ -425,7 +425,9 @@ route returned snapshot `2026-08-19` with 8 income changes, 8 asset records, and
 Highlights smoke routes all returned HTTP 200. Production browser verification
 confirmed the new bundle, all 24 cards, source-detail navigation, bilingual
 copy, zero desktop overflow, and no console errors. No ingestion replay was
-performed for this dashboard-only release.
+performed for this dashboard-only release. Main workflow run `32310774561`
+passed its tests, configuration gate, image build/push, and Cloud Run Job
+deployment for commit `ed027a7`.
 
 ## 11. BigQuery tutorial
 
