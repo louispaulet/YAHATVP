@@ -36,6 +36,8 @@ documented and complete.
 - [x] Add the simple DOB/salary analysis page with youngest/oldest leaderboards and five-year age bins.
 - [x] Add the declarant age/year page with a Lecornu example, name search, annual income sources, occupations, and asset timeline.
 - [x] Cover the new pipeline, bridge, Worker, and frontend contracts with fixture/unit tests.
+- [x] Verify both analysis pages, the Lecornu search flow, responsive layout, and browser console output with Chrome MCP.
+- [ ] Open a PR from the feature branch and address review before merge.
 - [ ] After merge, replay ingestion before dashboard deployment so the new Gold columns are present in BigQuery.
 
 ## Google Cloud project details (completed)

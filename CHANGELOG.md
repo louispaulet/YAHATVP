@@ -21,6 +21,10 @@
 
 - 44 focused pipeline tests, 37 bridge tests, 22 frontend tests plus a Vite
   production build, and 9 Worker tests plus TypeScript typecheck pass.
+- Chrome MCP verified `/analysis` and `/age-analysis` locally: the leaderboards,
+  five-year salary chart, Lecornu profile, annual income, occupations, asset
+  timeline, and accent-insensitive search rendered without console warnings or
+  horizontal overflow.
 - Production replay and dashboard deployment remain intentionally deferred to
   the post-merge release sequence because the new Gold columns must exist before
   the analysis queries are deployed.
