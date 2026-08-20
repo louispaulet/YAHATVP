@@ -48,7 +48,7 @@ function AnnualAmounts({ values, language, label }: { values: AnnualAmount[]; la
         {values.map((item, index) => (
           <div className="flex min-w-0 flex-1 flex-col items-center justify-end gap-2" key={`${item.year}-${item.field}-${index}`}>
             <span className="max-w-full truncate text-[10px] font-bold text-slate-500">{formatCurrency(item.amount, language)}</span>
-            <div className="w-full max-w-12 rounded-t-xl bg-emerald/80" style={{ height: `${Math.max(10, (Math.abs(item.amount) / max) * 78)}%` }} title={`${item.year}: ${formatCurrency(item.amount, language)}`} />
+            <div data-testid="annual-bar" className="w-full max-w-12 rounded-t-xl bg-emerald/80" style={{ height: `${Math.max(10, (Math.abs(item.amount) / max) * 78)}px` }} title={`${item.year}: ${formatCurrency(item.amount, language)}`} />
             <span className="text-[10px] font-bold text-slate-500">{item.year}</span>
           </div>
         ))}

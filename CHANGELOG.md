@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-20 — Fix declaration annual-value chart bars
+
+### Changed
+
+- Fixed the declaration detail annual-values chart so its bars use concrete
+  pixel heights instead of percentage heights inside auto-sized flex columns;
+  the source-reported amounts, including outliers, remain unchanged.
+- Added a regression test covering multi-year annual-value rendering.
+
+### Verified
+
+- The focused frontend Vitest passed and the Vite production build completed.
+- The full local frontend suite remains incompatible with the current Node 24
+  runtime because its existing jsdom setup exposes no `window.localStorage`;
+  this failure occurs before test assertions and is unrelated to the chart.
+
 ## 2026-08-20 — Publish grouped dashboard navigation
 
 ### Deployed
