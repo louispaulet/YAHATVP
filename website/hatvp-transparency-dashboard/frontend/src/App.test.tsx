@@ -96,8 +96,8 @@ describe("dashboard application", () => {
     expect(screen.getByRole("navigation", { name: "Primary navigation" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "What stands out" })).toHaveAttribute("aria-current", "page");
-    expect(await screen.findByText("Largest declared income changes")).toBeInTheDocument();
-    expect(screen.getByText("Assets that stand out")).toBeInTheDocument();
+    expect(await screen.findByText("Largest active income changes")).toBeInTheDocument();
+    expect(screen.getByText("Assets with active review flags")).toBeInTheDocument();
     expect(screen.getByText("Most amended public records")).toBeInTheDocument();
     expect(screen.getByText("+€70K")).toBeInTheDocument();
     expect(screen.getAllByText("Review flag")).toHaveLength(2);

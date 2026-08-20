@@ -57,10 +57,13 @@ def row():
 
 def test_highlights_query_is_fixed_source_linked_and_excludes_current_year():
     query = build_highlights_query("project", "dataset")
-    assert "gold_incomes" in query and "gold_assets" in query
+    assert "gold_incomes" in query and "gold_assets" in query and "anomaly_registry" in query
     assert "silver_declarations" in query and "silver_people" in query
+    assert "current_declarations" in query
+    assert "status NOT IN ('superseded', 'resolved')" in query
     assert "SAFE_CAST(i.income_year AS INT64) < EXTRACT(YEAR" in query
     assert "h.previous_year = h.income_year - 1" in query
+    assert "h.review_required OR h.previous_review_required" in query
     assert "p.date_naissance_date" in query
     assert "adresse_" not in query and "telephone" not in query and "email" not in query
 

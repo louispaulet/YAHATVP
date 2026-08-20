@@ -59,12 +59,18 @@ documented and complete.
 - [x] Replace the explorer placeholder with a bilingual, source-linked
   Highlights page for completed-year income changes, standout assets, and
   amendment history.
+- [x] Restrict Highlights income and asset cards to the latest person-level
+  declaration and current anomaly-registry records; keep superseded history
+  in the audit layers.
 - [x] Group the dashboard navbar into Explore, Declarations, and Data & methods
   with bilingual child labels while preserving all existing route URLs.
 - [x] Publish the grouped dashboard navigation to GitHub Pages and verify the
   public custom-domain routes.
 - [x] Pin frontend and Worker JavaScript dependencies to explicit compatible
   ranges instead of unconstrained `latest` specifications.
+- [ ] Deploy the current-issue Highlights release and verify the production
+  API, latest-version filtering, source links, bilingual copy, and browser
+  console output.
 - [ ] Deploy and force-replay the repaired timeline release; record the main
   workflow, ingestion execution, 13-table load, state advancement, bridge
   revision, Worker version, frontend publish, and final Chrome audit.

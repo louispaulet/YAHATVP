@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-21 — Restrict Highlights to current review signals
+
+### Changed
+
+- Updated the Highlights bridge query to use the latest person-level
+  declaration version for each mandate period and to read current anomaly
+  lifecycle records directly from `anomaly_registry`.
+- Excluded superseded and resolved income/asset records from the public
+  Highlights cards while retaining source values and historical evidence in
+  Silver and the registry.
+- Updated the bilingual Highlights copy and bridge/frontend regression
+  contracts to describe the current-issue selection.
+
+### Verified locally
+
+- The generated BigQuery query ran against snapshot `2026-08-19` and no longer
+  returned Nathalie Goulet’s superseded initial declaration
+  `81068658-e43c-4bf2-9947-df3a538b8182`.
+- `make backend-test` passed with 12 Worker tests, typecheck, and 43 bridge
+  tests. `make frontend-test` passed 27 tests and the production build.
+
 ## 2026-08-20 — Fix declaration annual-value chart bars
 
 ### Changed
