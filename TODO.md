@@ -60,6 +60,8 @@ documented and complete.
   amendment history.
 - [x] Group the dashboard navbar into Explore, Declarations, and Data & methods
   with bilingual child labels while preserving all existing route URLs.
+- [x] Publish the grouped dashboard navigation to GitHub Pages and verify the
+  public custom-domain routes.
 - [x] Pin frontend and Worker JavaScript dependencies to explicit compatible
   ranges instead of unconstrained `latest` specifications.
 - [ ] Deploy and force-replay the repaired timeline release; record the main

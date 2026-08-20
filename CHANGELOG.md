@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-20 — Publish grouped dashboard navigation
+
+### Deployed
+
+- Published the committed frontend build from main commit `3002914` to
+  GitHub Pages; the `gh-pages` branch advanced to `77d69d1` and contains the
+  new `index-DC7XE1jI.js` bundle.
+
+### Verified
+
+- The cache-busted custom-domain page served the new bundle and loaded the
+  homepage, Highlights, analysis, search, declarant profiles, sources, data
+  quality, and declaration detail routes with the expected active parent and
+  child navigation states and no visible error state.
+- The initial uncached request briefly served the previous CDN copy during
+  propagation; a cache-busted request confirmed the new public deployment.
+
 ## 2026-08-20 — Group dashboard navigation by user task
 
 ### Changed
