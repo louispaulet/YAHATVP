@@ -58,6 +58,8 @@ documented and complete.
 - [x] Replace the explorer placeholder with a bilingual, source-linked
   Highlights page for completed-year income changes, standout assets, and
   amendment history.
+- [x] Group the dashboard navbar into Explore, Declarations, and Data & methods
+  with bilingual child labels while preserving all existing route URLs.
 - [x] Pin frontend and Worker JavaScript dependencies to explicit compatible
   ranges instead of unconstrained `latest` specifications.
 - [ ] Deploy and force-replay the repaired timeline release; record the main

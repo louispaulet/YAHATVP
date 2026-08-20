@@ -11,13 +11,17 @@
   },
   "nav": {
     "label": "Navigation principale",
-    "overview": "Vue d’ensemble",
+    "sectionLabel": "Navigation de section",
+    "explore": "Explorer",
+    "declarations": "Déclarations",
+    "data": "Données et méthodes",
+    "snapshot": "Instantané",
+    "highlights": "Ce qui ressort",
+    "populationPay": "Population et revenus",
     "search": "Rechercher une déclaration",
-    "explore": "À la une",
-    "analysis": "Analyse simple",
-    "ageAnalysis": "Âge / année",
-    "about": "À propos des données",
-    "qualityIssues": "Signalements"
+    "profiles": "Profils des déclarants",
+    "sources": "Sources et méthodes",
+    "quality": "Qualité des données"
   },
   "footer": {
     "builtFrom": "Construit à partir des déclarations publiques de la HATVP.",
@@ -89,7 +93,7 @@
     }
   },
   "about": {
-    "eyebrow": "À propos des données",
+    "eyebrow": "Sources et méthodes",
     "title": "Une petite fenêtre sur un jeu de données public.",
     "paragraphs": [
       "Ce tableau de bord est construit à partir du pipeline de données ouvertes de la HATVP. Le pipeline conserve les fichiers sources, normalise les enregistrements, contrôle leur qualité et publie quatre tables BigQuery Gold.",
@@ -165,7 +169,7 @@
     "unknownAsset": "Bien sans libellé"
   },
   "simpleAnalysis": {
-    "eyebrow": "Analyse simple",
+    "eyebrow": "Population et revenus",
     "title": "Âge, revenus et forme du jeu de données.",
     "description": "Une première vue statistique des déclarants publics. Les âges inhabituels restent visibles et sont signalés plutôt que masqués.",
     "reference": "Date de référence des âges",
@@ -204,7 +208,7 @@
     "anomalyNote": "Les signalements sont des indices à revoir, pas des corrections de la date publiée."
   },
   "ageAnalysis": {
-    "eyebrow": "Analyse âge / année",
+    "eyebrow": "Profil du déclarant",
     "title": "Lisez le dernier état d’un déclarant, sans perdre son historique.",
     "description": "Les revenus viennent de la dernière déclaration d’intérêts ; le patrimoine vient de la dernière déclaration patrimoniale. Les versions antérieures restent consultables.",
     "inputLabel": "Rechercher un déclarant",

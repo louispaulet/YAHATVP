@@ -94,7 +94,8 @@ describe("dashboard application", () => {
   it("turns the explorer placeholder into source-linked highlights", async () => {
     render(<MemoryRouter initialEntries={["/explore"]}><App /></MemoryRouter>);
     expect(screen.getByRole("navigation", { name: "Primary navigation" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Highlights" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "What stands out" })).toHaveAttribute("aria-current", "page");
     expect(await screen.findByText("Largest declared income changes")).toBeInTheDocument();
     expect(screen.getByText("Assets that stand out")).toBeInTheDocument();
     expect(screen.getByText("Most amended public records")).toBeInTheDocument();
@@ -158,7 +159,8 @@ describe("dashboard application", () => {
     expect(screen.getAllByText("2 years, 1 month, 22 days")).toHaveLength(4);
     expect(screen.getAllByText("0 days")).toHaveLength(2);
     expect(screen.getAllByRole("link", { name: "Open link ↗" })[0]).toHaveAttribute("href", "https://www.hatvp.fr/fiche-nominative/?declarant=vigier-jean-francois-17617");
-    expect(screen.getByRole("link", { name: "Reported issues" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Data & methods" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Data quality" })).toHaveAttribute("aria-current", "page");
   });
 
   it("searches declarations and opens the source XML detail page", async () => {
@@ -190,14 +192,15 @@ describe("dashboard application", () => {
     render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
     expect(await screen.findByText("Real estate")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "French" }));
-    expect(screen.getByText("Vue d’ensemble")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Explorer" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Instantané" })).toBeInTheDocument();
     expect(screen.getByText("déclarants uniques")).toBeInTheDocument();
     expect(screen.getByText("Immobilier")).toBeInTheDocument();
     expect(screen.getByText("Revenu annuel moyen vs patrimoine")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Revenu annuel moyen et patrimoine total/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Voir le projet sur GitHub" })).toHaveAttribute("href", "https://github.com/louispaulet/YAHATVP/tree/main");
-    expect(screen.getByRole("link", { name: "À la une" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("link", { name: "À propos des données" }));
+    expect(screen.getByRole("link", { name: "Ce qui ressort" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("link", { name: "Données et méthodes" }));
     expect(screen.getByText("Sources officielles")).toBeInTheDocument();
     const frenchDownloadBadges = screen.getAllByText("Téléchargement direct");
     expect(frenchDownloadBadges).toHaveLength(2);

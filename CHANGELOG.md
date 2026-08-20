@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-08-20 — Group dashboard navigation by user task
+
+### Changed
+
+- Reorganized the dashboard navbar into Explore, Declarations, and Data &
+  methods with contextual child navigation while preserving every existing
+  route.
+- Replaced ambiguous labels such as “Simple analysis” and “Age / year” with
+  “Population & pay” and “Declarant profiles” in English and French.
+- Updated the related page eyebrows and route-aware frontend tests.
+
+### Verified
+
+- Frontend Vitest passed all 26 tests, TypeScript checks passed, and the Vite
+  production build completed successfully with Node 22.12.0.
+- Local Chrome verification covered the homepage, highlights, analysis,
+  declaration search, declarant profiles, sources, and data-quality routes in
+  the grouped navigation.
+
 ## 2026-08-20 — Publish source-linked declaration highlights
 
 ### Changed

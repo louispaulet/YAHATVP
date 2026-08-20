@@ -11,13 +11,17 @@
   },
   "nav": {
     "label": "Primary navigation",
-    "overview": "Overview",
+    "sectionLabel": "Section navigation",
+    "explore": "Explore",
+    "declarations": "Declarations",
+    "data": "Data & methods",
+    "snapshot": "Snapshot",
+    "highlights": "What stands out",
+    "populationPay": "Population & pay",
     "search": "Search declarations",
-    "explore": "Highlights",
-    "analysis": "Simple analysis",
-    "ageAnalysis": "Age / year",
-    "about": "About the data",
-    "qualityIssues": "Reported issues"
+    "profiles": "Declarant profiles",
+    "sources": "Sources & methods",
+    "quality": "Data quality"
   },
   "footer": {
     "builtFrom": "Built from public HATVP declarations.",
@@ -89,7 +93,7 @@
     }
   },
   "about": {
-    "eyebrow": "About the data",
+    "eyebrow": "Sources & methods",
     "title": "A small window into a public dataset.",
     "paragraphs": [
       "This dashboard is built from the HATVP open-data pipeline. The pipeline preserves raw source files, normalizes records, checks quality, and publishes four Gold BigQuery tables.",
@@ -165,7 +169,7 @@
     "unknownAsset": "Unnamed asset"
   },
   "simpleAnalysis": {
-    "eyebrow": "Simple analysis",
+    "eyebrow": "Population & pay",
     "title": "Age, pay, and the shape of the dataset.",
     "description": "A first statistical view of public declarants. Unusual ages stay visible and are labelled rather than hidden.",
     "reference": "Age reference date",
@@ -204,7 +208,7 @@
     "anomalyNote": "Anomaly labels are signals for review, not corrections to the published DOB."
   },
   "ageAnalysis": {
-    "eyebrow": "Age / year analysis",
+    "eyebrow": "Declarant profile",
     "title": "Read one declarant’s latest story — with its history intact.",
     "description": "Income comes from the newest interest declaration; assets come from the newest patrimonial declaration. Earlier versions remain available for audit.",
     "inputLabel": "Search for a declarant",
