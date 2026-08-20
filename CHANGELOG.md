@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-21 — Select Highlights by latest name+surname declaration
+
+### Changed
+
+- Changed current Highlights selection to choose exactly one latest declaration
+  per normalized first-name/surname pair before any income or asset analysis.
+- Removed mandate-period, organisation, and date-of-birth partitioning from the
+  current-issue selector so later corrective filings replace earlier filings
+  for the same displayed name.
+- Restricted current income and asset cards to the four review-oriented
+  compensation rules; supersession and same-period conflict history remains in
+  the audit layers.
+
+### Verified locally
+
+- Read-only BigQuery dry run against snapshot `2026-08-19` selected Warsmann's
+  2025-03-31 modificative declaration `d1bb952f-ad78-4d04-b498-915e0995a38a`
+  instead of the older `5ef9ca8a-7101-407b-aa8d-8507aa415a52` filing.
+- Jean-Luc Ruelle collapsed from two candidate rows to one latest declaration;
+  the candidate list was regenerated before deployment.
+
 ## 2026-08-21 — Restrict Highlights to current review signals
 
 ### Changed

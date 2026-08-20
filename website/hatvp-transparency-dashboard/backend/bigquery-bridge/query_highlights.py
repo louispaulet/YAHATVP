@@ -20,16 +20,14 @@ def build_highlights_query(project: str, dataset: str) -> str:
   SELECT MAX(snapshot_date) AS snapshot_date FROM {gold_declarations}
 ), current_declarations AS (
   SELECT d.snapshot_date, d.declaration_uuid, d.bronze_record_key, d.mandat_label, d.date_depot,
-    p.prenom, p.nom, p.date_naissance_date
+    p.prenom, p.nom
   FROM {gold_declarations} d
   JOIN {gold_people} p USING (snapshot_date, bronze_record_key, declaration_uuid)
   CROSS JOIN latest l
   WHERE d.snapshot_date = l.snapshot_date
   QUALIFY ROW_NUMBER() OVER (
-    PARTITION BY {accent_fold("COALESCE(p.prenom, '')")},
-      {accent_fold("COALESCE(p.nom, '')")},
-      COALESCE(CAST(p.date_naissance_date AS STRING), CONCAT('uuid:', d.declaration_uuid)),
-      COALESCE(d.mandat_label, ''), COALESCE(CAST(d.date_debut_mandat AS STRING), '')
+    PARTITION BY {accent_fold("TRIM(COALESCE(p.prenom, ''))")},
+      {accent_fold("TRIM(COALESCE(p.nom, ''))")}
     ORDER BY d.date_depot DESC,
       IF(LOWER(COALESCE(d.declaration_modificative, 'false')) IN ('true', '1', 'oui'), 1, 0) DESC,
       d.declaration_uuid DESC
@@ -41,7 +39,11 @@ def build_highlights_query(project: str, dataset: str) -> str:
     AND r.record_ref LIKE 'incomes:%'
     AND r.status NOT IN ('superseded', 'resolved')
     AND COALESCE(r.active_in_gold, TRUE)
-  GROUP BY r.record_ref
+    AND r.rule_id IN (
+      'COMP_YOY_CHANGE', 'COMP_DIGIT_EDIT', 'COMP_FACTOR_ERROR',
+      'COMP_IMPLAUSIBLE_AMOUNT'
+    )
+    GROUP BY r.record_ref
 ), active_asset_records AS (
   SELECT r.record_ref
   FROM {anomaly_registry} r CROSS JOIN latest l
@@ -49,7 +51,11 @@ def build_highlights_query(project: str, dataset: str) -> str:
     AND r.record_ref LIKE 'assets:%'
     AND r.status NOT IN ('superseded', 'resolved')
     AND COALESCE(r.active_in_gold, TRUE)
-  GROUP BY r.record_ref
+    AND r.rule_id IN (
+      'COMP_YOY_CHANGE', 'COMP_DIGIT_EDIT', 'COMP_FACTOR_ERROR',
+      'COMP_IMPLAUSIBLE_AMOUNT'
+    )
+    GROUP BY r.record_ref
 ), annual_income AS (
   SELECT i.declaration_uuid, SAFE_CAST(i.income_year AS INT64) AS income_year,
     SUM(i.normalized_value) AS amount,
@@ -68,23 +74,35 @@ def build_highlights_query(project: str, dataset: str) -> str:
     LAG(amount) OVER w AS previous_amount,
     LAG(review_required) OVER w AS previous_review_required
   FROM annual_income WINDOW w AS (PARTITION BY declaration_uuid ORDER BY income_year)
-), income_changes AS (
+), income_change_candidates AS (
   SELECT h.declaration_uuid, c.prenom, c.nom, c.mandat_label,
     h.previous_year, h.income_year, h.previous_amount, h.amount,
     h.amount - h.previous_amount AS absolute_change,
     SAFE_DIVIDE(h.amount, NULLIF(h.previous_amount, 0)) AS ratio,
-    h.review_required OR h.previous_review_required AS review_required
+    h.review_required OR h.previous_review_required AS review_required,
+    ROW_NUMBER() OVER (
+      PARTITION BY h.declaration_uuid
+      ORDER BY ABS(h.amount - h.previous_amount) DESC, h.income_year DESC
+    ) AS candidate_rank
   FROM income_history h JOIN current_declarations c USING (declaration_uuid)
   WHERE h.previous_year = h.income_year - 1
     AND h.previous_amount IS NOT NULL
     AND (h.review_required OR h.previous_review_required)
-  ORDER BY ABS(absolute_change) DESC, h.declaration_uuid
+), income_changes AS (
+  SELECT declaration_uuid, prenom, nom, mandat_label, previous_year, income_year,
+    previous_amount, amount, absolute_change, ratio, review_required
+  FROM income_change_candidates
+  WHERE candidate_rank = 1
+  ORDER BY ABS(absolute_change) DESC, declaration_uuid
   LIMIT 8
-), unusual_assets AS (
+), asset_candidates AS (
   SELECT a.declaration_uuid, c.prenom, c.nom, c.mandat_label,
     a.source_section, a.asset_name, a.raw_value, a.normalized_value,
-    a.anomaly_status,
-    TRUE AS review_required
+    a.anomaly_status, TRUE AS review_required,
+    ROW_NUMBER() OVER (
+      PARTITION BY a.declaration_uuid
+      ORDER BY ABS(a.normalized_value) DESC, a.asset_name
+    ) AS candidate_rank
   FROM {gold_assets} a
   JOIN current_declarations c USING (snapshot_date, bronze_record_key, declaration_uuid)
   JOIN active_asset_records flagged
@@ -92,14 +110,18 @@ def build_highlights_query(project: str, dataset: str) -> str:
   CROSS JOIN latest l
   WHERE a.snapshot_date = l.snapshot_date AND a.normalized_value IS NOT NULL
   QUALIFY ROW_NUMBER() OVER (
-    PARTITION BY {accent_fold("COALESCE(c.prenom, '')")},
-      {accent_fold("COALESCE(c.nom, '')")},
-      COALESCE(CAST(c.date_naissance_date AS STRING), c.declaration_uuid),
+    PARTITION BY {accent_fold("TRIM(COALESCE(c.prenom, ''))")},
+      {accent_fold("TRIM(COALESCE(c.nom, ''))")},
       a.source_section, a.asset_name,
       CAST(a.normalized_value AS STRING)
     ORDER BY c.date_depot DESC, a.declaration_uuid
   ) = 1
-  ORDER BY ABS(a.normalized_value) DESC, a.declaration_uuid
+), unusual_assets AS (
+  SELECT declaration_uuid, prenom, nom, mandat_label, source_section, asset_name,
+    raw_value, normalized_value, anomaly_status, review_required
+  FROM asset_candidates
+  WHERE candidate_rank = 1
+  ORDER BY ABS(normalized_value) DESC, declaration_uuid
   LIMIT 8
 ), silver_filings AS (
   SELECT CONCAT({accent_fold("COALESCE(p.prenom, '')")}, '|',

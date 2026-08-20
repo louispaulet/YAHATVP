@@ -61,6 +61,10 @@ def test_highlights_query_is_fixed_source_linked_and_excludes_current_year():
     assert "silver_declarations" in query and "silver_people" in query
     assert "current_declarations" in query
     assert "status NOT IN ('superseded', 'resolved')" in query
+    assert "r.rule_id IN (" in query
+    assert "date_debut_mandat" not in query
+    assert "PARTITION BY h.declaration_uuid" in query
+    assert "PARTITION BY a.declaration_uuid" in query
     assert "SAFE_CAST(i.income_year AS INT64) < EXTRACT(YEAR" in query
     assert "h.previous_year = h.income_year - 1" in query
     assert "h.review_required OR h.previous_review_required" in query

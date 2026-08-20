@@ -71,6 +71,9 @@ documented and complete.
 - [x] Deploy the current-issue Highlights release and verify the production
   API, latest-version filtering, source links, bilingual copy, and browser
   console output.
+- [ ] Deploy the approved latest-name+surname Highlights selection and verify
+  that only the latest declaration per normalized name is analyzed, including
+  the Warsmann and Ruelle regression cases.
 - [ ] Deploy and force-replay the repaired timeline release; record the main
   workflow, ingestion execution, 13-table load, state advancement, bridge
   revision, Worker version, frontend publish, and final Chrome audit.
