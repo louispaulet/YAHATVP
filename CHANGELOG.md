@@ -21,6 +21,25 @@
 - `make backend-test` passed with 12 Worker tests, typecheck, and 43 bridge
   tests. `make frontend-test` passed 27 tests and the production build.
 
+### Deployed
+
+- Cloud Run bridge revision `hatvp-dashboard-api-00016-5sc`, Worker version
+  `bac39a3f-4b7c-43d1-8e6b-1c33496ccb61`, and GitHub Pages commit
+  `808fe9e202e58968578bf38d52296ba69bc7ab07` are serving the release.
+- GitHub Actions Test and deploy run
+  [32425613102](https://github.com/louispaulet/YAHATVP/actions/runs/32425613102)
+  passed for commit `8f70657`.
+
+### Verified in production
+
+- Health, overview, income, assets, declarations, search, and frontend routes
+  returned HTTP 200 with cache-busted requests.
+- The live Highlights response reports snapshot `2026-08-19`, eight income
+  signals, eight asset signals, and eight amendment records; it no longer
+  returns Nathalie Goulet’s superseded UUID `81068658-e43c-4bf2-9947-df3a538b8182`.
+- Chrome verification found the current-issue copy, no old Nathalie card, and
+  no warning or error console entries.
+
 ## 2026-08-20 — Fix declaration annual-value chart bars
 
 ### Changed

@@ -68,7 +68,7 @@ documented and complete.
   public custom-domain routes.
 - [x] Pin frontend and Worker JavaScript dependencies to explicit compatible
   ranges instead of unconstrained `latest` specifications.
-- [ ] Deploy the current-issue Highlights release and verify the production
+- [x] Deploy the current-issue Highlights release and verify the production
   API, latest-version filtering, source links, bilingual copy, and browser
   console output.
 - [ ] Deploy and force-replay the repaired timeline release; record the main
