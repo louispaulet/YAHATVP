@@ -15,6 +15,9 @@
 - The full local frontend suite remains incompatible with the current Node 24
   runtime because its existing jsdom setup exposes no `window.localStorage`;
   this failure occurs before test assertions and is unrelated to the chart.
+- Published the frontend to GitHub Pages (`gh-pages` commit `a54cc06`) and
+  verified the cache-busted declaration route in Chrome: all 14 annual bars had
+  concrete rendered heights and the page reported no console errors.
 
 ## 2026-08-20 — Publish grouped dashboard navigation
 
