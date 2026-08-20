@@ -20,6 +20,20 @@
   instead of the older `5ef9ca8a-7101-407b-aa8d-8507aa415a52` filing.
 - Jean-Luc Ruelle collapsed from two candidate rows to one latest declaration;
   the candidate list was regenerated before deployment.
+- `make backend-test`, `make frontend-test`, `uv run pytest`, Ruff, `uv build`,
+  and the generated live BigQuery query all passed.
+
+### Deployed and verified
+
+- Cloud Run bridge revision `hatvp-dashboard-api-00017-dpz` and Worker version
+  `66a5958a-074e-4a3c-b5f3-6ae8b89cf0b8` serve the approved selector.
+- GitHub Actions Test and deploy run
+  [32429301099](https://github.com/louispaulet/YAHATVP/actions/runs/32429301099)
+  passed for commit `74d580d`.
+- Production health, overview, income, assets, declarations, search, and
+  frontend routes returned HTTP 200. The live Highlights page shows no old
+  Warsmann €2.6M card, one Ruelle candidate, and no browser console errors or
+  warnings.
 
 ## 2026-08-21 — Restrict Highlights to current review signals
 
