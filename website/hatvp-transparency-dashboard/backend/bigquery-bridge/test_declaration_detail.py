@@ -25,10 +25,14 @@ class Client:
 
 
 class Storage:
+    def __init__(self):
+        self.names = []
+
     def bucket(self, _name):
         return self
 
-    def blob(self, _name):
+    def blob(self, name):
+        self.names.append(name)
         return self
 
     def download_to_filename(self, target):
@@ -40,6 +44,7 @@ def row(identifier: str = "fixture-uuid-1"):
         "snapshot_date": "2026-08-18",
         "generated_at": "2026-08-18T08:00:00+00:00",
         "result_json": json.dumps({"declaration_uuid": identifier, "nom": "DUPONT"}),
+        "source_object": "raw/source=wayback_hf/snapshot_date=2026-08-18/declarations.xml",
     }
 
 
@@ -53,11 +58,13 @@ def configure(monkeypatch, client):
     monkeypatch.setenv("BQ_DATASET", "hatvp")
     monkeypatch.setenv("HATVP_BUCKET", "bucket")
     monkeypatch.setattr(service, "client", lambda: client)
-    monkeypatch.setattr(service, "storage_client", lambda: Storage())
+    storage = Storage()
+    monkeypatch.setattr(service, "storage_client", lambda: storage)
+    return storage
 
 
 def test_detail_route_returns_only_the_matching_source_node(monkeypatch):
-    configure(monkeypatch, Client([row()]))
+    storage = configure(monkeypatch, Client([row()]))
 
     result = main.dashboard(request("/v1/dashboard/declarations/fixture-uuid-1"))
 
@@ -66,6 +73,9 @@ def test_detail_route_returns_only_the_matching_source_node(monkeypatch):
     assert payload["declaration"]["declarationUuid"] == "fixture-uuid-1"
     assert "<uuid>fixture-uuid-1</uuid>" in payload["rawXml"]
     assert "<uuid>fixture-uuid-2</uuid>" not in payload["rawXml"]
+    assert storage.names == [
+        "hatvp/raw/source=wayback_hf/snapshot_date=2026-08-18/declarations.xml"
+    ]
 
 
 def test_detail_route_returns_not_found_for_unknown_uuid(monkeypatch):

@@ -60,6 +60,9 @@ def test_declaration_query_uses_uuid_parameter_without_private_fields():
     assert "@declaration_uuid" in query
     assert "result_json" in query
     assert "p.nom" in query
+    assert "`project.dataset`.declarations" in query
+    assert "source_object" in query
+    assert "gold_declarations" not in query
     assert "email" not in query
 
 

@@ -39,13 +39,16 @@ def query_rows(query: str, config: Any = None) -> list[Any]:
     return list(client().query(query, **options).result())
 
 
-def raw_declaration_xml(snapshot_date: str, declaration_uuid: str) -> str:
+def raw_declaration_xml(
+    snapshot_date: str, declaration_uuid: str, source_object: str | None = None
+) -> str:
     return read_declaration_xml(
         storage_client,
         configured_bucket(),
         configured_prefix(),
         snapshot_date,
         declaration_uuid,
+        source_object,
     )
 
 
@@ -155,7 +158,9 @@ def run_declaration(declaration_uuid: str) -> tuple[str, int, dict[str, str]]:
             return response(error_payload("NOT_FOUND", "Declaration not found"), 404)
         try:
             snapshot = str(row_value(rows[0], "snapshot_date"))
-            raw_xml = raw_declaration_xml(snapshot, declaration_uuid)
+            raw_xml = raw_declaration_xml(
+                snapshot, declaration_uuid, row_value(rows[0], "source_object")
+            )
         except LookupError:
             return response(error_payload("NOT_FOUND", "Declaration XML not found"), 404)
         return response(declaration_payload(rows[0], raw_xml), 200)

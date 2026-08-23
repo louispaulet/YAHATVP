@@ -30,22 +30,36 @@ def build_declaration_query(project: str, dataset: str) -> str:
     """Build a parameterized lookup for one public declaration's metadata."""
 
     prefix = dataset_prefix(project, dataset)
+    declarations = f"{prefix}.declarations"
+    people = f"{prefix}.people"
     fields = declaration_struct()
     return f"""WITH latest AS (
-  SELECT MAX(snapshot_date) AS snapshot_date FROM {prefix}.gold_declarations
+  SELECT MAX(snapshot_date) AS snapshot_date FROM {declarations}
+), candidates AS (
+SELECT d.source_object,
+  TO_JSON_STRING(STRUCT(
+    {fields}
+  )) AS result_json
+FROM {declarations} d
+LEFT JOIN {people} p
+  ON p.snapshot_date = d.snapshot_date
+  AND p.bronze_record_key = d.bronze_record_key
+  AND p.declaration_uuid = d.declaration_uuid
+CROSS JOIN latest l
+WHERE d.snapshot_date = l.snapshot_date
+  AND d.declaration_uuid = @declaration_uuid
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY d.declaration_uuid
+  ORDER BY IF(d.ingestion_source = 'hatvp_website', 1, 0) DESC,
+    d.date_depot DESC, d.bronze_record_key DESC
+) = 1
 )
 SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
 CURRENT_TIMESTAMP() AS generated_at,
-TO_JSON_STRING(STRUCT(
-  {fields}
-)) AS result_json
-FROM latest l
-JOIN {prefix}.gold_declarations d ON d.snapshot_date = l.snapshot_date
-LEFT JOIN {prefix}.gold_people p
-  ON p.declaration_uuid = d.declaration_uuid
-  AND p.snapshot_date = d.snapshot_date
-WHERE d.declaration_uuid = @declaration_uuid
-LIMIT 1"""
+  c.result_json,
+  c.source_object
+FROM candidates c
+CROSS JOIN latest l"""
 
 
 def declaration_query_fields() -> tuple[str, ...]:

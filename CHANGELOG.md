@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-24 — Keep DOB leaderboard links source-loadable
+
+### Changed
+
+- Updated declaration detail lookup to resolve the source-preserving Bronze row
+  used by the DOB leaderboards instead of requiring a Gold row.
+- Passed each declaration's immutable `source_object` through the bridge so
+  official, GitHub/Wayback, and Hugging Face XML snapshots can be opened from
+  the same detail route.
+
+### Verified
+
+- `make backend-test` passed 47 bridge tests, 13 Worker tests, and Worker
+  TypeScript typecheck.
+
 ## 2026-08-23 — Redesign the Explore presentation
 
 ### Changed

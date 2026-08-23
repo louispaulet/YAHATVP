@@ -41,6 +41,22 @@ def snapshot_object_name(prefix: str, snapshot_date: str) -> str:
     return f"{clean_prefix}/raw/snapshot_date={snapshot_date}/declarations.xml"
 
 
+def source_object_name(prefix: str, object_name: str | None, snapshot_date: str) -> str:
+    """Resolve a source-preserving raw object into a bucket-relative path."""
+
+    clean_prefix = prefix.strip("/")
+    clean_object = (object_name or "").strip("/")
+    if not clean_object:
+        return snapshot_object_name(prefix, snapshot_date)
+    if ".." in Path(clean_object).parts:
+        raise ValueError("Raw source object cannot contain parent traversal")
+    if clean_object.startswith(f"{clean_prefix}/"):
+        return clean_object
+    if clean_object.startswith("raw/"):
+        return f"{clean_prefix}/{clean_object}"
+    raise ValueError("Raw source object must be a raw artifact path")
+
+
 def download_snapshot(storage_factory: Any, bucket: str, object_name: str, target: str) -> None:
     """Download a raw object to a temporary path using the injected client factory."""
 
@@ -63,10 +79,11 @@ def read_declaration_xml(
     prefix: str,
     snapshot_date: str,
     identifier: str,
+    object_name: str | None = None,
 ) -> str:
     """Download and stream-extract one source declaration XML node."""
 
-    object_name = snapshot_object_name(prefix, snapshot_date)
+    object_name = source_object_name(prefix, object_name, snapshot_date)
     with tempfile.NamedTemporaryFile(suffix=".xml") as source:
         download_snapshot(storage_factory, bucket, object_name, source.name)
         return find_declaration(Path(source.name), identifier)
@@ -78,5 +95,6 @@ __all__ = [
     "iter_declaration_nodes",
     "local_name",
     "read_declaration_xml",
+    "source_object_name",
     "snapshot_object_name",
 ]
