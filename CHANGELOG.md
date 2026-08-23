@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-23 — Redesign the Explore presentation
+
+### Changed
+
+- Added Lucide icons and semantic surface, border, and card-shadow tokens to
+  the dashboard frontend.
+- Reworked `/explore` into an editorial two-column hero with structured
+  snapshot/method metadata, distinct income/asset/amendment section tones,
+  readable rank markers, clearer review badges, source-link CTAs, and
+  card-shaped loading skeletons.
+- Refined the shared header, language switcher, footer links, error state, and
+  responsive card grid while keeping all existing strings, records, routes,
+  API requests, and navigation behavior unchanged.
+
+### Verified
+
+- `npm test` passed all 29 frontend tests.
+- `npm run build` passed the production TypeScript/Vite build.
+- Browser QA covered 1440×1024 English/French, 1024×768, 768×1024,
+  390×844 English/French, and 320px layouts with no page-level horizontal
+  overflow; a fresh browser tab reported no warning or error console entries.
 ## 2026-08-23 — Show raw and deduplicated source coverage
 
 ### Changed

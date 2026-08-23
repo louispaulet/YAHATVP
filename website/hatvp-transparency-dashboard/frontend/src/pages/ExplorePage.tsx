@@ -1,7 +1,8 @@
+import { CalendarDays, FilePenLine, ShieldCheck, TrendingUp, WalletCards } from "lucide-react";
 import { fetchHighlights } from "../api";
 import { AmendedHighlightCard } from "../components/AmendedHighlightCard";
 import { AssetHighlightCard } from "../components/AssetHighlightCard";
-import { ChartSkeleton, SliceError } from "../components/Feedback";
+import { ExploreCardSkeleton, SliceError } from "../components/Feedback";
 import { HighlightSection } from "../components/HighlightSection";
 import { IncomeHighlightCard } from "../components/IncomeHighlightCard";
 import { useI18n } from "../context/I18nContext";
@@ -12,25 +13,37 @@ export function ExplorePage() {
   const { locale } = useI18n();
   const highlights = useResource<DashboardHighlightsResponse>(fetchHighlights);
   return (
-    <div className="mx-auto max-w-7xl space-y-12 px-5 py-8 lg:px-8 lg:py-12">
-      <section className="hero-grid overflow-hidden rounded-[2rem] bg-ink px-6 py-10 text-white shadow-soft sm:px-10 sm:py-14">
-        <div className="max-w-3xl">
+    <div className="mx-auto max-w-7xl space-y-20 px-5 py-8 sm:px-6 lg:px-8 lg:py-14">
+      <section className="explore-hero overflow-hidden bg-ink text-white">
+        <div className="relative z-10 max-w-3xl">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-lime">{locale.explore.eyebrow}</p>
           <h1 className="mt-5 text-4xl font-black leading-[1.02] tracking-[-0.05em] sm:text-6xl">{locale.explore.title}</h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300">{locale.explore.description}</p>
-          <div className="mt-8 flex flex-wrap gap-3 text-xs font-bold"><span className="rounded-full bg-white/10 px-4 py-2">{locale.explore.snapshot} {highlights.data?.snapshotDate ?? locale.hero.notAvailable}</span><span className="rounded-full bg-lime px-4 py-2 text-ink">{locale.explore.method}</span></div>
+        </div>
+        <div className="explore-hero-meta relative z-10">
+          <div className="explore-meta-card">
+            <span className="explore-meta-icon explore-meta-icon--lime"><CalendarDays size={18} strokeWidth={1.8} aria-hidden="true" /></span>
+            <div>
+              <span className="explore-meta-label">{locale.explore.snapshot}</span>
+              <strong className="explore-meta-value tabular-nums">{highlights.data?.snapshotDate ?? locale.hero.notAvailable}</strong>
+            </div>
+          </div>
+          <div className="explore-meta-card explore-meta-card--method">
+            <span className="explore-meta-icon explore-meta-icon--lime"><ShieldCheck size={18} strokeWidth={1.8} aria-hidden="true" /></span>
+            <span className="explore-meta-label">{locale.explore.method}</span>
+          </div>
         </div>
       </section>
-      {highlights.loading && <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4"><ChartSkeleton /><ChartSkeleton /><ChartSkeleton /><ChartSkeleton /></div>}
+      {highlights.loading && <div className="explore-card-grid" aria-busy="true"><ExploreCardSkeleton /><ExploreCardSkeleton /><ExploreCardSkeleton /><ExploreCardSkeleton /></div>}
       {highlights.error && <SliceError onRetry={highlights.reload} />}
       {highlights.data && <>
-        <HighlightSection eyebrow={locale.explore.incomeEyebrow} title={locale.explore.incomeTitle} description={locale.explore.incomeDescription}>
+        <HighlightSection tone="income" icon={TrendingUp} eyebrow={locale.explore.incomeEyebrow} title={locale.explore.incomeTitle} description={locale.explore.incomeDescription}>
           {highlights.data.incomeChanges.map((item, index) => <IncomeHighlightCard key={`${item.declarationUuid}-${item.toYear}`} item={item} rank={index + 1} />)}
         </HighlightSection>
-        <HighlightSection eyebrow={locale.explore.assetsEyebrow} title={locale.explore.assetsTitle} description={locale.explore.assetsDescription}>
+        <HighlightSection tone="asset" icon={WalletCards} eyebrow={locale.explore.assetsEyebrow} title={locale.explore.assetsTitle} description={locale.explore.assetsDescription}>
           {highlights.data.unusualAssets.map((item, index) => <AssetHighlightCard key={`${item.declarationUuid}-${index}`} item={item} rank={index + 1} />)}
         </HighlightSection>
-        <HighlightSection eyebrow={locale.explore.amendedEyebrow} title={locale.explore.amendedTitle} description={locale.explore.amendedDescription}>
+        <HighlightSection tone="amended" icon={FilePenLine} eyebrow={locale.explore.amendedEyebrow} title={locale.explore.amendedTitle} description={locale.explore.amendedDescription}>
           {highlights.data.amendedRecords.map((item, index) => <AmendedHighlightCard key={`${item.declarationUuid}-${index}`} item={item} rank={index + 1} />)}
         </HighlightSection>
       </>}
