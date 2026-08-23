@@ -166,6 +166,8 @@ describe("dashboard application", () => {
   it("renders the pipeline health page", async () => {
     render(<MemoryRouter initialEntries={["/pipeline-health"]}><App /></MemoryRouter>);
     expect(await screen.findByText("The data pipeline, in view.")).toBeInTheDocument();
+    expect(screen.getByTestId("pipeline-countdown-card")).toHaveClass("pipeline-health-countdown");
+    expect(screen.getByTestId("pipeline-countdown")).toHaveTextContent(/\d+d \d{2}h \d{2}m \d{2}s/);
     expect(screen.getByText("HATVP website")).toBeInTheDocument();
     expect(screen.getByText("GitHub / Wayback backup")).toBeInTheDocument();
     expect(screen.getByText("Rows and review load by layer")).toBeInTheDocument();

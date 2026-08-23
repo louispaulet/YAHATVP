@@ -44,6 +44,11 @@ h3 {
   box-shadow: 0 12px 34px rgb(23 35 31 / 0.045);
 }
 
+.pipeline-health-countdown {
+  border-color: transparent;
+  background: #1f9d75;
+}
+
 .source-link-card {
   container-type: inline-size;
 }

@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-08-23 — Restore pipeline countdown card visibility
+
+### Fixed
+
+- Fixed the pipeline-health countdown card rendering white-on-white because the
+  shared `.dashboard-card` background overrode its Tailwind background utility.
+  The countdown now has an explicit emerald surface, white timer text, and a
+  live timer landmark for assistive technology.
+
+### Verified
+
+- `make frontend-test` passed with 29 tests and the production Vite build.
+- `make backend-test` passed with 13 Worker tests, typecheck, and 47 bridge
+  tests.
+- Published the frontend and verified the live cache-busted custom-domain page
+  in Chrome: visible countdown, French view, emerald computed background, and
+  zero warning/error console entries.
+
 ## 2026-08-23 — Split source ingestion and publish pipeline health
 
 ### Changed
