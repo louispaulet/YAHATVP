@@ -85,10 +85,9 @@ def source_ids(store: ArtifactStore) -> tuple[str, ...]:
     """Discover ingested sources while retaining legacy official deployments."""
 
     found: set[str] = set()
-    if (
-        any(path.startswith("raw/snapshot_date=") for path in store.list_paths("raw/"))
-        or store.exists("state/latest.json")
-    ):
+    if any(
+        path.startswith("raw/snapshot_date=") for path in store.list_paths("raw/")
+    ) or store.exists("state/latest.json"):
         found.add(OFFICIAL_SOURCE)
     for path in store.list_paths("state/sources/"):
         parts = path.split("/")
