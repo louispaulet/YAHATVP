@@ -198,6 +198,7 @@
     "age": "Âge",
     "mandate": "Mandat",
     "quality": "Qualité de la date",
+    "openDeclaration": "Ouvrir la déclaration",
     "qualityLabels": {
       "valid": "Interprétée",
       "missing": "Manquante",

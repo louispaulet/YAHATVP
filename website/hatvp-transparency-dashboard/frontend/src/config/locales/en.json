@@ -198,6 +198,7 @@
     "age": "Age",
     "mandate": "Mandate",
     "quality": "DOB quality",
+    "openDeclaration": "Open declaration",
     "qualityLabels": {
       "valid": "Parsed",
       "missing": "Missing",
