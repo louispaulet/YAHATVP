@@ -9,6 +9,8 @@
 - Passed each declaration's immutable `source_object` through the bridge so
   official, GitHub/Wayback, and Hugging Face XML snapshots can be opened from
   the same detail route.
+- Accepted the `gs://...` URI form stored in BigQuery while validating that it
+  points at the configured archive bucket.
 
 ### Verified
 

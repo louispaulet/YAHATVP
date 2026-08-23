@@ -44,7 +44,7 @@ def row(identifier: str = "fixture-uuid-1"):
         "snapshot_date": "2026-08-18",
         "generated_at": "2026-08-18T08:00:00+00:00",
         "result_json": json.dumps({"declaration_uuid": identifier, "nom": "DUPONT"}),
-        "source_object": "raw/source=wayback_hf/snapshot_date=2026-08-18/declarations.xml",
+        "source_object": "gs://bucket/hatvp/raw/source=wayback_hf/snapshot_date=2026-08-18/declarations.xml",
     }
 
 

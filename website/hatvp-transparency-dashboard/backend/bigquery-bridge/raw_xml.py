@@ -41,13 +41,20 @@ def snapshot_object_name(prefix: str, snapshot_date: str) -> str:
     return f"{clean_prefix}/raw/snapshot_date={snapshot_date}/declarations.xml"
 
 
-def source_object_name(prefix: str, object_name: str | None, snapshot_date: str) -> str:
+def source_object_name(
+    prefix: str, object_name: str | None, snapshot_date: str, bucket: str | None = None
+) -> str:
     """Resolve a source-preserving raw object into a bucket-relative path."""
 
     clean_prefix = prefix.strip("/")
     clean_object = (object_name or "").strip("/")
     if not clean_object:
         return snapshot_object_name(prefix, snapshot_date)
+    if clean_object.startswith("gs://"):
+        uri_bucket, separator, uri_object = clean_object[5:].partition("/")
+        if not separator or (bucket and uri_bucket != bucket):
+            raise ValueError("Raw source URI does not match the configured bucket")
+        clean_object = uri_object.strip("/")
     if ".." in Path(clean_object).parts:
         raise ValueError("Raw source object cannot contain parent traversal")
     if clean_object.startswith(f"{clean_prefix}/"):
@@ -83,7 +90,7 @@ def read_declaration_xml(
 ) -> str:
     """Download and stream-extract one source declaration XML node."""
 
-    object_name = source_object_name(prefix, object_name, snapshot_date)
+    object_name = source_object_name(prefix, object_name, snapshot_date, bucket)
     with tempfile.NamedTemporaryFile(suffix=".xml") as source:
         download_snapshot(storage_factory, bucket, object_name, source.name)
         return find_declaration(Path(source.name), identifier)
