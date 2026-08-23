@@ -96,6 +96,8 @@ documented and complete.
   tables, and Chrome confirmed the English and French source labels.
 - [x] Explain the Internet Archive Wayback source and the static Hugging Face
   snapshot, including its `thefrenchartist` provenance, on the public About page.
+- [x] Show raw ingested declaration counts beneath each deduplicated source
+  count on the public pipeline-health page.
 
 ## Google Cloud project details (completed)
 

@@ -336,6 +336,7 @@
     "sourcesEyebrow": "Couverture des sources",
     "sourcesTitle": "Déclarations par source",
     "sourcesDescription": "Le site de la HATVP est la publication officielle et la source de la mise à jour hebdomadaire. Les archives GitHub / Wayback et HF / Wayback récupèrent des déclarations historiques lorsque la HATVP les dépublie après la fin d’une fonction publique ; elles restent séparées et identifiées pour ne pas être confondues avec une publication officielle actuelle.",
+    "rawDeclarations": "({count} déclarations brutes)",
     "qualityEyebrow": "Bronze → Silver → Gold",
     "qualityTitle": "Lignes et charge de vérification par couche",
     "rows": "lignes",

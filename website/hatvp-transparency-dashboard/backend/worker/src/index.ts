@@ -83,7 +83,7 @@ function isDashboardHealthResponse(value: unknown): value is DashboardHealthResp
     && Array.isArray(value.anomalyCategories)
     && isRecord(quality) && typeof quality.errors === "number" && typeof quality.warnings === "number"
     && typeof quality.flaggedRecords === "number" && typeof quality.regression === "boolean"
-    && value.sources.every((item) => isRecord(item) && typeof item.sourceId === "string" && typeof item.declarations === "number")
+    && value.sources.every((item) => isRecord(item) && typeof item.sourceId === "string" && typeof item.declarations === "number" && typeof item.rawDeclarations === "number")
     && value.layers.every((item) => isRecord(item) && typeof item.layer === "string" && typeof item.rows === "number" && typeof item.reviewRows === "number")
     && value.anomalies.every((item) => isRecord(item) && typeof item.status === "string" && typeof item.rows === "number")
     && value.anomalyCategories.every((item) => isRecord(item) && typeof item.category === "string" && typeof item.rows === "number");

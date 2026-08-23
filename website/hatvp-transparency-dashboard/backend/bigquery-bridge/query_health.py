@@ -59,12 +59,26 @@ layer_rows AS (
     WHERE t.snapshot_date = l.snapshot_date
   )
 ),
-source_rows AS (
+deduplicated_source_rows AS (
   SELECT COALESCE(t.ingestion_source, 'unknown') AS source_id,
          COUNT(DISTINCT t.declaration_uuid) AS declaration_count
   FROM {prefix}.gold_declarations t CROSS JOIN latest l
   WHERE t.snapshot_date = l.snapshot_date
   GROUP BY source_id
+),
+raw_source_rows AS (
+  SELECT COALESCE(t.ingestion_source, 'unknown') AS source_id,
+         COUNT(*) AS raw_declaration_count
+  FROM {prefix}.declarations t CROSS JOIN latest l
+  WHERE t.snapshot_date = l.snapshot_date
+  GROUP BY source_id
+),
+source_rows AS (
+  SELECT COALESCE(d.source_id, r.source_id) AS source_id,
+         COALESCE(d.declaration_count, 0) AS declaration_count,
+         COALESCE(r.raw_declaration_count, 0) AS raw_declaration_count
+  FROM deduplicated_source_rows d
+  FULL OUTER JOIN raw_source_rows r USING (source_id)
 ),
 anomaly_rows AS (
   SELECT COALESCE(status, 'unknown') AS status, COUNT(*) AS row_count
@@ -83,7 +97,7 @@ SELECT latest.snapshot_date,
        CURRENT_TIMESTAMP() AS generated_at,
        TO_JSON_STRING((SELECT ARRAY_AGG(STRUCT(layer, row_count, review_rows)
          ORDER BY layer) FROM layer_rows)) AS layers_json,
-       TO_JSON_STRING((SELECT ARRAY_AGG(STRUCT(source_id, declaration_count)
+       TO_JSON_STRING((SELECT ARRAY_AGG(STRUCT(source_id, declaration_count, raw_declaration_count)
          ORDER BY source_id) FROM source_rows)) AS sources_json,
        TO_JSON_STRING((SELECT ARRAY_AGG(STRUCT(status, row_count)
          ORDER BY status) FROM anomaly_rows)) AS anomalies_json,

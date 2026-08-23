@@ -21,7 +21,7 @@ export interface DashboardHealthResponse {
   snapshotDate: string | null;
   generatedAt: string;
   nextIngestionAt: string;
-  sources: Array<{ sourceId: string; declarations: number }>;
+  sources: Array<{ sourceId: string; declarations: number; rawDeclarations: number }>;
   layers: Array<{ layer: string; rows: number; reviewRows: number }>;
   quality: { errors: number; warnings: number; flaggedRecords: number; regression: boolean };
   anomalies: Array<{ status: string; rows: number }>;

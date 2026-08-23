@@ -336,6 +336,7 @@
     "sourcesEyebrow": "Source coverage",
     "sourcesTitle": "Declarations by source",
     "sourcesDescription": "The HATVP website is the official publication and weekly refresh. The GitHub / Wayback and HF / Wayback archives are historical recovery streams: HATVP can unpublish declarations after a person leaves public office, so archived records extend historical coverage without being mistaken for current official publication.",
+    "rawDeclarations": "({count} raw declarations)",
     "qualityEyebrow": "Bronze → Silver → Gold",
     "qualityTitle": "Rows and review load by layer",
     "rows": "rows",

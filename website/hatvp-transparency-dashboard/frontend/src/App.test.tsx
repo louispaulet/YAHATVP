@@ -176,6 +176,9 @@ describe("dashboard application", () => {
     expect(screen.getByText("HATVP official website")).toBeInTheDocument();
     expect(screen.getByText("GitHub / Wayback historical")).toBeInTheDocument();
     expect(screen.getByText("HF / Wayback 2014 archive")).toBeInTheDocument();
+    expect(screen.getByText("(3 raw declarations)")).toBeInTheDocument();
+    expect(screen.getByText("(2 raw declarations)")).toBeInTheDocument();
+    expect(screen.getByText("(4 raw declarations)")).toBeInTheDocument();
     expect(screen.getByText("Static 2014 historical snapshot rebuilt from the HF archive and kept separate with its provenance.")).toBeInTheDocument();
     expect(screen.getByText("Current official publication used for the weekly refresh.")).toBeInTheDocument();
     expect(screen.getByText("Rows and review load by layer")).toBeInTheDocument();
