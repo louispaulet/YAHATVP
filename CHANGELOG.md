@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-08-23 — Restore Wayback/GitHub source coverage
+
+### Changed
+
+- Fixed source discovery so a legacy official `state/latest.json` cannot be
+  dropped when a `wayback_github` source state is also present.
+- Made `pipeline-archive` run archive ingestion and processing in the same
+  configured process, with `FORCE=1` support for an authorized replay.
+- Force-ingested the GitHub/Wayback `declarations.xml.zip` archive into the
+  production raw store while retaining the original zip, extracted XML, hashes,
+  and source provenance. The existing frontend source mapping now displays the
+  restored source with its human-readable label.
+
+### Verified
+
+- Archive SHA-256: `e8bad9b08c15935321e0ff4c367159c251710f22028462a04c844e47fbe309e7`;
+  GCS contains both `hatvp_website` and `wayback_github` raw snapshots and
+  `state/latest.json` records both source hashes.
+- Production processing completed `SUCCESS_WITH_WARNINGS` with zero quality
+  errors; the combined quality stage contained 20,634 declarations and 28,764
+  flagged records. BigQuery loaded all 13 Bronze/Silver/Gold/registry tables.
+- The live health API reports `Site HATVP: 4,629` and
+  `GitHub / Wayback: 11,992`; the quality regression warning is retained because
+  the combined source set is larger than the previous official-only snapshot.
+- Full Python checks passed: 163 tests, Ruff, format check, and package build;
+  `make backend-test` passed 47 bridge tests plus Worker tests/typecheck;
+  `make frontend-test` passed 29 tests and the production build. GitHub Actions
+  run [32659679713](https://github.com/louispaulet/YAHATVP/actions/runs/32659679713)
+  passed and deployed image `97919c3`.
+- Chrome verified the public `/pipeline-health` page: both source rows,
+  countdown, Bronze → Silver → Gold order, localized top-five anomaly labels,
+  and zero browser warning/error logs.
+
 ## 2026-08-23 — Show the top reported anomaly categories
 
 ### Changed

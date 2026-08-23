@@ -86,9 +86,10 @@ documented and complete.
   record the main
   workflow, ingestion execution, 13-table load, state advancement, bridge
   revision, Worker version, frontend publish, and final Chrome audit.
-- [ ] Load the one-off Wayback/GitHub archive into production GCS/BigQuery and
-  verify that the deployed health page reports both source IDs. This requires
-  an authorized local ADC session for the user-run production backfill.
+- [x] Load the one-off Wayback/GitHub archive into production GCS/BigQuery and
+  verify that the deployed health page reports both source IDs. The authorized
+  ADC replay on 2026-08-23 persisted both raw sources, loaded all 13 tables,
+  and Chrome confirmed both source rows on the public health page.
 
 ## Google Cloud project details (completed)
 
