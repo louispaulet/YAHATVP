@@ -90,6 +90,8 @@ documented and complete.
   verify that the deployed health page reports both source IDs. The authorized
   ADC replay on 2026-08-23 persisted both raw sources, loaded all 13 tables,
   and Chrome confirmed both source rows on the public health page.
+- [x] Link DOB leaderboard quality tags to their source declarations and remove
+  the redundant five-year age-bin text summary from the analysis page.
 
 ## Google Cloud project details (completed)
 

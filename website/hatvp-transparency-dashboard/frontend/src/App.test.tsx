@@ -116,9 +116,14 @@ describe("dashboard application", () => {
     expect(screen.getByRole("checkbox", { name: "Exclude 0€ salary" })).toBeChecked();
     expect(screen.getByRole("img", { name: "Count of 0€ salary declarations by five-year age bin" })).toBeInTheDocument();
     expect(screen.getAllByText("Review: implausible").every((badge) => badge.classList.contains("break-words"))).toBe(true);
+    expect(screen.getAllByRole("link", { name: /Open declaration:/ })).toHaveLength(2);
+    expect(screen.getByRole("link", { name: "Open declaration: Young Person" })).toHaveAttribute("href", "/declarations/young");
+    expect(screen.getByRole("link", { name: "Open declaration: Old Person" })).toHaveAttribute("href", "/declarations/old");
+    expect(screen.queryByText("€20K / €15K")).not.toBeInTheDocument();
     expect(screen.getAllByRole("table")[0]).not.toHaveClass("min-w-[40rem]");
     fireEvent.click(screen.getByRole("checkbox", { name: "Exclude 0€ salary" }));
-    expect(screen.getByText("€13.3K / €15K")).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Exclude 0€ salary" })).not.toBeChecked();
+    expect(screen.getByRole("img", { name: "Average and median salary by five-year age bin" })).toBeInTheDocument();
   });
 
   it("renders the Lecornu age and year analysis page", async () => {

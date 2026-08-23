@@ -2116,3 +2116,18 @@
   production trigger at `hatvp-ingestion` only in a separate handoff.
 - Confirm duplicate-delivery safety and a successful Scheduler-triggered
   ingestion execution after that handoff.
+
+## 2026-08-23 — Link DOB leaderboard records to declarations
+
+### Changed
+
+- Made each DOB-quality tag in the youngest and oldest leaderboards an internal
+  link to the retained declaration detail route when a declaration UUID is
+  available.
+- Removed the redundant five-year age-bin text grid below the salary chart;
+  the chart and zero-salary breakdown remain available.
+
+### Verified
+
+- Frontend Vitest coverage confirms both leaderboard links and the removed text
+  summary, with the existing analysis-page behavior still covered.
