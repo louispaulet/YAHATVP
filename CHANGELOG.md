@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-08-23 — Explain official and Wayback source coverage in the dashboard
+
+### Changed
+
+- Expanded the bilingual Sources & methods page with the distinction between
+  the current official HATVP publication and historical declarations recovered
+  from the Internet Archive's Wayback Machine after HATVP unpublishes them.
+- Added a direct link to the companion
+  [`hatvp-archive-wayback-machine`](https://github.com/louispaulet/hatvp-archive-wayback-machine)
+  project and source-specific explanations to Pipeline health.
+- Renamed the source labels to `HATVP official website` and `GitHub / Wayback
+  historical` so the recovery stream cannot be mistaken for a current official
+  publication.
+
+### Verified
+
+- `make frontend-test` passed 29 frontend tests and the production build.
+- Published the frontend from main commit `cfbadf3`; GitHub Pages advanced to
+  `830c951b53d4193dd9ef6b25852d585709cb2af3`.
+- Chrome verified both public routes in English and French with the new copy,
+  live source counts, and zero warning or error console entries.
+
 ## 2026-08-23 — Link the companion Wayback archive
 
 ### Changed
