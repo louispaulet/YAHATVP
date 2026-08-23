@@ -73,7 +73,9 @@ describe("dashboard application", () => {
     expect(screen.getByText("HATVP open data")).toBeInTheDocument();
     expect(screen.getByText("Follow the data back to HATVP.")).toBeInTheDocument();
     expect(screen.getByText("Why Wayback declarations appear here.")).toBeInTheDocument();
+    expect(screen.getByText("A static snapshot made by thefrenchartist.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Explore the archive project/ })).toHaveAttribute("href", "https://github.com/louispaulet/hatvp-archive-wayback-machine");
+    expect(screen.getByRole("link", { name: /Open the Hugging Face dataset/ })).toHaveAttribute("href", "https://huggingface.co/datasets/the-french-artist/hatvp_declarations_xml");
     expect(screen.getByRole("link", { name: /Declaration index \(CSV\)/ })).toHaveAttribute("href", "https://www.hatvp.fr/livraison/opendata/liste.csv");
     expect(screen.getByRole("link", { name: /Declarations feed \(XML\)/ })).toHaveAttribute("href", "https://www.hatvp.fr/livraison/merge/declarations.xml");
     expect(screen.getByRole("link", { name: /Open source page/ })).toHaveAttribute("target", "_blank");

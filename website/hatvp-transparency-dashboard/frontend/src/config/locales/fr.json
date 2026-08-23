@@ -99,7 +99,7 @@
     "paragraphs": [
       "Ce tableau de bord est construit à partir du pipeline de données ouvertes de la HATVP. Le pipeline conserve les fichiers sources, normalise les enregistrements, contrôle leur qualité et publie quatre tables BigQuery Gold.",
       "La vue d’ensemble expose uniquement des agrégats. Les coordonnées personnelles et les lignes brutes des déclarations ne font pas partie de cette API publique.",
-      "Le tableau de bord combine trois flux clairement identifiés. Le site de la HATVP est la publication officielle actuelle. Les archives GitHub / Wayback et HF / Wayback conservent des déclarations historiques, car la HATVP dépublie les déclarations lorsque leur auteur n’exerce plus de fonction publique. Ces archives conservent des traces publiques pour les comparer et les étudier ; ce sont des sources de récupération transparentes, pas de nouvelles publications de la HATVP."
+      "Le tableau de bord combine trois flux clairement identifiés. Le site de la HATVP est la publication officielle actuelle. L’Internet Archive, via la Wayback Machine, et l’archive GitHub associée conservent d’anciennes déclarations publiques que la HATVP a depuis dépubliées. Un instantané statique distinct, assemblé par thefrenchartist, fournit une autre copie conservée des XML historiques sur Hugging Face. Ces sources de récupération servent à préserver l’historique public pour la comparaison et la recherche ; elles ne constituent pas de nouvelles publications de la HATVP."
     ],
     "sourcePrefix": "Pour consulter la publication officielle actuelle et le contexte complet des déclarations, utilisez les liens officiels de la HATVP ci-dessous.",
     "sources": {
@@ -134,11 +134,18 @@
       ]
     },
     "archive": {
-      "eyebrow": "Récupération historique",
+      "eyebrow": "Internet Archive / Wayback Machine",
       "title": "Pourquoi des déclarations Wayback apparaissent ici.",
       "description": "La Wayback Machine conserve d’anciennes versions publiques des pages et fichiers XML de déclarations de la HATVP. YAHATVP utilise ces archives pour retrouver des déclarations que le site officiel a depuis dépubliées, tout en affichant leur provenance et en les séparant des publications actuelles de la HATVP.",
       "link": "Découvrir le projet d’archivage",
       "href": "https://github.com/louispaulet/hatvp-archive-wayback-machine"
+    },
+    "huggingFace": {
+      "eyebrow": "Instantané Hugging Face",
+      "title": "Un instantané réalisé par thefrenchartist.",
+      "description": "YAHATVP ingère aussi un instantané historique statique des XML de déclarations de la HATVP, publié sur Hugging Face par thefrenchartist, l’auteur de ce projet. Ce n’est pas un flux en direct : le pipeline télécharge l’archive, extrait et normalise les XML, déduplique les déclarations et conserve la provenance de la source.",
+      "link": "Ouvrir le jeu de données Hugging Face",
+      "href": "https://huggingface.co/datasets/the-french-artist/hatvp_declarations_xml"
     },
     "project": {
       "eyebrow": "Source du projet",

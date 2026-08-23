@@ -94,6 +94,8 @@ documented and complete.
   the retained-source cascade, and verify its source row on the deployed health
   page. Production replay on 2026-08-23 persisted the archive, loaded all 13
   tables, and Chrome confirmed the English and French source labels.
+- [x] Explain the Internet Archive Wayback source and the static Hugging Face
+  snapshot, including its `thefrenchartist` provenance, on the public About page.
 
 ## Google Cloud project details (completed)
 
