@@ -90,9 +90,10 @@ documented and complete.
   verify that the deployed health page reports both source IDs. The authorized
   ADC replay on 2026-08-23 persisted both raw sources, loaded all 13 tables,
   and Chrome confirmed both source rows on the public health page.
-- [ ] Ingest the static HF/Wayback 2014 archive, process and deduplicate it with
+- [x] Ingest the static HF/Wayback 2014 archive, process and deduplicate it with
   the retained-source cascade, and verify its source row on the deployed health
-  page.
+  page. Production replay on 2026-08-23 persisted the archive, loaded all 13
+  tables, and Chrome confirmed the English and French source labels.
 
 ## Google Cloud project details (completed)
 
