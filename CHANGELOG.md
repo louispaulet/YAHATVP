@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-23 — Order pipeline layers by processing flow
+
+### Changed
+
+- Ordered the pipeline-health layer card deterministically as Bronze, Silver,
+  then Gold, even when the API returns the layer rows in another order.
+
+### Verified
+
+- The frontend regression fixture now deliberately scrambles the API order;
+  `make frontend-test` still passes all 29 tests and the production build.
+- Published the frontend and verified the live French page in Chrome renders
+  Bronze at the top, Silver in the middle, and Gold at the bottom with no
+  warning or error console entries.
+
 ## 2026-08-23 — Restore pipeline countdown card visibility
 
 ### Fixed

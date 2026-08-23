@@ -168,6 +168,7 @@ describe("dashboard application", () => {
     expect(await screen.findByText("The data pipeline, in view.")).toBeInTheDocument();
     expect(screen.getByTestId("pipeline-countdown-card")).toHaveClass("pipeline-health-countdown");
     expect(screen.getByTestId("pipeline-countdown")).toHaveTextContent(/\d+d \d{2}h \d{2}m \d{2}s/);
+    expect(screen.getAllByTestId("pipeline-layer").map((layer) => layer.getAttribute("data-layer"))).toEqual(["bronze", "silver", "gold"]);
     expect(screen.getByText("HATVP website")).toBeInTheDocument();
     expect(screen.getByText("GitHub / Wayback backup")).toBeInTheDocument();
     expect(screen.getByText("Rows and review load by layer")).toBeInTheDocument();
