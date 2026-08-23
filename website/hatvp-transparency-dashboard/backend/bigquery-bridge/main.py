@@ -21,6 +21,7 @@ from service import (
     run_age_analysis,
     run_dashboard,
     run_declaration,
+    run_health,
     run_highlights,
     run_search,
     run_simple_analysis,
@@ -33,6 +34,7 @@ SLICE_ROUTES = {
     "/v1/dashboard/declarations": "declarations",
     "/v1/dashboard/gender": "gender",
     "/v1/dashboard/highlights": "highlights",
+    "/v1/dashboard/health": "health",
     "/v1/dashboard/search": "search",
     "/v1/dashboard/simple-analysis": "simple-analysis",
     "/v1/dashboard/age-analysis": "age-analysis",
@@ -103,6 +105,8 @@ def dashboard_route(request: Any) -> tuple[str, int, dict[str, str]]:
         return run_simple_analysis()
     if dashboard_view(request) == "highlights":
         return run_highlights()
+    if dashboard_view(request) == "health":
+        return run_health()
     if dashboard_view(request) == "declaration":
         identifier = declaration_uuid(request)
         if not identifier or "/" in identifier or len(identifier) > 120:

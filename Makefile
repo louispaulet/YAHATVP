@@ -15,8 +15,31 @@ BRIDGE_SERVICE ?= hatvp-dashboard-api
 BRIDGE_SECRET_NAME ?= hatvp-dashboard-bridge-token
 READER_SERVICE_ACCOUNT ?= hatvp-dashboard-reader
 FRONTEND_ORIGIN ?= https://yahatvp.thefrenchartist.dev
+LOCAL_OUTPUT ?=
+WAYBACK_ARCHIVE_ZIP ?= ../hatvp-archive-wayback-machine/xml-archive/declarations.xml.zip
+PIPELINE_SNAPSHOT_DATE ?=
 
-.PHONY: dashboard-install backend-test backend-dev backend-secrets bridge-deploy backend-deploy frontend-test frontend-dev frontend-deploy
+PIPELINE_LOCAL_ARGS = $(if $(LOCAL_OUTPUT),--local-output "$(LOCAL_OUTPUT)",)
+PIPELINE_DATE_ARGS = $(if $(PIPELINE_SNAPSHOT_DATE),--snapshot-date "$(PIPELINE_SNAPSHOT_DATE)",)
+
+.PHONY: pipeline-run pipeline-ingest pipeline-process pipeline-archive-ingest pipeline-archive dashboard-install backend-test backend-dev backend-secrets bridge-deploy backend-deploy frontend-test frontend-dev frontend-deploy
+
+pipeline-run:
+	uv run python -m hatvp.main --stage all $(PIPELINE_LOCAL_ARGS)
+
+pipeline-ingest:
+	uv run python -m hatvp.main --stage ingest $(PIPELINE_LOCAL_ARGS)
+
+pipeline-process:
+	uv run python -m hatvp.main --stage process $(PIPELINE_LOCAL_ARGS) $(PIPELINE_DATE_ARGS)
+
+pipeline-archive-ingest:
+	@test -f "$(WAYBACK_ARCHIVE_ZIP)" || (echo "Archive zip not found: $(WAYBACK_ARCHIVE_ZIP)" >&2; exit 1)
+	uv run python -m hatvp.main --stage archive-ingest --archive-zip "$(WAYBACK_ARCHIVE_ZIP)" $(PIPELINE_LOCAL_ARGS) $(PIPELINE_DATE_ARGS)
+
+pipeline-archive:
+	$(MAKE) pipeline-archive-ingest LOCAL_OUTPUT="$(LOCAL_OUTPUT)" WAYBACK_ARCHIVE_ZIP="$(WAYBACK_ARCHIVE_ZIP)" PIPELINE_SNAPSHOT_DATE="$(PIPELINE_SNAPSHOT_DATE)"
+	$(MAKE) pipeline-process LOCAL_OUTPUT="$(LOCAL_OUTPUT)" PIPELINE_SNAPSHOT_DATE="$(PIPELINE_SNAPSHOT_DATE)"
 
 dashboard-install:
 	npm --prefix $(WORKER_DIR) install

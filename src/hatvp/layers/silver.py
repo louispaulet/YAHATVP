@@ -8,6 +8,7 @@ from typing import Any
 import polars as pl
 
 from .anomaly import detect_anomalies, parent_map, record_ref
+from .quality_selection import dedupe_for_quality
 from .registry import upsert_registry
 from .silver_dedupe import unique_rows
 from .silver_metadata import annotate_tables, occurrences_by_ref
@@ -42,7 +43,8 @@ def build_silver(
         name: unique_rows([*history.get(name, []), *current.get(name, [])])
         for name in SILVER_TABLES
     }
-    occurrences = detect_anomalies(current, history, registry)
+    quality_current, quality_history = dedupe_for_quality(current, history)
+    occurrences = detect_anomalies(quality_current, quality_history, registry)
     current_refs = {
         record_ref(name, row) for name in SILVER_TABLES for row in current.get(name, [])
     }

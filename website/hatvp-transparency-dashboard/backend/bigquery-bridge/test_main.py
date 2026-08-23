@@ -144,6 +144,16 @@ def test_bridge_returns_highlights_slice(monkeypatch):
     assert "income_changes_json" in client.queries[0]
 
 
+def test_bridge_dispatches_health_slice(monkeypatch):
+    expected = (json.dumps({"quality": {"errors": 0}}), 200, {})
+    monkeypatch.setenv("BRIDGE_TOKEN", "secret")
+    monkeypatch.setattr(main, "run_health", lambda: expected)
+
+    result = main.dashboard(request(path="/v1/dashboard/health", headers=AUTH))
+
+    assert result == expected
+
+
 def test_bridge_reports_empty_result_without_leaking_query_details(monkeypatch):
     monkeypatch.setenv("BRIDGE_TOKEN", "secret")
     monkeypatch.setenv("BQ_PROJECT_ID", "project")

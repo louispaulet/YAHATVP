@@ -74,7 +74,16 @@ documented and complete.
 - [x] Deploy the approved latest-name+surname Highlights selection and verify
   that only the latest declaration per normalized name is analyzed, including
   the Warsmann and Ruelle regression cases.
-- [ ] Deploy and force-replay the repaired timeline release; record the main
+- [x] Split official and Wayback/GitHub raw ingestion from retained-source
+  processing, preserve source-specific hashes and raw zip bytes, and expose
+  reproducible Make targets for each stage.
+- [x] Deduplicate by declaration UUID before anomaly detection while retaining
+  all source occurrences and provenance in Bronze/Silver history.
+- [x] Add the bilingual pipeline-health API and frontend page with next-run
+  countdown, source coverage, Bronze/Silver/Gold quality counts, and anomaly
+  summary.
+- [ ] Deploy and force-replay the repaired timeline and pipeline-health release;
+  record the main
   workflow, ingestion execution, 13-table load, state advancement, bridge
   revision, Worker version, frontend publish, and final Chrome audit.
 

@@ -1,5 +1,6 @@
 """Cloud execution and response dispatch for the dashboard bridge."""
 
+import json
 import os
 from typing import Any
 
@@ -13,10 +14,12 @@ from bridge_runtime import (
     runtime_setting,
     storage_client,
 )
+from health_payloads import health_payload
 from highlight_payloads import highlights_payload
 from query import build_query
 from query_analysis import build_age_analysis_query, build_simple_analysis_query
 from query_declaration import build_declaration_query
+from query_health import build_health_query
 from query_highlights import build_highlights_query
 from query_search import build_search_query
 from raw_xml import read_declaration_xml
@@ -81,6 +84,24 @@ def run_highlights() -> tuple[str, int, dict[str, str]]:
         return response(highlights_payload(rows[0]), 200)
     except Exception:
         return response(error_payload("QUERY_FAILED", "Highlights are unavailable"), 502)
+
+
+def run_health() -> tuple[str, int, dict[str, str]]:
+    """Return current source, layer, quality, and anomaly health."""
+
+    try:
+        query = build_health_query(os.environ["BQ_PROJECT_ID"], os.environ["BQ_DATASET"])
+        rows = query_rows(query)
+        if not rows or row_value(rows[0], "snapshot_date") is None:
+            return response(error_payload("NO_DATA", "No dashboard snapshot is available"), 404)
+        snapshot = str(row_value(rows[0], "snapshot_date"))
+        path = f"{configured_prefix()}/quality/snapshot_date={snapshot}/report.json"
+        report = json.loads(
+            storage_client().bucket(configured_bucket()).blob(path).download_as_bytes()
+        )
+        return response(health_payload(rows[0], report), 200)
+    except Exception:
+        return response(error_payload("QUERY_FAILED", "Pipeline health is unavailable"), 502)
 
 
 def run_age_analysis(search_term: str) -> tuple[str, int, dict[str, str]]:

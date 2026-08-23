@@ -3,6 +3,7 @@ import type {
   DashboardBreakdownResponse,
   DashboardDeclarationResponse,
   DashboardGenderResponse,
+  DashboardHealthResponse,
   DashboardHighlightsResponse,
   DashboardOverviewResponse,
   DashboardSearchResponse,
@@ -29,6 +30,17 @@ function isOverviewResponse(value: unknown): value is DashboardOverviewResponse 
   return isRecord(tables) && ["declarations", "people", "incomes", "assets"].every(
     (name) => typeof tables[name] === "number",
   );
+}
+
+function isHealthResponse(value: unknown): value is DashboardHealthResponse {
+  if (!isMeta(value) || typeof value.nextIngestionAt !== "string") return false;
+  if (!Array.isArray(value.sources) || !Array.isArray(value.layers) || !Array.isArray(value.anomalies)) return false;
+  const quality = value.quality;
+  return isRecord(quality) && ["errors", "warnings", "flaggedRecords"].every((key) => typeof quality[key] === "number")
+    && typeof quality.regression === "boolean"
+    && value.sources.every((item) => isRecord(item) && typeof item.sourceId === "string" && typeof item.declarations === "number")
+    && value.layers.every((item) => isRecord(item) && typeof item.layer === "string" && typeof item.rows === "number" && typeof item.reviewRows === "number")
+    && value.anomalies.every((item) => isRecord(item) && typeof item.status === "string" && typeof item.rows === "number");
 }
 
 function isBreakdownResponse(value: unknown): value is DashboardBreakdownResponse {
@@ -96,6 +108,10 @@ async function fetchJson<T>(path: string, validate: (value: unknown) => value is
 
 export function fetchOverview(signal?: AbortSignal): Promise<DashboardOverviewResponse> {
   return fetchJson("/api/dashboard/overview", isOverviewResponse, signal);
+}
+
+export function fetchHealth(signal?: AbortSignal): Promise<DashboardHealthResponse> {
+  return fetchJson("/api/dashboard/health", isHealthResponse, signal);
 }
 
 export function fetchIncome(signal?: AbortSignal): Promise<DashboardBreakdownResponse> {

@@ -21,7 +21,8 @@
     "search": "Search declarations",
     "profiles": "Declarant profiles",
     "sources": "Sources & methods",
-    "quality": "Data quality"
+    "quality": "Data quality",
+    "health": "Pipeline health"
   },
   "footer": {
     "builtFrom": "Built from public HATVP declarations.",
@@ -307,6 +308,28 @@
       "day": "day",
       "days": "days"
     }
+  },
+  "pipelineHealth": {
+    "eyebrow": "Pipeline observability",
+    "title": "The data pipeline, in view.",
+    "description": "Track the latest run, source coverage, layer quality, and records that need review before using the dashboard.",
+    "snapshot": "Latest snapshot",
+    "weekly": "Runs every Monday",
+    "nextIngestion": "Next scheduled ingestion",
+    "flagged": "Records flagged",
+    "flaggedDetail": "High-level count of records carrying an active quality or anomaly signal.",
+    "sourcesEyebrow": "Source coverage",
+    "sourcesTitle": "Declarations by source",
+    "qualityEyebrow": "Bronze → Silver → Gold",
+    "qualityTitle": "Rows and review load by layer",
+    "rows": "rows",
+    "reviewRows": "rows currently flagged for review",
+    "anomalyEyebrow": "Anomaly registry",
+    "anomalyTitle": "High-level anomaly report",
+    "qualitySummary": "{errors} errors · {warnings} warnings",
+    "countdown": { "unavailable": "Not scheduled", "days": "d" },
+    "sourceNames": { "hatvp_website": "HATVP website", "wayback_github": "GitHub / Wayback backup" },
+    "layers": { "bronze": "Bronze", "silver": "Silver", "gold": "Gold" }
   },
   "search": {
     "eyebrow": "Declaration search",

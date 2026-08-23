@@ -3,6 +3,15 @@ export const dashboard = {
   tables: { declarations: 2, people: 2, incomes: 3, assets: 4 },
 };
 
+export const health = {
+  snapshotDate: "2026-08-18", generatedAt: "2026-08-18T08:00:00Z",
+  nextIngestionAt: "2026-08-24T05:00:00Z",
+  sources: [{ sourceId: "hatvp_website", declarations: 2 }, { sourceId: "wayback_github", declarations: 1 }],
+  layers: [{ layer: "bronze", rows: 12, reviewRows: 0 }, { layer: "silver", rows: 12, reviewRows: 2 }, { layer: "gold", rows: 8, reviewRows: 1 }],
+  quality: { errors: 0, warnings: 2, flaggedRecords: 2, regression: false },
+  anomalies: [{ status: "active", rows: 2 }, { status: "resolved", rows: 1 }],
+};
+
 export const income = {
   snapshotDate: "2026-08-18", generatedAt: "2026-08-18T08:00:00Z", totalValue: 150000, yearCount: 2,
   items: [{ label: "mandate_remuneration", rows: 2, totalValue: 120000 }, { label: "revenu_mandat", rows: 1, totalValue: 30000 }],

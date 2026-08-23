@@ -28,6 +28,8 @@ def context_for(
         source_url=values.get("url"),
         source_object=values.get("source_object") or default_object,
         source_sha256=values.get("sha256"),
+        ingestion_source=str(values.get("ingestion_source") or "hatvp_website"),
+        source_ingestion_snapshot_date=values.get("source_snapshot_date"),
         pipeline_version=values.get("pipeline_version"),
         parser_version=str(values.get("parser_version") or PARSER_VERSION),
     )
@@ -41,6 +43,7 @@ def record_key(context: ParseContext, source_record_id: str | None, row_index: i
         (
             context.source_format,
             context.source_file,
+            context.ingestion_source,
             context.snapshot_date,
             identity,
             str(row_index),
@@ -74,11 +77,14 @@ def apply_provenance(
             "bronze_record_key": key,
             "source_record_id": source_record_id,
             "source_snapshot_date": context.snapshot_date,
+            "source_ingestion_snapshot_date": context.source_ingestion_snapshot_date
+            or context.snapshot_date,
             "source_format": context.source_format,
             "source_file": context.source_file,
             "source_url": context.source_url,
             "source_object": context.source_object,
             "source_sha256": context.source_sha256,
+            "ingestion_source": context.ingestion_source,
             "source_location": location,
             "pipeline_version": context.pipeline_version,
             "parser_version": context.parser_version,

@@ -8,6 +8,7 @@ import { DeclarationPage } from "./pages/DeclarationPage";
 import { ExplorePage } from "./pages/ExplorePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { QualityIssuesPage } from "./pages/QualityIssuesPage";
+import { PipelineHealthPage } from "./pages/PipelineHealthPage";
 import { SearchPage } from "./pages/SearchPage";
 import { SimpleAnalysisPage } from "./pages/SimpleAnalysisPage";
 
@@ -24,6 +25,7 @@ export function App() {
           <Route path="/age-analysis" element={<AgeAnalysisPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/quality-issues" element={<QualityIssuesPage />} />
+          <Route path="/pipeline-health" element={<PipelineHealthPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Layout>

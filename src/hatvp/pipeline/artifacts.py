@@ -11,6 +11,7 @@ from ..download import DownloadedFile
 from ..quality import QualityResult
 from ..storage import ArtifactStore
 from ..tables import write_parquet, write_table
+from .source_contract import OFFICIAL_SOURCE, source_raw_prefix
 
 
 def archive_raw(
@@ -19,18 +20,19 @@ def archive_raw(
     downloaded: dict[str, DownloadedFile],
     metadata: dict[str, Any],
     dry_run: bool,
+    source_id: str = OFFICIAL_SOURCE,
 ) -> None:
     if dry_run:
         return
     for name, source in downloaded.items():
         store.put_file(
-            f"raw/snapshot_date={snapshot_date}/{name}",
+            f"raw/{source_raw_prefix(source_id)}snapshot_date={snapshot_date}/{name}",
             source.path,
-            content_type="application/xml" if name.endswith(".xml") else "text/csv",
+            content_type=_content_type(name),
             immutable=True,
         )
     store.put_bytes(
-        f"raw/snapshot_date={snapshot_date}/metadata.json",
+        f"raw/{source_raw_prefix(source_id)}snapshot_date={snapshot_date}/metadata.json",
         _json(metadata),
         content_type="application/json",
         immutable=True,
@@ -88,3 +90,11 @@ def _json(value: object) -> bytes:
     return (
         json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True, default=str) + "\n"
     ).encode()
+
+
+def _content_type(name: str) -> str:
+    if name.endswith(".xml"):
+        return "application/xml"
+    if name.endswith(".zip"):
+        return "application/zip"
+    return "text/csv"

@@ -11,8 +11,10 @@ def _typed(names: str, dtype: object) -> dict[str, object]:
 
 BRONZE_PROVENANCE_SCHEMA = {
     **_typed(
-        "bronze_record_key source_record_id source_format source_file source_url source_object "
-        "source_sha256 source_location pipeline_version parser_version raw_record_json "
+        "bronze_record_key source_record_id ingestion_source source_format source_file source_url "
+        "source_object source_sha256 source_ingestion_snapshot_date source_location "
+        "pipeline_version "
+        "parser_version raw_record_json "
         "declaration_version declaration_modificative",
         pl.String,
     ),
@@ -95,6 +97,3 @@ def schema_for(table_name: str) -> dict[str, object]:
     """Return a copy of the stable schema for a known normalized table."""
 
     return dict(PARQUET_SCHEMAS.get(table_name, {}))
-
-
-__all__ = ["PARQUET_SCHEMAS", "schema_for"]

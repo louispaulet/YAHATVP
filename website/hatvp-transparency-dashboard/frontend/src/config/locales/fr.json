@@ -21,7 +21,8 @@
     "search": "Rechercher une déclaration",
     "profiles": "Profils des déclarants",
     "sources": "Sources et méthodes",
-    "quality": "Qualité des données"
+    "quality": "Qualité des données",
+    "health": "Santé du pipeline"
   },
   "footer": {
     "builtFrom": "Construit à partir des déclarations publiques de la HATVP.",
@@ -307,6 +308,28 @@
       "day": "jour",
       "days": "jours"
     }
+  },
+  "pipelineHealth": {
+    "eyebrow": "Observabilité du pipeline",
+    "title": "Le pipeline de données, en vue.",
+    "description": "Suivez le dernier traitement, la couverture des sources, la qualité des couches et les lignes à vérifier avant d’utiliser le tableau de bord.",
+    "snapshot": "Dernier instantané",
+    "weekly": "Exécution chaque lundi",
+    "nextIngestion": "Prochaine ingestion planifiée",
+    "flagged": "Lignes signalées",
+    "flaggedDetail": "Nombre global de lignes portant un signal actif de qualité ou d’anomalie.",
+    "sourcesEyebrow": "Couverture des sources",
+    "sourcesTitle": "Déclarations par source",
+    "qualityEyebrow": "Bronze → Silver → Gold",
+    "qualityTitle": "Lignes et charge de vérification par couche",
+    "rows": "lignes",
+    "reviewRows": "lignes à vérifier",
+    "anomalyEyebrow": "Registre des anomalies",
+    "anomalyTitle": "Rapport d’anomalies synthétique",
+    "qualitySummary": "{errors} erreurs · {warnings} avertissements",
+    "countdown": { "unavailable": "Non planifiée", "days": "j" },
+    "sourceNames": { "hatvp_website": "Site HATVP", "wayback_github": "Sauvegarde GitHub / Wayback" },
+    "layers": { "bronze": "Bronze", "silver": "Silver", "gold": "Gold" }
   },
   "search": {
     "eyebrow": "Recherche de déclarations",

@@ -3,7 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { declarationXmlFixtures } from "./declaration-fixtures";
-import { ageAnalysis, assets, dashboard, declarations, gender, highlights, income, simpleAnalysis } from "./test-fixtures";
+import { ageAnalysis, assets, dashboard, declarations, gender, health, highlights, income, simpleAnalysis } from "./test-fixtures";
 
 const search = {
   snapshotDate: "2026-08-18",
@@ -36,10 +36,10 @@ describe("dashboard application", () => {
   afterEach(() => vi.useRealTimers());
 
   beforeEach(() => {
-    window.localStorage.clear();
+    window.localStorage?.clear();
     vi.stubGlobal("fetch", vi.fn().mockImplementation((url: string) => {
       const path = new URL(url).pathname;
-      const payload = path.endsWith("/overview") ? dashboard : path.endsWith("/income") ? income : path.endsWith("/assets") ? assets : path.endsWith("/gender") ? gender : path.endsWith("/highlights") ? highlights : path.endsWith("/search") ? search : path.endsWith("/simple-analysis") ? simpleAnalysis : path.endsWith("/age-analysis") ? ageAnalysis : path.includes("/declarations/") ? declaration : declarations;
+      const payload = path.endsWith("/overview") ? dashboard : path.endsWith("/health") ? health : path.endsWith("/income") ? income : path.endsWith("/assets") ? assets : path.endsWith("/gender") ? gender : path.endsWith("/highlights") ? highlights : path.endsWith("/search") ? search : path.endsWith("/simple-analysis") ? simpleAnalysis : path.endsWith("/age-analysis") ? ageAnalysis : path.includes("/declarations/") ? declaration : declarations;
       return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
     }));
   });
@@ -161,6 +161,16 @@ describe("dashboard application", () => {
     expect(screen.getAllByRole("link", { name: "Open link ↗" })[0]).toHaveAttribute("href", "https://www.hatvp.fr/fiche-nominative/?declarant=vigier-jean-francois-17617");
     expect(screen.getByRole("link", { name: "Data & methods" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Data quality" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("renders the pipeline health page", async () => {
+    render(<MemoryRouter initialEntries={["/pipeline-health"]}><App /></MemoryRouter>);
+    expect(await screen.findByText("The data pipeline, in view.")).toBeInTheDocument();
+    expect(screen.getByText("HATVP website")).toBeInTheDocument();
+    expect(screen.getByText("GitHub / Wayback backup")).toBeInTheDocument();
+    expect(screen.getByText("Rows and review load by layer")).toBeInTheDocument();
+    expect(screen.getByText("High-level anomaly report")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Pipeline health" })).toHaveAttribute("aria-current", "page");
   });
 
   it("searches declarations and opens the source XML detail page", async () => {

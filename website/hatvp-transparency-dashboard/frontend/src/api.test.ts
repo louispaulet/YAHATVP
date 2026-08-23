@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fetchAgeAnalysis, fetchAssets, fetchGender, fetchHighlights, fetchIncome, fetchOverview, fetchSimpleAnalysis } from "./api";
+import { fetchAgeAnalysis, fetchAssets, fetchGender, fetchHealth, fetchHighlights, fetchIncome, fetchOverview, fetchSimpleAnalysis } from "./api";
 
 describe("dashboard API client", () => {
   beforeEach(() => vi.restoreAllMocks());
@@ -29,6 +29,21 @@ describe("dashboard API client", () => {
       "http://localhost:8787/api/dashboard/income",
       "http://localhost:8787/api/dashboard/assets",
     ]);
+  });
+
+  it("loads the pipeline health slice", async () => {
+    const response = {
+      snapshotDate: "2026-08-18", generatedAt: "now", nextIngestionAt: "2026-08-24T05:00:00Z",
+      sources: [{ sourceId: "hatvp_website", declarations: 1 }],
+      layers: [{ layer: "gold", rows: 1, reviewRows: 0 }],
+      quality: { errors: 0, warnings: 1, flaggedRecords: 1, regression: false },
+      anomalies: [{ status: "active", rows: 1 }],
+    };
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(response), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(fetchHealth()).resolves.toEqual(response);
+    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8787/api/dashboard/health", expect.any(Object));
   });
 
   it("loads the gender slice", async () => {

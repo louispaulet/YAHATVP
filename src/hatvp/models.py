@@ -61,6 +61,8 @@ class ParseContext:
     source_url: str | None = None
     source_object: str | None = None
     source_sha256: str | None = None
+    ingestion_source: str = "hatvp_website"
+    source_ingestion_snapshot_date: str | None = None
     pipeline_version: str | None = None
     parser_version: str = "1"
     declaration_version: str | None = None

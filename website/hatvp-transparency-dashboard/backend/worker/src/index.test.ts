@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { handleRequest } from "./index";
-import type { AgeAnalysisResponse, DashboardGenderResponse, DashboardHighlightsResponse, DashboardOverviewResponse, SimpleAnalysisResponse, WorkerEnv } from "./types";
+import type { AgeAnalysisResponse, DashboardGenderResponse, DashboardHealthResponse, DashboardHighlightsResponse, DashboardOverviewResponse, SimpleAnalysisResponse, WorkerEnv } from "./types";
 
 const env: WorkerEnv = {
   BRIDGE_URL: "https://bridge.example.test",
@@ -12,6 +12,16 @@ const overview: DashboardOverviewResponse = {
   snapshotDate: "2026-08-18",
   generatedAt: "2026-08-18T08:00:00Z",
   tables: { declarations: 2, people: 2, incomes: 3, assets: 4 },
+};
+
+const health: DashboardHealthResponse = {
+  snapshotDate: "2026-08-18",
+  generatedAt: "2026-08-18T08:00:00Z",
+  nextIngestionAt: "2026-08-24T05:00:00Z",
+  sources: [{ sourceId: "hatvp_website", declarations: 2 }],
+  layers: [{ layer: "gold", rows: 2, reviewRows: 1 }],
+  quality: { errors: 0, warnings: 1, flaggedRecords: 1, regression: false },
+  anomalies: [{ status: "active", rows: 1 }],
 };
 
 const gender: DashboardGenderResponse = {
@@ -120,6 +130,19 @@ describe("dashboard Worker", () => {
       expect.objectContaining({
         headers: expect.objectContaining({ Authorization: "Bearer fixture-token" }),
       }),
+    );
+  });
+
+  it("forwards and validates the pipeline health slice", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify(health), { status: 200 }),
+    );
+    const response = await handleRequest(request("/api/dashboard/health"), env, fetcher);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(health);
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://bridge.example.test/v1/dashboard/health",
+      expect.anything(),
     );
   });
 

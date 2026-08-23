@@ -6,6 +6,7 @@ import type {
   DashboardOverviewResponse,
   DashboardSearchResponse,
   DashboardGenderResponse,
+  DashboardHealthResponse,
   DashboardHighlightsResponse,
   WorkerEnv,
 } from "./types";
@@ -19,6 +20,7 @@ const DASHBOARD_SLICE_ROUTES = {
   "/api/dashboard/declarations": "/v1/dashboard/declarations",
   "/api/dashboard/gender": "/v1/dashboard/gender",
   "/api/dashboard/highlights": "/v1/dashboard/highlights",
+  "/api/dashboard/health": "/v1/dashboard/health",
   "/api/dashboard/search": "/v1/dashboard/search",
   "/api/dashboard/simple-analysis": "/v1/dashboard/simple-analysis",
   "/api/dashboard/age-analysis": "/v1/dashboard/age-analysis",
@@ -71,6 +73,18 @@ function isDashboardOverviewResponse(value: unknown): value is DashboardOverview
   return isRecord(tables) && ["declarations", "people", "incomes", "assets"].every(
     (name) => typeof tables[name] === "number",
   );
+}
+
+function isDashboardHealthResponse(value: unknown): value is DashboardHealthResponse {
+  if (!isRecord(value) || typeof value.generatedAt !== "string" || typeof value.nextIngestionAt !== "string") return false;
+  const quality = value.quality;
+  return (value.snapshotDate === null || typeof value.snapshotDate === "string")
+    && Array.isArray(value.sources) && Array.isArray(value.layers) && Array.isArray(value.anomalies)
+    && isRecord(quality) && typeof quality.errors === "number" && typeof quality.warnings === "number"
+    && typeof quality.flaggedRecords === "number" && typeof quality.regression === "boolean"
+    && value.sources.every((item) => isRecord(item) && typeof item.sourceId === "string" && typeof item.declarations === "number")
+    && value.layers.every((item) => isRecord(item) && typeof item.layer === "string" && typeof item.rows === "number" && typeof item.reviewRows === "number")
+    && value.anomalies.every((item) => isRecord(item) && typeof item.status === "string" && typeof item.rows === "number");
 }
 
 function isDashboardBreakdownResponse(value: unknown): value is DashboardBreakdownResponse {
@@ -196,7 +210,9 @@ export async function handleRequest(
     return new Response(null, { status: 204, headers: corsHeaders(request, env) });
   }
   if (slicePath && request.method === "GET") {
-    const validate = slicePath.endsWith("/overview")
+    const validate = slicePath.endsWith("/health")
+      ? isDashboardHealthResponse
+      : slicePath.endsWith("/overview")
       ? isDashboardOverviewResponse
       : slicePath.endsWith("/gender")
         ? isDashboardGenderResponse

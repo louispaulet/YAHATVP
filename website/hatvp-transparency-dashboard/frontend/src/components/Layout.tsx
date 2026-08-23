@@ -9,7 +9,7 @@ type ChildLink = { to: string; label: string; end?: boolean };
 function sectionForPath(pathname: string): SectionKey | null {
   if (pathname === "/" || pathname.startsWith("/explore") || pathname.startsWith("/analysis")) return "explore";
   if (pathname.startsWith("/search") || pathname.startsWith("/age-analysis") || pathname.startsWith("/declarations/")) return "declarations";
-  if (pathname.startsWith("/about") || pathname.startsWith("/quality-issues")) return "data";
+  if (pathname.startsWith("/about") || pathname.startsWith("/quality-issues") || pathname.startsWith("/pipeline-health")) return "data";
   return null;
 }
 
@@ -47,6 +47,7 @@ export function Layout({ children }: { children: ReactNode }) {
     data: [
       { to: "/about", label: locale.nav.sources, end: true },
       { to: "/quality-issues", label: locale.nav.quality },
+      { to: "/pipeline-health", label: locale.nav.health },
     ],
   };
 

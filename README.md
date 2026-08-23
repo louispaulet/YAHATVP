@@ -6,8 +6,10 @@ datasets.
 
 > Project status: the local end-to-end path is implemented and has been exercised
 > against the current public HATVP files. The Cloud Run deployment is in place,
-> and the weekly `hatvp-ingestion-weekly` Scheduler trigger runs the real
-> ingestion job at 07:00 Europe/Paris. BigQuery keeps the version-complete
+> and the weekly `hatvp-ingestion-weekly` Scheduler trigger runs the official
+> raw-ingestion stage at 07:00 Europe/Paris. Raw ingestion is now separate from
+> retained-source processing, so the GitHub/Wayback archive can be replayed with
+> the same Bronze → Silver → Gold cascade. BigQuery keeps the version-complete
 > `declarations`, `people`, `incomes`, and `assets` Bronze tables and now loads
 > anomaly-annotated Silver, latest-version Gold, and the anomaly registry.
 
@@ -28,11 +30,15 @@ deployment, never as the weekly execution engine.
 flowchart TB
     scheduler["Cloud Scheduler<br/>weekly, Europe/Paris"]
     job["Cloud Run Job"]
-    download["Download HATVP files"]
-    raw["Immutable raw archive"]
-    hashes["Compare SHA-256"]
-    unchanged{"No change?"}
+    official["Official HATVP source<br/>weekly Monday"]
+    backup["Wayback/GitHub archive zip<br/>one-off replay"]
+    ingest["Raw ingestion stage<br/>hash + immutable archive"]
+    source_state["state/sources/<source>/latest.json"]
+    hashes["Compare exact-byte SHA-256"]
+    unchanged{"Source unchanged?"}
     exit["exit 0"]
+    raw["Retained raw snapshots<br/>per source"]
+    process["Processing stage<br/>all latest raw sources"]
     parse["Parse and normalize"]
     quality["Data-quality checks"]
     parquet["Parquet to GCS"]
@@ -40,19 +46,25 @@ flowchart TB
     report["Quality report to GCS"]
     bigquery["Optional BigQuery Bronze / Silver / Gold tables"]
     state["Update state/latest.json last"]
+    health["Pipeline health API/page"]
     status["Emit status<br/>NO_CHANGE / SUCCESS /<br/>SUCCESS_WITH_WARNINGS / FAILED"]
     github["GitHub Actions +<br/>Workload Identity Federation"]
     registry["Artifact Registry"]
     deploy["Deploy Cloud Run Job"]
 
     scheduler -->|authenticated POST| job
-    job --> download
+    job --> official
+    official --> ingest
+    backup --> ingest
     job --> status
-    download --> raw
-    download --> hashes
+    ingest --> raw
+    ingest --> hashes
+    ingest --> source_state
     hashes --> unchanged
     unchanged -->|yes| exit
-    unchanged -->|no| parse
+    unchanged -->|no| process
+    raw --> process
+    process --> parse
     parse --> quality
     quality --> parquet
     quality --> anomalies
@@ -60,6 +72,9 @@ flowchart TB
     anomalies --> report
     report --> bigquery
     bigquery --> state
+    state --> health
+    bigquery --> health
+    backup -.->|make pipeline-archive| ingest
     github --> registry --> deploy
 ```
 
@@ -143,6 +158,12 @@ hatvp-pipeline/
 │   │   ├── __init__.py            # orchestration façade
 │   │   ├── artifacts.py
 │   │   ├── bigquery.py
+│   │   ├── ingestion.py          # official and Wayback raw sources
+│   │   ├── processing.py         # retained-source Bronze → Gold cascade
+│   │   ├── processing_sources.py # latest raw-source materialization
+│   │   ├── source_contract.py    # source paths and hash state
+│   │   ├── orchestrator.py       # ingestion → processing cascade
+│   │   ├── legacy.py             # fixture dry-run compatibility path
 │   │   ├── result.py
 │   │   ├── state.py
 │   │   └── steps.py
@@ -242,12 +263,20 @@ gs://<bucket>/hatvp/
 ├── anomaly_registry/snapshot_date=YYYY-MM-DD/data.parquet
 ├── quarantine/snapshot_date=YYYY-MM-DD/anomalies.parquet
 ├── quality/snapshot_date=YYYY-MM-DD/report.json
+├── raw/source=wayback_github/snapshot_date=YYYY-MM-DD/
+│   ├── declarations.xml
+│   ├── declarations.xml.zip
+│   └── metadata.json
+├── state/sources/<source_id>/latest.json
 └── state/latest.json
 ```
 
-Raw objects are immutable. Never overwrite a historical snapshot. Derived files
-may be deterministically rewritten when retrying the same snapshot after a
-partial failure.
+Raw objects are immutable. Never overwrite a historical snapshot. The official
+source keeps the historic `raw/snapshot_date=...` path; non-official sources are
+namespaced below `raw/source=<source_id>/snapshot_date=...`. The Wayback source
+retains both the original zip and its extracted XML. `state/sources/<source_id>/latest.json`
+advances after each raw-ingestion stage; derived files may be deterministically
+rewritten when retrying the same processing snapshot after a partial failure.
 
 `state/latest.json` is advanced only after every required stage succeeds:
 
@@ -263,7 +292,31 @@ partial failure.
 ```
 
 A failed download, parse, normalization, quality check, Parquet write, anomaly
-registry write, or BigQuery load must never advance this state.
+registry write, or BigQuery load must never advance this state. The processing
+state also records `source_snapshots`, including each source's snapshot and
+file hashes, so a raw-only success cannot be mistaken for a fully processed run.
+
+### Split pipeline commands
+
+Raw acquisition and processing are intentionally separate commands. The weekly
+Cloud Run entrypoint still uses `pipeline-run`, which ingests the official HATVP
+files and then processes all latest retained sources. The archive command uses
+the local sibling repository's immutable zip by default:
+
+```bash
+make pipeline-ingest LOCAL_OUTPUT=/tmp/yahatvp-output
+make pipeline-process LOCAL_OUTPUT=/tmp/yahatvp-output
+make pipeline-archive-ingest LOCAL_OUTPUT=/tmp/yahatvp-output \
+  WAYBACK_ARCHIVE_ZIP=../hatvp-archive-wayback-machine/xml-archive/declarations.xml.zip
+make pipeline-archive LOCAL_OUTPUT=/tmp/yahatvp-output \
+  PIPELINE_SNAPSHOT_DATE=2026-08-23
+```
+
+Use `PIPELINE_SNAPSHOT_DATE` for a reproducible archive partition. The
+`wayback_github` source is deduplicated by `declaration_uuid` before anomaly
+detection, while Bronze and the raw archive retain every source occurrence and
+its provenance. Exact-byte hash changes create a new raw snapshot; different
+bytes for an existing snapshot date fail rather than overwrite it.
 
 ### Normalized data
 
@@ -455,6 +508,12 @@ uv run python -m hatvp.main --local-output ./data
 uv run python -m hatvp.main --local-output ./data --dry-run
 uv run python -m hatvp.main --local-output ./data --force
 ```
+
+For the split stages, prefer the Make targets above. `--stage ingest` writes
+only raw files and source state; `--stage process` reads every latest retained
+source and writes Bronze, Silver, Gold, quality, registry, and optional
+BigQuery outputs. `state/latest.json` is written only after that cascade
+finishes.
 
 `--dry-run` must not mutate GCS, BigQuery, or state. `--force` reprocesses even
 when hashes are unchanged. Normal unit tests must use small fixtures and must
@@ -660,7 +719,11 @@ Read-only Cloud Run bridge ─┬─ BigQuery Gold aggregates
 The public API does not expose arbitrary SQL or contact/address fields.
 The bridge selects the latest normalized `snapshot_date` and exposes fixed
 read-only slices: `overview`, `income`, `assets`, `declarations`,
-`gender`, `simple-analysis`, and `age-analysis?q=...`. The `gender` slice
+`gender`, `simple-analysis`, `age-analysis?q=...`, and `health`. The
+`/pipeline-health` frontend route shows the countdown to the next Monday
+07:00 Europe/Paris ingestion, declaration counts by `hatvp_website` and
+`wayback_github`, Bronze/Silver/Gold row and review counts, quality totals, and
+anomaly-registry statuses. The `gender` slice
 returns the male/female ratio plus male and female counts by Gold mandate
 position; it derives the bounded `gender` value from the XML `civilite` field
 and excludes missing or unmapped titles from the ratio. Its
