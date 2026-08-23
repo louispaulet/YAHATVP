@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-08-24 — v1.5 dashboard release
+
+### Changed
+
+- Merged PR #39 for DOB leaderboard declaration links and PR #40 for the
+  editorial Explore page redesign into `main`.
+- Published the frontend to `gh-pages` commit `0724cea`, deployed bridge
+  revision `hatvp-dashboard-api-00024-g65`, and deployed Worker version
+  `3dc05b05-bc5f-4ad9-b2e7-27c1ebacf34b`.
+- GitHub Actions runs `32672542370`, `32673011394`, and `32673157976` passed;
+  the Cloud Run ingestion deployment completed successfully.
+
+### Verified
+
+- Local checks passed: 164 Python tests, 47 bridge tests, 13 Worker tests,
+  Worker typecheck, 29 frontend tests, the frontend production build, Ruff,
+  formatting, and package build.
+- The live local dry-run completed `SUCCESS_WITH_WARNINGS` with zero quality
+  errors; the public health API reports snapshot `2026-08-23` with zero
+  quality errors and all three retained source IDs.
+- Chrome verified Explore, pipeline health, About, analysis, age analysis, and
+  a DOB leaderboard click-through to declaration detail with raw XML; all
+  audited pages had zero warning/error console entries and no horizontal
+  overflow.
+
 ## 2026-08-24 — Keep DOB leaderboard links source-loadable
 
 ### Changed

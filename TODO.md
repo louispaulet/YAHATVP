@@ -104,6 +104,8 @@ documented and complete.
   snapshot, including its `thefrenchartist` provenance, on the public About page.
 - [x] Show raw ingested declaration counts beneath each deduplicated source
   count on the public pipeline-health page.
+- [x] Keep DOB leaderboard declaration links source-loadable through the
+  source-preserving Bronze row and its immutable raw XML object.
 
 ## Google Cloud project details (completed)
 
