@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-08-23 — Show the top reported anomaly categories
+
+### Changed
+
+- Extended the pipeline-health API with a deterministic top-five anomaly
+  category aggregate from the current anomaly registry, ordered by frequency.
+- Added human-readable English and French labels for the anomaly rule IDs,
+  with ranked cards and counts on `/pipeline-health`.
+- Versioned the health request contract so browsers do not reuse a cached
+  pre-category response after the release.
+
+### Verified
+
+- The live snapshot `2026-08-23` reports: large year-over-year change (2,388),
+  digit transcription error (1,578), superseded declaration (333),
+  conflicting same-period values (301), and factor-of-ten error (236).
+- `make backend-test` passed 13 Worker tests/typecheck and 47 bridge tests;
+  `make frontend-test` passed 29 tests and the production build. Full Ruff
+  checks, format checks, package build, and GitHub Actions run
+  [32658369775](https://github.com/louispaulet/YAHATVP/actions/runs/32658369775)
+  passed.
+- Deployed Cloud Run bridge revision `hatvp-dashboard-api-00020-j6j`, Worker
+  version `0669aaee-f308-43fd-a298-d9a2cbf669ba`, and GitHub Pages revision
+  `f33d7fca0df65b7c0859f79fb224a930cd835b0c`. All Worker smoke routes and the
+  custom-domain frontend returned HTTP 200.
+- Chrome verified the French and English labels, visible countdown, Bronze →
+  Silver → Gold layer order, five category cards, and zero warning/error
+  console entries. No ingestion replay was needed because this release only
+  changes the health aggregate and presentation.
+
 ## 2026-08-23 — Order pipeline layers by processing flow
 
 ### Changed
