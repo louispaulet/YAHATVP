@@ -22,10 +22,12 @@ def _row() -> Row:
         sources_json=json.dumps([{"source_id": "hatvp_website", "declaration_count": 9}]),
         layers_json=json.dumps([{"layer": "bronze", "row_count": 20, "review_rows": 0}]),
         anomalies_json=json.dumps([{"status": "active", "row_count": 3}]),
-        anomaly_categories_json=json.dumps([
-            {"category": "COMP_YOY_CHANGE", "row_count": 5},
-            {"category": "PERSON_DOB_IMPLAUSIBLE", "row_count": 2},
-        ]),
+        anomaly_categories_json=json.dumps(
+            [
+                {"category": "COMP_YOY_CHANGE", "row_count": 5},
+                {"category": "PERSON_DOB_IMPLAUSIBLE", "row_count": 2},
+            ]
+        ),
     )
 
 
