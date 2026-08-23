@@ -99,7 +99,7 @@
     "paragraphs": [
       "This dashboard is built from the HATVP open-data pipeline. The pipeline preserves raw source files, normalizes records, checks quality, and publishes four Gold BigQuery tables.",
       "The overview intentionally exposes aggregates only. Personal contact details and raw declaration rows are not part of this public API.",
-      "The dashboard combines three clearly labelled source streams. The HATVP website is the official, current publication. The GitHub / Wayback and HF / Wayback archives preserve historical declarations because HATVP unpublishes records when a person is no longer in public office. Those recovered records help preserve public history for comparison and research; they are transparent recovery sources, not new HATVP publications."
+      "The dashboard combines three clearly labelled source streams. The HATVP website is the official, current publication. The Internet Archive's Wayback Machine and the companion GitHub archive preserve earlier public declarations that HATVP has since unpublished. A separate static Hugging Face snapshot, assembled by thefrenchartist, provides another preserved copy of historical declaration XML. These recovery sources help preserve public history for comparison and research; they are not new HATVP publications."
     ],
     "sourcePrefix": "For the authoritative current publication and the full declaration context, use the official HATVP links below.",
     "sources": {
@@ -134,11 +134,18 @@
       ]
     },
     "archive": {
-      "eyebrow": "Historical recovery",
+      "eyebrow": "Internet Archive / Wayback Machine",
       "title": "Why Wayback declarations appear here.",
       "description": "The Wayback Machine preserves earlier public versions of HATVP declaration pages and XML files. YAHATVP uses that archive to recover declarations the official site has since withdrawn, while keeping their provenance visible and their status separate from current HATVP publication.",
       "link": "Explore the archive project",
       "href": "https://github.com/louispaulet/hatvp-archive-wayback-machine"
+    },
+    "huggingFace": {
+      "eyebrow": "Hugging Face snapshot",
+      "title": "A static snapshot made by thefrenchartist.",
+      "description": "YAHATVP also ingests a static historical snapshot of HATVP declaration XML published on Hugging Face by thefrenchartist, the author of this project. It is not a live feed: the pipeline downloads the archive, extracts and normalizes the XML, deduplicates declarations, and keeps the source provenance visible.",
+      "link": "Open the Hugging Face dataset",
+      "href": "https://huggingface.co/datasets/the-french-artist/hatvp_declarations_xml"
     },
     "project": {
       "eyebrow": "Project source",
@@ -191,6 +198,7 @@
     "age": "Age",
     "mandate": "Mandate",
     "quality": "DOB quality",
+    "openDeclaration": "Open declaration",
     "qualityLabels": {
       "valid": "Parsed",
       "missing": "Missing",
@@ -329,6 +337,7 @@
     "sourcesEyebrow": "Source coverage",
     "sourcesTitle": "Declarations by source",
     "sourcesDescription": "The HATVP website is the official publication and weekly refresh. The GitHub / Wayback and HF / Wayback archives are historical recovery streams: HATVP can unpublish declarations after a person leaves public office, so archived records extend historical coverage without being mistaken for current official publication.",
+    "rawDeclarations": "({count} raw declarations)",
     "qualityEyebrow": "Bronze → Silver → Gold",
     "qualityTitle": "Rows and review load by layer",
     "rows": "rows",

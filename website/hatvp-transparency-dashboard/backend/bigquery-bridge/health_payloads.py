@@ -33,6 +33,7 @@ def health_payload(row: Any, quality: dict[str, Any] | None = None) -> dict[str,
             {
                 "sourceId": str(item.get("source_id", "unknown")),
                 "declarations": int(item.get("declaration_count", 0)),
+                "rawDeclarations": int(item.get("raw_declaration_count", 0)),
             }
             for item in parse_array(row_value(row, "sources_json"))
         ],

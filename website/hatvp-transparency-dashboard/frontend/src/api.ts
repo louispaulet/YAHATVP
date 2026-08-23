@@ -38,7 +38,7 @@ function isHealthResponse(value: unknown): value is DashboardHealthResponse {
   const quality = value.quality;
   return isRecord(quality) && ["errors", "warnings", "flaggedRecords"].every((key) => typeof quality[key] === "number")
     && typeof quality.regression === "boolean"
-    && value.sources.every((item) => isRecord(item) && typeof item.sourceId === "string" && typeof item.declarations === "number")
+    && value.sources.every((item) => isRecord(item) && typeof item.sourceId === "string" && typeof item.declarations === "number" && typeof item.rawDeclarations === "number")
     && value.layers.every((item) => isRecord(item) && typeof item.layer === "string" && typeof item.rows === "number" && typeof item.reviewRows === "number")
     && value.anomalies.every((item) => isRecord(item) && typeof item.status === "string" && typeof item.rows === "number")
     && value.anomalyCategories.every((item) => isRecord(item) && typeof item.category === "string" && typeof item.rows === "number");
@@ -112,7 +112,7 @@ export function fetchOverview(signal?: AbortSignal): Promise<DashboardOverviewRe
 }
 
 export function fetchHealth(signal?: AbortSignal): Promise<DashboardHealthResponse> {
-  return fetchJson("/api/dashboard/health?schema=2", isHealthResponse, signal);
+  return fetchJson("/api/dashboard/health?schema=3", isHealthResponse, signal);
 }
 
 export function fetchIncome(signal?: AbortSignal): Promise<DashboardBreakdownResponse> {

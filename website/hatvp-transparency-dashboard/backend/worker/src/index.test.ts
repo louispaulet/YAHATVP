@@ -18,7 +18,7 @@ const health: DashboardHealthResponse = {
   snapshotDate: "2026-08-18",
   generatedAt: "2026-08-18T08:00:00Z",
   nextIngestionAt: "2026-08-24T05:00:00Z",
-  sources: [{ sourceId: "hatvp_website", declarations: 2 }],
+  sources: [{ sourceId: "hatvp_website", declarations: 2, rawDeclarations: 3 }],
   layers: [{ layer: "gold", rows: 2, reviewRows: 1 }],
   quality: { errors: 0, warnings: 1, flaggedRecords: 1, regression: false },
   anomalies: [{ status: "active", rows: 1 }],
