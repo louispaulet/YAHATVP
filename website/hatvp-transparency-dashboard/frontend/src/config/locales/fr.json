@@ -98,9 +98,10 @@
     "title": "Une petite fenêtre sur un jeu de données public.",
     "paragraphs": [
       "Ce tableau de bord est construit à partir du pipeline de données ouvertes de la HATVP. Le pipeline conserve les fichiers sources, normalise les enregistrements, contrôle leur qualité et publie quatre tables BigQuery Gold.",
-      "La vue d’ensemble expose uniquement des agrégats. Les coordonnées personnelles et les lignes brutes des déclarations ne font pas partie de cette API publique."
+      "La vue d’ensemble expose uniquement des agrégats. Les coordonnées personnelles et les lignes brutes des déclarations ne font pas partie de cette API publique.",
+      "Le tableau de bord combine deux flux clairement identifiés. Le site de la HATVP est la publication officielle actuelle. Le flux historique provient de la Wayback Machine de l’Internet Archive, car la HATVP dépublie les déclarations lorsque leur auteur n’exerce plus de fonction publique. Ces archives conservent des traces publiques pour les comparer et les étudier ; c’est une source de récupération transparente, pas une nouvelle publication de la HATVP."
     ],
-    "sourcePrefix": "Pour consulter la source officielle et le contexte complet des déclarations, utilisez les liens officiels de la HATVP ci-dessous.",
+    "sourcePrefix": "Pour consulter la publication officielle actuelle et le contexte complet des déclarations, utilisez les liens officiels de la HATVP ci-dessous.",
     "sources": {
       "eyebrow": "Sources officielles",
       "title": "Remontez à la source HATVP.",
@@ -131,6 +132,13 @@
           "href": "https://www.hatvp.fr/livraison/merge/declarations.xml"
         }
       ]
+    },
+    "archive": {
+      "eyebrow": "Récupération historique",
+      "title": "Pourquoi des déclarations Wayback apparaissent ici.",
+      "description": "La Wayback Machine conserve d’anciennes versions publiques des pages et fichiers XML de déclarations de la HATVP. YAHATVP utilise ces archives pour retrouver des déclarations que le site officiel a depuis dépubliées, tout en affichant leur provenance et en les séparant des publications actuelles de la HATVP.",
+      "link": "Découvrir le projet d’archivage",
+      "href": "https://github.com/louispaulet/hatvp-archive-wayback-machine"
     },
     "project": {
       "eyebrow": "Source du projet",
@@ -312,7 +320,7 @@
   "pipelineHealth": {
     "eyebrow": "Observabilité du pipeline",
     "title": "Le pipeline de données, en vue.",
-    "description": "Suivez le dernier traitement, la couverture des sources, la qualité des couches et les lignes à vérifier avant d’utiliser le tableau de bord.",
+    "description": "Suivez le dernier traitement, la couverture des sources, la qualité des couches et les lignes à vérifier. Le pipeline combine la publication officielle actuelle de la HATVP avec une source historique récupérée via la Wayback Machine et identifiée séparément.",
     "snapshot": "Dernier instantané",
     "weekly": "Exécution chaque lundi",
     "nextIngestion": "Prochaine ingestion planifiée",
@@ -320,6 +328,7 @@
     "flaggedDetail": "Nombre global de lignes portant un signal actif de qualité ou d’anomalie.",
     "sourcesEyebrow": "Couverture des sources",
     "sourcesTitle": "Déclarations par source",
+    "sourcesDescription": "Le site de la HATVP est la publication officielle et la source de la mise à jour hebdomadaire. La sauvegarde GitHub / Wayback récupère des déclarations historiques lorsque la HATVP les dépublie après la fin d’une fonction publique ; elle reste séparée et identifiée pour ne pas être confondue avec une publication officielle actuelle.",
     "qualityEyebrow": "Bronze → Silver → Gold",
     "qualityTitle": "Lignes et charge de vérification par couche",
     "rows": "lignes",
@@ -331,7 +340,8 @@
     "topCategoriesTitle": "Les anomalies les plus fréquentes",
     "noCategories": "Aucune catégorie d’anomalie signalée.",
     "countdown": { "unavailable": "Non planifiée", "days": "j" },
-    "sourceNames": { "hatvp_website": "Site HATVP", "wayback_github": "Sauvegarde GitHub / Wayback" },
+    "sourceNames": { "hatvp_website": "Site officiel HATVP", "wayback_github": "Historique GitHub / Wayback" },
+    "sourceDetails": { "hatvp_website": "Publication officielle actuelle utilisée pour la mise à jour hebdomadaire.", "wayback_github": "Récupération historique depuis l’Internet Archive après la dépublication d’anciennes déclarations par la HATVP. Source séparée et reliée à sa provenance." },
     "layers": { "bronze": "Bronze", "silver": "Silver", "gold": "Gold" },
     "anomalyCategories": {
       "COMP_YOY_CHANGE": "Forte variation d’une année sur l’autre",
