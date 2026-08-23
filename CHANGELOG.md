@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-08-23 — Split source ingestion and publish pipeline health
+
+### Changed
+
+- Split raw acquisition from retained-source processing. The official HATVP
+  source keeps the existing raw path and weekly Cloud Run/Scheduler cascade;
+  the `wayback_github` source now retains its original
+  `declarations.xml.zip`, extracted XML, source hash state, and provenance.
+- Added `pipeline-ingest`, `pipeline-process`, `pipeline-archive-ingest`, and
+  `pipeline-archive` Make targets. Higher-layer anomaly input is deduplicated
+  by declaration UUID while Bronze and historical Silver retain every source
+  occurrence.
+- Added the bilingual `/pipeline-health` dashboard route, fixed health API
+  slice, source counts, Bronze/Silver/Gold row and review counts, quality
+  summary, anomaly registry summary, and Monday 07:00 Europe/Paris countdown.
+
+### Verified
+
+- The local Wayback archive replay processed 14,026 declarations with zero
+  quality errors, 13,988 Gold declaration rows, and 13,121 retained review
+  flags. A second archive ingestion returned `NO_CHANGE`; a same-date archive
+  with different bytes failed the immutable snapshot guard.
+- GitHub Actions Test and deploy run
+  [32655288176](https://github.com/louispaulet/YAHATVP/actions/runs/32655288176)
+  passed the full Python suite, Ruff, package build, and deployed the
+  ingestion job image. The forced official execution `hatvp-ingestion-7jz78`
+  completed successfully in 4m35s, loaded all 13 Bronze/Silver/Gold/registry
+  tables, and ended `SUCCESS_WITH_WARNINGS` with zero quality errors.
+- Deployed Cloud Run bridge revision `hatvp-dashboard-api-00018-prz`, Worker
+  version `1dd56e6e-dcd0-440e-ae54-b7bcb7559213`, and the GitHub Pages frontend.
+  Production health, aggregate, search, and frontend routes returned HTTP 200;
+  Chrome verified the hash-routed health page in French and English with no
+  warning or error console entries.
+
+### Follow-up
+
+- The production one-off Wayback backfill remains pending because the local
+  user-run GCS/BigQuery path needs Application Default Credentials. No
+  service-account key was created or requested.
+
 ## 2026-08-21 — Select Highlights by latest name+surname declaration
 
 ### Changed

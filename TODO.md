@@ -82,10 +82,13 @@ documented and complete.
 - [x] Add the bilingual pipeline-health API and frontend page with next-run
   countdown, source coverage, Bronze/Silver/Gold quality counts, and anomaly
   summary.
-- [ ] Deploy and force-replay the repaired timeline and pipeline-health release;
+- [x] Deploy and force-replay the repaired timeline and pipeline-health release;
   record the main
   workflow, ingestion execution, 13-table load, state advancement, bridge
   revision, Worker version, frontend publish, and final Chrome audit.
+- [ ] Load the one-off Wayback/GitHub archive into production GCS/BigQuery and
+  verify that the deployed health page reports both source IDs. This requires
+  an authorized local ADC session for the user-run production backfill.
 
 ## Google Cloud project details (completed)
 
