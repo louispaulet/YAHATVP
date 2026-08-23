@@ -173,6 +173,8 @@ describe("dashboard application", () => {
     expect(screen.getAllByTestId("pipeline-layer").map((layer) => layer.getAttribute("data-layer"))).toEqual(["bronze", "silver", "gold"]);
     expect(screen.getByText("HATVP official website")).toBeInTheDocument();
     expect(screen.getByText("GitHub / Wayback historical")).toBeInTheDocument();
+    expect(screen.getByText("HF / Wayback 2014 archive")).toBeInTheDocument();
+    expect(screen.getByText("Static 2014 historical snapshot rebuilt from the HF archive and kept separate with its provenance.")).toBeInTheDocument();
     expect(screen.getByText("Current official publication used for the weekly refresh.")).toBeInTheDocument();
     expect(screen.getByText("Rows and review load by layer")).toBeInTheDocument();
     expect(screen.getByText("High-level anomaly report")).toBeInTheDocument();

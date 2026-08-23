@@ -49,7 +49,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--local-output", type=Path)
     parser.add_argument("--stage", choices=("all", "ingest", "process", "archive-ingest"), default="all")  # fmt: skip  # noqa: E501
-    parser.add_argument("--archive-zip", type=Path, help="Wayback GitHub declarations.xml.zip")
+    parser.add_argument("--archive-zip", type=Path, help="Wayback archive zip")
+    parser.add_argument("--archive-source", choices=("wayback_github", "wayback_hf"), default="wayback_github")  # fmt: skip  # noqa: E501
     parser.add_argument("--snapshot-date", help="ISO date for an archive raw snapshot")
     return parser
 
@@ -72,6 +73,7 @@ def cli(argv: list[str] | None = None) -> int:
                 args.snapshot_date or _snapshot_date(),
                 _store(settings),
                 force=args.force,
+                source_id=args.archive_source,
             )
         elif args.stage == "ingest":
             settings.validate_storage()

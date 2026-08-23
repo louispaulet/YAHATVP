@@ -17,13 +17,15 @@ READER_SERVICE_ACCOUNT ?= hatvp-dashboard-reader
 FRONTEND_ORIGIN ?= https://yahatvp.thefrenchartist.dev
 LOCAL_OUTPUT ?=
 WAYBACK_ARCHIVE_ZIP ?= ../hatvp-archive-wayback-machine/xml-archive/declarations.xml.zip
+WAYBACK_HF_ARCHIVE_ZIP ?= ../hatvp-archive-wayback-machine/xml-archive/hf/declarations_from_hf.xml.zip
+WAYBACK_HF_ARCHIVE_URL ?= https://raw.githubusercontent.com/louispaulet/hatvp-archive-wayback-machine/main/xml-archive/hf/declarations_from_hf.xml.zip
 PIPELINE_SNAPSHOT_DATE ?=
 
 PIPELINE_LOCAL_ARGS = $(if $(LOCAL_OUTPUT),--local-output "$(LOCAL_OUTPUT)",)
 PIPELINE_DATE_ARGS = $(if $(PIPELINE_SNAPSHOT_DATE),--snapshot-date "$(PIPELINE_SNAPSHOT_DATE)",)
 PIPELINE_FORCE_ARGS = $(if $(FORCE),--force,)
 
-.PHONY: pipeline-run pipeline-ingest pipeline-process pipeline-archive-ingest pipeline-archive dashboard-install backend-test backend-dev backend-secrets bridge-deploy backend-deploy frontend-test frontend-dev frontend-deploy
+.PHONY: pipeline-run pipeline-ingest pipeline-process pipeline-archive-ingest pipeline-archive pipeline-archive-hf-ingest pipeline-archive-hf dashboard-install backend-test backend-dev backend-secrets bridge-deploy backend-deploy frontend-test frontend-dev frontend-deploy
 
 pipeline-run:
 	uv run python -m hatvp.main --stage all $(PIPELINE_LOCAL_ARGS)
@@ -41,6 +43,18 @@ pipeline-archive-ingest:
 pipeline-archive:
 	@test -f "$(WAYBACK_ARCHIVE_ZIP)" || (echo "Archive zip not found: $(WAYBACK_ARCHIVE_ZIP)" >&2; exit 1)
 	uv run python -m hatvp.main --stage archive-ingest --archive-zip "$(WAYBACK_ARCHIVE_ZIP)" $(PIPELINE_LOCAL_ARGS) $(PIPELINE_DATE_ARGS) $(PIPELINE_FORCE_ARGS)
+	uv run python -m hatvp.main --stage process $(PIPELINE_LOCAL_ARGS) $(PIPELINE_DATE_ARGS)
+
+pipeline-archive-hf-ingest:
+	@archive="$(WAYBACK_HF_ARCHIVE_ZIP)"; \
+	if [ ! -f "$$archive" ]; then \
+		tmpdir="$$(mktemp -d /tmp/yahatvp-hf.XXXXXX)"; archive="$$tmpdir/declarations_from_hf.xml.zip"; \
+		trap 'rm -rf "$$tmpdir"' EXIT; \
+		curl --fail --location --retry 2 "$(WAYBACK_HF_ARCHIVE_URL)" --output "$$archive"; \
+	fi; \
+	uv run python -m hatvp.main --stage archive-ingest --archive-source wayback_hf --archive-zip "$$archive" $(PIPELINE_LOCAL_ARGS) $(PIPELINE_DATE_ARGS) $(PIPELINE_FORCE_ARGS)
+
+pipeline-archive-hf: pipeline-archive-hf-ingest
 	uv run python -m hatvp.main --stage process $(PIPELINE_LOCAL_ARGS) $(PIPELINE_DATE_ARGS)
 
 dashboard-install:

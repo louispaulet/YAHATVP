@@ -19,7 +19,7 @@ from tests.pipeline_support import FIXTURES, fixture_downloader, settings
 
 def _archive(path: Path) -> Path:
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as output:
-        output.write(FIXTURES / "declarations.xml", "declarations.xml")
+        output.write(FIXTURES / "declarations.xml", path.stem)
     return path
 
 
@@ -44,27 +44,30 @@ def test_official_ingestion_only_writes_immutable_raw_files(tmp_path: Path) -> N
     assert not (root / "state/latest.json").exists()
 
 
-def test_archive_ingestion_preserves_zip_and_processing_tags_source(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "source_id, archive_name",
+    [("wayback_github", "declarations.xml.zip"), ("wayback_hf", "declarations_from_hf.xml.zip")],
+)
+def test_archive_ingestion_preserves_zip_and_processing_tags_source(tmp_path: Path, source_id: str, archive_name: str) -> None:  # fmt: skip  # noqa: E501
     output = tmp_path / "output"
-    archive = _archive(tmp_path / "declarations.xml.zip")
+    archive = _archive(tmp_path / archive_name)
     configured = settings(output)
     store = configured_store(configured)
 
-    assert ingest_wayback_zip(configured, archive, "2026-08-23", store) == "INGESTED"
+    assert (
+        ingest_wayback_zip(configured, archive, "2026-08-23", store, source_id=source_id)
+        == "INGESTED"
+    )
     assert process_pipeline(configured, snapshot="2026-08-23") == "SUCCESS_WITH_WARNINGS"
     root = output / "hatvp"
-    assert (
-        root / "raw/source=wayback_github/snapshot_date=2026-08-23/declarations.xml.zip"
-    ).exists()
-    state = load_source_state(store, "wayback_github")
+    assert (root / f"raw/source={source_id}/snapshot_date=2026-08-23/{archive_name}").exists()
+    state = load_source_state(store, source_id)
     assert state["archive_sha256"]
     declarations = pl.read_parquet(
         root / "bronze/declarations/snapshot_date=2026-08-23/data.parquet"
     )
-    assert declarations["ingestion_source"].unique().to_list() == ["wayback_github"]
-    assert json.loads((root / "state/latest.json").read_text())["source_snapshots"][
-        "wayback_github"
-    ]
+    assert declarations["ingestion_source"].unique().to_list() == [source_id]
+    assert json.loads((root / "state/latest.json").read_text())["source_snapshots"][source_id]
 
 
 def test_quality_selection_deduplicates_uuid_before_anomaly_input() -> None:

@@ -17,11 +17,11 @@ function countdown(target: string | null, now: number, labels: Record<string, st
 }
 
 function sourceName(sourceId: string, locale: Locale): string {
-  return locale.pipelineHealth.sourceNames[sourceId as "hatvp_website" | "wayback_github"] ?? sourceId;
+  return locale.pipelineHealth.sourceNames[sourceId as "hatvp_website" | "wayback_github" | "wayback_hf"] ?? sourceId;
 }
 
 function sourceDescription(sourceId: string, locale: Locale): string {
-  return locale.pipelineHealth.sourceDetails[sourceId as "hatvp_website" | "wayback_github"] ?? sourceId;
+  return locale.pipelineHealth.sourceDetails[sourceId as "hatvp_website" | "wayback_github" | "wayback_hf"] ?? sourceId;
 }
 
 function layerName(layer: string, locale: Locale): string {

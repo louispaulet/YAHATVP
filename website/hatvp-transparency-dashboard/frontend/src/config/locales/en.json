@@ -99,7 +99,7 @@
     "paragraphs": [
       "This dashboard is built from the HATVP open-data pipeline. The pipeline preserves raw source files, normalizes records, checks quality, and publishes four Gold BigQuery tables.",
       "The overview intentionally exposes aggregates only. Personal contact details and raw declaration rows are not part of this public API.",
-      "The dashboard combines two clearly labelled source streams. The HATVP website is the official, current publication. The historical stream comes from the Internet Archive's Wayback Machine because HATVP unpublishes declarations when a person is no longer in public office. Those recovered records help preserve public history for comparison and research; they are a transparent recovery source, not a new HATVP publication."
+      "The dashboard combines three clearly labelled source streams. The HATVP website is the official, current publication. The GitHub / Wayback and HF / Wayback archives preserve historical declarations because HATVP unpublishes records when a person is no longer in public office. Those recovered records help preserve public history for comparison and research; they are transparent recovery sources, not new HATVP publications."
     ],
     "sourcePrefix": "For the authoritative current publication and the full declaration context, use the official HATVP links below.",
     "sources": {
@@ -320,7 +320,7 @@
   "pipelineHealth": {
     "eyebrow": "Pipeline observability",
     "title": "The data pipeline, in view.",
-    "description": "Track the latest run, source coverage, layer quality, and records that need review. The pipeline combines the current official HATVP publication with a separately labelled historical Wayback recovery source.",
+    "description": "Track the latest run, source coverage, layer quality, and records that need review. The pipeline combines the current official HATVP publication with two separately labelled historical Wayback recovery archives.",
     "snapshot": "Latest snapshot",
     "weekly": "Runs every Monday",
     "nextIngestion": "Next scheduled ingestion",
@@ -328,7 +328,7 @@
     "flaggedDetail": "High-level count of records carrying an active quality or anomaly signal.",
     "sourcesEyebrow": "Source coverage",
     "sourcesTitle": "Declarations by source",
-    "sourcesDescription": "The HATVP website is the official publication and weekly refresh. GitHub / Wayback backup is a historical recovery stream: HATVP can unpublish declarations after a person leaves public office, so archived records extend historical coverage without being mistaken for current official publication.",
+    "sourcesDescription": "The HATVP website is the official publication and weekly refresh. The GitHub / Wayback and HF / Wayback archives are historical recovery streams: HATVP can unpublish declarations after a person leaves public office, so archived records extend historical coverage without being mistaken for current official publication.",
     "qualityEyebrow": "Bronze → Silver → Gold",
     "qualityTitle": "Rows and review load by layer",
     "rows": "rows",
@@ -340,8 +340,8 @@
     "topCategoriesTitle": "Most frequent anomaly categories",
     "noCategories": "No anomaly categories were reported.",
     "countdown": { "unavailable": "Not scheduled", "days": "d" },
-    "sourceNames": { "hatvp_website": "HATVP official website", "wayback_github": "GitHub / Wayback historical" },
-    "sourceDetails": { "hatvp_website": "Current official publication used for the weekly refresh.", "wayback_github": "Historical recovery from the Internet Archive after HATVP unpublishes older declarations. Kept separate and provenance-labelled." },
+    "sourceNames": { "hatvp_website": "HATVP official website", "wayback_github": "GitHub / Wayback historical", "wayback_hf": "HF / Wayback 2014 archive" },
+    "sourceDetails": { "hatvp_website": "Current official publication used for the weekly refresh.", "wayback_github": "Historical recovery from the Internet Archive after HATVP unpublishes older declarations. Kept separate and provenance-labelled.", "wayback_hf": "Static 2014 historical snapshot rebuilt from the HF archive and kept separate with its provenance." },
     "layers": { "bronze": "Bronze", "silver": "Silver", "gold": "Gold" },
     "anomalyCategories": {
       "COMP_YOY_CHANGE": "Large year-over-year change",

@@ -86,4 +86,5 @@ def test_source_discovery_keeps_legacy_official_state_with_archive_source(tmp_pa
     store = default_store(settings(tmp_path / "output"))
     store.put_bytes("state/latest.json", b'{"snapshot_date":"2026-08-23"}\n')
     store.put_bytes("state/sources/wayback_github/latest.json", b'{"source_id":"wayback_github"}\n')
-    assert source_ids(store) == ("hatvp_website", "wayback_github")
+    store.put_bytes("state/sources/wayback_hf/latest.json", b'{"source_id":"wayback_hf"}\n')
+    assert source_ids(store) == ("hatvp_website", "wayback_github", "wayback_hf")
