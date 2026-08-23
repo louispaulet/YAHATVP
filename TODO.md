@@ -82,6 +82,10 @@ documented and complete.
 - [x] Add the bilingual pipeline-health API and frontend page with next-run
   countdown, source coverage, Bronze/Silver/Gold quality counts, and anomaly
   summary.
+- [x] Polish the bilingual `/explore` presentation with restrained Lucide iconography,
+  editorial hero metadata, section tones, readable ranks, source-link CTAs,
+  responsive card grids, and accessible loading/error states without changing
+  data, routes, or API behavior.
 - [x] Deploy and force-replay the repaired timeline and pipeline-health release;
   record the main
   workflow, ingestion execution, 13-table load, state advancement, bridge

@@ -64,7 +64,8 @@ describe("dashboard application", () => {
     expect(screen.getByText("Gender balance")).toBeInTheDocument();
     expect(screen.getByText("Gender by job position")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Male-to-female ratio/i })).toBeInTheDocument();
-    expect(screen.getByText("⚖️", { selector: "header span" })).toHaveClass("size-10");
+    expect(screen.queryByText("⚖️", { selector: "header span" })).not.toBeInTheDocument();
+    expect(screen.getByRole("banner").querySelector("svg")).toBeTruthy();
   });
 
   it("renders the about page through the router", () => {
