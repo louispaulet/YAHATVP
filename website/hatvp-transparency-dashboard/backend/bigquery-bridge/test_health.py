@@ -22,6 +22,10 @@ def _row() -> Row:
         sources_json=json.dumps([{"source_id": "hatvp_website", "declaration_count": 9}]),
         layers_json=json.dumps([{"layer": "bronze", "row_count": 20, "review_rows": 0}]),
         anomalies_json=json.dumps([{"status": "active", "row_count": 3}]),
+        anomaly_categories_json=json.dumps([
+            {"category": "COMP_YOY_CHANGE", "row_count": 5},
+            {"category": "PERSON_DOB_IMPLAUSIBLE", "row_count": 2},
+        ]),
     )
 
 
@@ -32,6 +36,8 @@ def test_health_query_covers_all_source_layers_and_registry() -> None:
     assert "silver_declarations" in query
     assert "gold_assets" in query
     assert "anomaly_registry" in query
+    assert "anomaly_categories_json" in query
+    assert "LIMIT 5" in query
 
 
 def test_health_payload_maps_layer_source_quality_and_anomaly_values() -> None:
@@ -44,6 +50,7 @@ def test_health_payload_maps_layer_source_quality_and_anomaly_values() -> None:
     assert payload["layers"][0]["reviewRows"] == 0
     assert payload["quality"]["flaggedRecords"] == 3
     assert payload["anomalies"][0]["status"] == "active"
+    assert payload["anomalyCategories"][0] == {"category": "COMP_YOY_CHANGE", "rows": 5}
 
 
 def test_next_ingestion_skips_a_monday_run_that_already_started() -> None:

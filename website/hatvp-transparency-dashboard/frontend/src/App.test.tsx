@@ -173,6 +173,9 @@ describe("dashboard application", () => {
     expect(screen.getByText("GitHub / Wayback backup")).toBeInTheDocument();
     expect(screen.getByText("Rows and review load by layer")).toBeInTheDocument();
     expect(screen.getByText("High-level anomaly report")).toBeInTheDocument();
+    expect(screen.getByText("Most frequent anomaly categories")).toBeInTheDocument();
+    expect(screen.getByText(/Large year-over-year change/)).toBeInTheDocument();
+    expect(screen.getAllByTestId("anomaly-category")).toHaveLength(2);
     expect(screen.getByRole("link", { name: "Pipeline health" })).toHaveAttribute("aria-current", "page");
   });
 

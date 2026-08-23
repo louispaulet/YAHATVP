@@ -38,6 +38,7 @@ describe("dashboard API client", () => {
       layers: [{ layer: "gold", rows: 1, reviewRows: 0 }],
       quality: { errors: 0, warnings: 1, flaggedRecords: 1, regression: false },
       anomalies: [{ status: "active", rows: 1 }],
+      anomalyCategories: [{ category: "COMP_YOY_CHANGE", rows: 1 }],
     };
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(response), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);

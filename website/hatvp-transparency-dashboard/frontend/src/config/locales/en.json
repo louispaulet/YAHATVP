@@ -327,9 +327,27 @@
     "anomalyEyebrow": "Anomaly registry",
     "anomalyTitle": "High-level anomaly report",
     "qualitySummary": "{errors} errors · {warnings} warnings",
+    "topCategoriesEyebrow": "Top reported categories",
+    "topCategoriesTitle": "Most frequent anomaly categories",
+    "noCategories": "No anomaly categories were reported.",
     "countdown": { "unavailable": "Not scheduled", "days": "d" },
     "sourceNames": { "hatvp_website": "HATVP website", "wayback_github": "GitHub / Wayback backup" },
-    "layers": { "bronze": "Bronze", "silver": "Silver", "gold": "Gold" }
+    "layers": { "bronze": "Bronze", "silver": "Silver", "gold": "Gold" },
+    "anomalyCategories": {
+      "COMP_YOY_CHANGE": "Large year-over-year change",
+      "COMP_IMPLAUSIBLE_AMOUNT": "Implausibly large amount",
+      "COMP_FACTOR_ERROR": "Possible factor-of-ten error",
+      "COMP_CONCATENATED_VALUE": "Possible concatenated value",
+      "COMP_DIGIT_EDIT": "Possible digit transcription error",
+      "COMP_CONFLICT_SAME_PERIOD": "Conflicting values in the same period",
+      "COMP_SUPERSEDED_DECLARATION": "Superseded declaration",
+      "GEO_DEPARTMENT_MUNICIPALITY": "Department/municipality mismatch",
+      "PERSON_IDENTITY_REVIEW": "Identity requires review",
+      "PERSON_DOB_IMPLAUSIBLE": "Implausible date of birth",
+      "PERSON_DOB_CONFLICT": "Conflicting dates of birth",
+      "SOURCE_CROSS_FORMAT": "Conflicting source formats",
+      "unknown": "Other / unclassified"
+    }
   },
   "search": {
     "eyebrow": "Declaration search",

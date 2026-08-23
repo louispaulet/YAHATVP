@@ -57,6 +57,13 @@ def health_payload(row: Any, quality: dict[str, Any] | None = None) -> dict[str,
             }
             for item in parse_array(row_value(row, "anomalies_json"))
         ],
+        "anomalyCategories": [
+            {
+                "category": str(item.get("category", "unknown")),
+                "rows": int(item.get("row_count", 0) or 0),
+            }
+            for item in parse_array(row_value(row, "anomaly_categories_json"))
+        ],
     }
 
 

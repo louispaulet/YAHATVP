@@ -34,13 +34,14 @@ function isOverviewResponse(value: unknown): value is DashboardOverviewResponse 
 
 function isHealthResponse(value: unknown): value is DashboardHealthResponse {
   if (!isMeta(value) || typeof value.nextIngestionAt !== "string") return false;
-  if (!Array.isArray(value.sources) || !Array.isArray(value.layers) || !Array.isArray(value.anomalies)) return false;
+  if (!Array.isArray(value.sources) || !Array.isArray(value.layers) || !Array.isArray(value.anomalies) || !Array.isArray(value.anomalyCategories)) return false;
   const quality = value.quality;
   return isRecord(quality) && ["errors", "warnings", "flaggedRecords"].every((key) => typeof quality[key] === "number")
     && typeof quality.regression === "boolean"
     && value.sources.every((item) => isRecord(item) && typeof item.sourceId === "string" && typeof item.declarations === "number")
     && value.layers.every((item) => isRecord(item) && typeof item.layer === "string" && typeof item.rows === "number" && typeof item.reviewRows === "number")
-    && value.anomalies.every((item) => isRecord(item) && typeof item.status === "string" && typeof item.rows === "number");
+    && value.anomalies.every((item) => isRecord(item) && typeof item.status === "string" && typeof item.rows === "number")
+    && value.anomalyCategories.every((item) => isRecord(item) && typeof item.category === "string" && typeof item.rows === "number");
 }
 
 function isBreakdownResponse(value: unknown): value is DashboardBreakdownResponse {

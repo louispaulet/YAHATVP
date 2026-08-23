@@ -327,9 +327,27 @@
     "anomalyEyebrow": "Registre des anomalies",
     "anomalyTitle": "Rapport d’anomalies synthétique",
     "qualitySummary": "{errors} erreurs · {warnings} avertissements",
+    "topCategoriesEyebrow": "Catégories les plus signalées",
+    "topCategoriesTitle": "Les anomalies les plus fréquentes",
+    "noCategories": "Aucune catégorie d’anomalie signalée.",
     "countdown": { "unavailable": "Non planifiée", "days": "j" },
     "sourceNames": { "hatvp_website": "Site HATVP", "wayback_github": "Sauvegarde GitHub / Wayback" },
-    "layers": { "bronze": "Bronze", "silver": "Silver", "gold": "Gold" }
+    "layers": { "bronze": "Bronze", "silver": "Silver", "gold": "Gold" },
+    "anomalyCategories": {
+      "COMP_YOY_CHANGE": "Forte variation d’une année sur l’autre",
+      "COMP_IMPLAUSIBLE_AMOUNT": "Montant potentiellement incohérent",
+      "COMP_FACTOR_ERROR": "Possible erreur de facteur dix",
+      "COMP_CONCATENATED_VALUE": "Possible concaténation de valeurs",
+      "COMP_DIGIT_EDIT": "Possible erreur de saisie d’un chiffre",
+      "COMP_CONFLICT_SAME_PERIOD": "Valeurs contradictoires sur la même période",
+      "COMP_SUPERSEDED_DECLARATION": "Déclaration remplacée",
+      "GEO_DEPARTMENT_MUNICIPALITY": "Incohérence département/commune",
+      "PERSON_IDENTITY_REVIEW": "Identité à vérifier",
+      "PERSON_DOB_IMPLAUSIBLE": "Date de naissance improbable",
+      "PERSON_DOB_CONFLICT": "Dates de naissance contradictoires",
+      "SOURCE_CROSS_FORMAT": "Sources contradictoires",
+      "unknown": "Autre / non classée"
+    }
   },
   "search": {
     "eyebrow": "Recherche de déclarations",

@@ -10,6 +10,7 @@ export const health = {
   layers: [{ layer: "gold", rows: 8, reviewRows: 1 }, { layer: "bronze", rows: 12, reviewRows: 0 }, { layer: "silver", rows: 12, reviewRows: 2 }],
   quality: { errors: 0, warnings: 2, flaggedRecords: 2, regression: false },
   anomalies: [{ status: "active", rows: 2 }, { status: "resolved", rows: 1 }],
+  anomalyCategories: [{ category: "COMP_YOY_CHANGE", rows: 5 }, { category: "PERSON_DOB_IMPLAUSIBLE", rows: 2 }],
 };
 
 export const income = {

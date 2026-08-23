@@ -24,6 +24,15 @@ function layerName(layer: string, locale: Locale): string {
   return locale.pipelineHealth.layers[layer as "bronze" | "silver" | "gold"] ?? layer;
 }
 
+function anomalyCategoryName(category: string, locale: Locale): string {
+  const labels = locale.pipelineHealth.anomalyCategories as Record<string, string>;
+  if (labels[category]) return labels[category];
+  return category
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/^\w/, (letter) => letter.toUpperCase());
+}
+
 const LAYER_ORDER: Record<string, number> = { bronze: 0, silver: 1, gold: 2 };
 
 function orderedLayers(layers: DashboardHealthResponse["layers"]): DashboardHealthResponse["layers"] {
@@ -59,7 +68,7 @@ export function PipelineHealthPage() {
         <div className="dashboard-card p-6"><p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald">{locale.pipelineHealth.sourcesEyebrow}</p><h2 className="mt-2 text-2xl font-black">{locale.pipelineHealth.sourcesTitle}</h2><div className="mt-5 divide-y divide-slate-200/80">{data.sources.map((source) => <div className="flex items-center justify-between gap-4 py-4" key={source.sourceId}><span className="text-sm font-semibold text-slate-700">{sourceName(source.sourceId, locale)}</span><span className="text-2xl font-black text-ink">{number.format(source.declarations)}</span></div>)}</div></div>
         <div className="dashboard-card p-6"><p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald">{locale.pipelineHealth.qualityEyebrow}</p><h2 className="mt-2 text-2xl font-black">{locale.pipelineHealth.qualityTitle}</h2><div className="mt-5 space-y-4">{layers.map((layer) => <div key={layer.layer} data-layer={layer.layer} data-testid="pipeline-layer"><div className="flex justify-between gap-3 text-sm font-bold"><span>{layerName(layer.layer, locale)}</span><span>{number.format(layer.rows)} {locale.pipelineHealth.rows}</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-emerald" style={{ width: `${Math.min(100, Math.max(2, (layer.rows / Math.max(...layers.map((item) => item.rows), 1)) * 100))}%` }} /></div><p className="mt-1 text-xs text-slate-500">{number.format(layer.reviewRows)} {locale.pipelineHealth.reviewRows}</p></div>)}</div></div>
       </section>
-      <section className="dashboard-card p-6"><div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald">{locale.pipelineHealth.anomalyEyebrow}</p><h2 className="mt-2 text-2xl font-black">{locale.pipelineHealth.anomalyTitle}</h2></div><p className="text-sm text-slate-500">{locale.pipelineHealth.qualitySummary.replace("{errors}", number.format(data.quality.errors)).replace("{warnings}", number.format(data.quality.warnings))}</p></div><div className="mt-5 flex flex-wrap gap-3">{data.anomalies.map((anomaly) => <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700" key={anomaly.status}>{anomaly.status}: {number.format(anomaly.rows)}</span>)}</div></section>
+      <section className="dashboard-card p-6"><div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald">{locale.pipelineHealth.anomalyEyebrow}</p><h2 className="mt-2 text-2xl font-black">{locale.pipelineHealth.anomalyTitle}</h2></div><p className="text-sm text-slate-500">{locale.pipelineHealth.qualitySummary.replace("{errors}", number.format(data.quality.errors)).replace("{warnings}", number.format(data.quality.warnings))}</p></div><div className="mt-5 flex flex-wrap gap-3">{data.anomalies.map((anomaly) => <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700" key={anomaly.status}>{anomaly.status}: {number.format(anomaly.rows)}</span>)}</div><div className="mt-7 border-t border-slate-100 pt-6"><p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald">{locale.pipelineHealth.topCategoriesEyebrow}</p><h3 className="mt-2 text-xl font-black">{locale.pipelineHealth.topCategoriesTitle}</h3>{data.anomalyCategories.length > 0 ? <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{data.anomalyCategories.map((item, index) => <div className="rounded-2xl bg-slate-50 px-4 py-4" data-testid="anomaly-category" key={item.category}><div className="flex items-baseline justify-between gap-3"><span className="text-sm font-semibold text-slate-700">{index + 1}. {anomalyCategoryName(item.category, locale)}</span><span className="text-lg font-black tabular-nums text-ink">{number.format(item.rows)}</span></div></div>)}</div> : <p className="mt-4 text-sm text-slate-500">{locale.pipelineHealth.noCategories}</p>}</div></section>
     </>}
   </div>;
 }

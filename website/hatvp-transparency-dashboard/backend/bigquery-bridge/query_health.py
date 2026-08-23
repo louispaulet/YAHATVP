@@ -71,6 +71,13 @@ anomaly_rows AS (
   FROM {prefix}.anomaly_registry t CROSS JOIN latest l
   WHERE t.snapshot_date = l.snapshot_date
   GROUP BY status
+),
+anomaly_categories AS (
+  SELECT COALESCE(NULLIF(t.rule_id, ''), 'unknown') AS category, COUNT(*) AS row_count
+  FROM {prefix}.anomaly_registry t CROSS JOIN latest l
+  WHERE t.snapshot_date = l.snapshot_date
+    AND COALESCE(NULLIF(t.rule_id, ''), 'unknown') NOT IN ('ANOMALY_KNOWN', 'ANOMALY_REGRESSION')
+  GROUP BY category
 )
 SELECT latest.snapshot_date,
        CURRENT_TIMESTAMP() AS generated_at,
@@ -79,7 +86,10 @@ SELECT latest.snapshot_date,
        TO_JSON_STRING((SELECT ARRAY_AGG(STRUCT(source_id, declaration_count)
          ORDER BY source_id) FROM source_rows)) AS sources_json,
        TO_JSON_STRING((SELECT ARRAY_AGG(STRUCT(status, row_count)
-         ORDER BY status) FROM anomaly_rows)) AS anomalies_json
+         ORDER BY status) FROM anomaly_rows)) AS anomalies_json,
+       TO_JSON_STRING((SELECT ARRAY_AGG(STRUCT(category, row_count)
+         ORDER BY row_count DESC, category LIMIT 5)
+         FROM anomaly_categories)) AS anomaly_categories_json
 FROM latest
 """
 
