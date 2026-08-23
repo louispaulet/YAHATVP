@@ -13,6 +13,10 @@ datasets.
 > `declarations`, `people`, `incomes`, and `assets` Bronze tables and now loads
 > anomaly-annotated Silver, latest-version Gold, and the anomaly registry.
 
+## Related source archive
+
+The companion project, [hatvp-archive-wayback-machine](https://github.com/louispaulet/hatvp-archive-wayback-machine), preserves historical HATVP PDF and XML captures from the Internet Archive Wayback Machine. It is important because official HATVP endpoints and older declarations can disappear or change, while reproducible historical source material is essential for audit, comparison, and recovery. YAHATVP can ingest the archive's retained XML bundle through its `pipeline-archive-ingest` and `pipeline-archive` commands, keeping that historical source separate from the weekly official feed while processing both through the same quality-controlled layers.
+
 ## Goal
 
 The pipeline downloads the two public HATVP datasets, detects changes using

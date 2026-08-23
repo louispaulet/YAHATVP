@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-23 — Link the companion Wayback archive
+
+### Changed
+
+- Linked the main README to
+  [`hatvp-archive-wayback-machine`](https://github.com/louispaulet/hatvp-archive-wayback-machine).
+- Explained why preserved historical HATVP source material matters for
+  YAHATVP's audit, comparison, recovery, and retained-source replay paths.
+
+### Verified
+
+- Checked the reciprocal GitHub link and confirmed the documentation-only diff
+  contains no code, generated data, credentials, or deployment changes.
+
 ## 2026-08-23 — Document the project architecture
 
 ### Added
