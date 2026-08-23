@@ -26,6 +26,11 @@ deployment, never as the weekly execution engine.
 
 ## Architecture
 
+The compact overview below is supplemented by the repository-level
+[`ARCHITECTURE.md`](ARCHITECTURE.md), which documents module responsibilities,
+source-specific storage, state transitions, analytical layers, dashboard
+boundaries, and deployment identity flows with ASCII diagrams.
+
 ```mermaid
 flowchart TB
     scheduler["Cloud Scheduler<br/>weekly, Europe/Paris"]

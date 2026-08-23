@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-23 — Document the project architecture
+
+### Added
+
+- Added [`ARCHITECTURE.md`](ARCHITECTURE.md) with repository structure,
+  source-ingestion and processing flows, analytical-layer semantics, dashboard
+  boundaries, deployment identities, and ASCII diagrams.
+- Linked the detailed architecture reference from the main README architecture
+  section.
+
+### Verified
+
+- Checked the new Markdown links and confirmed the documentation-only change
+  introduces no code, generated data, credentials, or deployment changes.
+
 ## 2026-08-23 — Restore Wayback/GitHub source coverage
 
 ### Changed
