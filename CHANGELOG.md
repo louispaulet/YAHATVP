@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-08-23 — Show raw and deduplicated source coverage
+
+### Changed
+
+- Extended the pipeline-health API with a raw Bronze declaration count for
+  each source while keeping the headline count deduplicated from Gold.
+- Added the raw count beneath each source total in italicized parentheses,
+  with bilingual labels and contract tests across the bridge, Worker, and
+  frontend.
+
+### Verified
+
+- Backend checks passed: 47 bridge tests, 13 Worker tests, and Worker
+  TypeScript typecheck. Frontend checks passed: 29 tests and the production
+  build.
+- The live health API reports deduplicated/raw pairs of `3,728`/`6,608` for
+  HATVP, `8,518`/`14,026` for GitHub/Wayback, and `5,652`/`10,944` for the
+  Hugging Face snapshot.
+- Deployed bridge revision `hatvp-dashboard-api-00022-9tn`, Worker version
+  `36dd9e0f-ab4a-469c-924a-f02693ae915d`, and the frontend at
+  https://yahatvp.thefrenchartist.dev/#/pipeline-health.
+- Chrome verified the public English and French pages with the three raw
+  labels rendered beneath their deduplicated values and zero console warnings
+  or errors.
+
 ## 2026-08-23 — Explain Wayback and Hugging Face provenance on the About page
 
 ### Changed
