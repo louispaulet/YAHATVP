@@ -44,7 +44,7 @@ describe("dashboard API client", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(fetchHealth()).resolves.toEqual(response);
-    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8787/api/dashboard/health", expect.any(Object));
+    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8787/api/dashboard/health?schema=2", expect.any(Object));
   });
 
   it("loads the gender slice", async () => {

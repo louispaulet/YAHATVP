@@ -22,6 +22,7 @@ const health: DashboardHealthResponse = {
   layers: [{ layer: "gold", rows: 2, reviewRows: 1 }],
   quality: { errors: 0, warnings: 1, flaggedRecords: 1, regression: false },
   anomalies: [{ status: "active", rows: 1 }],
+  anomalyCategories: [{ category: "COMP_YOY_CHANGE", rows: 1 }],
 };
 
 const gender: DashboardGenderResponse = {

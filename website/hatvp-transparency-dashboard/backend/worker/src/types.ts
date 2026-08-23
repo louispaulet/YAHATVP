@@ -25,6 +25,7 @@ export interface DashboardHealthResponse {
   layers: Array<{ layer: string; rows: number; reviewRows: number }>;
   quality: { errors: number; warnings: number; flaggedRecords: number; regression: boolean };
   anomalies: Array<{ status: string; rows: number }>;
+  anomalyCategories: Array<{ category: string; rows: number }>;
 }
 
 export interface DashboardBreakdownResponse {

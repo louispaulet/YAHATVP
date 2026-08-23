@@ -112,7 +112,7 @@ export function fetchOverview(signal?: AbortSignal): Promise<DashboardOverviewRe
 }
 
 export function fetchHealth(signal?: AbortSignal): Promise<DashboardHealthResponse> {
-  return fetchJson("/api/dashboard/health", isHealthResponse, signal);
+  return fetchJson("/api/dashboard/health?schema=2", isHealthResponse, signal);
 }
 
 export function fetchIncome(signal?: AbortSignal): Promise<DashboardBreakdownResponse> {

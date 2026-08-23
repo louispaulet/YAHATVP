@@ -80,11 +80,13 @@ function isDashboardHealthResponse(value: unknown): value is DashboardHealthResp
   const quality = value.quality;
   return (value.snapshotDate === null || typeof value.snapshotDate === "string")
     && Array.isArray(value.sources) && Array.isArray(value.layers) && Array.isArray(value.anomalies)
+    && Array.isArray(value.anomalyCategories)
     && isRecord(quality) && typeof quality.errors === "number" && typeof quality.warnings === "number"
     && typeof quality.flaggedRecords === "number" && typeof quality.regression === "boolean"
     && value.sources.every((item) => isRecord(item) && typeof item.sourceId === "string" && typeof item.declarations === "number")
     && value.layers.every((item) => isRecord(item) && typeof item.layer === "string" && typeof item.rows === "number" && typeof item.reviewRows === "number")
-    && value.anomalies.every((item) => isRecord(item) && typeof item.status === "string" && typeof item.rows === "number");
+    && value.anomalies.every((item) => isRecord(item) && typeof item.status === "string" && typeof item.rows === "number")
+    && value.anomalyCategories.every((item) => isRecord(item) && typeof item.category === "string" && typeof item.rows === "number");
 }
 
 function isDashboardBreakdownResponse(value: unknown): value is DashboardBreakdownResponse {
