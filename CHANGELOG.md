@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-23 — Explain Wayback and Hugging Face provenance on the About page
+
+### Changed
+
+- Added bilingual About-page cards that distinguish the Internet Archive's
+  Wayback Machine and its companion GitHub archive from the separate static
+  Hugging Face snapshot.
+- Identified the Hugging Face snapshot as made by `thefrenchartist`, explained
+  that it is not a live feed, and linked directly to the
+  [`hatvp_declarations_xml`](https://huggingface.co/datasets/the-french-artist/hatvp_declarations_xml)
+  dataset.
+
+### Verified
+
+- `make frontend-test` passed all 29 frontend tests and the production build.
+- `make frontend-deploy VITE_API_BASE_URL=https://hatvp-transparency-api.louispaulet13.workers.dev`
+  published the frontend from main commit `a1aaaac`.
+- Chrome verified the cache-busted public `/about` route in English and French,
+  including both archive cards and links, with zero warning or error console
+  entries.
+
 ## 2026-08-23 — Add the static HF/Wayback archive source
 
 ### Changed
