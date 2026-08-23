@@ -12,7 +12,7 @@ import pytest
 from hatvp.layers.quality_selection import dedupe_for_quality, quality_declaration_count
 from hatvp.pipeline import process_pipeline
 from hatvp.pipeline.ingestion import ingest_wayback_zip
-from hatvp.pipeline.source_contract import load_source_state
+from hatvp.pipeline.source_contract import load_source_state, source_ids
 from hatvp.pipeline.state import PipelineFailure
 from tests.pipeline_support import FIXTURES, fixture_downloader, settings
 
@@ -89,6 +89,17 @@ def test_archive_snapshot_rejects_different_bytes(tmp_path: Path) -> None:
     ingest_wayback_zip(configured, archive, "2026-08-23", store)
     with pytest.raises(PipelineFailure, match="different source hashes"):
         ingest_wayback_zip(configured, changed, "2026-08-23", store)
+
+
+def test_source_discovery_keeps_legacy_official_state_with_archive_source(tmp_path: Path) -> None:
+    store = configured_store(settings(tmp_path / "output"))
+    store.put_bytes("state/latest.json", b'{"snapshot_date":"2026-08-23"}\n')
+    store.put_bytes(
+        "state/sources/wayback_github/latest.json",
+        b'{"source_id":"wayback_github","snapshot_date":"2026-08-23"}\n',
+    )
+
+    assert source_ids(store) == ("hatvp_website", "wayback_github")
 
 
 def configured_store(settings):

@@ -21,6 +21,7 @@ PIPELINE_SNAPSHOT_DATE ?=
 
 PIPELINE_LOCAL_ARGS = $(if $(LOCAL_OUTPUT),--local-output "$(LOCAL_OUTPUT)",)
 PIPELINE_DATE_ARGS = $(if $(PIPELINE_SNAPSHOT_DATE),--snapshot-date "$(PIPELINE_SNAPSHOT_DATE)",)
+PIPELINE_FORCE_ARGS = $(if $(FORCE),--force,)
 
 .PHONY: pipeline-run pipeline-ingest pipeline-process pipeline-archive-ingest pipeline-archive dashboard-install backend-test backend-dev backend-secrets bridge-deploy backend-deploy frontend-test frontend-dev frontend-deploy
 
@@ -35,11 +36,12 @@ pipeline-process:
 
 pipeline-archive-ingest:
 	@test -f "$(WAYBACK_ARCHIVE_ZIP)" || (echo "Archive zip not found: $(WAYBACK_ARCHIVE_ZIP)" >&2; exit 1)
-	uv run python -m hatvp.main --stage archive-ingest --archive-zip "$(WAYBACK_ARCHIVE_ZIP)" $(PIPELINE_LOCAL_ARGS) $(PIPELINE_DATE_ARGS)
+	uv run python -m hatvp.main --stage archive-ingest --archive-zip "$(WAYBACK_ARCHIVE_ZIP)" $(PIPELINE_LOCAL_ARGS) $(PIPELINE_DATE_ARGS) $(PIPELINE_FORCE_ARGS)
 
 pipeline-archive:
-	$(MAKE) pipeline-archive-ingest LOCAL_OUTPUT="$(LOCAL_OUTPUT)" WAYBACK_ARCHIVE_ZIP="$(WAYBACK_ARCHIVE_ZIP)" PIPELINE_SNAPSHOT_DATE="$(PIPELINE_SNAPSHOT_DATE)"
-	$(MAKE) pipeline-process LOCAL_OUTPUT="$(LOCAL_OUTPUT)" PIPELINE_SNAPSHOT_DATE="$(PIPELINE_SNAPSHOT_DATE)"
+	@test -f "$(WAYBACK_ARCHIVE_ZIP)" || (echo "Archive zip not found: $(WAYBACK_ARCHIVE_ZIP)" >&2; exit 1)
+	uv run python -m hatvp.main --stage archive-ingest --archive-zip "$(WAYBACK_ARCHIVE_ZIP)" $(PIPELINE_LOCAL_ARGS) $(PIPELINE_DATE_ARGS) $(PIPELINE_FORCE_ARGS)
+	uv run python -m hatvp.main --stage process $(PIPELINE_LOCAL_ARGS) $(PIPELINE_DATE_ARGS)
 
 dashboard-install:
 	npm --prefix $(WORKER_DIR) install
