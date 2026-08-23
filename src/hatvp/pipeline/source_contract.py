@@ -9,6 +9,7 @@ from ..download import DownloadedFile
 from ..storage import ArtifactStore
 
 OFFICIAL_SOURCE = "hatvp_website"
+HF_ARCHIVE_URL = "https://github.com/louispaulet/hatvp-archive-wayback-machine/blob/main/xml-archive/hf/declarations_from_hf.xml.zip"  # noqa: E501
 
 
 def source_raw_prefix(source_id: str) -> str:

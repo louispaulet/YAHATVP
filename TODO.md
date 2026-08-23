@@ -92,6 +92,14 @@ documented and complete.
   and Chrome confirmed both source rows on the public health page.
 - [x] Link DOB leaderboard quality tags to their source declarations and remove
   the redundant five-year age-bin text summary from the analysis page.
+- [x] Ingest the static HF/Wayback 2014 archive, process and deduplicate it with
+  the retained-source cascade, and verify its source row on the deployed health
+  page. Production replay on 2026-08-23 persisted the archive, loaded all 13
+  tables, and Chrome confirmed the English and French source labels.
+- [x] Explain the Internet Archive Wayback source and the static Hugging Face
+  snapshot, including its `thefrenchartist` provenance, on the public About page.
+- [x] Show raw ingested declaration counts beneath each deduplicated source
+  count on the public pipeline-health page.
 
 ## Google Cloud project details (completed)
 

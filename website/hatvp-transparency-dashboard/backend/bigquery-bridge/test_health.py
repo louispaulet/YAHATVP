@@ -19,7 +19,9 @@ def _row() -> Row:
     return Row(
         snapshot_date="2026-08-23",
         generated_at="2026-08-23T08:00:00Z",
-        sources_json=json.dumps([{"source_id": "hatvp_website", "declaration_count": 9}]),
+        sources_json=json.dumps(
+            [{"source_id": "hatvp_website", "declaration_count": 9, "raw_declaration_count": 12}]
+        ),
         layers_json=json.dumps([{"layer": "bronze", "row_count": 20, "review_rows": 0}]),
         anomalies_json=json.dumps([{"status": "active", "row_count": 3}]),
         anomaly_categories_json=json.dumps(
@@ -35,6 +37,8 @@ def test_health_query_covers_all_source_layers_and_registry() -> None:
     query = build_health_query("project", "dataset")
 
     assert "ingestion_source" in query
+    assert "raw_declaration_count" in query
+    assert "FROM `project.dataset`.declarations" in query
     assert "silver_declarations" in query
     assert "gold_assets" in query
     assert "anomaly_registry" in query
@@ -48,7 +52,9 @@ def test_health_payload_maps_layer_source_quality_and_anomaly_values() -> None:
         {"quality": {"errors": 1, "warnings": 2, "flagged_records": 3, "quality_regression": True}},
     )
 
-    assert payload["sources"] == [{"sourceId": "hatvp_website", "declarations": 9}]
+    assert payload["sources"] == [
+        {"sourceId": "hatvp_website", "declarations": 9, "rawDeclarations": 12}
+    ]
     assert payload["layers"][0]["reviewRows"] == 0
     assert payload["quality"]["flaggedRecords"] == 3
     assert payload["anomalies"][0]["status"] == "active"

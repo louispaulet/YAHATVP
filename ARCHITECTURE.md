@@ -166,6 +166,13 @@ Wayback/GitHub archive
     declarations.xml.zip       original immutable archive bytes
     metadata.json
   state/sources/wayback_github/latest.json
+
+HF/Wayback static archive
+  raw/source=wayback_hf/snapshot_date=YYYY-MM-DD/
+    declarations.xml
+    declarations_from_hf.xml.zip original immutable archive bytes
+    metadata.json
+  state/sources/wayback_hf/latest.json
 ```
 
 `source_contract.py` owns these paths and the source IDs. The official source
@@ -210,8 +217,11 @@ same bytes and fails for different bytes at the same source/date path.
 The weekly official `pipeline-run` performs official ingestion first. If the
 official input changed, processing reads all latest retained sources, including
 the archive source. The explicit `pipeline-archive` target runs archive ingest
-and processing in one configured process; use `FORCE=1` only for an intentional
-replay.
+and processing in one configured process; `pipeline-archive-hf` applies the same
+steps after downloading the static HF archive when needed. Both archive sources
+use the same `declaration_uuid` pre-anomaly dedupe and retain all source
+occurrences in Bronze and historical Silver; use `FORCE=1` only for an
+intentional replay.
 
 ### Processing flow
 
@@ -394,7 +404,8 @@ Identity is intentionally separated:
 | Run the full official local cascade | `make pipeline-run LOCAL_OUTPUT=/tmp/yahatvp-output` |
 | Ingest only official raw files | `make pipeline-ingest` |
 | Process retained latest sources | `make pipeline-process` |
-| Replay the Wayback archive | `make pipeline-archive WAYBACK_ARCHIVE_ZIP=... PIPELINE_SNAPSHOT_DATE=YYYY-MM-DD` |
+| Replay the GitHub/Wayback archive | `make pipeline-archive WAYBACK_ARCHIVE_ZIP=... PIPELINE_SNAPSHOT_DATE=YYYY-MM-DD` |
+| Replay the static HF/Wayback archive | `make pipeline-archive-hf WAYBACK_HF_ARCHIVE_ZIP=... PIPELINE_SNAPSHOT_DATE=YYYY-MM-DD` |
 | Run Python checks | `uv run pytest`, `uv run ruff check .`, `uv build` |
 | Run dashboard checks | `make backend-test` and `make frontend-test` |
 | Review source-linked quality evidence | `uv run python -m hatvp.triage ...` |

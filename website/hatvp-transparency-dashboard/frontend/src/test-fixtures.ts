@@ -6,7 +6,7 @@ export const dashboard = {
 export const health = {
   snapshotDate: "2026-08-18", generatedAt: "2026-08-18T08:00:00Z",
   nextIngestionAt: "2026-08-24T05:00:00Z",
-  sources: [{ sourceId: "hatvp_website", declarations: 2 }, { sourceId: "wayback_github", declarations: 1 }],
+  sources: [{ sourceId: "hatvp_website", declarations: 2, rawDeclarations: 3 }, { sourceId: "wayback_github", declarations: 1, rawDeclarations: 2 }, { sourceId: "wayback_hf", declarations: 1, rawDeclarations: 4 }],
   layers: [{ layer: "gold", rows: 8, reviewRows: 1 }, { layer: "bronze", rows: 12, reviewRows: 0 }, { layer: "silver", rows: 12, reviewRows: 2 }],
   quality: { errors: 0, warnings: 2, flaggedRecords: 2, regression: false },
   anomalies: [{ status: "active", rows: 2 }, { status: "resolved", rows: 1 }],

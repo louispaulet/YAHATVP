@@ -276,6 +276,10 @@ gs://<bucket>/hatvp/
 │   ├── declarations.xml
 │   ├── declarations.xml.zip
 │   └── metadata.json
+├── raw/source=wayback_hf/snapshot_date=YYYY-MM-DD/
+│   ├── declarations.xml
+│   ├── declarations_from_hf.xml.zip
+│   └── metadata.json
 ├── state/sources/<source_id>/latest.json
 └── state/latest.json
 ```
@@ -286,6 +290,8 @@ namespaced below `raw/source=<source_id>/snapshot_date=...`. The Wayback source
 retains both the original zip and its extracted XML. `state/sources/<source_id>/latest.json`
 advances after each raw-ingestion stage; derived files may be deterministically
 rewritten when retrying the same processing snapshot after a partial failure.
+The static `wayback_hf` source keeps the HF-built 2014 archive as a separate
+source alongside the original GitHub/Wayback archive.
 
 `state/latest.json` is advanced only after every required stage succeeds:
 
@@ -319,13 +325,18 @@ make pipeline-archive-ingest LOCAL_OUTPUT=/tmp/yahatvp-output \
   WAYBACK_ARCHIVE_ZIP=../hatvp-archive-wayback-machine/xml-archive/declarations.xml.zip
 make pipeline-archive LOCAL_OUTPUT=/tmp/yahatvp-output \
   PIPELINE_SNAPSHOT_DATE=2026-08-23
+make pipeline-archive-hf LOCAL_OUTPUT=/tmp/yahatvp-output \
+  PIPELINE_SNAPSHOT_DATE=2026-08-23
 ```
 
-Use `PIPELINE_SNAPSHOT_DATE` for a reproducible archive partition. The
-`wayback_github` source is deduplicated by `declaration_uuid` before anomaly
-detection, while Bronze and the raw archive retain every source occurrence and
-its provenance. Exact-byte hash changes create a new raw snapshot; different
-bytes for an existing snapshot date fail rather than overwrite it.
+`pipeline-archive-hf` downloads the static
+`declarations_from_hf.xml.zip` from the companion repository when the local
+sibling path is absent. Use `PIPELINE_SNAPSHOT_DATE` for a reproducible archive
+partition. Both `wayback_github` and `wayback_hf` are deduplicated by
+`declaration_uuid` before anomaly detection, while Bronze and the raw archives
+retain every source occurrence and its provenance. Exact-byte hash changes
+create a new raw snapshot; different bytes for an existing snapshot date fail
+rather than overwrite it.
 
 ### Normalized data
 
@@ -730,9 +741,9 @@ The bridge selects the latest normalized `snapshot_date` and exposes fixed
 read-only slices: `overview`, `income`, `assets`, `declarations`,
 `gender`, `simple-analysis`, `age-analysis?q=...`, and `health`. The
 `/pipeline-health` frontend route shows the countdown to the next Monday
-07:00 Europe/Paris ingestion, declaration counts by `hatvp_website` and
-`wayback_github`, Bronze/Silver/Gold row and review counts, quality totals, and
-anomaly-registry statuses. The `gender` slice
+07:00 Europe/Paris ingestion, declaration counts by `hatvp_website`,
+`wayback_github`, and `wayback_hf`, Bronze/Silver/Gold row and review counts,
+quality totals, and anomaly-registry statuses. The `gender` slice
 returns the male/female ratio plus male and female counts by Gold mandate
 position; it derives the bounded `gender` value from the XML `civilite` field
 and excludes missing or unmapped titles from the ratio. Its

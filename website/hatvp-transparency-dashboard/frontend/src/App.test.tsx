@@ -73,7 +73,9 @@ describe("dashboard application", () => {
     expect(screen.getByText("HATVP open data")).toBeInTheDocument();
     expect(screen.getByText("Follow the data back to HATVP.")).toBeInTheDocument();
     expect(screen.getByText("Why Wayback declarations appear here.")).toBeInTheDocument();
+    expect(screen.getByText("A static snapshot made by thefrenchartist.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Explore the archive project/ })).toHaveAttribute("href", "https://github.com/louispaulet/hatvp-archive-wayback-machine");
+    expect(screen.getByRole("link", { name: /Open the Hugging Face dataset/ })).toHaveAttribute("href", "https://huggingface.co/datasets/the-french-artist/hatvp_declarations_xml");
     expect(screen.getByRole("link", { name: /Declaration index \(CSV\)/ })).toHaveAttribute("href", "https://www.hatvp.fr/livraison/opendata/liste.csv");
     expect(screen.getByRole("link", { name: /Declarations feed \(XML\)/ })).toHaveAttribute("href", "https://www.hatvp.fr/livraison/merge/declarations.xml");
     expect(screen.getByRole("link", { name: /Open source page/ })).toHaveAttribute("target", "_blank");
@@ -178,6 +180,11 @@ describe("dashboard application", () => {
     expect(screen.getAllByTestId("pipeline-layer").map((layer) => layer.getAttribute("data-layer"))).toEqual(["bronze", "silver", "gold"]);
     expect(screen.getByText("HATVP official website")).toBeInTheDocument();
     expect(screen.getByText("GitHub / Wayback historical")).toBeInTheDocument();
+    expect(screen.getByText("HF / Wayback 2014 archive")).toBeInTheDocument();
+    expect(screen.getByText("(3 raw declarations)")).toBeInTheDocument();
+    expect(screen.getByText("(2 raw declarations)")).toBeInTheDocument();
+    expect(screen.getByText("(4 raw declarations)")).toBeInTheDocument();
+    expect(screen.getByText("Static 2014 historical snapshot rebuilt from the HF archive and kept separate with its provenance.")).toBeInTheDocument();
     expect(screen.getByText("Current official publication used for the weekly refresh.")).toBeInTheDocument();
     expect(screen.getByText("Rows and review load by layer")).toBeInTheDocument();
     expect(screen.getByText("High-level anomaly report")).toBeInTheDocument();

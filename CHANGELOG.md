@@ -1,5 +1,91 @@
 # Changelog
 
+## 2026-08-23 — Show raw and deduplicated source coverage
+
+### Changed
+
+- Extended the pipeline-health API with a raw Bronze declaration count for
+  each source while keeping the headline count deduplicated from Gold.
+- Added the raw count beneath each source total in italicized parentheses,
+  with bilingual labels and contract tests across the bridge, Worker, and
+  frontend.
+
+### Verified
+
+- Backend checks passed: 47 bridge tests, 13 Worker tests, and Worker
+  TypeScript typecheck. Frontend checks passed: 29 tests and the production
+  build.
+- The live health API reports deduplicated/raw pairs of `3,728`/`6,608` for
+  HATVP, `8,518`/`14,026` for GitHub/Wayback, and `5,652`/`10,944` for the
+  Hugging Face snapshot.
+- Deployed bridge revision `hatvp-dashboard-api-00022-9tn`, Worker version
+  `36dd9e0f-ab4a-469c-924a-f02693ae915d`, and the frontend at
+  https://yahatvp.thefrenchartist.dev/#/pipeline-health.
+- GitHub Actions Test and deploy run
+  [32664892398](https://github.com/louispaulet/YAHATVP/actions/runs/32664892398)
+  passed on the corrected main commit `4449fd2`.
+- Chrome verified the public English and French pages with the three raw
+  labels rendered beneath their deduplicated values and zero console warnings
+  or errors.
+
+## 2026-08-23 — Explain Wayback and Hugging Face provenance on the About page
+
+### Changed
+
+- Added bilingual About-page cards that distinguish the Internet Archive's
+  Wayback Machine and its companion GitHub archive from the separate static
+  Hugging Face snapshot.
+- Identified the Hugging Face snapshot as made by `thefrenchartist`, explained
+  that it is not a live feed, and linked directly to the
+  [`hatvp_declarations_xml`](https://huggingface.co/datasets/the-french-artist/hatvp_declarations_xml)
+  dataset.
+
+### Verified
+
+- `make frontend-test` passed all 29 frontend tests and the production build.
+- `make frontend-deploy VITE_API_BASE_URL=https://hatvp-transparency-api.louispaulet13.workers.dev`
+  published the frontend from main commit `a1aaaac`.
+- Chrome verified the cache-busted public `/about` route in English and French,
+  including both archive cards and links, with zero warning or error console
+  entries.
+
+## 2026-08-23 — Add the static HF/Wayback archive source
+
+### Changed
+
+- Added the `wayback_hf` source with the same immutable zip retention, XML
+  extraction, source-state tracking, Bronze → Silver → Gold processing, UUID
+  deduplication, and `NO_CHANGE` behavior as the existing GitHub/Wayback
+  archive.
+- Added `pipeline-archive-hf` and `pipeline-archive-hf-ingest` targets. They
+  download `declarations_from_hf.xml.zip` from the companion archive repository
+  when the local sibling file is absent and preserve the requested GitHub
+  provenance URL.
+- Added bilingual pipeline-health labels and fixture coverage for the new
+  source. The archive’s `declarations_from_hf.xml` zip member is accepted as
+  the single XML document while the normalized XML artifact remains
+  `declarations.xml`.
+
+### Verified
+
+- Fixture replay covered both archive source IDs; the real local Hf replay
+  processed 10,944 Bronze declarations, deduplicated to 10,924 unique UUIDs in
+  Gold, returned `SUCCESS_WITH_WARNINGS` with zero quality errors, and returned
+  `NO_CHANGE` on a second ingestion. Archive SHA-256:
+  `5c0c00dca2ecf9749a0491d871ed2829f7ffd9006ca79086b3a55554c3fdcb1d`.
+- GitHub Actions Test and deploy run
+  [32663428913](https://github.com/louispaulet/YAHATVP/actions/runs/32663428913)
+  passed and deployed the ingestion image from commit `76c2662`.
+- The authorized production replay persisted `wayback_hf`, loaded all 13
+  Bronze/Silver/Gold/registry tables, and advanced `state/latest.json` with
+  `SUCCESS_WITH_WARNINGS`, zero quality errors, and 58,672 flagged records.
+  The live health API reports `hatvp_website: 3,728`,
+  `wayback_github: 8,518`, and `wayback_hf: 5,652` declarations.
+- Deployed bridge revision `hatvp-dashboard-api-00021-22b`, Worker version
+  `b84bdfdd-16d3-4edb-beba-95344b568c4d`, and the GitHub Pages frontend.
+  Chrome verified the English and French `/pipeline-health` pages show the
+  Hf source name and detail with zero console warnings or errors.
+
 ## 2026-08-23 — Explain official and Wayback source coverage in the dashboard
 
 ### Changed

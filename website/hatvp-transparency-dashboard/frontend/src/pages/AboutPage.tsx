@@ -14,12 +14,20 @@ export function AboutPage() {
         <p className="mt-3 text-sm leading-6 text-slate-600">{locale.about.sources.description}</p>
         <div className="mt-5 grid gap-4 sm:grid-cols-3">{locale.about.sources.links.map((link) => <SourceLinkCard key={link.href} link={link} />)}</div>
       </section>
-      <section className="dashboard-card mt-8 border-lime/40 p-6">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.about.archive.eyebrow}</p>
-        <h2 className="mt-2 text-2xl font-black tracking-tight text-ink">{locale.about.archive.title}</h2>
-        <p className="mt-3 text-sm leading-6 text-slate-600">{locale.about.archive.description}</p>
-        <a className="mt-4 inline-flex text-sm font-bold text-emerald hover:underline" href={locale.about.archive.href} target="_blank" rel="noreferrer">{locale.about.archive.link} ↗</a>
-      </section>
+      <div className="mt-8 grid gap-6 md:grid-cols-2">
+        <section className="dashboard-card border-lime/40 p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.about.archive.eyebrow}</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-ink">{locale.about.archive.title}</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-600">{locale.about.archive.description}</p>
+          <a className="mt-4 inline-flex text-sm font-bold text-emerald hover:underline" href={locale.about.archive.href} target="_blank" rel="noreferrer">{locale.about.archive.link} ↗</a>
+        </section>
+        <section className="dashboard-card border-lime/40 p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.about.huggingFace.eyebrow}</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-ink">{locale.about.huggingFace.title}</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-600">{locale.about.huggingFace.description}</p>
+          <a className="mt-4 inline-flex text-sm font-bold text-emerald hover:underline" href={locale.about.huggingFace.href} target="_blank" rel="noreferrer">{locale.about.huggingFace.link} ↗</a>
+        </section>
+      </div>
       <a className="dashboard-card group mt-6 block p-5 transition hover:-translate-y-0.5 hover:border-emerald/40 hover:shadow-soft" href={locale.about.project.href} target="_blank" rel="noreferrer">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.about.project.eyebrow}</p>
         <span className="mt-2 flex items-start justify-between gap-3 text-sm font-bold text-ink"><span>{locale.about.project.title}</span><span aria-hidden="true" className="text-emerald transition group-hover:translate-x-0.5">↗</span></span>

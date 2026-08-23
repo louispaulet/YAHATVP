@@ -14,6 +14,7 @@ from ..hashing import sha256_file
 from ..storage import ArtifactStore
 from .artifacts import archive_raw
 from .source_contract import (
+    HF_ARCHIVE_URL,
     OFFICIAL_SOURCE,
     build_source_state,
     load_source_state,
@@ -54,8 +55,9 @@ def ingest_wayback_zip(
     *,
     dry_run: bool = False,
     force: bool = False,
+    source_id: str = "wayback_github",
 ) -> str:
-    source_id = "wayback_github"
+    source_url = HF_ARCHIVE_URL if source_id == "wayback_hf" else f"github://{archive.name}"
     archive_hash = sha256_file(archive)
     previous = load_source_state(store, source_id) if not dry_run else {}
     if not force and previous.get("archive_sha256") == archive_hash:
@@ -63,25 +65,23 @@ def ingest_wayback_zip(
     with tempfile.TemporaryDirectory(prefix="hatvp-wayback-") as directory:
         xml_path = _extract_xml(archive, Path(directory) / "declarations.xml")
         downloaded = {
-            "declarations.xml": _file(xml_path, f"github://{archive.name}"),
-            "declarations.xml.zip": _file(archive, f"github://{archive.name}"),
+            "declarations.xml": _file(xml_path, source_url),
+            archive.name: _file(archive, source_url),
         }
         metadata = build_metadata(snapshot, settings, downloaded, source_id)
         metadata["archive_sha256"] = archive_hash
         metadata = reuse_snapshot_metadata(store, snapshot, metadata, dry_run, source_id)
         archive_raw(store, snapshot, downloaded, metadata, dry_run, source_id)
         if not dry_run:
-            write_source_state(
-                store, source_id, build_source_state(metadata, downloaded, archive_hash)
-            )
+            write_source_state(store, source_id, build_source_state(metadata, downloaded, archive_hash))  # fmt: skip  # noqa: E501
     return "INGESTED"
 
 
 def _extract_xml(archive: Path, destination: Path) -> Path:
     with zipfile.ZipFile(archive) as zipped:
-        members = [item for item in zipped.namelist() if Path(item).name == "declarations.xml"]
+        members = [item for item in zipped.namelist() if Path(item).suffix.casefold() == ".xml"]
         if len(members) != 1:
-            raise ValueError("Wayback archive must contain exactly one declarations.xml")
+            raise ValueError("Wayback archive must contain exactly one XML document")
         with zipped.open(members[0]) as source, destination.open("wb") as target:
             target.write(source.read())
     validate_dataset_prefix(destination, "declarations.xml")
