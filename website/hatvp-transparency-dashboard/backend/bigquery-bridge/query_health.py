@@ -91,6 +91,8 @@ anomaly_categories AS (
   FROM {prefix}.anomaly_registry t CROSS JOIN latest l
   WHERE t.snapshot_date = l.snapshot_date
     AND COALESCE(NULLIF(t.rule_id, ''), 'unknown') NOT IN ('ANOMALY_KNOWN', 'ANOMALY_REGRESSION')
+    AND COALESCE(NULLIF(t.rule_id, ''), 'unknown') NOT IN ('COMP_YOY_CHANGE', 'COMP_DIGIT_EDIT')
+    AND NOT STARTS_WITH(COALESCE(t.record_ref, ''), 'assets:')
   GROUP BY category
 )
 SELECT latest.snapshot_date,

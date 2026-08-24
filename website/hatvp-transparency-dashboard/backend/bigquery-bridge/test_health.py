@@ -43,6 +43,8 @@ def test_health_query_covers_all_source_layers_and_registry() -> None:
     assert "gold_assets" in query
     assert "anomaly_registry" in query
     assert "anomaly_categories_json" in query
+    assert "COMP_YOY_CHANGE" in query and "COMP_DIGIT_EDIT" in query
+    assert "STARTS_WITH(COALESCE(t.record_ref, ''), 'assets:')" in query
     assert "LIMIT 5" in query
 
 
