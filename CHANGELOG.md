@@ -1,5 +1,42 @@
 # Changelog
 
+## 2026-08-24 — Narrow anomaly policy by metric
+
+### Changed
+
+- Disabled compensation-oriented anomaly detection for assets, so all asset
+  rows with normalized values remain eligible for public statistics; source
+  rows and review evidence remain preserved.
+- Temporarily ignored `COMP_YOY_CHANGE` and `COMP_DIGIT_EDIT` for income
+  eligibility because of false positives, while retaining the other income
+  exclusions: factor error, implausible amount, concatenated value,
+  same-period conflict, and superseded declaration.
+- Removed asset anomaly highlights and filtered disabled income rules and asset
+  records from the public Pipeline Health category summary.
+- Added bilingual policy copy to Pipeline Health and the asset highlights state,
+  and bumped the dashboard request schema to invalidate older cached metrics.
+
+### Verified
+
+- GitHub Actions run
+  [32774474464](https://github.com/louispaulet/YAHATVP/actions/runs/32774474464)
+  passed tests and the production ingestion-job deployment.
+- Forced replay `hatvp-ingestion-zsmlc` completed successfully after a
+  temporary 4 CPU / 16 GiB execution configuration; the recurring production
+  job was restored to 1 CPU / 4 GiB.
+- The replay loaded all 13 Bronze/Silver/Gold/anomaly tables and advanced the
+  latest snapshot to `2026-08-24`.
+- Current Gold metrics contain 227,943 eligible income rows and 4,784 eligible
+  asset rows. The 11 asset rows without normalized values remain outside
+  monetary aggregates; they are not anomaly exclusions. Income rows still
+  excluded by the retained rules total 38,773, and the two ignored rule IDs
+  are absent from current Gold eligibility flags.
+- Deployed bridge revision `hatvp-dashboard-api-00028-np8` and Worker version
+  `355427b2-05a4-412a-a91e-8ec09d0b71cf`; published frontend pages were checked
+  in Chrome. All public API routes returned HTTP 200, Pipeline Health showed
+  the new policy explanation with no disabled or asset categories, and
+  Highlights returned zero asset anomaly cards.
+
 ## 2026-08-24 — Exclude anomalous values from dashboard statistics
 
 ### Changed
