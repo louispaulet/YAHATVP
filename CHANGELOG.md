@@ -5,7 +5,8 @@
 ### Changed
 
 - Applied the existing Gold/Silver `metric_eligible` contract to homepage
-  income and asset aggregates, including their clean row counts and year count.
+  income and asset aggregates, including their clean row counts and year count;
+  homepage monetary row cards now use those same eligible counts.
 - Updated declarant income-by-year chart totals to exclude flagged values while
   retaining the unchanged source amounts and review metadata for audit.
 - Documented the dashboard-wide monetary metric policy and added bridge query

@@ -34,8 +34,10 @@ TO_JSON_STRING(ARRAY(
     CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
     UNION ALL SELECT 'incomes', COUNT(*) FROM {incomes} t
     CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
+      AND COALESCE(t.metric_eligible, TRUE) AND t.normalized_value IS NOT NULL
     UNION ALL SELECT 'assets', COUNT(*) FROM {assets} t
     CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
+      AND COALESCE(t.metric_eligible, TRUE) AND t.normalized_value IS NOT NULL
   ) ORDER BY table_name
 )) AS tables_json FROM latest l"""
     elif view == "income":

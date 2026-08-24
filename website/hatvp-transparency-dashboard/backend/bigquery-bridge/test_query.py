@@ -47,6 +47,12 @@ def test_overview_counts_distinct_people_by_normalized_name_pair():
     assert "NULLIF(TRIM(t.prenom), '')" in query
 
 
+def test_overview_counts_only_eligible_monetary_rows():
+    query = build_query("project", "dataset", "overview")
+    assert query.count("COALESCE(t.metric_eligible, TRUE)") == 2
+    assert query.count("t.normalized_value IS NOT NULL") == 2
+
+
 def test_income_groups_values_by_stream():
     query = build_query("project", "dataset", "income")
     assert "income_stream" in query
