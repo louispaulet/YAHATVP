@@ -40,20 +40,8 @@ def build_highlights_query(project: str, dataset: str) -> str:
     AND r.status NOT IN ('superseded', 'resolved')
     AND COALESCE(r.active_in_gold, TRUE)
     AND r.rule_id IN (
-      'COMP_YOY_CHANGE', 'COMP_DIGIT_EDIT', 'COMP_FACTOR_ERROR',
-      'COMP_IMPLAUSIBLE_AMOUNT'
-    )
-    GROUP BY r.record_ref
-), active_asset_records AS (
-  SELECT r.record_ref
-  FROM {anomaly_registry} r CROSS JOIN latest l
-    WHERE r.snapshot_date = l.snapshot_date
-    AND r.record_ref LIKE 'assets:%'
-    AND r.status NOT IN ('superseded', 'resolved')
-    AND COALESCE(r.active_in_gold, TRUE)
-    AND r.rule_id IN (
-      'COMP_YOY_CHANGE', 'COMP_DIGIT_EDIT', 'COMP_FACTOR_ERROR',
-      'COMP_IMPLAUSIBLE_AMOUNT'
+      'COMP_FACTOR_ERROR', 'COMP_IMPLAUSIBLE_AMOUNT', 'COMP_CONCATENATED_VALUE',
+      'COMP_CONFLICT_SAME_PERIOD', 'COMP_SUPERSEDED_DECLARATION'
     )
     GROUP BY r.record_ref
 ), annual_income AS (
@@ -95,34 +83,13 @@ def build_highlights_query(project: str, dataset: str) -> str:
   WHERE candidate_rank = 1
   ORDER BY ABS(absolute_change) DESC, declaration_uuid
   LIMIT 8
-), asset_candidates AS (
+), unusual_assets AS (
   SELECT a.declaration_uuid, c.prenom, c.nom, c.mandat_label,
     a.source_section, a.asset_name, a.raw_value, a.normalized_value,
-    a.anomaly_status, TRUE AS review_required,
-    ROW_NUMBER() OVER (
-      PARTITION BY a.declaration_uuid
-      ORDER BY ABS(a.normalized_value) DESC, a.asset_name
-    ) AS candidate_rank
+    a.anomaly_status, TRUE AS review_required
   FROM {gold_assets} a
   JOIN current_declarations c USING (snapshot_date, bronze_record_key, declaration_uuid)
-  JOIN active_asset_records flagged
-    ON flagged.record_ref = CONCAT('assets:', a.bronze_record_key)
-  CROSS JOIN latest l
-  WHERE a.snapshot_date = l.snapshot_date AND a.normalized_value IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER (
-    PARTITION BY {accent_fold("TRIM(COALESCE(c.prenom, ''))")},
-      {accent_fold("TRIM(COALESCE(c.nom, ''))")},
-      a.source_section, a.asset_name,
-      CAST(a.normalized_value AS STRING)
-    ORDER BY c.date_depot DESC, a.declaration_uuid
-  ) = 1
-), unusual_assets AS (
-  SELECT declaration_uuid, prenom, nom, mandat_label, source_section, asset_name,
-    raw_value, normalized_value, anomaly_status, review_required
-  FROM asset_candidates
-  WHERE candidate_rank = 1
-  ORDER BY ABS(normalized_value) DESC, declaration_uuid
-  LIMIT 8
+  WHERE FALSE
 ), silver_filings AS (
   SELECT CONCAT({accent_fold("COALESCE(p.prenom, '')")}, '|',
       {accent_fold("COALESCE(p.nom, '')")}, '|',

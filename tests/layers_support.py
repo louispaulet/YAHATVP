@@ -76,7 +76,7 @@ def layer_tables() -> dict[str, list[dict[str, Any]]]:
         people("new", "2026-01-01", "2099-01-01"),
     ]
     asset = income("new", "2026-01-01", 10_000, year="", raw="10 000")
-    asset.update(
+    incomes[1].update(
         {
             "source_section": "comptesBancaireDto",
             "department": "75",

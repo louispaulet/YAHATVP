@@ -754,6 +754,13 @@ age-analysis detail route uses Silver intentionally: only the newest declaration
 in each family contributes, and flagged source amounts remain visible unchanged
 with their review metadata while staying out of the yearly chart totals. Prior
 filings remain auditable. The
+current anomaly policy treats all asset rows as eligible because the
+compensation-oriented anomaly rules are paused for assets. For incomes,
+`COMP_YOY_CHANGE` and `COMP_DIGIT_EDIT` are temporarily ignored because of
+false-positive concerns; the remaining income amount rules continue to exclude
+affected values. This policy is explained on `/pipeline-health` and does not
+remove raw values or historical anomaly evidence.
+The
 parameterized search matches public declarant and declaration metadata plus
 published income/asset labels. A declaration detail route accepts only a public
 declaration UUID, reads the corresponding immutable `declarations.xml` object,

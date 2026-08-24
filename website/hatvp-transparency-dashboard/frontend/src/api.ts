@@ -11,7 +11,7 @@ import type {
 } from "./types";
 
 const DEFAULT_API_URL = "http://localhost:8787";
-const DASHBOARD_SCHEMA = "4";
+const DASHBOARD_SCHEMA = "5";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

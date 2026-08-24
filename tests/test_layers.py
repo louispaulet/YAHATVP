@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from hatvp.layers.anomaly import anomaly_rule_ids, detect_anomalies
+from hatvp.layers.anomaly import IGNORED_INCOME_RULE_IDS, anomaly_rule_ids, detect_anomalies
 from hatvp.layers.gold import build_gold, gold_metric_rows, latest_declaration_keys
 from hatvp.layers.registry import anomaly_id, upsert_registry
 from hatvp.layers.silver import apply_registry_states, build_silver
@@ -15,12 +15,13 @@ def test_all_required_rules_flag_source_rows_without_rewriting_values() -> None:
     current = layer_tables()
     items = detect_anomalies(current, historical_tables())
     found = {item["rule_id"] for item in items}
-
     lifecycle = {"ANOMALY_KNOWN", "ANOMALY_REGRESSION"}
-    assert set(anomaly_rule_ids()) - lifecycle <= found | {
+    assert not IGNORED_INCOME_RULE_IDS & found
+    assert set(anomaly_rule_ids()) - lifecycle - IGNORED_INCOME_RULE_IDS <= found | {
         "PERSON_IDENTITY_REVIEW",
         "PERSON_DOB_CONFLICT",
     }
+    assert not any(item["table_name"] == "assets" for item in items)
     assert current["incomes"][1]["normalized_value"] == 500_000
     assert all(item["source_format"] == "xml" for item in items if item["table_name"] == "incomes")
 
@@ -31,7 +32,7 @@ def test_silver_adds_field_eligibility_registry_links_and_evidence() -> None:
     )
     income_rows = silver["incomes"]
     flagged = next(row for row in income_rows if row["normalized_value"] == 500_000)
-
+    assert silver["assets"][0]["metric_eligible"] is True
     assert flagged["anomaly_active"] is True
     assert flagged["metric_eligible"] is False
     assert json.loads(flagged["field_metric_eligibility_json"])["normalized_value"] is False
@@ -74,7 +75,6 @@ def test_latest_gold_metrics_exclude_anomalous_values_but_keep_rows() -> None:
     gold, registry = build_gold(all_silver, registry)
     gold = apply_registry_states(gold, registry)
     eligible = gold_metric_rows({"incomes": gold["incomes"]})
-
     assert gold["incomes"]
     assert all(row["normalized_value"] != 500_000 for row in eligible)
     assert any(row["normalized_value"] == 500_000 for row in gold["incomes"])

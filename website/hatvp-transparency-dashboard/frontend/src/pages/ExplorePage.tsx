@@ -41,7 +41,9 @@ export function ExplorePage() {
           {highlights.data.incomeChanges.map((item, index) => <IncomeHighlightCard key={`${item.declarationUuid}-${item.toYear}`} item={item} rank={index + 1} />)}
         </HighlightSection>
         <HighlightSection tone="asset" icon={WalletCards} eyebrow={locale.explore.assetsEyebrow} title={locale.explore.assetsTitle} description={locale.explore.assetsDescription}>
-          {highlights.data.unusualAssets.map((item, index) => <AssetHighlightCard key={`${item.declarationUuid}-${index}`} item={item} rank={index + 1} />)}
+          {highlights.data.unusualAssets.length > 0
+            ? highlights.data.unusualAssets.map((item, index) => <AssetHighlightCard key={`${item.declarationUuid}-${index}`} item={item} rank={index + 1} />)
+            : <p className="text-sm leading-7 text-slate-500">{locale.explore.assetsPaused}</p>}
         </HighlightSection>
         <HighlightSection tone="amended" icon={FilePenLine} eyebrow={locale.explore.amendedEyebrow} title={locale.explore.amendedTitle} description={locale.explore.amendedDescription}>
           {highlights.data.amendedRecords.map((item, index) => <AmendedHighlightCard key={`${item.declarationUuid}-${index}`} item={item} rank={index + 1} />)}

@@ -102,10 +102,10 @@ describe("dashboard application", () => {
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "What stands out" })).toHaveAttribute("aria-current", "page");
     expect(await screen.findByText("Largest active income changes")).toBeInTheDocument();
-    expect(screen.getByText("Assets with active review flags")).toBeInTheDocument();
+    expect(screen.getByText("Asset anomaly review is paused")).toBeInTheDocument();
     expect(screen.getByText("Most amended public records")).toBeInTheDocument();
     expect(screen.getByText("+€70K")).toBeInTheDocument();
-    expect(screen.getAllByText("Review flag")).toHaveLength(2);
+    expect(screen.getAllByText("Review flag")).toHaveLength(1);
     expect(screen.getByRole("link", { name: "Open latest declaration" })).toHaveAttribute("href", "/declarations/fixture-uuid-1");
   });
 
@@ -189,6 +189,8 @@ describe("dashboard application", () => {
     expect(screen.getByText("Current official publication used for the weekly refresh.")).toBeInTheDocument();
     expect(screen.getByText("Rows and review load by layer")).toBeInTheDocument();
     expect(screen.getByText("High-level anomaly report")).toBeInTheDocument();
+    expect(screen.getByText("How anomaly flags affect statistics")).toBeInTheDocument();
+    expect(screen.getByText(/Asset rows are currently treated as anomaly-free/)).toBeInTheDocument();
     expect(screen.getByText("Most frequent anomaly categories")).toBeInTheDocument();
     expect(screen.getByText(/Large year-over-year change/)).toBeInTheDocument();
     expect(screen.getAllByTestId("anomaly-category")).toHaveLength(2);

@@ -1,4 +1,4 @@
-"""Numeric historical anomaly rules for compensation and asset values."""
+"""Numeric historical anomaly rules for income values."""
 
 from __future__ import annotations
 

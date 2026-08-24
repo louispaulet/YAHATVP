@@ -434,6 +434,9 @@ audit history.
 - [x] Apply Gold/Silver `metric_eligible` filtering to every dashboard monetary
   aggregate so active anomalous values remain auditable but cannot distort
   homepage, income, asset, or analysis statistics.
+- [x] Narrow the active anomaly policy: pause anomaly screening for assets and
+  ignore income `COMP_YOY_CHANGE` and `COMP_DIGIT_EDIT` until their false-positive
+  rates are reviewed; retain the source rows and the remaining income flags.
 
 Static quality-register evidence (2026-08-19): the frontend fixture suite passes
 with 19 tests, the production build succeeds, the local page renders ten rows
@@ -789,6 +792,10 @@ reviewed_at
 - [x] Keep future feature-specific clean versions out of this phase. If they are
   later needed, build them as explicitly named derived views/tables with the
   original observed value, anomaly links, and transformation rules preserved.
+- [x] Apply the current conservative policy explicitly: assets remain eligible
+  for metrics while asset-specific anomaly rules are paused; income
+  `COMP_YOY_CHANGE` and `COMP_DIGIT_EDIT` are ignored for now, while other
+  income amount anomalies continue to make the amount ineligible.
 
 ### 12.7 Implementation, backfill, and acceptance checks
 

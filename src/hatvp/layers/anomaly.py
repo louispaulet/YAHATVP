@@ -10,7 +10,8 @@ from .anomaly_numeric import numeric_anomalies
 from .anomaly_source import source_anomalies
 from .anomaly_support import parent_map, record_ref
 
-NUMERIC_TABLES = ("incomes", "assets")
+NUMERIC_TABLES = ("incomes",)
+IGNORED_INCOME_RULE_IDS = frozenset({"COMP_DIGIT_EDIT", "COMP_YOY_CHANGE"})
 
 
 def detect_anomalies(
@@ -27,7 +28,11 @@ def detect_anomalies(
     income_rows = _tag_rows(combined, ("incomes",))
     people_rows = _tag_rows(combined, ("people",))
     current_numeric = _tag_rows(tables, NUMERIC_TABLES)
-    items = numeric_anomalies(numeric_rows, parents)
+    items = [
+        item
+        for item in numeric_anomalies(numeric_rows, parents)
+        if item["rule_id"] not in IGNORED_INCOME_RULE_IDS
+    ]
     items.extend(conflict_anomalies(income_rows, parents))
     items.extend(identity_anomalies(people_rows, parents, dob_max_age_years))
     items.extend(source_anomalies(current_numeric, parents))
