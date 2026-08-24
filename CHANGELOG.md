@@ -14,8 +14,18 @@
 ### Verified
 
 - Focused bridge tests cover eligible-only income and asset aggregates and the
-  clean income-by-year calculation. Production publication and smoke-test
-  evidence will be recorded after the dashboard release.
+  clean income-by-year calculation.
+- GitHub Actions run [32755426575](https://github.com/louispaulet/YAHATVP/actions/runs/32755426575)
+  passed for commit `fa47ba6`.
+- Deployed Cloud Run bridge revision `hatvp-dashboard-api-00025-mtq` and
+  Worker version `1bdd3dea-5e17-4ccd-b81a-70a653ff7de4`; republished the
+  frontend at https://yahatvp.thefrenchartist.dev/.
+- Live income metrics now total €2,459,926,847 across 17 eligible years,
+  rendering as €144.7M average annual income; eligible assets total €1,885,901.
+  The Worker slices, `/`, and `/#/analysis` all returned HTTP 200, and browser
+  verification found zero warning or error console entries on both pages. No
+  ingestion replay was needed because the existing Gold eligibility columns
+  were already materialized.
 
 ## 2026-08-24 — v1.5 dashboard release
 
