@@ -92,7 +92,7 @@ TO_JSON_STRING(ARRAY(
     WHERE d.snapshot_date = l.snapshot_date
     GROUP BY label
     HAVING COUNTIF(p.gender = 'male') + COUNTIF(p.gender = 'female') > 0
-  ) ORDER BY male_count + female_count DESC, label LIMIT 20
+  ) ORDER BY male_count + female_count DESC, label LIMIT 10
 )) AS positions_json
 FROM latest l"""
     else:

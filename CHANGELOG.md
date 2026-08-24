@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-24 — Limit gender-position chart to the top 10
+
+### Changed
+
+- Limited the gender-by-job-position aggregate to the ten most common positions,
+  ranked by the combined known male and female counts.
+- Added bridge-query regression coverage for the top-10 limit.
+
+### Verified
+
+- The focused BigQuery bridge query test passed.
+
 ## 2026-08-24 — Narrow anomaly policy by metric
 
 ### Changed

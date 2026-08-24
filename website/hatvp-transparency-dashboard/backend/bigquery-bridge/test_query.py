@@ -80,6 +80,7 @@ def test_gender_groups_gold_people_and_mandate_positions():
     assert "COUNTIF(p.gender = 'female')" in query
     assert "d.mandat_label" in query
     assert "positions_json" in query
+    assert "ORDER BY male_count + female_count DESC, label LIMIT 10" in query
 
 
 def test_declarations_groups_values_by_type():

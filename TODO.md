@@ -385,6 +385,7 @@ audit history.
 - [x] Add slow-blinking loading shells so the dashboard layout renders before any slice completes.
 - [x] Derive bounded gender values from XML `civilite` and carry them through Silver and Gold people tables.
 - [x] Add the homepage male/female ratio pie chart and gender-by-job-position bar chart through a fixed aggregate API slice.
+- [x] Limit the gender-by-job-position chart to the ten most common positions.
 - [x] Use lazy-loaded Recharts pie and bar plots with animation, responsive sizing, tooltips, and accessible value lists.
 - [x] Add English/French locale configuration, a language switcher, and readable translations for dynamic dashboard labels.
 - [x] Harden declaration-type translation lookup for source-label casing and punctuation variants.
