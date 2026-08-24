@@ -19,6 +19,11 @@
 - Frontend tests passed: 31 tests; production build passed.
 - BigQuery bridge tests passed: 48 tests; Ruff passed for the changed bridge
   modules.
+- Deployed Cloud Run bridge revision `hatvp-dashboard-api-00030-5gq` with 100%
+  traffic and published frontend `gh-pages` commit `0394dbbd`.
+- Live browser verification confirmed the percentage chart, parity guide,
+  readable value cards, 10 total-position entries, and zero warning or error
+  logs.
 
 ## 2026-08-24 — Limit gender-position chart to the top 10
 
