@@ -210,7 +210,7 @@ def build_age_analysis_query(project: str, dataset: str) -> str:
   WHERE i.snapshot_date = l.snapshot_date AND i.normalized_value IS NOT NULL
     AND SAFE_CAST(i.income_year AS INT64) IS NOT NULL
 ), income_by_year AS (
-  SELECT year, SUM(amount) AS combined_amount,
+  SELECT year, SUM(IF(metric_eligible, amount, 0)) AS combined_amount,
     ARRAY_AGG(STRUCT(source_id, source_kind, source_section, label, employer, start_date,
       end_date, amount_basis, amount, metric_eligible, review_status)
       ORDER BY amount DESC, label) AS sources

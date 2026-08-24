@@ -431,6 +431,9 @@ audit history.
   values, and most-amended identities without exposing contact data.
 - [x] Turn `/explore` into an editorial Highlights page with localized context,
   review-state labels, and direct links to each immutable declaration source.
+- [x] Apply Gold/Silver `metric_eligible` filtering to every dashboard monetary
+  aggregate so active anomalous values remain auditable but cannot distort
+  homepage, income, asset, or analysis statistics.
 
 Static quality-register evidence (2026-08-19): the frontend fixture suite passes
 with 19 tests, the production build succeeds, the local page renders ten rows

@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-24 — Exclude anomalous values from dashboard statistics
+
+### Changed
+
+- Applied the existing Gold/Silver `metric_eligible` contract to homepage
+  income and asset aggregates, including their clean row counts and year count.
+- Updated declarant income-by-year chart totals to exclude flagged values while
+  retaining the unchanged source amounts and review metadata for audit.
+- Documented the dashboard-wide monetary metric policy and added bridge query
+  regression coverage.
+
+### Verified
+
+- Focused bridge tests cover eligible-only income and asset aggregates and the
+  clean income-by-year calculation. Production publication and smoke-test
+  evidence will be recorded after the dashboard release.
+
 ## 2026-08-24 — v1.5 dashboard release
 
 ### Changed

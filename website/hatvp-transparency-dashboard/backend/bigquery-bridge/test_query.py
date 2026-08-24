@@ -51,6 +51,8 @@ def test_income_groups_values_by_stream():
     query = build_query("project", "dataset", "income")
     assert "income_stream" in query
     assert "SUM(normalized_value)" in query
+    assert query.count("COALESCE(t.metric_eligible, TRUE)") == 3
+    assert query.count("t.normalized_value IS NOT NULL") == 3
     assert "COUNT(DISTINCT income_year)" in query
     assert "AS year_count" in query
     assert "GROUP BY label" in query
@@ -60,6 +62,8 @@ def test_assets_groups_values_by_source_section():
     query = build_query("project", "dataset", "assets")
     assert "source_section" in query
     assert "AS total_value" in query
+    assert query.count("COALESCE(t.metric_eligible, TRUE)") == 2
+    assert query.count("t.normalized_value IS NOT NULL") == 2
     assert "LIMIT 12" in query
 
 

@@ -44,11 +44,14 @@ CURRENT_TIMESTAMP() AS generated_at,
 TO_JSON_STRING(ARRAY(SELECT AS STRUCT COALESCE(income_stream, 'unknown') AS label,
 COUNT(*) AS row_count, COALESCE(SUM(normalized_value), 0) AS total_value
 FROM {incomes} t CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
+  AND COALESCE(t.metric_eligible, TRUE) AND t.normalized_value IS NOT NULL
 GROUP BY label ORDER BY total_value DESC, label)) AS items_json,
 COALESCE((SELECT SUM(normalized_value) FROM {incomes} t
-WHERE t.snapshot_date = l.snapshot_date), 0) AS total_value,
+WHERE t.snapshot_date = l.snapshot_date
+  AND COALESCE(t.metric_eligible, TRUE) AND t.normalized_value IS NOT NULL), 0) AS total_value,
 (SELECT COUNT(DISTINCT income_year) FROM {incomes} t
-WHERE t.snapshot_date = l.snapshot_date) AS year_count
+WHERE t.snapshot_date = l.snapshot_date
+  AND COALESCE(t.metric_eligible, TRUE) AND t.normalized_value IS NOT NULL) AS year_count
 FROM latest l"""
     elif view == "assets":
         body = f"""SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
@@ -56,9 +59,11 @@ CURRENT_TIMESTAMP() AS generated_at,
 TO_JSON_STRING(ARRAY(SELECT AS STRUCT COALESCE(source_section, 'unknown') AS label,
 COUNT(*) AS row_count, COALESCE(SUM(normalized_value), 0) AS total_value
 FROM {assets} t CROSS JOIN latest l WHERE t.snapshot_date = l.snapshot_date
+  AND COALESCE(t.metric_eligible, TRUE) AND t.normalized_value IS NOT NULL
 GROUP BY label ORDER BY total_value DESC, label LIMIT 12)) AS items_json,
 COALESCE((SELECT SUM(normalized_value) FROM {assets} t
-WHERE t.snapshot_date = l.snapshot_date), 0) AS total_value
+WHERE t.snapshot_date = l.snapshot_date
+  AND COALESCE(t.metric_eligible, TRUE) AND t.normalized_value IS NOT NULL), 0) AS total_value
 FROM latest l"""
     elif view == "gender":
         body = f"""SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,

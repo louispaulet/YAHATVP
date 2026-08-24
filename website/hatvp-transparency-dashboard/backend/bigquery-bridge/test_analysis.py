@@ -48,6 +48,7 @@ def test_age_analysis_query_ranks_declaration_families_and_keeps_flagged_values(
     assert "JOIN latest_interest" in query
     assert "JOIN latest_assets" in query
     assert "AND COALESCE(i.metric_eligible, TRUE)" not in query
+    assert "SUM(IF(metric_eligible, amount, 0)) AS combined_amount" in query
     assert "JSON_VALUE(i.raw_record_json, '$.employeur')" in query
     assert "asset_event_date" in query
     assert "asset_event_precision" in query

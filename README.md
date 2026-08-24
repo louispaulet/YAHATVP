@@ -748,11 +748,12 @@ returns the male/female ratio plus male and female counts by Gold mandate
 position; it derives the bounded `gender` value from the XML `civilite` field
 and excludes missing or unmapped titles from the ratio. Its
 metric queries filter by Gold's explicit `metric_eligible` and `active_in_gold`
-fields; they do not recreate anomaly logic in the dashboard. The age-analysis
-detail route uses Silver intentionally: only the newest declaration in each
-family contributes to income or the asset inventory, but flagged source amounts
-remain visible unchanged with their review metadata and prior filings remain
-auditable. The
+fields; they do not recreate anomaly logic in the dashboard. Monetary overview,
+income, asset, and salary aggregates exclude ineligible values, while the
+age-analysis detail route uses Silver intentionally: only the newest declaration
+in each family contributes, and flagged source amounts remain visible unchanged
+with their review metadata while staying out of the yearly chart totals. Prior
+filings remain auditable. The
 parameterized search matches public declarant and declaration metadata plus
 published income/asset labels. A declaration detail route accepts only a public
 declaration UUID, reads the corresponding immutable `declarations.xml` object,
