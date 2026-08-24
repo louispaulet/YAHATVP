@@ -11,6 +11,10 @@
 ### Verified
 
 - The focused BigQuery bridge query test passed.
+- Cloud Run bridge revision `hatvp-dashboard-api-00029-flg` deployed and is
+  serving 100% of traffic.
+- Live Chrome verification of the public homepage found exactly 10 rendered
+  gender-position entries and zero browser warning or error logs.
 
 ## 2026-08-24 — Narrow anomaly policy by metric
 
