@@ -11,6 +11,7 @@ import type {
 } from "./types";
 
 const DEFAULT_API_URL = "http://localhost:8787";
+const DASHBOARD_SCHEMA = "4";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -108,31 +109,31 @@ async function fetchJson<T>(path: string, validate: (value: unknown) => value is
 }
 
 export function fetchOverview(signal?: AbortSignal): Promise<DashboardOverviewResponse> {
-  return fetchJson("/api/dashboard/overview", isOverviewResponse, signal);
+  return fetchJson(`/api/dashboard/overview?schema=${DASHBOARD_SCHEMA}`, isOverviewResponse, signal);
 }
 
 export function fetchHealth(signal?: AbortSignal): Promise<DashboardHealthResponse> {
-  return fetchJson("/api/dashboard/health?schema=3", isHealthResponse, signal);
+  return fetchJson(`/api/dashboard/health?schema=${DASHBOARD_SCHEMA}`, isHealthResponse, signal);
 }
 
 export function fetchIncome(signal?: AbortSignal): Promise<DashboardBreakdownResponse> {
-  return fetchJson("/api/dashboard/income", isBreakdownResponse, signal);
+  return fetchJson(`/api/dashboard/income?schema=${DASHBOARD_SCHEMA}`, isBreakdownResponse, signal);
 }
 
 export function fetchAssets(signal?: AbortSignal): Promise<DashboardBreakdownResponse> {
-  return fetchJson("/api/dashboard/assets", isBreakdownResponse, signal);
+  return fetchJson(`/api/dashboard/assets?schema=${DASHBOARD_SCHEMA}`, isBreakdownResponse, signal);
 }
 
 export function fetchDeclarations(signal?: AbortSignal): Promise<DashboardBreakdownResponse> {
-  return fetchJson("/api/dashboard/declarations", isBreakdownResponse, signal);
+  return fetchJson(`/api/dashboard/declarations?schema=${DASHBOARD_SCHEMA}`, isBreakdownResponse, signal);
 }
 
 export function fetchGender(signal?: AbortSignal): Promise<DashboardGenderResponse> {
-  return fetchJson("/api/dashboard/gender", isGenderResponse, signal);
+  return fetchJson(`/api/dashboard/gender?schema=${DASHBOARD_SCHEMA}`, isGenderResponse, signal);
 }
 
 export function fetchHighlights(signal?: AbortSignal): Promise<DashboardHighlightsResponse> {
-  return fetchJson("/api/dashboard/highlights", isHighlightsResponse, signal);
+  return fetchJson(`/api/dashboard/highlights?schema=${DASHBOARD_SCHEMA}`, isHighlightsResponse, signal);
 }
 
 export function fetchSearch(query: string, signal?: AbortSignal): Promise<DashboardSearchResponse> {
@@ -144,9 +145,9 @@ export function fetchDeclaration(uuid: string, signal?: AbortSignal): Promise<Da
 }
 
 export function fetchSimpleAnalysis(signal?: AbortSignal): Promise<SimpleAnalysisResponse> {
-  return fetchJson("/api/dashboard/simple-analysis", isSimpleAnalysisResponse, signal);
+  return fetchJson(`/api/dashboard/simple-analysis?schema=${DASHBOARD_SCHEMA}`, isSimpleAnalysisResponse, signal);
 }
 
 export function fetchAgeAnalysis(query: string, signal?: AbortSignal): Promise<AgeAnalysisResponse> {
-  return fetchJson(`/api/dashboard/age-analysis?q=${encodeURIComponent(query)}`, isAgeAnalysisResponse, signal);
+  return fetchJson(`/api/dashboard/age-analysis?q=${encodeURIComponent(query)}&schema=${DASHBOARD_SCHEMA}`, isAgeAnalysisResponse, signal);
 }

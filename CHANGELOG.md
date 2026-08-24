@@ -9,6 +9,8 @@
   homepage monetary row cards now use those same eligible counts.
 - Updated declarant income-by-year chart totals to exclude flagged values while
   retaining the unchanged source amounts and review metadata for audit.
+- Versioned public dashboard statistic requests so browsers do not reuse a
+  pre-release cached overview after a metric-policy deployment.
 - Documented the dashboard-wide monetary metric policy and added bridge query
   regression coverage.
 

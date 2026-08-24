@@ -14,7 +14,7 @@ describe("dashboard API client", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(fetchOverview()).resolves.toEqual(response);
-    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8787/api/dashboard/overview", expect.any(Object));
+    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8787/api/dashboard/overview?schema=4", expect.any(Object));
   });
 
   it("loads breakdown slices independently", async () => {
@@ -26,8 +26,8 @@ describe("dashboard API client", () => {
     await expect(fetchAssets()).resolves.toEqual(response);
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
-      "http://localhost:8787/api/dashboard/income",
-      "http://localhost:8787/api/dashboard/assets",
+      "http://localhost:8787/api/dashboard/income?schema=4",
+      "http://localhost:8787/api/dashboard/assets?schema=4",
     ]);
   });
 
@@ -44,7 +44,7 @@ describe("dashboard API client", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(fetchHealth()).resolves.toEqual(response);
-    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8787/api/dashboard/health?schema=3", expect.any(Object));
+    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8787/api/dashboard/health?schema=4", expect.any(Object));
   });
 
   it("loads the gender slice", async () => {
@@ -64,7 +64,7 @@ describe("dashboard API client", () => {
 
     await expect(fetchHighlights()).resolves.toEqual(response);
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8787/api/dashboard/highlights",
+      "http://localhost:8787/api/dashboard/highlights?schema=4",
       expect.any(Object),
     );
   });
@@ -78,8 +78,8 @@ describe("dashboard API client", () => {
     await expect(fetchSimpleAnalysis()).resolves.toEqual(simple);
     await expect(fetchAgeAnalysis("Sébastien Lecornu")).resolves.toEqual(age);
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
-      "http://localhost:8787/api/dashboard/simple-analysis",
-      "http://localhost:8787/api/dashboard/age-analysis?q=S%C3%A9bastien%20Lecornu",
+      "http://localhost:8787/api/dashboard/simple-analysis?schema=4",
+      "http://localhost:8787/api/dashboard/age-analysis?q=S%C3%A9bastien%20Lecornu&schema=4",
     ]);
   });
 
