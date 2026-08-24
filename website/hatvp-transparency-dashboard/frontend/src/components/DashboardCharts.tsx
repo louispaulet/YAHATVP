@@ -43,7 +43,7 @@ export function DashboardCharts({ income, assets, gender, language }: DashboardC
         <Panel title={locale.panels.genderPositions.title} eyebrow={locale.panels.genderPositions.eyebrow}>
         {gender.loading && <ChartSkeleton />}
         {gender.error && <SliceError onRetry={gender.reload} />}
-        {gender.data && <Suspense fallback={<ChartSkeleton />}><GenderPositionChart positions={gender.data.positions} emptyLabel={locale.panels.genderPositions.empty} language={language} chartLabel={locale.accessibility.genderPositionsChart} maleLabel={locale.panels.genderPositions.male} femaleLabel={locale.panels.genderPositions.female} /></Suspense>}
+        {gender.data && <Suspense fallback={<ChartSkeleton />}><GenderPositionChart positions={gender.data.positions} emptyLabel={locale.panels.genderPositions.empty} language={language} chartLabel={locale.accessibility.genderPositionsChart} legendLabel={locale.accessibility.genderPositionsLegend} womenLabel={locale.panels.genderPositions.women} parityLabel={locale.panels.genderPositions.parity} peopleLabel={locale.panels.genderPositions.people} noteLabel={locale.panels.genderPositions.note} /></Suspense>}
         </Panel>
       </section>
     </>

@@ -62,7 +62,7 @@ describe("dashboard application", () => {
     expect(screen.getByRole("img", { name: /Average annual income and asset totals/i })).toBeInTheDocument();
     expect(screen.getByText("Declaration types")).toBeInTheDocument();
     expect(screen.getByText("Gender balance")).toBeInTheDocument();
-    expect(screen.getByText("Gender by job position")).toBeInTheDocument();
+    expect(screen.getByText("Women’s share by job position")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Male-to-female ratio/i })).toBeInTheDocument();
     expect(screen.queryByText("⚖️", { selector: "header span" })).not.toBeInTheDocument();
     expect(screen.getByRole("banner").querySelector("svg")).toBeTruthy();

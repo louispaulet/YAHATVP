@@ -72,11 +72,13 @@
       "unknownNote": "{count} lignes avec une civilité manquante ou non reconnue sont exclues de ce ratio."
     },
     "genderPositions": {
-      "title": "Femmes et hommes par fonction",
-      "eyebrow": "Nombre de déclarants",
+      "title": "Part des femmes par fonction",
+      "eyebrow": "Part des femmes · fonctions classées par taille",
       "empty": "Aucune fonction avec un genre connu n’a été trouvée dans cet instantané.",
-      "male": "Hommes",
-      "female": "Femmes"
+      "women": "Femmes",
+      "parity": "Parité (50 %)",
+      "people": "personnes au total",
+      "note": "Les barres montrent la part des femmes parmi toutes les personnes occupant chaque fonction. Les fonctions sont classées par nombre total de personnes ; le dénominateur inclut les personnes dont le genre est inconnu ou non reconnu."
     },
     "declarationTypes": {
       "title": "Types de déclarations",
@@ -449,7 +451,8 @@
     "comparisonLegend": "Légende du revenu annuel moyen et du patrimoine total",
     "genderRatioChart": "Ratio femmes-hommes",
     "genderRatioLegend": "Légende du ratio femmes-hommes",
-    "genderPositionsChart": "Nombre de femmes et d’hommes par fonction",
+    "genderPositionsChart": "Part des femmes par fonction, classée par nombre total de personnes",
+    "genderPositionsLegend": "Légende du graphique des fonctions et du genre",
     "rows": "lignes"
   },
   "labels": {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatCurrency, formatNumber } from "./formatters";
+import { formatCurrency, formatNumber, formatPercentage } from "./formatters";
 
 describe("dashboard value formatting", () => {
   it("uses compact currency units for readable large amounts", () => {
@@ -17,5 +17,10 @@ describe("dashboard value formatting", () => {
   it("keeps ordinary counts grouped until they are genuinely large", () => {
     expect(formatNumber(74_791, "en")).toBe("74,791");
     expect(formatNumber(1_250_000, "en")).toBe("1.3M");
+  });
+
+  it("formats women shares with one decimal and locale conventions", () => {
+    expect(formatPercentage(37.5, "en")).toBe("37.5%");
+    expect(formatPercentage(37.5, "fr")).toBe("37,5\u00a0%");
   });
 });

@@ -36,6 +36,14 @@ export function formatNumber(value: number, language: Language): string {
   return new Intl.NumberFormat(localeFor(language)).format(value);
 }
 
+export function formatPercentage(value: number, language: Language): string {
+  return new Intl.NumberFormat(localeFor(language), {
+    style: "percent",
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(value / 100);
+}
+
 export function formatCurrency(value: number, language: Language): string {
   if (Math.abs(value) >= COMPACT_CURRENCY_THRESHOLD) return compactValue(value, language, true);
   return new Intl.NumberFormat(localeFor(language), {

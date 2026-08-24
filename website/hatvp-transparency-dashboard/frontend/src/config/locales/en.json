@@ -72,11 +72,13 @@
       "unknownNote": "{count} records with missing or unmapped civilité are excluded from this ratio."
     },
     "genderPositions": {
-      "title": "Gender by job position",
-      "eyebrow": "Declarant counts",
+      "title": "Women’s share by job position",
+      "eyebrow": "Women’s share · positions ranked by size",
       "empty": "No job positions with known gender were found in this snapshot.",
-      "male": "Male",
-      "female": "Female"
+      "women": "Women",
+      "parity": "Parity (50%)",
+      "people": "people total",
+      "note": "Bars show the percentage of women among everyone with each position. Positions are sorted by total people; the denominator includes people with an unknown or unmapped gender."
     },
     "declarationTypes": {
       "title": "Declaration types",
@@ -449,7 +451,8 @@
     "comparisonLegend": "Average annual income and asset totals legend",
     "genderRatioChart": "Male-to-female ratio",
     "genderRatioLegend": "Male-to-female ratio legend",
-    "genderPositionsChart": "Male and female counts by job position",
+    "genderPositionsChart": "Share of women by job position, sorted by total people",
+    "genderPositionsLegend": "Gender-position chart legend",
     "rows": "rows"
   },
   "labels": {

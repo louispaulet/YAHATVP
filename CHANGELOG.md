@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-24 — Show women’s share by job position
+
+### Changed
+
+- Changed the top-10 job-position chart from paired gender counts to the
+  percentage of women among all people with each position, with a 50% parity
+  guide.
+- Kept positions sorted by total people, including unknown or unmapped gender
+  rows in the denominator and ranking.
+- Reworked the chart labels and value list with wrapped axis labels, responsive
+  value cards, explicit totals, and a non-overlapping women/parity legend.
+- Added frontend and bridge regression coverage for the percentage and sorting
+  contracts.
+
+### Verified
+
+- Frontend tests passed: 31 tests; production build passed.
+- BigQuery bridge tests passed: 48 tests; Ruff passed for the changed bridge
+  modules.
+
 ## 2026-08-24 — Limit gender-position chart to the top 10
 
 ### Changed
