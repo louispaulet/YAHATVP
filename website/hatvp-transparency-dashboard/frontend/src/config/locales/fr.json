@@ -73,7 +73,8 @@
     },
     "genderPositions": {
       "title": "Part des femmes par fonction",
-      "eyebrow": "Part des femmes · fonctions classées par taille",
+      "eyebrow": "Part des femmes",
+      "description": "Les barres sont classées de la fonction la plus représentée à la moins représentée, parmi les 10 principales fonctions.",
       "empty": "Aucune fonction avec un genre connu n’a été trouvée dans cet instantané.",
       "women": "Femmes",
       "parity": "Parité (50 %)",

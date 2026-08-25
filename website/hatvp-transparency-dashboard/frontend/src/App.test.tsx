@@ -63,6 +63,7 @@ describe("dashboard application", () => {
     expect(screen.getByText("Declaration types")).toBeInTheDocument();
     expect(screen.getByText("Gender balance")).toBeInTheDocument();
     expect(screen.getByText("Women’s share by job position")).toBeInTheDocument();
+    expect(screen.getByText("Bars are sorted from the most popular position to the least popular, showing the top 10 job positions.")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Male-to-female ratio/i })).toBeInTheDocument();
     expect(screen.queryByText("⚖️", { selector: "header span" })).not.toBeInTheDocument();
     expect(screen.getByRole("banner").querySelector("svg")).toBeTruthy();

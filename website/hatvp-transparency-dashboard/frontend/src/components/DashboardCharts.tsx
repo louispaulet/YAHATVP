@@ -40,7 +40,7 @@ export function DashboardCharts({ income, assets, gender, language }: DashboardC
         {gender.error && <SliceError onRetry={gender.reload} />}
         {gender.data && <Suspense fallback={<ChartSkeleton />}><GenderRatioChart items={gender.data.gender} unknownRows={gender.data.unknownRows} emptyLabel={locale.panels.genderRatio.empty} language={language} chartLabel={locale.accessibility.genderRatioChart} legendLabel={locale.accessibility.genderRatioLegend} maleLabel={locale.panels.genderRatio.male} femaleLabel={locale.panels.genderRatio.female} unknownNote={locale.panels.genderRatio.unknownNote} /></Suspense>}
         </Panel>
-        <Panel title={locale.panels.genderPositions.title} eyebrow={locale.panels.genderPositions.eyebrow}>
+        <Panel title={locale.panels.genderPositions.title} eyebrow={locale.panels.genderPositions.eyebrow} description={locale.panels.genderPositions.description}>
         {gender.loading && <ChartSkeleton />}
         {gender.error && <SliceError onRetry={gender.reload} />}
         {gender.data && <Suspense fallback={<ChartSkeleton />}><GenderPositionChart positions={gender.data.positions} emptyLabel={locale.panels.genderPositions.empty} language={language} chartLabel={locale.accessibility.genderPositionsChart} legendLabel={locale.accessibility.genderPositionsLegend} womenLabel={locale.panels.genderPositions.women} parityLabel={locale.panels.genderPositions.parity} peopleLabel={locale.panels.genderPositions.people} noteLabel={locale.panels.genderPositions.note} /></Suspense>}

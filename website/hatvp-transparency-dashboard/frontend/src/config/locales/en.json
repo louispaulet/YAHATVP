@@ -73,7 +73,8 @@
     },
     "genderPositions": {
       "title": "Women’s share by job position",
-      "eyebrow": "Women’s share · positions ranked by size",
+      "eyebrow": "Women’s share",
+      "description": "Bars are sorted from the most popular position to the least popular, showing the top 10 job positions.",
       "empty": "No job positions with known gender were found in this snapshot.",
       "women": "Women",
       "parity": "Parity (50%)",

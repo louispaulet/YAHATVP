@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-25 — Explain job-position ordering below the chart title
+
+### Changed
+
+- Added a bilingual sentence directly below the women’s-share chart title
+  stating that the bars run from the most popular to least popular position
+  across the top 10 job positions.
+
 ## 2026-08-24 — Show women’s share by job position
 
 ### Changed
