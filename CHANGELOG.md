@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-27 — Publish balanced homepage evidence layout
+
+### Released
+
+- Published the balanced supporting-evidence homepage layout from commit
+  `3bc5a63` to the GitHub Pages custom domain
+  `yahatvp.thefrenchartist.dev`.
+
+### Verified
+
+- The live homepage serves the “One view, four tables” coverage panel.
+- Live Chrome checks at 1440 × 1024 confirmed the declaration table and the
+  stacked right column share the same 851px row height.
+- Live Chrome checks at 390 × 844 confirmed the declaration table wraps within
+  its 300px content area, the page remains 390px wide, and no console messages
+  were emitted.
+
 ## 2026-08-27 — Balance homepage supporting evidence
 
 ### Changed

@@ -402,6 +402,7 @@ audit history.
 - [x] Use compact, locale-aware formatting for large dashboard values.
 - [x] Redesign the dashboard homepage as a story-first civic snapshot with a no-rail responsive layout, reusable Tailwind sections, staged data loading, bilingual copy, and browser QA at desktop and mobile widths.
 - [x] Balance the homepage supporting-evidence row with a reusable snapshot-coverage panel and a mobile-safe declaration table.
+- [x] Deploy the balanced homepage supporting-evidence layout to the live custom domain and verify desktop/mobile rendering.
 - [x] Publish and smoke-test the dashboard at `yahatvp.thefrenchartist.dev`
   with the GitHub Pages custom domain and HTTPS enabled.
 - [x] Add a localized declaration search page with parameterized public-field
