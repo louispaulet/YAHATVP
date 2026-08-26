@@ -28,6 +28,33 @@
 - Production was not deployed; the verified local preview remains available
   for review.
 
+## 2026-08-27 — Publish the story-first homepage
+
+### Deployed
+
+- Cloud Run bridge revision `hatvp-dashboard-api-00031-22p` is serving 100% of
+  traffic at the existing service URL.
+- Cloudflare Worker version
+  `105720a1-893f-499a-99e6-cf67dc4f6b6d` is live at
+  `https://hatvp-transparency-api.louispaulet13.workers.dev`.
+- Frontend published to
+  `https://yahatvp.thefrenchartist.dev/` through the `gh-pages` branch with
+  the production Worker URL configured.
+
+### Verified
+
+- GitHub Actions workflow run
+  [33020138162](https://github.com/louispaulet/YAHATVP/actions/runs/33020138162)
+  passed for commit `39129ed`.
+- Worker health, overview, income, assets, declarations, and search routes
+  returned HTTP 200; all dashboard slices reported snapshot `2026-08-24` with
+  17,899 declarations, 7,318 people, 227,943 income rows, and 4,784 asset
+  rows. Search returned 28 results for `Dupont`.
+- Live Chrome smoke testing confirmed the homepage headline, snapshot values,
+  search navigation, accessible chart disclosure, 390px layout, no horizontal
+  overflow, and no console warnings or errors. No ingestion replay was needed
+  because this release only changed the frontend and dashboard presentation.
+
 ## 2026-08-25 — Explain job-position ordering below the chart title
 
 ### Changed
