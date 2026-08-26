@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-08-27 — Add canonical website tone-of-voice guide
+
+### Changed
+
+- Added the repository-level `tone_of_voice.md` as the canonical writing guide
+  for the dashboard’s curious, clear, precise, candid, and respectful civic
+  voice.
+- Documented data-sensitive vocabulary, source and caveat language,
+  amendment/anomaly wording, UI copy patterns, loading/empty/error states,
+  accessibility, and English/French parity.
+- Updated `agents.md` so future user-facing frontend copy reads and follows the
+  tone guide alongside `design_style.md`.
+
+### Verified
+
+- The guide was checked against the current homepage, data cards, chart notes,
+  source labels, loading states, and locale conventions.
+- Documentation diff validation passed with `git diff --check`.
+
 ## 2026-08-27 — Add canonical website design style guide
 
 ### Changed
