@@ -44,7 +44,7 @@ export function DashboardCharts({ income, assets, declarations, gender, overview
           <p className="mt-4 text-base leading-7 text-slate-600">{locale.homepage.reading.description}</p>
         </div>
 
-        <div className="mt-8 grid items-start gap-5 lg:grid-cols-3">
+        <div className="mt-8 grid items-stretch gap-5 lg:grid-cols-3">
           <HomepageInsightCard number="01" tone="emerald" eyebrow={locale.homepage.reading.incomeEyebrow} title={locale.panels.comparison.title} description={locale.homepage.reading.incomeDescription}>
             {(income.loading || assets.loading || !deferred) && <ChartSkeleton compact />}
             {(income.error || assets.error) && <SliceError onRetry={retryIncomeAssets} />}

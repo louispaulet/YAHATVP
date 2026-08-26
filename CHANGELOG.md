@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-27 — Align homepage insight cards
+
+### Changed
+
+- Made the three story-first “Reading the snapshot” cards share the same
+  height on desktop while preserving natural stacked sizing on mobile.
+
+### Verified
+
+- Local Chrome inspection at the desktop preview confirmed all three cards use
+  the same 596px row height, with no horizontal overflow or console warnings.
+- The frontend suite and production build passed after the change.
+
 ## 2026-08-27 — Redesign the homepage as a story-first civic snapshot
 
 ### Changed
