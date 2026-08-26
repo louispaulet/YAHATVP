@@ -18,20 +18,20 @@ export function SliceError({ onRetry }: { onRetry: () => void }) {
   );
 }
 
-export function MetricSkeleton() {
+export function MetricSkeleton({ compact = false }: { compact?: boolean }) {
   return (
-    <article className="dashboard-card p-6">
-      <LoadingShell className="h-4 w-28 rounded-full" />
-      <LoadingShell className="mt-5 h-10 w-32 rounded-xl" />
-      <LoadingShell className="mt-3 h-3 w-24 rounded-full" />
-    </article>
+    <div className={compact ? "border-l-2 border-white/15 pl-4 first:border-l-0 first:pl-0 sm:pl-5" : "dashboard-card p-6"}>
+      <LoadingShell className={compact ? "h-3 w-20 rounded-full" : "h-4 w-28 rounded-full"} />
+      <LoadingShell className={compact ? "mt-4 h-9 w-28 rounded-xl" : "mt-5 h-10 w-32 rounded-xl"} />
+      <LoadingShell className="mt-2 h-3 w-24 rounded-full" />
+    </div>
   );
 }
 
-export function ChartSkeleton({ table = false }: { table?: boolean }) {
+export function ChartSkeleton({ table = false, compact = false }: { table?: boolean; compact?: boolean }) {
   return (
     <div className="space-y-4" aria-busy="true">
-      <LoadingShell className={table ? "h-4 w-3/4 rounded-full" : "h-56 w-full rounded-[1.5rem]"} />
+      <LoadingShell className={table ? "h-4 w-3/4 rounded-full" : compact ? "h-32 w-full rounded-2xl" : "h-56 w-full rounded-[1.5rem]"} />
       {table && <><LoadingShell className="h-4 w-full rounded-full" /><LoadingShell className="h-4 w-5/6 rounded-full" /><LoadingShell className="h-4 w-2/3 rounded-full" /></>}
     </div>
   );

@@ -1,4 +1,4 @@
-import { ExternalLink, GitBranch, Scale } from "lucide-react";
+import { ExternalLink, GitBranch } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useI18n } from "../context/I18nContext";
@@ -55,19 +55,17 @@ export function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-canvas text-ink">
       <header className="border-b border-slate-200/80 bg-canvas/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-          <Link to="/" className="flex shrink-0 items-center gap-3">
-            <span className="brand-mark" aria-hidden="true"><Scale size={19} strokeWidth={1.9} /></span>
-            <span><span className="block text-xs font-bold uppercase tracking-[0.22em] text-slate-500">HATVP</span><span className="block text-sm font-semibold">{locale.brand.name}</span></span>
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-5 lg:flex-nowrap lg:px-8 lg:py-4">
+          <Link to="/" className="flex min-w-0 shrink-0 items-center gap-3">
+            <img src="/hatvp-mark.webp" alt="" aria-hidden="true" className="size-10 rounded-xl object-cover shadow-sm" />
+            <span className="min-w-0"><span className="block text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">HATVP</span><span className="block truncate text-sm font-semibold">{locale.brand.name}</span></span>
           </Link>
-          <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-5 gap-y-2 lg:flex-1 lg:flex-nowrap lg:justify-end">
-            <nav aria-label={locale.nav.label} className="flex min-w-0 flex-1 items-center gap-x-1 overflow-x-auto py-1 whitespace-nowrap sm:gap-x-2">
-              {sections.map((section) => <Link key={section.key} to={section.to} aria-current={currentSection === section.key ? "page" : undefined} className={parentClass(currentSection === section.key)}>{section.label}</Link>)}
-            </nav>
-            <div className="shrink-0"><LanguageSwitcher /></div>
-          </div>
+          <nav aria-label={locale.nav.label} className="order-3 -mx-1 flex w-[calc(100%+0.5rem)] min-w-0 flex-wrap items-center gap-x-1 gap-y-1 overflow-x-hidden px-1 py-1 sm:gap-x-2 lg:order-none lg:w-auto lg:flex-1 lg:flex-nowrap lg:justify-end">
+            {sections.map((section) => <Link key={section.key} to={section.to} aria-current={currentSection === section.key ? "page" : undefined} className={parentClass(currentSection === section.key)}>{section.label}</Link>)}
+          </nav>
+          <div className="ml-auto shrink-0"><LanguageSwitcher /></div>
         </div>
-        {currentSection && <div className="border-t border-slate-200/60 bg-canvas/60"><nav aria-label={locale.nav.sectionLabel} className="mx-auto flex max-w-7xl gap-x-5 overflow-x-auto px-5 py-2 whitespace-nowrap lg:px-8">{childrenBySection[currentSection].map((child) => <NavLink key={child.to} to={child.to} end={child.end} className={childClass}>{child.label}</NavLink>)}</nav></div>}
+        {currentSection && <div className="border-t border-slate-200/60 bg-canvas/60"><nav aria-label={locale.nav.sectionLabel} className="mx-auto flex max-w-7xl flex-wrap gap-x-5 gap-y-1 px-5 py-2 lg:px-8">{childrenBySection[currentSection].map((child) => <NavLink key={child.to} to={child.to} end={child.end} className={childClass}>{child.label}</NavLink>)}</nav></div>}
       </header>
       <main className="flex-1">{children}</main>
       <footer className="mt-auto border-t border-slate-200/80">

@@ -400,6 +400,7 @@ audit history.
 - [x] Compare total income and asset amounts in the dashboard pie chart.
 - [x] Compare average annual reported income with total assets and explain the calculation.
 - [x] Use compact, locale-aware formatting for large dashboard values.
+- [x] Redesign the dashboard homepage as a story-first civic snapshot with a no-rail responsive layout, reusable Tailwind sections, staged data loading, bilingual copy, and browser QA at desktop and mobile widths.
 - [x] Publish and smoke-test the dashboard at `yahatvp.thefrenchartist.dev`
   with the GitHub Pages custom domain and HTTPS enabled.
 - [x] Add a localized declaration search page with parameterized public-field

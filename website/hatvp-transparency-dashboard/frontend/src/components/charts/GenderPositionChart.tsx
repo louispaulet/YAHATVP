@@ -63,10 +63,10 @@ function toChartData(positions: GenderPosition[]): PositionDatum[] {
   });
 }
 
-export default function GenderPositionChart({ positions, emptyLabel, language, chartLabel, legendLabel, womenLabel, parityLabel, peopleLabel, noteLabel }: Props) {
+export default function GenderPositionChart({ positions, emptyLabel, language, chartLabel, legendLabel, womenLabel, parityLabel, peopleLabel, noteLabel, compact = false }: Props & { compact?: boolean }) {
   if (positions.length === 0) return <p className="py-8 text-sm text-slate-500">{emptyLabel}</p>;
   const data = toChartData(positions);
-  const chartHeight = Math.max(500, Math.min(820, data.length * 60 + 50));
+  const chartHeight = compact ? Math.max(300, Math.min(500, data.length * 44 + 34)) : Math.max(500, Math.min(820, data.length * 60 + 50));
   const description = data.map((item) => `${item.label}: ${formatPercentage(item.womenPercentage, language)}, ${formatNumber(item.total, language)} ${peopleLabel}`).join("; ");
   return (
     <div className="space-y-5">
@@ -80,14 +80,14 @@ export default function GenderPositionChart({ positions, emptyLabel, language, c
             <BarChart data={data} layout="vertical" margin={{ top: 8, right: 24, bottom: 8, left: 8 }}>
               <CartesianGrid horizontal={false} stroke="#e2e8f0" strokeDasharray="4 4" />
               <XAxis type="number" domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(value) => `${value}%`} allowDecimals={false} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis dataKey="label" type="category" width={220} interval={0} tick={<PositionTick />} axisLine={false} tickLine={false} />
+              <YAxis dataKey="label" type="category" width={compact ? 164 : 220} interval={0} tick={<PositionTick />} axisLine={false} tickLine={false} />
               <ReferenceLine x={50} stroke="#94a3b8" strokeDasharray="4 4" />
               <Tooltip formatter={(value) => formatPercentage(Number(value), language)} />
               <Bar dataKey="womenPercentage" name={womenLabel} fill="#d96c86" radius={[0, 6, 6, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="mt-6 grid gap-3 border-t border-slate-100 pt-5 sm:grid-cols-2" aria-label={chartLabel}>
+        <div className={`${compact ? "mt-4 pt-4" : "mt-6 pt-5"} grid gap-3 border-t border-slate-100 sm:grid-cols-2`} aria-label={chartLabel}>
           {data.map((item, index) => (
             <div key={item.label} className="min-w-0 rounded-xl border border-slate-100 bg-slate-50/70 p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">

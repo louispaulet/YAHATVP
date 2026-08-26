@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-08-27 — Redesign the homepage as a story-first civic snapshot
+
+### Changed
+
+- Rebuilt the dashboard homepage as a long-scroll editorial civic experience
+  with a clearer public-facing headline, declarant search, snapshot context,
+  compact At a glance metrics, story-led insights, supporting evidence, and
+  Explore next links.
+- Reused Tailwind-based insight, route, metric, panel, and declaration-table
+  components; removed the side-rail composition and wrapped navigation for
+  narrow mobile widths.
+- Added the real HATVP mark to the shared header and kept the existing routes,
+  data palette, DM Sans / Space Grotesk pairing, and English/French behavior.
+- Deferred the slower income, asset, declaration, and gender requests until
+  the user approaches the reading section, with loading shells and a fallback
+  for browsers without IntersectionObserver.
+
+### Verified
+
+- `make frontend-test` passed: 8 frontend test files and 33 tests; production
+  build passed with only the existing Vite bundle-size advisory.
+- Browser QA at 1440 × 1024, 1024 × 768, 390 × 844, and 320 × 844 confirmed
+  no horizontal overflow, no fresh console warnings/errors, working search
+  navigation, English/French switching, staged loading, and the accessible
+  women’s-share disclosure.
+- Production was not deployed; the verified local preview remains available
+  for review.
+
 ## 2026-08-25 — Explain job-position ordering below the chart title
 
 ### Changed
