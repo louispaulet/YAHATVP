@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-27 — Stack supporting evidence panels
+
+### Changed
+
+- Changed the supporting-evidence area from a two-column split into a single
+  full-width vertical flow, with “Assets, by section” first and the women’s
+  share disclosure directly below it.
+
+### Verified
+
+- Local Chrome inspection confirmed both desktop panels span 1,216px of the
+  1,216px content width, including the expanded women’s-share chart.
+- The 390px layout stacks both panels at 350px content width with no
+  horizontal overflow; frontend tests and the production build passed.
+
 ## 2026-08-27 — Align homepage insight cards
 
 ### Changed

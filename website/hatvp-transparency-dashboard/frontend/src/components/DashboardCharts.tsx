@@ -74,7 +74,7 @@ export function DashboardCharts({ income, assets, declarations, gender, overview
           <p className="max-w-lg text-sm leading-6 text-slate-500">{locale.homepage.evidence.description}</p>
         </div>
 
-        <div className="mt-7 grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="mt-7 grid gap-5">
           <Panel title={locale.panels.assets.title} eyebrow={locale.panels.assets.eyebrow} description={locale.homepage.evidence.assetsDescription}>
             {(!deferred || assets.loading) && <ChartSkeleton compact />}
             {assets.error && <SliceError onRetry={assets.reload} />}
