@@ -13,6 +13,24 @@
   the same 596px row height, with no horizontal overflow or console warnings.
 - The frontend suite and production build passed after the change.
 
+## 2026-08-27 — Republish aligned homepage cards
+
+### Deployed
+
+- Republished the frontend from commit `b36f2c7` to the `gh-pages` branch at
+  commit `14e2582`, with the existing production Worker URL configured.
+- The live homepage is available at
+  `https://yahatvp.thefrenchartist.dev/`.
+
+### Verified
+
+- GitHub Actions workflow run
+  [33020816201](https://github.com/louispaulet/YAHATVP/actions/runs/33020816201)
+  passed for the post-fix `main` commit.
+- Cache-busted live Chrome inspection confirmed equal 596px heights for all
+  three desktop cards, a no-overflow 390px layout, and no console warnings or
+  errors.
+
 ## 2026-08-27 — Redesign the homepage as a story-first civic snapshot
 
 ### Changed
