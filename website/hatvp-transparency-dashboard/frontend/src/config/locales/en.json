@@ -153,6 +153,11 @@
       "counts": "Counts are limited to the latest successful snapshot shared across the Gold tables.",
       "amounts": "Amounts preserve the normalized numeric values produced by the ingestion pipeline. They are presented as indicators, not as a substitute for the source declarations.",
       "lastGenerated": "Last generated"
+    },
+    "snapshotCoverage": {
+      "title": "One view, four tables",
+      "eyebrow": "Inside the snapshot",
+      "description": "These four counts stay tied to the same successful publication snapshot."
     }
   },
   "about": {

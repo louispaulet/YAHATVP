@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-08-27 — Balance homepage supporting evidence
+
+### Changed
+
+- Added a reusable “One view, four tables” coverage panel beneath the
+  homepage methodology note so the right side of the supporting-evidence row
+  carries useful snapshot context instead of ending in open space.
+- Let the methodology panel stretch to the declaration-type table height on
+  desktop while preserving a single-column flow on smaller screens.
+- Changed the declaration-type table to wrap long labels on mobile rather than
+  forcing an inner horizontal scrollbar.
+- Added English/French copy and homepage regression coverage for the new panel.
+
+### Verified
+
+- Chrome inspection at 1440 × 1024 confirmed the declaration table and the
+  stacked right column share the same 851px row height.
+- Chrome inspection at 390 × 844 confirmed the panels remain stacked, the body
+  width stays at 390px, and the declaration table has no horizontal overflow.
+- Frontend homepage tests passed (13 tests) and `npm run build` passed; the
+  existing Vite large-chunk advisory remains informational.
+
 ## 2026-08-27 — Stack supporting evidence panels
 
 ### Changed

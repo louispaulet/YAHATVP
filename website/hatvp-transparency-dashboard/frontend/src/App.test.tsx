@@ -54,10 +54,10 @@ describe("dashboard application", () => {
     expect(screen.getByRole("heading", { name: "People. Money. Public declarations." })).toBeInTheDocument();
     expect(screen.getByText("2026-08-18")).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Search a declarant" })).toBeInTheDocument();
-    expect(screen.getAllByText("2", { selector: "p" })).toHaveLength(2);
-    expect(screen.getByText("3", { selector: "p" })).toBeInTheDocument();
-    expect(screen.getByText("4", { selector: "p" })).toBeInTheDocument();
-    expect(screen.getByText("unique declarants")).toBeInTheDocument();
+    expect(screen.getAllByText("2", { selector: "p" })).toHaveLength(4);
+    expect(screen.getAllByText("3", { selector: "p" })).toHaveLength(2);
+    expect(screen.getAllByText("4", { selector: "p" })).toHaveLength(2);
+    expect(screen.getAllByText("unique declarants")).toHaveLength(2);
     expect(screen.getByText("Average annual income vs assets")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "See standout records" })).toHaveAttribute("href", "/explore");
     expect(await screen.findByText("Average annual income")).toBeInTheDocument();
@@ -71,6 +71,7 @@ describe("dashboard application", () => {
     expect(screen.getByText("Real estate")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Average annual income and asset totals/i })).toBeInTheDocument();
     expect(screen.getByText("Declaration types")).toBeInTheDocument();
+    expect(screen.getByText("One view, four tables")).toBeInTheDocument();
     expect(screen.getByText("Gender balance")).toBeInTheDocument();
     expect(screen.getByText("Women’s share by job position")).toBeInTheDocument();
     expect(screen.getByText("Bars are sorted from the most popular position to the least popular, showing the top 10 job positions.")).toBeInTheDocument();
@@ -92,6 +93,13 @@ describe("dashboard application", () => {
     fireEvent.change(input, { target: { value: "Alice" } });
     fireEvent.submit(input.closest("form")!);
     expect(await screen.findByDisplayValue("Alice")).toBeInTheDocument();
+  });
+
+  it("localizes the homepage supporting coverage panel", () => {
+    render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+    expect(screen.getByText("One view, four tables")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "French" }));
+    expect(screen.getByText("Une vue, quatre tables")).toBeInTheDocument();
   });
 
   it("renders the about page through the router", () => {
@@ -256,7 +264,7 @@ describe("dashboard application", () => {
     expect(screen.getByRole("heading", { name: "Personnes. Revenus. Déclarations publiques." })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Explorer" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Instantané" })).toBeInTheDocument();
-    expect(screen.getByText("déclarants uniques")).toBeInTheDocument();
+    expect(screen.getAllByText("déclarants uniques")).toHaveLength(2);
     expect(screen.getByText("Immobilier")).toBeInTheDocument();
     expect(screen.getByText("Revenu annuel moyen vs patrimoine")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Revenu annuel moyen et patrimoine total/i })).toBeInTheDocument();

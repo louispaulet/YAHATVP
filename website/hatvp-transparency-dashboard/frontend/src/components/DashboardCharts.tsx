@@ -9,6 +9,7 @@ import { DeclarationComposition } from "./DeclarationComposition";
 import { HomepageInsightCard } from "./HomepageInsightCard";
 import { HomepageRouteCard } from "./HomepageRouteCard";
 import { Panel } from "./Panel";
+import { SnapshotCoverage } from "./SnapshotCoverage";
 import { SnapshotMeaning } from "./SnapshotMeaning";
 
 const IncomeAssetsChart = lazy(() => import("./charts/IncomeAssetsChart"));
@@ -97,15 +98,20 @@ export function DashboardCharts({ income, assets, declarations, gender, overview
         </div>
       </section>
 
-      <section className="mt-16 grid items-start gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]" aria-label={locale.homepage.supportingEvidence}>
+      <section className="mt-16 grid items-stretch gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]" aria-label={locale.homepage.supportingEvidence}>
         <Panel title={locale.panels.declarationTypes.title} eyebrow={locale.panels.declarationTypes.eyebrow} description={locale.homepage.evidence.declarationsDescription}>
           {(!deferred || declarations.loading) && <ChartSkeleton compact table />}
           {declarations.error && <SliceError onRetry={declarations.reload} />}
           {declarations.data && <DeclarationTable data={declarations.data} language={language} />}
         </Panel>
-        <Panel title={locale.panels.snapshotMeaning.title} eyebrow={locale.panels.snapshotMeaning.eyebrow} description={locale.homepage.evidence.methodDescription}>
-          <SnapshotMeaning overview={overview} loading={!deferred && !overview} language={language} />
-        </Panel>
+        <div className="flex h-full flex-col gap-5">
+          <Panel className="lg:flex-1" title={locale.panels.snapshotMeaning.title} eyebrow={locale.panels.snapshotMeaning.eyebrow} description={locale.homepage.evidence.methodDescription}>
+            <SnapshotMeaning overview={overview} loading={!deferred && !overview} language={language} />
+          </Panel>
+          <Panel title={locale.panels.snapshotCoverage.title} eyebrow={locale.panels.snapshotCoverage.eyebrow} description={locale.panels.snapshotCoverage.description}>
+            <SnapshotCoverage overview={overview} loading={!overview} language={language} />
+          </Panel>
+        </div>
       </section>
 
       <section className="mt-16" aria-labelledby="explore-next-title">

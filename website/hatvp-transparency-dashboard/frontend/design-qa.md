@@ -31,6 +31,42 @@
 
 final result: passed
 
+## 2026-08-27 — Supporting evidence balance polish
+
+**Selected visual source**
+
+- Source visual truth: the user-provided Chrome capture of the homepage
+  supporting-evidence and methodology section, showing the declaration-type
+  table on the left and an under-filled methodology card on the right.
+- Intended refinement: preserve the two-column desktop reading path, fill the
+  right-side gap with useful snapshot context, and keep the section stacked on
+  mobile.
+
+**Implementation captures and comparison evidence**
+
+- Captured the local implementation in Chrome DevTools at 1440 × 1024 with
+  loaded English data. The declaration-type panel and the right column both
+  measured 851px high; the right column contains the methodology card followed
+  by the new “One view, four tables” panel.
+- Compared the same loaded state against the provided capture: the lower
+  section keeps its original content and hierarchy, while the added coverage
+  panel removes the empty right-side runout with source-backed counts.
+- Captured the same route at a 390 × 844 mobile viewport. The declaration table
+  wraps long labels, the right-side panels follow below it, and the document
+  scroll width remains equal to the viewport width.
+
+**Functional and responsive checks**
+
+- [x] The new coverage panel reuses the overview snapshot counts and existing
+  locale-aware number formatting.
+- [x] English/French copy is present and covered by the homepage test suite.
+- [x] Desktop panels align at the bottom; mobile panels remain a readable
+  single-column flow.
+- [x] Chrome console inspection reported no warning or error messages from the
+  implementation.
+
+final result: passed
+
 ## 2026-08-27 — Story-first civic homepage redesign
 
 **Selected visual source**

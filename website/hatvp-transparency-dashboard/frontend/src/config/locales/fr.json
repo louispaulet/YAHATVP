@@ -153,6 +153,11 @@
       "counts": "Les décomptes se limitent au dernier instantané réussi partagé par les tables Gold.",
       "amounts": "Les montants conservent les valeurs numériques normalisées par le pipeline d’ingestion. Ils constituent des indicateurs et ne remplacent pas les déclarations sources.",
       "lastGenerated": "Dernière génération"
+    },
+    "snapshotCoverage": {
+      "title": "Une vue, quatre tables",
+      "eyebrow": "Dans l’instantané",
+      "description": "Ces quatre décomptes restent rattachés au même instantané de publication réussi."
     }
   },
   "about": {
