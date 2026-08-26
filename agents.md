@@ -2,6 +2,16 @@
 
 Read this file before making changes in this repository.
 
+## Website design system
+
+Before changing anything under `website/hatvp-transparency-dashboard/frontend`,
+read the repository-level [design_style.md](design_style.md). It is the
+canonical visual and interaction guide for the dashboard: follow its tokens,
+typography, responsive rules, reusable component patterns, data-visualization
+conventions, loading behavior, accessibility requirements, and bilingual
+content rules. Update `design_style.md` when a website change introduces a
+new shared visual pattern or token.
+
 ## Required workflow
 
 After every change, always:

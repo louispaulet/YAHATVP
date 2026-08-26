@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-27 — Add canonical website design style guide
+
+### Changed
+
+- Added the repository-level `design_style.md` as the canonical reference for
+  the dashboard’s Tailwind-first visual language, reusable components,
+  responsive behavior, data-visualization conventions, progressive loading,
+  accessibility, and English/French content.
+- Updated `agents.md` so future frontend work reads and follows the guide, and
+  updates it when introducing a shared visual token or pattern.
+
+### Verified
+
+- The guide was checked against the current frontend theme tokens, shared
+  components, homepage layout, chart behavior, and responsive QA requirements.
+- Documentation diff validation passed with `git diff --check`.
+
 ## 2026-08-27 — Publish balanced homepage evidence layout
 
 ### Released
