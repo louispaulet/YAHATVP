@@ -6,6 +6,8 @@ from pathlib import Path
 import pytest
 from lxml import etree
 
+from hatvp.config import load_pipeline_config
+from hatvp.models import ParseContext
 from hatvp.parser import is_allowed_top_level
 from hatvp.parser.csv import (
     csv_config,
@@ -21,6 +23,7 @@ from hatvp.parser.dispatch import (
     component_table_names,
     output_table_count,
 )
+from hatvp.parser.mandates import mandate_rows
 from hatvp.xml_support import children, item_groups, normalized_child_text
 from tests.parser_support import FIXTURES
 
@@ -60,6 +63,20 @@ def test_xml_navigation_is_namespace_safe_and_grouped() -> None:
     assert child_values(item)["name"] == "A"
     assert item_groups(root) == [item]
     assert is_allowed_top_level("declaration")
+
+
+def test_namespaced_general_mandate_keeps_quality_only_rows() -> None:
+    element = etree.fromstring(
+        b'<declaration xmlns="urn:test"><uuid>fixture</uuid><general>'
+        b"<qualiteMandat><typeMandat>local</typeMandat></qualiteMandat>"
+        b"</general></declaration>"
+    )
+
+    rows = mandate_rows(
+        element, ParseContext(snapshot_date="2026-08-16"), load_pipeline_config().parser
+    )
+
+    assert rows[0]["mandate_type"] == "local"
 
 
 def test_csv_fixture_can_be_read_with_the_configured_delimiter(tmp_path: Path) -> None:
