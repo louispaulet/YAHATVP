@@ -52,3 +52,5 @@ evidence, and canonical website design and tone guides.
   through the production deployment workflow.
 - [x] Fixed CSV source-identity fallback when the first configured candidate is
   blank or a normalized missing marker.
+- [x] Fixed namespace-safe preservation of general mandate rows with quality
+  metadata but no mandate label.
