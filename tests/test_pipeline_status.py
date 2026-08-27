@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from hatvp import main as main_module
 from hatvp.main import run_pipeline
 from tests.pipeline_support import (
@@ -78,3 +80,20 @@ def test_force_reprocesses_an_unchanged_snapshot(tmp_path: Path) -> None:
         run_pipeline(settings(output), force=True, downloader=fixture_downloader)
         == "SUCCESS_WITH_WARNINGS"
     )
+
+
+@pytest.mark.parametrize("stage", ("ingest", "archive-ingest", "process"))
+def test_cli_forwards_dry_run_to_split_stages(tmp_path: Path, monkeypatch, stage: str) -> None:
+    captured: dict[str, object] = {}
+
+    def capture(*_: object, **kwargs: object) -> str:
+        captured["dry_run"] = kwargs.get("dry_run")
+        return "SUCCESS"
+
+    monkeypatch.setattr(main_module, "ingest_official", capture)
+    monkeypatch.setattr(main_module, "ingest_wayback_zip", capture)
+    monkeypatch.setattr(main_module, "process_pipeline", capture)
+    args = ["--stage", stage, "--dry-run", "--archive-zip", str(tmp_path / "archive.zip")]
+
+    assert main_module.cli(args) == 0
+    assert captured["dry_run"] is True

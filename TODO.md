@@ -48,6 +48,8 @@ evidence, and canonical website design and tone guides.
   snapshot-coverage panel and mobile-safe declaration table.
 - [x] Added canonical repository-level design and tone-of-voice guides for
   future dashboard work.
+- [x] Fixed split-stage `--dry-run` handling so ingest, archive-ingest, and
+  process do not require storage or mutate state.
 - [x] Verified recent frontend, Worker, bridge, ingestion, and browser releases
   through the production deployment workflow.
 - [x] Fixed CSV source-identity fallback when the first configured candidate is

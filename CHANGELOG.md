@@ -41,12 +41,15 @@ long-form validation evidence remains under `reports/`.
   coverage panel and mobile-safe declaration table.
 - Added canonical [`design_style.md`](design_style.md) and
   [`tone_of_voice.md`](tone_of_voice.md) guides for future dashboard work.
+- Fixed `--dry-run` propagation for the split ingest, archive-ingest, and
+  process CLI stages so they do not require storage or mutate state.
 
 ### Verified
 
 - Frontend tests, production builds, responsive browser QA, and homepage
   deployment checks passed; reviewed desktop and mobile layouts had no
   horizontal overflow or console warnings/errors.
+- Split-stage dry-run regression tests and Ruff checks passed.
 
 ## 2026-08-26 — Archive historical tracking documentation
 

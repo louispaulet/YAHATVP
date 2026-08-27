@@ -56,6 +56,7 @@ def process_pipeline(
     settings: Settings,
     *,
     snapshot: str | None = None,
+    dry_run: bool = False,
     parser: Callable[..., dict[str, list[dict[str, Any]]]] = parse_sources,
     quality_runner: Callable[..., QualityResult] = run_quality_checks,
     bq_loader: Callable[..., None] | None = None,
@@ -63,8 +64,9 @@ def process_pipeline(
 ) -> str:
     """Run processing against all latest raw source snapshots."""
 
-    settings.validate_storage()
-    store = store_factory(settings, dry_run=False)
+    if not dry_run:
+        settings.validate_storage()
+    store = store_factory(settings, dry_run=dry_run)
     return process_sources(
         settings,
         snapshot or snapshot_date(),
@@ -72,6 +74,7 @@ def process_pipeline(
         parser=parser,
         quality_runner=quality_runner,
         bq_loader=bq_loader,
+        dry_run=dry_run,
     )
 
 
