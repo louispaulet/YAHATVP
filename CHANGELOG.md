@@ -6,6 +6,19 @@ deployment, and pre-v1.0 history is preserved in
 [`documentation_archive/20260826T215722Z_CHANGELOG.md`](documentation_archive/20260826T215722Z_CHANGELOG.md);
 long-form validation evidence remains under `reports/`.
 
+## 2026-08-27 — Preserve fallback CSV source identities
+
+### Fixed
+
+- CSV parsing now skips blank and normalized missing identity candidates before
+  selecting the next configured fallback, preserving stable source linkage.
+
+### Verified
+
+- Added a regression test covering a blank `id_origine` with a valid
+  `url_dossier`; the focused parser tests, full Python suite, and Ruff checks
+  pass.
+
 ## 2026-08-27 — Publish the story-first homepage and website guides
 
 ### Changed
