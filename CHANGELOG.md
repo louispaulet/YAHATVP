@@ -1,10 +1,28 @@
 # Changelog
 
 This live changelog keeps concise release-level information from the recent
-development week, 2026-08-19 through 2026-08-25. Detailed implementation,
+development week, 2026-08-19 through 2026-08-27. Detailed implementation,
 deployment, and pre-v1.0 history is preserved in
 [`documentation_archive/20260826T215722Z_CHANGELOG.md`](documentation_archive/20260826T215722Z_CHANGELOG.md);
 long-form validation evidence remains under `reports/`.
+
+## 2026-08-27 — Publish the story-first homepage and website guides
+
+### Changed
+
+- Rebuilt the dashboard homepage as a story-first civic snapshot with staged
+  loading, responsive sections, bilingual copy, declarant search, snapshot
+  context, and supporting evidence.
+- Balanced and published the supporting-evidence layout with a snapshot-
+  coverage panel and mobile-safe declaration table.
+- Added canonical [`design_style.md`](design_style.md) and
+  [`tone_of_voice.md`](tone_of_voice.md) guides for future dashboard work.
+
+### Verified
+
+- Frontend tests, production builds, responsive browser QA, and homepage
+  deployment checks passed; reviewed desktop and mobile layouts had no
+  horizontal overflow or console warnings/errors.
 
 ## 2026-08-26 — Archive historical tracking documentation
 

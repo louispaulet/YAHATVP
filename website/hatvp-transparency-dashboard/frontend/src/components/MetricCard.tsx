@@ -1,5 +1,5 @@
-import { formatNumber } from "../formatters";
 import type { Language } from "../config/i18n";
+import { formatNumber } from "../formatters";
 
 interface MetricCardProps {
   label: string;
@@ -11,11 +11,11 @@ interface MetricCardProps {
 
 export function MetricCard({ label, value, detail, accent, language }: MetricCardProps) {
   return (
-    <article className="dashboard-card relative overflow-hidden p-6 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg">
-      <span className={`absolute inset-x-0 top-0 h-1 ${accent}`} />
-      <p className="text-sm font-semibold text-slate-500">{label}</p>
-      <p className="mt-4 text-4xl font-black tracking-[-0.04em] text-ink">{formatNumber(value, language)}</p>
-      <p className="mt-2 text-xs font-medium uppercase tracking-[0.14em] text-slate-400">{detail}</p>
-    </article>
+    <div className="min-w-0 border-l-2 border-white/25 pl-4 first:border-l-0 first:pl-0 sm:pl-5">
+      <span className={`mb-4 block size-2.5 rounded-full ${accent}`} aria-hidden="true" />
+      <p className="text-sm font-semibold text-slate-300">{label}</p>
+      <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-white sm:text-4xl">{formatNumber(value, language)}</p>
+      <p className="mt-1 text-xs font-medium uppercase tracking-[0.13em] text-slate-400">{detail}</p>
+    </div>
   );
 }

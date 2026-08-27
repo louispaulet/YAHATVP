@@ -32,20 +32,79 @@
     "label": "Loading dashboard data"
   },
   "hero": {
-    "eyebrow": "Public data, made clearer",
-    "title": "A clearer view of public declarations.",
-    "description": "Explore the latest Gold HATVP snapshot through a small set of transparent, source-linked aggregates.",
-    "snapshot": "Snapshot",
+    "eyebrow": "HATVP transparency dashboard",
+    "title": "People. Money. Public declarations.",
+    "description": "A story-first view of the latest HATVP open-data snapshot: who is represented, what is reported, and where to read the source.",
+    "searchLabel": "Search a declarant",
+    "searchPlaceholder": "Name, role, or institution",
+    "searchSubmit": "Search",
+    "snapshot": "Latest snapshot",
+    "snapshotDate": "Snapshot date",
+    "snapshotDetails": "Latest snapshot details",
+    "coverage": "Dataset coverage",
+    "coverageDetail": "rows across four tables",
+    "generated": "Generated",
+    "liveCoverage": "Live coverage",
     "notAvailable": "not available",
     "totalRows": "total rows",
     "primaryAction": "See standout records",
-    "secondaryAction": "Search the source"
+    "secondaryAction": "Sources and methods"
   },
   "metrics": {
+    "eyebrow": "The latest snapshot",
+    "title": "At a glance",
+    "description": "Four useful counts from the same successful snapshot, so the scale of the dataset stays in view.",
     "declarations": { "label": "Declarations", "detail": "latest snapshot" },
     "people": { "label": "People", "detail": "unique declarants" },
     "incomes": { "label": "Income rows", "detail": "declared values" },
     "assets": { "label": "Asset rows", "detail": "observed assets" }
+  },
+  "homepage": {
+    "reading": {
+      "eyebrow": "Reading the snapshot",
+      "title": "Three signals worth a closer look.",
+      "description": "These comparisons are deliberately simple: they help orient a curious reader before the source-linked evidence gets more detailed.",
+      "incomeEyebrow": "Money reported",
+      "incomeDescription": "Average annual income is shown beside the total value of observed assets. The bars make the scale visible without suggesting they measure the same thing.",
+      "representationEyebrow": "Representation",
+      "representationDescription": "The gender split is inferred from published civilité fields. Missing or unmapped civilité stays visible as a caveat rather than disappearing.",
+      "compositionEyebrow": "How filings change",
+      "compositionTitle": "How filings change",
+      "compositionDescription": "The snapshot combines original and amended filings. An amended filing is a new public version, not automatically an error."
+    },
+    "composition": {
+      "original": "original or non-amended filings",
+      "amended": "amended filings",
+      "explanation": "Amendments are kept in the dataset because they are part of the publication history. Read them as later versions of a public record, not as a verdict on the person or the filing.",
+      "more": "+{count} more types in the supporting table"
+    },
+    "evidence": {
+      "eyebrow": "Supporting evidence",
+      "title": "Stay with the detail when you want it.",
+      "description": "Compact charts keep the page readable while preserving the underlying category and position breakdowns.",
+      "assetsDescription": "Observed values grouped by the asset section published in the latest snapshot.",
+      "declarationsDescription": "The complete declaration-type breakdown is kept here as a reference table.",
+      "methodDescription": "A short guide to what is counted, how amounts are treated, and when this view was generated.",
+      "show": "Show chart",
+      "hide": "Hide chart",
+      "genderClosed": "Open this disclosure to inspect the top 10 positions and the women’s share within each one."
+    },
+    "supportingEvidence": "Supporting evidence and methodology",
+    "exploreNext": {
+      "eyebrow": "Explore next",
+      "title": "Choose your next question.",
+      "description": "Move from the headline view to records, searchable declarations, or the sources and methods behind the numbers.",
+      "highlightsEyebrow": "What stands out",
+      "highlightsTitle": "Follow the strongest signals.",
+      "highlightsDescription": "Browse current income changes, amendment history, and source-linked records.",
+      "searchEyebrow": "Declarations",
+      "searchTitle": "Find a person or filing.",
+      "searchDescription": "Search names, mandates, institutions, and public declaration metadata.",
+      "methodsEyebrow": "Data and methods",
+      "methodsTitle": "Go back to the source.",
+      "methodsDescription": "Read how the pipeline preserves, checks, and publishes this snapshot.",
+      "open": "Open section"
+    }
   },
   "panels": {
     "comparison": {
@@ -56,7 +115,7 @@
       "assets": "Assets",
       "incomeExplanation": "Average annual income: {average} ({total} divided by {years} reported years).",
       "assetsExplanation": "Total observed assets: {assets}.",
-      "note": "The pie shows each amount as a share of the combined comparison. It is an indicator, not a measure of annual spending or personal wealth."
+      "note": "The comparison bars show relative scale, not a shared unit of meaning. This is an indicator, not a measure of annual spending or personal wealth."
     },
     "assets": {
       "title": "Assets, by section",
@@ -94,6 +153,11 @@
       "counts": "Counts are limited to the latest successful snapshot shared across the Gold tables.",
       "amounts": "Amounts preserve the normalized numeric values produced by the ingestion pipeline. They are presented as indicators, not as a substitute for the source declarations.",
       "lastGenerated": "Last generated"
+    },
+    "snapshotCoverage": {
+      "title": "One view, four tables",
+      "eyebrow": "Inside the snapshot",
+      "description": "These four counts stay tied to the same successful publication snapshot."
     }
   },
   "about": {
@@ -454,7 +518,9 @@
     "genderRatioLegend": "Male-to-female ratio legend",
     "genderPositionsChart": "Share of women by job position, sorted by total people",
     "genderPositionsLegend": "Gender-position chart legend",
-    "rows": "rows"
+    "rows": "rows",
+    "declarationComposition": "Declaration composition",
+    "declarationLegend": "Declaration composition legend"
   },
   "labels": {
     "assetSections": {

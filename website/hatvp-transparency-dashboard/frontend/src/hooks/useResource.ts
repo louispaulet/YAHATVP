@@ -7,15 +7,21 @@ export interface ResourceState<T> {
   reload: () => void;
 }
 
-export function useResource<T>(loader: (signal: AbortSignal) => Promise<T>): ResourceState<T> {
+export function useResource<T>(loader: (signal: AbortSignal) => Promise<T>, options: { enabled?: boolean } = {}): ResourceState<T> {
+  const enabled = options.enabled ?? true;
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState<Omit<ResourceState<T>, "reload">>({
     data: null,
     error: false,
-    loading: true,
+    loading: enabled,
   });
 
   useEffect(() => {
+    if (!enabled) {
+      setState((current) => ({ ...current, loading: false }));
+      return;
+    }
+
     const controller = new AbortController();
     setState((current) => ({ ...current, loading: true, error: false }));
     loader(controller.signal)
@@ -25,7 +31,7 @@ export function useResource<T>(loader: (signal: AbortSignal) => Promise<T>): Res
         setState((current) => ({ ...current, error: true, loading: false }));
       });
     return () => controller.abort();
-  }, [attempt, loader]);
+  }, [attempt, enabled, loader]);
 
   return { ...state, reload: () => setAttempt((value) => value + 1) };
 }

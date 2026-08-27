@@ -32,20 +32,79 @@
     "label": "Chargement des données du tableau de bord"
   },
   "hero": {
-    "eyebrow": "Les données publiques, plus lisibles",
-    "title": "Une vue plus claire des déclarations publiques.",
-    "description": "Explorez le dernier instantané HATVP sélectionné à travers quelques agrégats transparents et reliés à leurs sources.",
-    "snapshot": "Instantané",
+    "eyebrow": "Tableau de transparence HATVP",
+    "title": "Personnes. Revenus. Déclarations publiques.",
+    "description": "Une lecture narrative du dernier instantané de données ouvertes HATVP : qui est représenté, ce qui est déclaré et comment remonter à la source.",
+    "searchLabel": "Rechercher un déclarant",
+    "searchPlaceholder": "Nom, fonction ou institution",
+    "searchSubmit": "Rechercher",
+    "snapshot": "Dernier instantané",
+    "snapshotDate": "Date de l’instantané",
+    "snapshotDetails": "Détails du dernier instantané",
+    "coverage": "Couverture du jeu de données",
+    "coverageDetail": "lignes dans quatre tables",
+    "generated": "Généré",
+    "liveCoverage": "Données suivies",
     "notAvailable": "indisponible",
     "totalRows": "lignes au total",
     "primaryAction": "Voir les faits marquants",
-    "secondaryAction": "Rechercher dans la source"
+    "secondaryAction": "Sources et méthodes"
   },
   "metrics": {
+    "eyebrow": "Le dernier instantané",
+    "title": "En un coup d’œil",
+    "description": "Quatre décomptes utiles issus du même instantané réussi, pour garder l’échelle du jeu de données en tête.",
     "declarations": { "label": "Déclarations", "detail": "dernier instantané" },
     "people": { "label": "Personnes", "detail": "déclarants uniques" },
     "incomes": { "label": "Lignes de revenus", "detail": "valeurs déclarées" },
     "assets": { "label": "Lignes de patrimoine", "detail": "biens observés" }
+  },
+  "homepage": {
+    "reading": {
+      "eyebrow": "Lire l’instantané",
+      "title": "Trois signaux à regarder de plus près.",
+      "description": "Ces comparaisons restent volontairement simples : elles orientent une lecture curieuse avant d’entrer dans les éléments reliés aux sources.",
+      "incomeEyebrow": "Revenus déclarés",
+      "incomeDescription": "Le revenu annuel moyen est placé à côté de la valeur totale du patrimoine observé. Les barres rendent l’échelle visible sans suggérer qu’il s’agit de la même mesure.",
+      "representationEyebrow": "Représentation",
+      "representationDescription": "La répartition femmes-hommes est déduite des champs de civilité publiés. Les civilités manquantes ou non reconnues restent visibles comme réserve.",
+      "compositionEyebrow": "Évolution des dépôts",
+      "compositionTitle": "Comment les dépôts évoluent",
+      "compositionDescription": "L’instantané combine des dépôts initiaux et modificatifs. Un modificatif est une nouvelle version publique, pas automatiquement une erreur."
+    },
+    "composition": {
+      "original": "dépôts initiaux ou non modificatifs",
+      "amended": "dépôts modificatifs",
+      "explanation": "Les modificatifs sont conservés car ils font partie de l’historique de publication. Lisez-les comme des versions ultérieures d’un document public, pas comme un jugement sur la personne ou le dépôt.",
+      "more": "+{count} autres types dans le tableau de référence"
+    },
+    "evidence": {
+      "eyebrow": "Éléments de preuve",
+      "title": "Entrer dans le détail, si vous le souhaitez.",
+      "description": "Des graphiques compacts gardent la page lisible tout en préservant les répartitions par catégorie et par fonction.",
+      "assetsDescription": "Valeurs observées regroupées selon la catégorie publiée dans le dernier instantané.",
+      "declarationsDescription": "La répartition complète par type de déclaration reste disponible dans ce tableau de référence.",
+      "methodDescription": "Un guide court sur les décomptes, le traitement des montants et la génération de cette vue.",
+      "show": "Afficher le graphique",
+      "hide": "Masquer le graphique",
+      "genderClosed": "Ouvrez cette section pour examiner les 10 fonctions principales et la part des femmes dans chacune."
+    },
+    "supportingEvidence": "Éléments de preuve et méthode",
+    "exploreNext": {
+      "eyebrow": "Explorer ensuite",
+      "title": "Choisissez votre prochaine question.",
+      "description": "Passez de la vue d’ensemble aux dossiers, aux déclarations recherchables ou aux sources et méthodes derrière les chiffres.",
+      "highlightsEyebrow": "Ce qui ressort",
+      "highlightsTitle": "Suivre les signaux les plus forts.",
+      "highlightsDescription": "Parcourez les variations de revenus, l’historique des modificatifs et les dossiers reliés à leur source.",
+      "searchEyebrow": "Déclarations",
+      "searchTitle": "Trouver une personne ou un dépôt.",
+      "searchDescription": "Recherchez des noms, mandats, institutions et métadonnées publiques.",
+      "methodsEyebrow": "Données et méthodes",
+      "methodsTitle": "Remonter à la source.",
+      "methodsDescription": "Comprenez comment le pipeline conserve, contrôle et publie cet instantané.",
+      "open": "Ouvrir la section"
+    }
   },
   "panels": {
     "comparison": {
@@ -56,7 +115,7 @@
       "assets": "Patrimoine",
       "incomeExplanation": "Revenu annuel moyen : {average} ({total} ÷ {years} années déclarées).",
       "assetsExplanation": "Patrimoine total observé : {assets}.",
-      "note": "Le graphique montre chaque montant comme une part de la comparaison combinée. C’est un indicateur, pas une mesure des dépenses annuelles ou du patrimoine personnel."
+      "note": "Les barres montrent une échelle relative, pas une unité de sens commune. C’est un indicateur, pas une mesure des dépenses annuelles ou du patrimoine personnel."
     },
     "assets": {
       "title": "Patrimoine, par catégorie",
@@ -94,6 +153,11 @@
       "counts": "Les décomptes se limitent au dernier instantané réussi partagé par les tables Gold.",
       "amounts": "Les montants conservent les valeurs numériques normalisées par le pipeline d’ingestion. Ils constituent des indicateurs et ne remplacent pas les déclarations sources.",
       "lastGenerated": "Dernière génération"
+    },
+    "snapshotCoverage": {
+      "title": "Une vue, quatre tables",
+      "eyebrow": "Dans l’instantané",
+      "description": "Ces quatre décomptes restent rattachés au même instantané de publication réussi."
     }
   },
   "about": {
@@ -454,7 +518,9 @@
     "genderRatioLegend": "Légende du ratio femmes-hommes",
     "genderPositionsChart": "Part des femmes par fonction, classée par nombre total de personnes",
     "genderPositionsLegend": "Légende du graphique des fonctions et du genre",
-    "rows": "lignes"
+    "rows": "lignes",
+    "declarationComposition": "Composition des déclarations",
+    "declarationLegend": "Légende de la composition des déclarations"
   },
   "labels": {
     "assetSections": {

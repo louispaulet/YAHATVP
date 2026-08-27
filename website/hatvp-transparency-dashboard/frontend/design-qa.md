@@ -27,6 +27,66 @@
 
 **Follow-up Polish**
 
-- [P3] The global navigation still uses the original dashboard mark and compact header treatment, intentionally outside this page-only redesign.
+- [P3] The prior global-navigation mark note was addressed by the shared-header polish documented in the homepage redesign section below.
+
+final result: passed
+
+## 2026-08-27 — Supporting evidence balance polish
+
+**Selected visual source**
+
+- Source visual truth: the user-provided Chrome capture of the homepage
+  supporting-evidence and methodology section, showing the declaration-type
+  table on the left and an under-filled methodology card on the right.
+- Intended refinement: preserve the two-column desktop reading path, fill the
+  right-side gap with useful snapshot context, and keep the section stacked on
+  mobile.
+
+**Implementation captures and comparison evidence**
+
+- Captured the local implementation in Chrome DevTools at 1440 × 1024 with
+  loaded English data. The declaration-type panel and the right column both
+  measured 851px high; the right column contains the methodology card followed
+  by the new “One view, four tables” panel.
+- Compared the same loaded state against the provided capture: the lower
+  section keeps its original content and hierarchy, while the added coverage
+  panel removes the empty right-side runout with source-backed counts.
+- Captured the same route at a 390 × 844 mobile viewport. The declaration table
+  wraps long labels, the right-side panels follow below it, and the document
+  scroll width remains equal to the viewport width.
+
+**Functional and responsive checks**
+
+- [x] The new coverage panel reuses the overview snapshot counts and existing
+  locale-aware number formatting.
+- [x] English/French copy is present and covered by the homepage test suite.
+- [x] Desktop panels align at the bottom; mobile panels remain a readable
+  single-column flow.
+- [x] Chrome console inspection reported no warning or error messages from the
+  implementation.
+
+final result: passed
+
+## 2026-08-27 — Story-first civic homepage redesign
+
+**Selected visual source**
+
+- Source visual truth: `/Users/louispaulet/.codex/generated_images/01a0400b-e4a6-77c2-bc34-ed4dc50d4c54/exec-ad82a515-c3a0-4580-ac22-62f885d4fa9a.png`.
+- The implementation follows the selected long-scroll, no-side-rail direction: editorial hero, dark snapshot band, story-led reading section, compact supporting evidence, and Explore next links.
+
+**Implementation captures and comparison evidence**
+
+- Captured the local implementation in the browser at 1440 × 1024, 1024 × 768, 390 × 844, and 320 × 844 CSS pixels.
+- Desktop comparison confirmed the full-width hero, HATVP mark, snapshot summary, At a glance band, and compact evidence rhythm against the selected visual source.
+- Mobile comparison confirmed a single-column flow with wrapped primary and section navigation, no lateral rail, no clipped search control, and no horizontal overflow.
+
+**Functional and responsive checks**
+
+- [x] Snapshot values render from the live overview slice: 2026-08-24, 17,899 declarations, 7,318 people, 227,943 income rows, and 4,784 asset rows.
+- [x] Homepage search navigates to `#/search?q=Lecornu` and the primary Explore, Search, and Sources & methods links resolve to their existing routes.
+- [x] English/French switching updates the homepage title and supporting copy without warnings or errors.
+- [x] Overview content renders first; income, assets, declaration, and gender slices remain in loading shells until the deferred sentinel is approached, then resolve before the reading section is reached.
+- [x] The women’s-share chart stays collapsed by default and renders after the disclosure is opened with an accessible chart description.
+- [x] Browser checks reported body width equal to viewport width at all four sizes and no console warnings or errors on fresh page loads.
 
 final result: passed

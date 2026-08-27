@@ -9,8 +9,8 @@ validation, architecture, and dashboard checklists are preserved in
 The ingestion pipeline, Google Cloud deployment, Bronze → Silver → Gold and
 anomaly-registry layers, source archives, and v1.5 transparency dashboard are
 implemented, deployed, and covered by local and production verification. The
-latest tracked dashboard work is the bilingual women’s-share chart and its
-top-10 ordering explanation.
+latest dashboard work is the story-first homepage, balanced supporting
+evidence, and canonical website design and tone guides.
 
 ## Open work
 
@@ -32,7 +32,7 @@ top-10 ordering explanation.
 - Keep historical raw snapshots immutable and periodically review retention
   settings without deleting required audit history.
 
-## Recent completed work (2026-08-19 through 2026-08-25)
+## Recent completed work (2026-08-19 through 2026-08-27)
 
 - [x] Released v1.0 through v1.5 dashboard functionality, including analysis,
   declarant search, Highlights, pipeline health, and grouped navigation.
@@ -42,5 +42,11 @@ top-10 ordering explanation.
   income and asset statistics while retaining audit evidence.
 - [x] Added the top-10 gender-by-position chart showing women’s percentage,
   responsive legend behavior, and explicit popularity ordering.
+- [x] Redesigned the homepage as a story-first civic snapshot with staged
+  loading, bilingual copy, reusable sections, and responsive browser QA.
+- [x] Balanced and published the homepage supporting-evidence layout with a
+  snapshot-coverage panel and mobile-safe declaration table.
+- [x] Added canonical repository-level design and tone-of-voice guides for
+  future dashboard work.
 - [x] Verified recent frontend, Worker, bridge, ingestion, and browser releases
   through the production deployment workflow.
