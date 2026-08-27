@@ -50,3 +50,5 @@ evidence, and canonical website design and tone guides.
   future dashboard work.
 - [x] Verified recent frontend, Worker, bridge, ingestion, and browser releases
   through the production deployment workflow.
+- [x] Fixed namespace-safe preservation of general mandate rows with quality
+  metadata but no mandate label.

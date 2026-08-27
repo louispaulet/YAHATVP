@@ -6,6 +6,18 @@ deployment, and pre-v1.0 history is preserved in
 [`documentation_archive/20260826T215722Z_CHANGELOG.md`](documentation_archive/20260826T215722Z_CHANGELOG.md);
 long-form validation evidence remains under `reports/`.
 
+## 2026-08-27 — Preserve namespaced general mandate rows
+
+### Fixed
+
+- Made the general-mandate presence check namespace-safe so quality-only rows
+  are retained when parsing namespaced HATVP XML.
+
+### Verified
+
+- Added a namespaced parser regression test; the full Python suite and Ruff
+  checks pass.
+
 ## 2026-08-27 — Publish the story-first homepage and website guides
 
 ### Changed
