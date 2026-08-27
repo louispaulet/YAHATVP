@@ -1,10 +1,30 @@
 # Changelog
 
 This live changelog keeps concise release-level information from the recent
-development week, 2026-08-19 through 2026-08-27. Detailed implementation,
+development week, 2026-08-19 through 2026-08-28. Detailed implementation,
 deployment, and pre-v1.0 history is preserved in
 [`documentation_archive/20260826T215722Z_CHANGELOG.md`](documentation_archive/20260826T215722Z_CHANGELOG.md);
 long-form validation evidence remains under `reports/`.
+
+## 2026-08-28 — Merge parser/pipeline fixes and replay production data
+
+### Changed
+
+- Merged open PRs #42–#45 into `main`, resolving the overlapping parser and
+  tracking-document conflicts while preserving the CSV, XML, and dry-run fixes.
+- Deployed Cloud Run Job image `215c48a` and forced a production replay. The
+  replay needed a temporary 8 CPU / 32 GiB profile after 4 GiB and 16 GiB
+  attempts were terminated by the platform; the scheduled job was restored to
+  1 CPU / 4 GiB after success.
+
+### Verified
+
+- Main workflow run `33121159432` passed tests, Ruff, build, and Cloud Run job
+  deployment; local verification passed 170 tests, Ruff, formatting, and build.
+- Execution `hatvp-ingestion-hrrp5` completed successfully in 8m41s with
+  `SUCCESS_WITH_WARNINGS`, zero quality errors, 41,201 warnings, and 58,502
+  flagged records. All 13 BigQuery tables and the 2026-08-28 Parquet/report
+  artifacts loaded, and `state/latest.json` advanced to commit `215c48a`.
 
 ## 2026-08-27 — Preserve namespaced general mandate rows
 
