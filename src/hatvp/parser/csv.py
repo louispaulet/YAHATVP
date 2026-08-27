@@ -38,7 +38,12 @@ def _row(
     row: dict[str, str | None], context: ParseContext, index: int, identity_columns: tuple[str, ...]
 ) -> dict[str, Any]:
     source_id = next(
-        (normalize_text(row.get(name)) for name in identity_columns if row.get(name)), None
+        (
+            value
+            for name in identity_columns
+            if (value := normalize_text(row.get(name))) is not None
+        ),
+        None,
     )
     values = {key: normalize_text(value) for key, value in row.items() if key is not None}
     values.update({"snapshot_date": context.snapshot_date, "raw_record_json": raw_record(row)})
