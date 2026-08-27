@@ -25,8 +25,7 @@ logger = logging.getLogger("hatvp")
 __all__ = ["CURATED_TABLES", "DownloadedFile", "PARQUET_SCHEMAS", "PipelineFailure", "Settings", "TABLE_COLUMNS", "build_parser", "cli", "run_pipeline"]  # fmt: skip  # noqa: E501
 
 
-def _snapshot_date() -> str:
-    return snapshot_date()
+_snapshot_date = snapshot_date
 
 
 def _store(settings: Settings, *, dry_run: bool = False) -> ArtifactStore:
@@ -71,20 +70,23 @@ def cli(argv: list[str] | None = None) -> int:
                 settings,
                 args.archive_zip,
                 args.snapshot_date or _snapshot_date(),
-                _store(settings),
+                _store(settings, dry_run=args.dry_run),
+                dry_run=args.dry_run,
                 force=args.force,
                 source_id=args.archive_source,
             )
         elif args.stage == "ingest":
-            settings.validate_storage()
+            if not args.dry_run:
+                settings.validate_storage()
             status = ingest_official(
                 settings,
                 _snapshot_date(),
-                _store(settings),
+                _store(settings, dry_run=args.dry_run),
+                dry_run=args.dry_run,
                 force=args.force,
             )
         elif args.stage == "process":
-            status = process_pipeline(settings, snapshot=args.snapshot_date)
+            status = process_pipeline(settings, snapshot=args.snapshot_date, dry_run=args.dry_run)
         else:
             status = run_pipeline(settings, dry_run=args.dry_run, force=args.force)
     except Exception:
