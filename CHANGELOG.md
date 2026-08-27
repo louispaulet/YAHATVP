@@ -26,6 +26,27 @@ long-form validation evidence remains under `reports/`.
   flagged records. All 13 BigQuery tables and the 2026-08-28 Parquet/report
   artifacts loaded, and `state/latest.json` advanced to commit `215c48a`.
 
+## 2026-08-28 — Configure project billing export and cost reporting
+
+### Changed
+
+- Created the EU `billing_export` BigQuery dataset in `yahatvp-pipeline-eu` and
+  enabled detailed Cloud Billing usage-cost export for billing account
+  `01B02E-7B96C5-47715B`.
+- Enabled BigQuery Data Transfer support and pre-provisioned the documented
+  pricing-export service account access. Pricing export could not be saved
+  because the Cloud Billing console returned a Google server error (request
+  ID `10702517473792787587`).
+
+### Verified
+
+- The filtered Cloud Billing report for `yahatvp-pipeline-eu` shows €0.24 of
+  Cloud Run usage for 1–27 August 2026, offset by €0.24 of discounts, for
+  €0.00 net; the project total is €0.48 including Artifact Registry and
+  Cloud Storage.
+- The detailed export dataset is in `EU`; its tables are not populated yet,
+  consistent with the normal export propagation delay.
+
 ## 2026-08-27 — Preserve namespaced general mandate rows
 
 ### Fixed

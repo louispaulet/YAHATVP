@@ -21,6 +21,9 @@ evidence, and canonical website design and tone guides.
 - [ ] Add a small operational dashboard from Cloud Logging and quality reports.
 - [ ] Add partition-aware BigQuery retention and cost controls.
 - [ ] Add data catalog/documentation for the normalized tables.
+- [ ] Retry Cloud Billing pricing export after the Google-side save error is
+  resolved, then verify `cloud_pricing_export` and resource-level net-EUR
+  reporting from the detailed export.
 
 ## Recurring operations
 
@@ -59,3 +62,6 @@ evidence, and canonical website design and tone guides.
 - [x] Merged open PRs #42–#45, resolved parser/test conflicts, deployed commit
   `215c48a`, forced a successful production replay, and restored the normal
   Cloud Run resource profile.
+- [x] Created the EU billing export dataset, enabled detailed usage-cost
+  export, and verified the current project’s Cloud Billing report; pricing
+  export remains pending the documented Google-side save error.
