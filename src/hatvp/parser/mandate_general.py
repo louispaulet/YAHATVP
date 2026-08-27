@@ -7,7 +7,7 @@ from typing import Any
 from lxml import etree
 
 from ..models import ParseContext
-from ..xml_support import date_fields, normalized_child_text, raw_child_text
+from ..xml_support import child, date_fields, normalized_child_text, raw_child_text
 
 
 def general_mandate_row(
@@ -49,7 +49,7 @@ def has_general_values(general: etree._Element | None, label: str | None) -> boo
 
     if general is None:
         return False
-    quality = general.find("qualiteMandat")
+    quality = child(general, "qualiteMandat")
     return bool(label or quality is not None)
 
 
