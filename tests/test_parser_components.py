@@ -12,6 +12,7 @@ from hatvp.parser.csv import (
     csv_delimiter,
     csv_has_header,
     csv_row_count,
+    parse_csv,
     validate_identity_columns,
 )
 from hatvp.parser.declaration_support import child_values, local_name
@@ -70,3 +71,18 @@ def test_csv_fixture_can_be_read_with_the_configured_delimiter(tmp_path: Path) -
         rows = list(csv.DictReader(source, delimiter=csv_delimiter()))
 
     assert rows == [{"identifiant": "A", "nom": "Dupont"}]
+
+
+@pytest.mark.parametrize("primary_value", [" ", "Néant"])
+def test_csv_identity_falls_back_after_an_empty_primary_candidate(
+    tmp_path: Path, primary_value: str
+) -> None:
+    path = tmp_path / "listing.csv"
+    path.write_text(
+        f"id_origine;url_dossier\n{primary_value};https://example.test/declaration\n",
+        encoding="utf-8",
+    )
+
+    rows = parse_csv(path, "2026-08-16")
+
+    assert rows[0]["source_record_id"] == "https://example.test/declaration"
