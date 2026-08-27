@@ -6,6 +6,23 @@ deployment, and pre-v1.0 history is preserved in
 [`documentation_archive/20260826T215722Z_CHANGELOG.md`](documentation_archive/20260826T215722Z_CHANGELOG.md);
 long-form validation evidence remains under `reports/`.
 
+## 2026-08-28 — Enable Cloud Billing pricing export
+
+### Changed
+
+- Retried the Cloud Billing pricing-export save for billing account
+  `01B02E-7B96C5-47715B` and enabled it for the EU `billing_export` dataset in
+  `yahatvp-pipeline-eu`.
+
+### Verified
+
+- The `Pricing BigQuery Transfer` configuration exists in `europe` with the
+  expected billing account parameter and destination dataset; its initial run
+  is `RUNNING`.
+- `cloud_pricing_export` is not populated yet. Google documents that initial
+  pricing export propagation can take up to 48 hours, so table and net-EUR
+  reporting verification remain pending.
+
 ## 2026-08-28 — Merge parser/pipeline fixes and replay production data
 
 ### Changed
