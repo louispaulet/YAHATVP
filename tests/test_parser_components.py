@@ -69,14 +69,11 @@ def test_xml_navigation_is_namespace_safe_and_grouped() -> None:
 def test_namespaced_general_mandate_keeps_quality_only_rows() -> None:
     element = etree.fromstring(
         b'<declaration xmlns="urn:test"><uuid>fixture</uuid><general>'
-        b"<qualiteMandat><typeMandat>local</typeMandat></qualiteMandat>"
-        b"</general></declaration>"
+        b"<qualiteMandat><typeMandat>local</typeMandat></qualiteMandat></general>"
+        b"</declaration>"
     )
 
-    rows = mandate_rows(
-        element, ParseContext(snapshot_date="2026-08-16"), load_pipeline_config().parser
-    )
-
+    rows = mandate_rows(element, ParseContext("2026-08-16"), load_pipeline_config().parser)
     assert rows[0]["mandate_type"] == "local"
 
 
@@ -91,9 +88,7 @@ def test_csv_fixture_can_be_read_with_the_configured_delimiter(tmp_path: Path) -
 
 
 @pytest.mark.parametrize("primary_value", [" ", "Néant"])
-def test_csv_identity_falls_back_after_an_empty_primary_candidate(
-    tmp_path: Path, primary_value: str
-) -> None:
+def test_csv_identity_fallback(tmp_path: Path, primary_value: str) -> None:
     path = tmp_path / "listing.csv"
     path.write_text(
         f"id_origine;url_dossier\n{primary_value};https://example.test/declaration\n",
