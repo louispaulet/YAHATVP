@@ -53,19 +53,26 @@ change is complete.
 - Check `git status --short --branch` and preserve unrelated user changes.
 - Read `agents.md`, `TODO.md`, and `CHANGELOG.md` before starting work. If
   `CHANGELOG.md` is missing, create it as part of the repository documentation
-  update.
+  update. The live TODO and changelog are intentionally concise; consult the
+  timestamped files under `documentation_archive/` for superseded history.
 - Read the relevant source, tests, and documentation before modifying them.
 - Prefer `rg` for repository searches.
 - Avoid destructive commands and broad rewrites.
 
 ## Project tracking
 
-- Treat `TODO.md` as the current execution plan. Reconcile its checkboxes and
-  remaining work with the actual result of every repository, infrastructure,
-  CI/CD, or operational change.
-- Append a dated entry to `CHANGELOG.md` for completed user-visible,
-  infrastructure, CI/CD, and operational changes. Include the important
-  verification evidence and leave unresolved follow-up work in `TODO.md`.
+- Treat `TODO.md` as the current execution plan. Keep only active follow-ups,
+  recurring operational reminders, and a short recent-completion context;
+  reconcile its checkboxes and remaining work with the actual result of every
+  repository, infrastructure, CI/CD, or operational change.
+- Append a concise dated entry to `CHANGELOG.md` for completed user-visible,
+  infrastructure, CI/CD, and operational changes. Include important
+  verification evidence, keep recent release information easy to scan, and
+  leave unresolved follow-up work in `TODO.md`.
+- When either live document becomes historical or unwieldy, move the previous
+  file into `documentation_archive/` with a UTC timestamp prefix before
+  replacing it with a shorter version. Keep detailed deployment evidence in
+  `reports/` rather than expanding the live changelog.
 - Do not mark work complete based only on configuration; record a successful
   test, deployment, or smoke-test result when one is required.
 
