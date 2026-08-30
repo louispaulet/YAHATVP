@@ -74,8 +74,8 @@ def test_latest_gold_metrics_exclude_anomalous_values_but_keep_rows() -> None:
     silver, all_silver, registry = build_silver(current, {}, snapshot_date="2026-01-01")
     gold, registry = build_gold(all_silver, registry)
     gold = apply_registry_states(gold, registry)
-    eligible = gold_metric_rows({"incomes": gold["incomes"]})
-    assert gold["incomes"]
+    eligible = gold_metric_rows({"incomes": gold["incomes"], "assets": gold["assets"]})
+    assert gold["incomes"] and any(row["normalized_value"] == 10_000 for row in eligible)
     assert all(row["normalized_value"] != 500_000 for row in eligible)
     assert any(row["normalized_value"] == 500_000 for row in gold["incomes"])
 
