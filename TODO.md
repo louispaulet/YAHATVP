@@ -59,6 +59,8 @@ evidence, and canonical website design and tone guides.
   blank or a normalized missing marker.
 - [x] Fixed namespace-safe preservation of general mandate rows with quality
   metadata but no mandate label.
+- [x] Fixed download validation for valid UTF-8 XML responses with a leading
+  byte-order mark.
 - [x] Merged open PRs #42–#45, resolved parser/test conflicts, deployed commit
   `215c48a`, forced a successful production replay, and restored the normal
   Cloud Run resource profile.

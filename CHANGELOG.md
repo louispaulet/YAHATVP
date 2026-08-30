@@ -6,6 +6,17 @@ deployment, and pre-v1.0 history is preserved in
 [`documentation_archive/20260826T215722Z_CHANGELOG.md`](documentation_archive/20260826T215722Z_CHANGELOG.md);
 long-form validation evidence remains under `reports/`.
 
+## 2026-08-30 — Accept BOM-prefixed XML downloads
+
+### Fixed
+
+- The download validator now accepts valid UTF-8 XML responses with a leading
+  byte-order mark instead of rejecting them before parsing.
+
+### Verified
+
+- Added a BOM regression test; the focused parser/download checks pass.
+
 ## 2026-08-28 — Enable Cloud Billing pricing export
 
 ### Changed

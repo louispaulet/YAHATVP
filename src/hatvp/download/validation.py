@@ -9,7 +9,7 @@ def validate_dataset_prefix(path: Path, name: str) -> None:
     """Reject empty or clearly unrelated responses without parsing the dataset."""
 
     with path.open("rb") as source:
-        prefix = source.read(4096).lstrip().lower()
+        prefix = source.read(4096).removeprefix(b"\xef\xbb\xbf").lstrip().lower()
     if not prefix:
         raise ValueError(f"Downloaded {name} is empty")
     if name.endswith(".xml") and not (
