@@ -6,6 +6,19 @@ deployment, and pre-v1.0 history is preserved in
 [`documentation_archive/20260826T215722Z_CHANGELOG.md`](documentation_archive/20260826T215722Z_CHANGELOG.md);
 long-form validation evidence remains under `reports/`.
 
+## 2026-08-30 — Preserve mixed historical layer backfill
+
+### Fixed
+
+- Historical processing now loads both retained Bronze partitions and legacy
+  Silver-only partitions, so newer Bronze data no longer hides older history
+  used for anomaly comparisons and Gold selection.
+
+### Verified
+
+- Added a mixed Bronze/Silver fixture regression test; the full suite passes
+  with 173 tests, Ruff, and formatting checks.
+
 ## 2026-08-30 — Accept BOM-prefixed XML downloads
 
 ### Fixed
