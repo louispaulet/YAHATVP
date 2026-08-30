@@ -45,6 +45,7 @@ def test_birth_age_threshold_can_be_overridden_for_detection() -> None:
         item["rule_id"] == "PERSON_DOB_IMPLAUSIBLE"
         for item in detect_anomalies(rows, {}, dob_max_age_years=110)
     )
+    assert build_silver(rows, {}, snapshot_date="2026-01-01", dob_max_age_years=110)[0]["people"][0]["anomaly_status"] == "clean"  # fmt: skip  # noqa: E501
 
 
 def test_implausible_birth_uses_reference_date_and_max_age() -> None:

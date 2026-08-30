@@ -35,6 +35,7 @@ def build_silver(
     history: dict[str, list[dict[str, Any]]] | None = None,
     registry: list[dict[str, Any]] | None = None,
     snapshot_date: str | None = None,
+    dob_max_age_years: int | None = None,
 ) -> tuple[dict[str, list[dict[str, Any]]], dict[str, list[dict[str, Any]]], list[dict[str, Any]]]:
     """Return current Silver, full historical Silver context, and registry rows."""
 
@@ -44,7 +45,9 @@ def build_silver(
         for name in SILVER_TABLES
     }
     quality_current, quality_history = dedupe_for_quality(current, history)
-    occurrences = detect_anomalies(quality_current, quality_history, registry)
+    occurrences = detect_anomalies(
+        quality_current, quality_history, registry, dob_max_age_years=dob_max_age_years
+    )
     current_refs = {
         record_ref(name, row) for name in SILVER_TABLES for row in current.get(name, [])
     }

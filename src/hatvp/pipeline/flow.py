@@ -20,11 +20,16 @@ def build_layers(
     snapshot: str,
     work: Path,
     dry_run: bool,
+    dob_max_age_years: int | None = None,
 ) -> dict[str, Path]:
     """Build and persist all analytical layer files before state advancement."""
 
     silver, silver_history, registry_rows = build_silver(
-        tables, history, registry, snapshot_date=snapshot
+        tables,
+        history,
+        registry,
+        snapshot_date=snapshot,
+        dob_max_age_years=dob_max_age_years,
     )
     gold, registry_rows = build_gold(silver_history, registry_rows)
     silver = apply_registry_states(silver, registry_rows)

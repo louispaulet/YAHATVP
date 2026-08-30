@@ -74,7 +74,16 @@ def run_legacy(
             raise PipelineFailure(
                 f"Quality checks failed: {quality.report['quality']['errors']} error(s)"
             )
-        files = build_layers(store, tables, history, registry, snapshot, Path(directory), dry_run)
+        files = build_layers(
+            store,
+            tables,
+            history,
+            registry,
+            snapshot,
+            Path(directory),
+            dry_run,
+            settings.hatvp_person_dob_max_age_years,
+        )
         load_bigquery(settings, files, snapshot, dry_run, bq_loader)
         if not dry_run:
             write_success_state(store, snapshot, metadata, downloaded, settings)

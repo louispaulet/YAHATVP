@@ -6,6 +6,18 @@ deployment, and pre-v1.0 history is preserved in
 [`documentation_archive/20260826T215722Z_CHANGELOG.md`](documentation_archive/20260826T215722Z_CHANGELOG.md);
 long-form validation evidence remains under `reports/`.
 
+## 2026-08-30 — Honor configured DOB anomaly threshold
+
+### Fixed
+
+- Threaded `HATVP_PERSON_DOB_MAX_AGE_YEARS` from runtime settings through both
+  processing paths into Silver anomaly detection.
+
+### Verified
+
+- Added regression coverage proving a configured 110-year threshold does not
+  flag a 101-year-old parsed source date; the focused and full local suites pass.
+
 ## 2026-08-28 — Enable Cloud Billing pricing export
 
 ### Changed
