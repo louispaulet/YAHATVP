@@ -21,9 +21,10 @@ def load_bronze_history(store: ArtifactStore) -> dict[str, list[dict[str, Any]]]
     if list_paths is None:
         return history
     for name in HISTORY_TABLES:
-        paths = list_paths(f"bronze/{name}/")
-        if not paths:
-            paths = list_paths(f"silver/{name}/")
+        paths = [
+            *list_paths(f"bronze/{name}/"),
+            *list_paths(f"silver/{name}/"),
+        ]
         for path in sorted(paths):
             if not path.endswith("data.parquet"):
                 continue

@@ -10,7 +10,8 @@ The ingestion pipeline, Google Cloud deployment, Bronze → Silver → Gold and
 anomaly-registry layers, source archives, and v1.5 transparency dashboard are
 implemented, deployed, and covered by local and production verification. The
 latest dashboard work is the story-first homepage, balanced supporting
-evidence, and canonical website design and tone guides.
+evidence, and canonical website design and tone guides. The latest pipeline
+fix restores mixed legacy Silver and current Bronze history during processing.
 
 ## Open work
 
@@ -35,8 +36,13 @@ evidence, and canonical website design and tone guides.
 - Keep historical raw snapshots immutable and periodically review retention
   settings without deleting required audit history.
 
-## Recent completed work (2026-08-19 through 2026-08-27)
+## Recent completed work (2026-08-19 through 2026-08-30)
 
+- [x] Fixed income coverage counting whitespace-only values as populated; added
+  a fixture regression test.
+
+- [x] Fixed historical layer loading so legacy Silver partitions remain
+  available when newer Bronze partitions also exist for the same table.
 - [x] Released v1.0 through v1.5 dashboard functionality, including analysis,
   declarant search, Highlights, pipeline health, and grouped navigation.
 - [x] Added source-linked declaration details, DOB quality links, Wayback and
@@ -51,14 +57,20 @@ evidence, and canonical website design and tone guides.
   snapshot-coverage panel and mobile-safe declaration table.
 - [x] Added canonical repository-level design and tone-of-voice guides for
   future dashboard work.
+- [x] Fixed Gold membership flags so clean selected rows remain active in
+  documented metrics while anomalous values stay ineligible.
 - [x] Fixed split-stage `--dry-run` handling so ingest, archive-ingest, and
   process do not require storage or mutate state.
 - [x] Verified recent frontend, Worker, bridge, ingestion, and browser releases
   through the production deployment workflow.
 - [x] Fixed CSV source-identity fallback when the first configured candidate is
   blank or a normalized missing marker.
+- [x] Fixed the official cascade short-circuit so newly ingested archive
+  sources are processed even when the official source is unchanged.
 - [x] Fixed namespace-safe preservation of general mandate rows with quality
   metadata but no mandate label.
+- [x] Fixed download validation for valid UTF-8 XML responses with a leading
+  byte-order mark.
 - [x] Merged open PRs #42–#45, resolved parser/test conflicts, deployed commit
   `215c48a`, forced a successful production replay, and restored the normal
   Cloud Run resource profile.
