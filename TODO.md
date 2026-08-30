@@ -38,9 +38,11 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 
 ## Recent completed work (2026-08-19 through 2026-08-30)
 
+- [x] Merged open PRs #46–#51, resolved tracking-document conflicts, deployed
+  commit `5352965`, and forced a successful production replay; the scheduled
+  Cloud Run Job profile was restored after the temporary high-memory retry.
 - [x] Fixed income coverage counting whitespace-only values as populated; added
   a fixture regression test.
-
 - [x] Fixed historical layer loading so legacy Silver partitions remain
   available when newer Bronze partitions also exist for the same table.
 - [x] Released v1.0 through v1.5 dashboard functionality, including analysis,

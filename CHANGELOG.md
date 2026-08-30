@@ -6,6 +6,30 @@ deployment, and pre-v1.0 history is preserved in
 [`documentation_archive/20260826T215722Z_CHANGELOG.md`](documentation_archive/20260826T215722Z_CHANGELOG.md);
 long-form validation evidence remains under `reports/`.
 
+## 2026-08-30 — Merge pipeline fixes and replay production
+
+### Changed
+
+- Merged open PRs #46–#51 in order, resolving three tracking-document
+  conflicts while preserving the Gold, orchestration, XML validation, income,
+  history, and DOB-threshold changes.
+- Deployed the final Cloud Run Job image for commit `5352965` and forced a full
+  production replay. The replay used a temporary 8 CPU / 32 GiB profile after
+  the normal 4 GiB profile reached its memory limit, then restored the normal
+  1 CPU / 4 GiB scheduled profile.
+
+### Verified
+
+- Main workflow `33285643477` passed tests, Ruff, formatting, build, and Cloud
+  Run deployment; local verification passed all 183 tests.
+- Replay `hatvp-ingestion-qhb9x` completed in 12m51.96s with
+  `SUCCESS_WITH_WARNINGS`, zero quality errors, 58,502 flagged records, 41,201
+  warnings, all 13 BigQuery tables loaded, and `state/latest.json` advanced to
+  snapshot `2026-08-30` at commit `5352965`.
+
+Detailed merge and replay evidence is in
+[`reports/03-validation/2026-08-30-pr-merge-deployment-replay.md`](reports/03-validation/2026-08-30-pr-merge-deployment-replay.md).
+
 ## 2026-08-30 — Honor configured DOB anomaly threshold
 
 ### Fixed
