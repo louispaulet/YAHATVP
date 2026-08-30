@@ -1,7 +1,7 @@
 # Changelog
 
 This live changelog keeps concise release-level information from the recent
-development week, 2026-08-19 through 2026-08-28. Detailed implementation,
+development period, 2026-08-19 through 2026-08-30. Detailed implementation,
 deployment, and pre-v1.0 history is preserved in
 [`documentation_archive/20260826T215722Z_CHANGELOG.md`](documentation_archive/20260826T215722Z_CHANGELOG.md);
 long-form validation evidence remains under `reports/`.
@@ -60,6 +60,18 @@ long-form validation evidence remains under `reports/`.
 - `cloud_pricing_export` is not populated yet. Google documents that initial
   pricing export propagation can take up to 48 hours, so table and net-EUR
   reporting verification remain pending.
+
+## 2026-08-30 — Ignore whitespace-only income values
+
+### Fixed
+
+- Income coverage now treats whitespace-only declared and spouse values as
+  empty, matching normalized income-row parsing.
+
+### Verified
+
+- Added a whitespace-income fixture regression test; the full Python suite and
+  Ruff checks pass.
 
 ## 2026-08-28 — Merge parser/pipeline fixes and replay production data
 

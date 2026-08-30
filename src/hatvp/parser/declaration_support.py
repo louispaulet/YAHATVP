@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from lxml import etree
 
+from ..normalize import raw_text
+
 
 def local_name(tag: str) -> str:
     """Strip an XML namespace from a tag used by declaration predicates."""
@@ -25,10 +27,16 @@ def income_item_has_value(item: etree._Element) -> bool:
         if not name.startswith("revenuMandatItem"):
             continue
         values = child_values(category)
-        if values.get("revenuElu") is not None or values.get("revenuConjoint") is not None:
+        if (
+            raw_text(values.get("revenuElu")) is not None
+            or raw_text(values.get("revenuConjoint")) is not None
+        ):
             return True
     values = child_values(item)
-    return values.get("totalElu") is not None or values.get("totalConjoint") is not None
+    return (
+        raw_text(values.get("totalElu")) is not None
+        or raw_text(values.get("totalConjoint")) is not None
+    )
 
 
 def declaration_has_general(element: etree._Element) -> bool:

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<declarations>
+  <declarations>
+    <declaration>
+      <uuid>fixture-whitespace-income</uuid>
+      <revenuMandatDto>
+        <items>
+          <items>
+            <annee>2025</annee>
+            <revenuMandatItem0>
+              <revenuElu>   </revenuElu>
+              <revenuConjoint>
+              </revenuConjoint>
+            </revenuMandatItem0>
+          </items>
+        </items>
+      </revenuMandatDto>
+    </declaration>
+  </declarations>
+</declarations>
