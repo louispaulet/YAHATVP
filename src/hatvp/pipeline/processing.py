@@ -49,7 +49,7 @@ def process_sources(
             raise PipelineFailure(
                 f"Quality checks failed: {quality.report['quality']['errors']} error(s)"
             )
-        files = build_layers(store, tables, history, registry, snapshot, Path(directory), dry_run)
+        files = build_layers(store, tables, history, registry, snapshot, Path(directory), dry_run, settings.hatvp_person_dob_max_age_years)  # fmt: skip  # noqa: E501
         load_bigquery(settings, files, snapshot, dry_run, bq_loader)
         if not dry_run:
             _write_processed_state(store, settings, snapshot, sources)
