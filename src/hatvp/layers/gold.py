@@ -31,7 +31,7 @@ def build_gold(
 def _gold_row(row: dict[str, Any], selected: bool) -> dict[str, Any]:
     copied = dict(row)
     copied["is_latest_declaration"] = selected
-    copied["active_in_gold"] = selected and bool(row.get("anomaly_active"))
+    copied["active_in_gold"] = selected
     if selected and row.get("anomaly_status") == "superseded":
         copied["active_in_gold"] = False
     return copied
