@@ -20,6 +20,19 @@ long-form validation evidence remains under `reports/`.
   Wayback ingestion; the full local suite passes 172 tests, Ruff checks, and
   the package build.
 
+## 2026-08-30 — Keep clean Gold rows active
+
+### Fixed
+
+- Gold now marks selected, non-superseded rows as active so clean values remain
+  available to the documented Gold metrics; anomaly eligibility still excludes
+  flagged values from aggregates.
+
+### Verified
+
+- The focused layer regression test and the full 170-test Python suite pass;
+  Ruff, formatting, and package build checks also pass.
+
 ## 2026-08-28 — Enable Cloud Billing pricing export
 
 ### Changed
