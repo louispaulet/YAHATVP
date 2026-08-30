@@ -19,6 +19,44 @@ long-form validation evidence remains under `reports/`.
 - Added a mixed Bronze/Silver fixture regression test; the full suite passes
   with 173 tests, Ruff, and formatting checks.
 
+## 2026-08-30 — Accept BOM-prefixed XML downloads
+
+### Fixed
+
+- The download validator now accepts valid UTF-8 XML responses with a leading
+  byte-order mark instead of rejecting them before parsing.
+
+### Verified
+
+- Added a BOM regression test; the focused parser/download checks pass.
+
+## 2026-08-30 — Reprocess newly ingested sources
+
+### Fixed
+
+- The official pipeline no longer returns `NO_CHANGE` when a new archive source
+  has been ingested since the previous processed state. Source sets must now
+  match exactly before the processing short-circuit is allowed.
+
+### Verified
+
+- Added an end-to-end regression covering official processing followed by
+  Wayback ingestion; the full local suite passes 172 tests, Ruff checks, and
+  the package build.
+
+## 2026-08-30 — Keep clean Gold rows active
+
+### Fixed
+
+- Gold now marks selected, non-superseded rows as active so clean values remain
+  available to the documented Gold metrics; anomaly eligibility still excludes
+  flagged values from aggregates.
+
+### Verified
+
+- The focused layer regression test and the full 170-test Python suite pass;
+  Ruff, formatting, and package build checks also pass.
+
 ## 2026-08-28 — Enable Cloud Billing pricing export
 
 ### Changed
@@ -35,6 +73,18 @@ long-form validation evidence remains under `reports/`.
 - `cloud_pricing_export` is not populated yet. Google documents that initial
   pricing export propagation can take up to 48 hours, so table and net-EUR
   reporting verification remain pending.
+
+## 2026-08-30 — Ignore whitespace-only income values
+
+### Fixed
+
+- Income coverage now treats whitespace-only declared and spouse values as
+  empty, matching normalized income-row parsing.
+
+### Verified
+
+- Added a whitespace-income fixture regression test; the full Python suite and
+  Ruff checks pass.
 
 ## 2026-08-28 — Merge parser/pipeline fixes and replay production data
 
