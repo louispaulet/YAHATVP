@@ -57,6 +57,8 @@ evidence, and canonical website design and tone guides.
   through the production deployment workflow.
 - [x] Fixed CSV source-identity fallback when the first configured candidate is
   blank or a normalized missing marker.
+- [x] Fixed the official cascade short-circuit so newly ingested archive
+  sources are processed even when the official source is unchanged.
 - [x] Fixed namespace-safe preservation of general mandate rows with quality
   metadata but no mandate label.
 - [x] Merged open PRs #42–#45, resolved parser/test conflicts, deployed commit

@@ -13,7 +13,7 @@ from .ingestion import ingest_official
 from .legacy import run_legacy
 from .processing import process_sources
 from .result import log_no_change
-from .source_contract import load_source_state, source_ids
+from .source_contract import OFFICIAL_SOURCE, load_source_state, source_ids
 from .state import PipelineFailure, load_state
 from .steps import default_store
 
@@ -65,12 +65,14 @@ def _processed_state_is_current(store: ArtifactStore) -> bool:
     processed = load_state(store)
     snapshots = processed.get("source_snapshots") or {}
     ids = source_ids(store)
-    if snapshots and set(snapshots) >= set(ids):
-        return all(
+    if snapshots:
+        return set(snapshots) == set(ids) and all(
             snapshots[source].get("files") == load_source_state(store, source).get("files")
             for source in ids
         )
-    official = load_source_state(store, "hatvp_website")
+    if set(ids) != {OFFICIAL_SOURCE}:
+        return False
+    official = load_source_state(store, OFFICIAL_SOURCE)
     return (
         bool(official)
         and processed.get("xml_sha256") == official.get("xml_sha256")

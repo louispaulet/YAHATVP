@@ -6,6 +6,20 @@ deployment, and pre-v1.0 history is preserved in
 [`documentation_archive/20260826T215722Z_CHANGELOG.md`](documentation_archive/20260826T215722Z_CHANGELOG.md);
 long-form validation evidence remains under `reports/`.
 
+## 2026-08-30 — Reprocess newly ingested sources
+
+### Fixed
+
+- The official pipeline no longer returns `NO_CHANGE` when a new archive source
+  has been ingested since the previous processed state. Source sets must now
+  match exactly before the processing short-circuit is allowed.
+
+### Verified
+
+- Added an end-to-end regression covering official processing followed by
+  Wayback ingestion; the full local suite passes 172 tests, Ruff checks, and
+  the package build.
+
 ## 2026-08-28 — Enable Cloud Billing pricing export
 
 ### Changed
