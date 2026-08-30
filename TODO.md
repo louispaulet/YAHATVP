@@ -35,7 +35,10 @@ evidence, and canonical website design and tone guides.
 - Keep historical raw snapshots immutable and periodically review retention
   settings without deleting required audit history.
 
-## Recent completed work (2026-08-19 through 2026-08-27)
+## Recent completed work (2026-08-19 through 2026-08-30)
+
+- [x] Fixed income coverage counting whitespace-only values as populated; added
+  a fixture regression test.
 
 - [x] Released v1.0 through v1.5 dashboard functionality, including analysis,
   declarant search, Highlights, pipeline health, and grouped navigation.

@@ -65,6 +65,13 @@ def test_optional_income_sections_report_presence_and_population_counts() -> Non
     assert by_uuid["fixture-empty-income-section"]["income_section_populated_item_count"] == 0
 
 
+def test_whitespace_only_income_values_are_not_counted_as_populated() -> None:
+    tables = xml_tables("whitespace_income.xml")
+
+    assert tables["declarations"][0]["income_section_populated_item_count"] == 0
+    assert tables["incomes"] == []
+
+
 def test_real_declaration_person_parser_preserves_missing_optional_identity() -> None:
     tables = xml_tables("edge_case_declarations.xml")
 
