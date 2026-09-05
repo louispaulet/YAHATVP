@@ -20,10 +20,14 @@
   shared focus treatment, and Lucide action icons for external and source links.
 - Added a keyboard-friendly annual-value table beneath declaration amount bars
   so each chart has an equivalent text reading path.
+- Added localized publication-history context beside declaration evidence so
+  later public versions are explained as part of the source history.
 
 ### Verified
 
 - Frontend tests: 34 passed; TypeScript/Vite production build passed.
+- Backend checks: 13 Worker tests, TypeScript typecheck, and 48 bridge tests
+  passed.
 - Browser checks covered the local dashboard at 320px and 1024px with no
   horizontal overflow; the deployed dashboard remains the source for loaded
   production data verification.

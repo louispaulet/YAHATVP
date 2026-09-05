@@ -53,6 +53,8 @@ final result: passed
   expanded navigation and disclosure controls.
 - Declaration annual amount bars now include a text table with localized year
   and amount headers for keyboard and screen-reader readers.
+- Declaration details now explain original versus later public versions in a
+  localized publication-history section before technical source fields.
 
 **Responsive and interaction checks**
 

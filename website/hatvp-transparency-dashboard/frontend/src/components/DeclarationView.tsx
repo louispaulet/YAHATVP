@@ -8,6 +8,7 @@ interface DeclarationViewProps {
   rawXml: string;
   language: Language;
   locale: Locale;
+  amended?: boolean;
 }
 
 function sourceValue(value: string, fallback: string): string {
@@ -109,7 +110,7 @@ function DeclarationSectionView({ section, language, locale }: { section: Declar
   );
 }
 
-export function DeclarationView({ rawXml, language, locale }: DeclarationViewProps) {
+export function DeclarationView({ rawXml, language, locale, amended = false }: DeclarationViewProps) {
   const [copied, setCopied] = useState(false);
   const parsed = useMemo(() => parseDeclarationXml(rawXml), [rawXml]);
   const model = parsed.model;
@@ -149,6 +150,12 @@ export function DeclarationView({ rawXml, language, locale }: DeclarationViewPro
       {nonProfileSections.length > 0 && <nav className="dashboard-card p-5 sm:p-6" aria-label={locale.declaration.sectionIndex}><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.sectionIndex}</p><div className="mt-3 flex flex-wrap gap-2">{nonProfileSections.map((section) => <a key={section.key} href={`#declaration-section-${section.key}`} className="rounded-full bg-surface-subtle px-3 py-2 text-sm font-bold text-ink transition hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{declarationSectionLabel(section.key, language, locale.declaration.sectionLabels)}</a>)}</div></nav>}
 
       <div className="space-y-6">{nonProfileSections.map((section) => <DeclarationSectionView key={section.key} section={section} language={language} locale={locale} />)}</div>
+
+      <section className="dashboard-card border-l-4 border-l-sky p-5 sm:p-7" aria-labelledby="declaration-history-title">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-sky">{locale.declaration.historyEyebrow}</p>
+        <h2 id="declaration-history-title" className="mt-2 text-xl font-black tracking-tight text-ink">{locale.declaration.historyTitle}</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">{amended ? locale.declaration.historyAmended : locale.declaration.historyOriginal}</p>
+      </section>
 
       <details className="dashboard-card min-w-0 p-5 sm:p-7"><summary className="cursor-pointer text-sm font-bold text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald">{locale.declaration.technicalFields} ({formatNumber(meta.fields.length, language)} {locale.declaration.fieldsLabel})</summary><p className="mt-3 text-sm leading-6 text-slate-500">{locale.declaration.technicalDescription}</p><div className="mt-4"><RecordFields record={meta} language={language} fallback={locale.declaration.notAvailable} labels={locale.declaration.fieldLabels} /></div></details>
 
