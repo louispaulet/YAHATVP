@@ -234,6 +234,8 @@
     "title": "Les déclarations à regarder de plus près.",
     "description": "Des pistes de contrôle actuelles à partir du dernier instantané public. Les fiches de revenus utilisent la dernière version et les signaux actuels du registre ; les mises en avant d’anomalies patrimoniales sont suspendues pendant la revue des règles dédiées. Chaque fiche renvoie à la source.",
     "snapshot": "Instantané",
+    "contentsLabel": "Explorer ces signaux",
+    "recordsLabel": "enregistrements affichés",
     "method": "Dernières versions · signaux actuels du registre",
     "incomeEyebrow": "Signaux de contrôle actuels",
     "incomeTitle": "Plus fortes variations de revenus actives",

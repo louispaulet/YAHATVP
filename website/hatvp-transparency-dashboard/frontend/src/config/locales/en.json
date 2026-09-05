@@ -234,6 +234,8 @@
     "title": "The declarations worth a closer look.",
     "description": "Current review leads from the latest public snapshot. Income cards use the latest declaration version and current anomaly-registry signals; asset anomaly highlights are paused while asset-specific rules are reviewed. Every record links back to the source.",
     "snapshot": "Snapshot",
+    "contentsLabel": "Explore these signals",
+    "recordsLabel": "records shown",
     "method": "Latest versions · current registry signals",
     "incomeEyebrow": "Current review signals",
     "incomeTitle": "Largest active income changes",

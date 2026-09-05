@@ -3,16 +3,18 @@ import type { ReactNode } from "react";
 
 export type HighlightTone = "income" | "asset" | "amended";
 
-export function HighlightSection({ tone, icon: Icon, eyebrow, title, description, children }: {
+export function HighlightSection({ tone, icon: Icon, eyebrow, title, description, children, id, countLabel }: {
   tone: HighlightTone;
   icon: LucideIcon;
   eyebrow: string;
   title: string;
   description: string;
   children: ReactNode;
+  id?: string;
+  countLabel?: string;
 }) {
   return (
-    <section className={`explore-section explore-section--${tone} border-t border-slate-200 pt-10 sm:pt-14`}>
+    <section id={id} className={`explore-section explore-section--${tone} scroll-mt-6 border-t border-slate-200 pt-10 sm:pt-14`}>
       <div className="grid gap-4 lg:grid-cols-[0.78fr_1.22fr] lg:gap-12">
         <div>
           <div className="flex items-start gap-3">
@@ -20,6 +22,7 @@ export function HighlightSection({ tone, icon: Icon, eyebrow, title, description
             <div>
               <p className="explore-section-eyebrow text-xs font-bold uppercase tracking-[0.16em]">{eyebrow}</p>
               <h2 className="mt-3 text-3xl font-black leading-[1.08] tracking-[-0.035em] sm:text-4xl">{title}</h2>
+              {countLabel && <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{countLabel}</p>}
             </div>
           </div>
         </div>

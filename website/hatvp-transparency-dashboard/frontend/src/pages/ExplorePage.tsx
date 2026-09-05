@@ -34,18 +34,23 @@ export function ExplorePage() {
           </div>
         </div>
       </section>
+      <nav className="flex flex-wrap gap-2 text-sm font-bold" aria-label={locale.explore.contentsLabel}>
+        <a className="rounded-full bg-surface-subtle px-3 py-2 text-ink hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald" href="#income-signals">{locale.explore.incomeTitle}</a>
+        <a className="rounded-full bg-surface-subtle px-3 py-2 text-ink hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald" href="#asset-signals">{locale.explore.assetsTitle}</a>
+        <a className="rounded-full bg-surface-subtle px-3 py-2 text-ink hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald" href="#amended-signals">{locale.explore.amendedTitle}</a>
+      </nav>
       {highlights.loading && <div className="explore-card-grid" aria-busy="true"><ExploreCardSkeleton /><ExploreCardSkeleton /><ExploreCardSkeleton /><ExploreCardSkeleton /></div>}
       {highlights.error && <SliceError onRetry={highlights.reload} />}
       {highlights.data && <>
-        <HighlightSection tone="income" icon={TrendingUp} eyebrow={locale.explore.incomeEyebrow} title={locale.explore.incomeTitle} description={locale.explore.incomeDescription}>
+        <HighlightSection id="income-signals" tone="income" icon={TrendingUp} eyebrow={locale.explore.incomeEyebrow} title={locale.explore.incomeTitle} description={locale.explore.incomeDescription} countLabel={`${highlights.data.incomeChanges.length} ${locale.explore.recordsLabel}`}>
           {highlights.data.incomeChanges.map((item, index) => <IncomeHighlightCard key={`${item.declarationUuid}-${item.toYear}`} item={item} rank={index + 1} />)}
         </HighlightSection>
-        <HighlightSection tone="asset" icon={WalletCards} eyebrow={locale.explore.assetsEyebrow} title={locale.explore.assetsTitle} description={locale.explore.assetsDescription}>
+        <HighlightSection id="asset-signals" tone="asset" icon={WalletCards} eyebrow={locale.explore.assetsEyebrow} title={locale.explore.assetsTitle} description={locale.explore.assetsDescription} countLabel={`${highlights.data.unusualAssets.length} ${locale.explore.recordsLabel}`}>
           {highlights.data.unusualAssets.length > 0
             ? highlights.data.unusualAssets.map((item, index) => <AssetHighlightCard key={`${item.declarationUuid}-${index}`} item={item} rank={index + 1} />)
             : <p className="text-sm leading-7 text-slate-500">{locale.explore.assetsPaused}</p>}
         </HighlightSection>
-        <HighlightSection tone="amended" icon={FilePenLine} eyebrow={locale.explore.amendedEyebrow} title={locale.explore.amendedTitle} description={locale.explore.amendedDescription}>
+        <HighlightSection id="amended-signals" tone="amended" icon={FilePenLine} eyebrow={locale.explore.amendedEyebrow} title={locale.explore.amendedTitle} description={locale.explore.amendedDescription} countLabel={`${highlights.data.amendedRecords.length} ${locale.explore.recordsLabel}`}>
           {highlights.data.amendedRecords.map((item, index) => <AmendedHighlightCard key={`${item.declarationUuid}-${index}`} item={item} rank={index + 1} />)}
         </HighlightSection>
       </>}
