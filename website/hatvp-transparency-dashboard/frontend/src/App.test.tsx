@@ -173,7 +173,7 @@ describe("dashboard application", () => {
     expect(screen.getByText("Two declaration families, selected independently")).toBeInTheDocument();
     expect(screen.getByText("Latest asset inventory")).toBeInTheDocument();
     expect(screen.getByText("Subscribed 21 Jan 2002 · age 15")).toBeInTheDocument();
-    expect(screen.getByText("French Ministry of Economy guidance ↗")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "French Ministry of Economy guidance" })).toBeInTheDocument();
     expect(screen.getAllByText("€770K")).toHaveLength(1);
     expect(screen.getAllByText("Terrain")).toHaveLength(1);
     expect(screen.queryByText("Occupations by year")).not.toBeInTheDocument();
@@ -204,7 +204,7 @@ describe("dashboard application", () => {
     expect(screen.getByText("3 years, 1 month, 29 days")).toBeInTheDocument();
     expect(screen.getAllByText("2 years, 1 month, 22 days")).toHaveLength(4);
     expect(screen.getAllByText("0 days")).toHaveLength(2);
-    expect(screen.getAllByRole("link", { name: "Open link ↗" })[0]).toHaveAttribute("href", "https://www.hatvp.fr/fiche-nominative/?declarant=vigier-jean-francois-17617");
+    expect(screen.getAllByRole("link", { name: "Open link" })[0]).toHaveAttribute("href", "https://www.hatvp.fr/fiche-nominative/?declarant=vigier-jean-francois-17617");
     expect(screen.getByRole("link", { name: "Data & methods" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Data quality" })).toHaveAttribute("aria-current", "page");
   });

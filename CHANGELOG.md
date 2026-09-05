@@ -13,6 +13,11 @@
 - Added an Explore table of contents with per-signal result counts and
   removed live countdown announcements from the screen-reader announcement
   channel while retaining a static scheduled timestamp.
+- Added locale-backed declaration labels, contextual empty-section disclosures,
+  source XML copy support, reusable snapshot context, signal explanations,
+  profile match announcements, and text summaries for analysis charts.
+- Added responsive quality-register rows, clearer analysis scope/toggle copy,
+  shared focus treatment, and Lucide action icons for external and source links.
 
 ### Verified
 

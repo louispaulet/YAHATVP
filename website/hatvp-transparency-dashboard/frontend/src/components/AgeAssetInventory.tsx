@@ -1,4 +1,5 @@
 import { translateDataLabel, type Language, type Locale } from "../config/i18n";
+import { ExternalLink } from "lucide-react";
 import { formatCurrency } from "../formatters";
 import type { AgeAnalysisResponse } from "../types";
 import { Panel } from "./Panel";
@@ -64,7 +65,7 @@ export function AgeAssetInventory({ assets, language, labels }: {
       <Panel title={labels.assetTitle} eyebrow={labels.assetEyebrow}>
         <p className="max-w-4xl text-sm leading-6 text-slate-500">{labels.assetDescription}</p>
         <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-600">{labels.assetDateClarification}</p>
-        {hasMinorSubscription && <aside className="mt-5 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-slate-700">{labels.minorPolicyNote} <a href="https://www.economie.gouv.fr/particuliers/gerer-mon-argent/gerer-mon-budget-et-mon-epargne/quels-produits-depargne-pouvez-vous-ouvrir-pour-votre-enfant" target="_blank" rel="noreferrer" className="font-bold text-emerald underline decoration-emerald/30 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{labels.minorPolicyLink} ↗</a></aside>}
+        {hasMinorSubscription && <aside className="mt-5 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-slate-700">{labels.minorPolicyNote} <a href="https://www.economie.gouv.fr/particuliers/gerer-mon-argent/gerer-mon-budget-et-mon-epargne/quels-produits-depargne-pouvez-vous-ouvrir-pour-votre-enfant" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-bold text-emerald underline decoration-emerald/30 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{labels.minorPolicyLink}<ExternalLink size={13} strokeWidth={2} aria-hidden="true" /></a></aside>}
         {assets.length === 0 && <p className="py-8 text-sm text-slate-500">{labels.noAssets}</p>}
         <div className="mt-6 space-y-6">{groups.map(([kind, items]) => <section key={kind}><div className="flex items-baseline justify-between gap-3"><h3 className="text-lg font-black text-ink">{translateDataLabel(language, "assetSections", kind)}</h3><span className="text-xs font-bold text-slate-400">{items.length} {items.length === 1 ? labels.item : labels.items}</span></div><div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">{items.map((item) => <AssetCard key={item.sourceId} asset={item} language={language} labels={labels} />)}</div></section>)}</div>
       </Panel>

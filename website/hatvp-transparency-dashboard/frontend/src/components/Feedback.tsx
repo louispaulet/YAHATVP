@@ -6,11 +6,11 @@ export function LoadingShell({ className }: { className: string }) {
   return <div className={`loading-shell ${className}`} role="status" aria-label={locale.loading.label} />;
 }
 
-export function SliceError({ onRetry }: { onRetry: () => void }) {
+export function SliceError({ onRetry, message }: { onRetry: () => void; message?: string }) {
   const { locale } = useI18n();
   return (
     <div className="explore-error rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950" role="alert">
-      <div className="flex items-start gap-3"><CircleAlert className="mt-0.5 shrink-0 text-amber-800" size={18} strokeWidth={1.8} aria-hidden="true" /><p>{locale.errors.sliceLoad}</p></div>
+      <div className="flex items-start gap-3"><CircleAlert className="mt-0.5 shrink-0 text-amber-800" size={18} strokeWidth={1.8} aria-hidden="true" /><p>{message || locale.errors.sliceLoad}</p></div>
       <button type="button" onClick={onRetry} className="mt-4 rounded-xl bg-ink px-4 py-2 text-xs font-bold text-white transition hover:bg-slate-700 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-emerald">
         {locale.errors.tryAgain}
       </button>
@@ -28,9 +28,9 @@ export function MetricSkeleton({ compact = false }: { compact?: boolean }) {
   );
 }
 
-export function ChartSkeleton({ table = false, compact = false }: { table?: boolean; compact?: boolean }) {
+export function ChartSkeleton({ table = false, compact = false, label }: { table?: boolean; compact?: boolean; label?: string }) {
   return (
-    <div className="space-y-4" aria-busy="true">
+    <div className="space-y-4" aria-busy="true" aria-label={label}>
       <LoadingShell className={table ? "h-4 w-3/4 rounded-full" : compact ? "h-32 w-full rounded-2xl" : "h-56 w-full rounded-[1.5rem]"} />
       {table && <><LoadingShell className="h-4 w-full rounded-full" /><LoadingShell className="h-4 w-5/6 rounded-full" /><LoadingShell className="h-4 w-2/3 rounded-full" /></>}
     </div>

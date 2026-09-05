@@ -67,7 +67,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <img src="/hatvp-mark.webp" alt="" aria-hidden="true" className="size-10 rounded-xl object-cover shadow-sm" />
             <span className="min-w-0"><span className="block text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">HATVP</span><span className="block truncate text-sm font-semibold">{locale.brand.name}</span></span>
           </Link>
-          <nav aria-label={locale.nav.label} className="order-3 -mx-1 flex w-[calc(100%+0.5rem)] min-w-0 flex-wrap items-center gap-x-1 gap-y-1 overflow-x-hidden px-1 py-1 sm:gap-x-2 lg:order-none lg:w-auto lg:flex-1 lg:flex-nowrap lg:justify-end">
+          <nav aria-label={locale.nav.label} className="order-3 -mx-1 flex w-[calc(100%+0.5rem)] min-w-0 flex-nowrap items-center gap-x-1 overflow-x-auto px-1 py-1 sm:gap-x-2 lg:order-none lg:w-auto lg:flex-1 lg:justify-end">
             {sections.map((section) => <Link key={section.key} to={section.to} aria-current={currentSection === section.key ? "page" : undefined} className={parentClass(currentSection === section.key)}>{section.label}</Link>)}
           </nav>
           <div className="ml-auto shrink-0"><LanguageSwitcher /></div>

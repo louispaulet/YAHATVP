@@ -1,9 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { Disclosure } from "./Disclosure";
 
 export type HighlightTone = "income" | "asset" | "amended";
 
-export function HighlightSection({ tone, icon: Icon, eyebrow, title, description, children, id, countLabel }: {
+export function HighlightSection({ tone, icon: Icon, eyebrow, title, description, children, id, countLabel, meaning, meaningTitle }: {
   tone: HighlightTone;
   icon: LucideIcon;
   eyebrow: string;
@@ -12,6 +13,8 @@ export function HighlightSection({ tone, icon: Icon, eyebrow, title, description
   children: ReactNode;
   id?: string;
   countLabel?: string;
+  meaning?: string;
+  meaningTitle?: string;
 }) {
   return (
     <section id={id} className={`explore-section explore-section--${tone} scroll-mt-6 border-t border-slate-200 pt-10 sm:pt-14`}>
@@ -28,6 +31,7 @@ export function HighlightSection({ tone, icon: Icon, eyebrow, title, description
         </div>
         <p className="max-w-2xl text-[0.9375rem] leading-7 text-slate-600 lg:pt-7">{description}</p>
       </div>
+      {meaning && meaningTitle && <Disclosure className="mt-5" summary={meaningTitle}><p>{meaning}</p></Disclosure>}
       <div className="explore-section-rule" aria-hidden="true"><span className={`explore-section-rule__accent explore-section-rule__accent--${tone}`} /></div>
       <div className="explore-card-grid">{children}</div>
     </section>

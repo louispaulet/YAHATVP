@@ -1,5 +1,6 @@
 import issues from "../data/qualityIssues.json";
 import { useI18n } from "../context/I18nContext";
+import { ExternalLink } from "lucide-react";
 
 type QualityIssue = (typeof issues)[number];
 
@@ -66,7 +67,7 @@ function formatOpenDuration(value: string, language: string, units: DurationUnit
 
 function IssueLinks({ links, label, noLink }: { links: string[]; label: string; noLink: string }) {
   if (!links.length) return <span className="text-slate-400">{noLink}</span>;
-  return <div className="flex flex-col items-start gap-2">{links.map((link, index) => <a key={link} className="text-sm font-bold text-emerald underline decoration-lime underline-offset-4 hover:text-ink" href={link} target="_blank" rel="noreferrer">{label} {links.length > 1 ? index + 1 : "↗"}</a>)}</div>;
+  return <div className="flex flex-col items-start gap-2">{links.map((link, index) => <a key={link} className="inline-flex min-h-10 items-center gap-1 text-sm font-bold text-emerald underline decoration-lime underline-offset-4 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald" href={link} target="_blank" rel="noreferrer">{label} {links.length > 1 ? index + 1 : <ExternalLink size={13} strokeWidth={2} aria-hidden="true" />}</a>)}</div>;
 }
 
 function StatusBadge({ solved, label }: { solved: boolean; label: string }) {
@@ -92,7 +93,7 @@ export function QualityIssuesPage() {
     </div>
     <section className="dashboard-card mt-8 overflow-hidden">
       <div className="border-b border-slate-200/80 px-5 py-5 sm:px-6"><p className="text-sm leading-6 text-slate-600">{locale.qualityIssues.privacyNote}</p></div>
-      <div className="overflow-x-auto"><table className="w-full min-w-[850px] border-collapse text-left"><thead className="bg-slate-50/80"><tr>{[locale.qualityIssues.columns.issueType, locale.qualityIssues.columns.contactDate, locale.qualityIssues.columns.declaration, locale.qualityIssues.columns.status, locale.qualityIssues.columns.duration].map((heading) => <th key={heading} className="px-5 py-4 text-xs font-bold uppercase tracking-[0.12em] text-slate-500 sm:px-6">{heading}</th>)}</tr></thead><tbody className="divide-y divide-slate-200/80">{issues.map((issue) => <tr key={`${issue.contactDate}-${issue.issueType}-${issue.declarationLinks.join("-")}`} className="align-top transition hover:bg-slate-50/70"><td className="px-5 py-5 text-sm font-bold text-ink sm:px-6">{issue.issueType}</td><td className="whitespace-nowrap px-5 py-5 text-sm text-slate-600 sm:px-6">{formatDate(issue.contactDate, language)}</td><td className="px-5 py-5 sm:px-6"><IssueLinks links={issue.declarationLinks} label={locale.qualityIssues.openLink} noLink={locale.qualityIssues.noLink} /></td><td className="px-5 py-5 sm:px-6"><StatusBadge solved={issue.solved} label={issue.solved ? locale.qualityIssues.solvedLabel : locale.qualityIssues.notSolved} /></td><td className="whitespace-nowrap px-5 py-5 text-sm font-semibold text-slate-600 sm:px-6">{duration(issue)}</td></tr>)}</tbody></table></div>
+      <div className="overflow-x-auto"><table className="quality-table w-full border-collapse text-left"><thead className="bg-slate-50/80"><tr>{[locale.qualityIssues.columns.issueType, locale.qualityIssues.columns.contactDate, locale.qualityIssues.columns.declaration, locale.qualityIssues.columns.status, locale.qualityIssues.columns.duration].map((heading) => <th key={heading} className="sticky top-0 px-5 py-4 text-xs font-bold uppercase tracking-[0.12em] text-slate-500 sm:px-6">{heading}</th>)}</tr></thead><tbody className="divide-y divide-slate-200/80">{issues.map((issue) => <tr key={`${issue.contactDate}-${issue.issueType}-${issue.declarationLinks.join("-")}`} className="align-top transition hover:bg-slate-50/70"><td data-label={locale.qualityIssues.columns.issueType} className="px-5 py-5 text-sm font-bold text-ink sm:px-6">{issue.issueType}</td><td data-label={locale.qualityIssues.columns.contactDate} className="whitespace-nowrap px-5 py-5 text-sm text-slate-600 sm:px-6">{formatDate(issue.contactDate, language)}</td><td data-label={locale.qualityIssues.columns.declaration} className="px-5 py-5 sm:px-6"><IssueLinks links={issue.declarationLinks} label={locale.qualityIssues.openLink} noLink={locale.qualityIssues.noLink} /></td><td data-label={locale.qualityIssues.columns.status} className="px-5 py-5 sm:px-6"><StatusBadge solved={issue.solved} label={issue.solved ? locale.qualityIssues.solvedLabel : locale.qualityIssues.notSolved} /></td><td data-label={locale.qualityIssues.columns.duration} className="whitespace-nowrap px-5 py-5 text-sm font-semibold text-slate-600 sm:px-6">{duration(issue)}</td></tr>)}</tbody></table></div>
     </section>
   </div>;
 }

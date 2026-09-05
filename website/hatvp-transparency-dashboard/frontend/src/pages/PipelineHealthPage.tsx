@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { fetchHealth } from "../api";
 import { ChartSkeleton, SliceError } from "../components/Feedback";
 import { useI18n } from "../context/I18nContext";
 import { useResource } from "../hooks/useResource";
 import type { Locale } from "../config/i18n";
 import type { DashboardHealthResponse } from "../types";
+import { SnapshotContext } from "../components/SnapshotContext";
 
 function countdown(target: string | null, now: number, labels: Record<string, string>): string {
   if (!target) return labels.unavailable;
@@ -61,6 +63,7 @@ export function PipelineHealthPage() {
       <p className="mt-5 max-w-3xl text-base leading-7 text-slate-300">{locale.pipelineHealth.description}</p>
       <div className="mt-8 flex flex-wrap gap-3 text-xs font-bold"><span className="rounded-full bg-white/10 px-4 py-2">{locale.pipelineHealth.snapshot} {data?.snapshotDate ?? locale.hero.notAvailable}</span><span className="rounded-full bg-lime px-4 py-2 text-ink">{locale.pipelineHealth.weekly}</span></div>
     </section>
+    {data && <SnapshotContext snapshotDate={data.snapshotDate} generatedAt={data.generatedAt} language={language} labels={locale.snapshotContext} sourceScope={locale.snapshotContext.officialScope} className="-mt-4" />}
     {health.loading && <div className="grid gap-4 md:grid-cols-3"><ChartSkeleton /><ChartSkeleton /><ChartSkeleton /></div>}
     {health.error && <SliceError onRetry={health.reload} />}
     {data && <>
@@ -76,6 +79,7 @@ export function PipelineHealthPage() {
         <p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald">{locale.pipelineHealth.policyEyebrow}</p>
         <h2 className="mt-2 text-2xl font-black">{locale.pipelineHealth.policyTitle}</h2>
         <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600">{locale.pipelineHealth.policyDescription}</p>
+        <Link to="/about" className="mt-4 inline-flex min-h-10 items-center font-bold text-emerald underline decoration-lime underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{locale.pipelineHealth.methodLink}</Link>
       </section>
       <section className="dashboard-card p-6"><div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald">{locale.pipelineHealth.anomalyEyebrow}</p><h2 className="mt-2 text-2xl font-black">{locale.pipelineHealth.anomalyTitle}</h2></div><p className="text-sm text-slate-500">{locale.pipelineHealth.qualitySummary.replace("{errors}", number.format(data.quality.errors)).replace("{warnings}", number.format(data.quality.warnings))}</p></div><div className="mt-5 flex flex-wrap gap-3">{data.anomalies.map((anomaly) => <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700" key={anomaly.status}>{anomaly.status}: {number.format(anomaly.rows)}</span>)}</div><div className="mt-7 border-t border-slate-100 pt-6"><p className="text-xs font-bold uppercase tracking-[0.15em] text-emerald">{locale.pipelineHealth.topCategoriesEyebrow}</p><h3 className="mt-2 text-xl font-black">{locale.pipelineHealth.topCategoriesTitle}</h3>{data.anomalyCategories.length > 0 ? <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{data.anomalyCategories.map((item, index) => <div className="rounded-2xl bg-slate-50 px-4 py-4" data-testid="anomaly-category" key={item.category}><div className="flex items-baseline justify-between gap-3"><span className="text-sm font-semibold text-slate-700">{index + 1}. {anomalyCategoryName(item.category, locale)}</span><span className="text-lg font-black tabular-nums text-ink">{number.format(item.rows)}</span></div></div>)}</div> : <p className="mt-4 text-sm text-slate-500">{locale.pipelineHealth.noCategories}</p>}</div></section>
     </>}

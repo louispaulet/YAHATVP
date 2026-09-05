@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { ArrowUpRight } from "lucide-react";
 import { translateDataLabel } from "../config/i18n";
 import { useI18n } from "../context/I18nContext";
 import { declarationDate, declarationName, searchValue } from "./declarationFormatters";
@@ -24,7 +25,7 @@ export function SearchResultCard({ result }: { result: DeclarationSearchResult }
         <div><dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.date}</dt><dd className="mt-1 text-sm font-semibold text-slate-700">{date}</dd></div>
         <div><dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.identifier}</dt><dd className="mt-1 break-all font-mono text-xs font-semibold text-slate-700">{searchValue(result.declarationUuid, locale.search.notAvailable)}</dd></div>
       </dl>
-      {result.declarationUuid && <NavLink to={`/declarations/${encodeURIComponent(result.declarationUuid)}`} className="mt-5 flex items-center justify-between border-t border-slate-100 pt-5 text-sm font-bold text-emerald transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald"><span>{locale.search.viewDeclaration}</span><span aria-hidden="true">↗</span></NavLink>}
+      {result.declarationUuid && <NavLink to={`/declarations/${encodeURIComponent(result.declarationUuid)}`} className="mt-5 flex min-h-11 items-center justify-between gap-3 border-t border-slate-100 pt-5 text-sm font-bold text-emerald transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald"><span>{locale.search.viewDeclaration}</span><ArrowUpRight size={16} strokeWidth={2} aria-hidden="true" /></NavLink>}
     </article>
   );
 }

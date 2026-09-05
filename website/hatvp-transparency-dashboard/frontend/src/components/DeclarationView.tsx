@@ -1,8 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { formatCurrency, formatNumber } from "../formatters";
 import type { Locale, Language } from "../config/i18n";
 import { declarationFieldLabel, declarationSectionLabel, sectionIcon } from "./declarationLabels";
-import { fieldValue, parseDeclarationXml, sectionFieldValue, type AnnualAmount, type DeclarationRecord, type DeclarationSection } from "./declarationData";
+import { fieldValue, parseDeclarationXml, type AnnualAmount, type DeclarationRecord, type DeclarationSection } from "./declarationData";
 
 interface DeclarationViewProps {
   rawXml: string;
@@ -35,14 +35,14 @@ function dateRange(record: DeclarationRecord, fallback: string): string | null {
   return [start, end].filter(Boolean).join(" — ") || fallback;
 }
 
-function AnnualAmounts({ values, language, label }: { values: AnnualAmount[]; language: Language; label: string }) {
+function AnnualAmounts({ values, language, label, valuesLabel }: { values: AnnualAmount[]; language: Language; label: string; valuesLabel: string }) {
   if (values.length === 0) return null;
   const max = Math.max(...values.map((item) => Math.abs(item.amount)), 1);
   return (
     <div className="mt-5 rounded-2xl bg-ink/[0.035] p-4" data-testid="annual-amounts">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald">{label}</p>
-        <span className="text-xs font-semibold text-slate-400">{formatNumber(values.length, language)} {language === "fr" ? "valeurs" : "values"}</span>
+        <span className="text-xs font-semibold text-slate-400">{formatNumber(values.length, language)} {valuesLabel}</span>
       </div>
       <div className="mt-4 flex h-32 items-end gap-2 border-b border-slate-200 px-1" role="img" aria-label={`${label}: ${values.map((item) => `${item.year} ${formatCurrency(item.amount, language)}`).join(", ")}`}>
         {values.map((item, index) => (
@@ -57,12 +57,12 @@ function AnnualAmounts({ values, language, label }: { values: AnnualAmount[]; la
   );
 }
 
-function RecordFields({ record, language, fallback }: { record: DeclarationRecord; language: Language; fallback: string }) {
+function RecordFields({ record, language, fallback, labels, sectionKey }: { record: DeclarationRecord; language: Language; fallback: string; labels: Record<string, string>; sectionKey?: string }) {
   return (
     <dl className="mt-4 grid gap-x-4 gap-y-3 sm:grid-cols-2">
       {record.fields.map((field, index) => (
         <div className="min-w-0" key={`${field.key}-${index}`}>
-          <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">{declarationFieldLabel(field.key, language)}</dt>
+          <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">{declarationFieldLabel(field.key, language, labels, sectionKey)}</dt>
           <dd className="mt-1 break-words text-sm font-semibold leading-5 text-slate-700">{sourceValue(field.value, fallback)}</dd>
         </div>
       ))}
@@ -79,33 +79,35 @@ function RecordCard({ record, index, section, language, locale }: { record: Decl
         <h3 className="text-base font-black tracking-tight text-ink">{title}</h3>
         {range && <span className="rounded-full bg-sky/20 px-3 py-1 text-xs font-bold text-ink">{range}</span>}
       </div>
-      <RecordFields record={record} language={language} fallback={locale.declaration.notAvailable} />
-      {record.annualAmounts.length > 0 && section.records.length === 1 && <AnnualAmounts values={record.annualAmounts} language={language} label={locale.declaration.annualValues} />}
+      <RecordFields record={record} language={language} fallback={locale.declaration.notAvailable} labels={locale.declaration.fieldLabels} sectionKey={section.key} />
+      {record.annualAmounts.length > 0 && section.records.length === 1 && <AnnualAmounts values={record.annualAmounts} language={language} label={locale.declaration.annualValues} valuesLabel={locale.declaration.valuesLabel} />}
     </article>
   );
 }
 
 function DeclarationSectionView({ section, language, locale }: { section: DeclarationSection; language: Language; locale: Locale }) {
   const annualAmounts = annualSummary(section.records.flatMap((record) => record.annualAmounts));
+  const Icon = sectionIcon(section.key);
   return (
     <section id={`declaration-section-${section.key}`} className="dashboard-card scroll-mt-6 p-5 sm:p-7" aria-labelledby={`section-${section.key}`}>
       <div className="flex items-start gap-4">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-emerald/10 text-xl font-black text-emerald" aria-hidden="true">{sectionIcon(section.key)}</span>
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-emerald/10 text-emerald" aria-hidden="true"><Icon size={20} strokeWidth={1.8} /></span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
-            <h2 id={`section-${section.key}`} className="text-xl font-black tracking-tight text-ink">{declarationSectionLabel(section.key, language)}</h2>
+            <h2 id={`section-${section.key}`} className="text-xl font-black tracking-tight text-ink">{declarationSectionLabel(section.key, language, locale.declaration.sectionLabels)}</h2>
             <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{formatNumber(section.records.length, language)} {locale.declaration.records}</span>
           </div>
-          {section.declaredNone && section.records.length === 0 && <p className="mt-3 rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-500">{locale.declaration.noneDeclared}</p>}
+          {section.records.length === 0 && <details className="mt-3 rounded-xl bg-slate-50 px-4 py-3"><summary className="cursor-pointer text-sm font-semibold text-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{section.declaredNone ? locale.declaration.noneDeclared : locale.declaration.emptySection}</summary>{!section.declaredNone && <p className="mt-2 text-xs leading-5 text-slate-500">{locale.declaration.emptySectionDetail}</p>}</details>}
         </div>
       </div>
-      {annualAmounts.length > 0 && section.records.length > 1 && <AnnualAmounts values={annualAmounts} language={language} label={locale.declaration.annualValues} />}
+      {annualAmounts.length > 0 && section.records.length > 1 && <AnnualAmounts values={annualAmounts} language={language} label={locale.declaration.annualValues} valuesLabel={locale.declaration.valuesLabel} />}
       {section.records.length > 0 && <div className="mt-5 grid min-w-0 gap-4 lg:grid-cols-2">{section.records.map((record, index) => <RecordCard key={`${section.key}-${index}`} record={record} index={index} section={section} language={language} locale={locale} />)}</div>}
     </section>
   );
 }
 
 export function DeclarationView({ rawXml, language, locale }: DeclarationViewProps) {
+  const [copied, setCopied] = useState(false);
   const parsed = useMemo(() => parseDeclarationXml(rawXml), [rawXml]);
   const model = parsed.model;
   if (!model) {
@@ -114,10 +116,6 @@ export function DeclarationView({ rawXml, language, locale }: DeclarationViewPro
 
   const profile = firstSection(model, "general");
   const meta = model.metadata;
-  const type = profile ? sectionFieldValue(profile, ["label"]) : null;
-  const mandate = profile ? sectionFieldValue(profile, ["labelTypeMandat", "typeMandat", "label"]) : null;
-  const organization = profile ? sectionFieldValue(profile, ["labelOrgane", "labelOrgan", "nomOrgane"]) : null;
-  const status = fieldValue(meta, ["complete"])?.toLowerCase() === "true" ? locale.declaration.complete : locale.declaration.incomplete;
   const nonProfileSections = model.sections.filter((section) => section.key !== "general");
   return (
     <div className="mt-8 space-y-6">
@@ -127,10 +125,9 @@ export function DeclarationView({ rawXml, language, locale }: DeclarationViewPro
           <h2 className="mt-2 text-2xl font-black tracking-tight text-ink">{locale.declaration.overviewTitle}</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{locale.declaration.overviewDescription}</p>
           <dl className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div><dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.declaration.fields.type}</dt><dd className="mt-1 text-sm font-bold text-slate-700">{sourceValue(type || "", locale.declaration.notAvailable)}</dd></div>
-            <div><dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.mandate}</dt><dd className="mt-1 text-sm font-bold text-slate-700">{sourceValue(mandate || "", locale.declaration.notAvailable)}</dd></div>
-            <div><dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.organ}</dt><dd className="mt-1 text-sm font-bold text-slate-700">{sourceValue(organization || "", locale.declaration.notAvailable)}</dd></div>
-            <div><dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.declaration.fields.status}</dt><dd className="mt-1 text-sm font-bold text-slate-700">{status}</dd></div>
+            <div><dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.declaration.sections}</dt><dd className="mt-1 text-sm font-bold text-slate-700">{formatNumber(model.summary.sectionCount, language)}</dd></div>
+            <div><dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.declaration.records}</dt><dd className="mt-1 text-sm font-bold text-slate-700">{formatNumber(model.summary.recordCount, language)}</dd></div>
+            <div><dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.declaration.annualValues}</dt><dd className="mt-1 text-sm font-bold text-slate-700">{formatNumber(model.summary.annualAmountCount, language)}</dd></div>
           </dl>
         </article>
         <aside className="rounded-[1.5rem] bg-ink p-5 text-white shadow-soft sm:p-7">
@@ -144,17 +141,17 @@ export function DeclarationView({ rawXml, language, locale }: DeclarationViewPro
         </aside>
       </section>
 
-      {profile && <section className="dashboard-card min-w-0 p-5 sm:p-7"><div className="flex items-baseline justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.profileEyebrow}</p><h2 className="mt-2 text-xl font-black tracking-tight text-ink">{locale.declaration.profileTitle}</h2></div><span className="text-xs font-semibold text-slate-400">{formatNumber(profile.fieldCount, language)} {locale.declaration.fieldsLabel}</span></div><RecordFields record={{ fields: profile.records.flatMap((record) => record.fields).filter((field) => !["email", "adresse", "telephoneDec", "voie", "complement", "codePostal", "ville", "pays"].includes(field.key)), annualAmounts: [] }} language={language} fallback={locale.declaration.notAvailable} /></section>}
+      {profile && <section className="dashboard-card min-w-0 p-5 sm:p-7"><div className="flex items-baseline justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.profileEyebrow}</p><h2 className="mt-2 text-xl font-black tracking-tight text-ink">{locale.declaration.profileTitle}</h2></div><span className="text-xs font-semibold text-slate-400">{formatNumber(profile.fieldCount, language)} {locale.declaration.fieldsLabel}</span></div><RecordFields record={{ fields: profile.records.flatMap((record) => record.fields).filter((field) => !["email", "adresse", "telephoneDec", "voie", "complement", "codePostal", "ville", "pays"].includes(field.key)), annualAmounts: [] }} language={language} fallback={locale.declaration.notAvailable} labels={locale.declaration.fieldLabels} sectionKey="general" /></section>}
 
-      {nonProfileSections.length > 0 && <nav className="dashboard-card p-5 sm:p-6" aria-label={locale.declaration.sectionIndex}><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.sectionIndex}</p><div className="mt-3 flex flex-wrap gap-2">{nonProfileSections.map((section) => <a key={section.key} href={`#declaration-section-${section.key}`} className="rounded-full bg-surface-subtle px-3 py-2 text-sm font-bold text-ink transition hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{declarationSectionLabel(section.key, language)}</a>)}</div></nav>}
+      {nonProfileSections.length > 0 && <nav className="dashboard-card p-5 sm:p-6" aria-label={locale.declaration.sectionIndex}><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.sectionIndex}</p><div className="mt-3 flex flex-wrap gap-2">{nonProfileSections.map((section) => <a key={section.key} href={`#declaration-section-${section.key}`} className="rounded-full bg-surface-subtle px-3 py-2 text-sm font-bold text-ink transition hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{declarationSectionLabel(section.key, language, locale.declaration.sectionLabels)}</a>)}</div></nav>}
 
       <div className="space-y-6">{nonProfileSections.map((section) => <DeclarationSectionView key={section.key} section={section} language={language} locale={locale} />)}</div>
 
-      <details className="dashboard-card min-w-0 p-5 sm:p-7"><summary className="cursor-pointer text-sm font-bold text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald">{locale.declaration.technicalFields} ({formatNumber(meta.fields.length, language)} {locale.declaration.fieldsLabel})</summary><p className="mt-3 text-sm leading-6 text-slate-500">{locale.declaration.technicalDescription}</p><div className="mt-4"><RecordFields record={meta} language={language} fallback={locale.declaration.notAvailable} /></div></details>
+      <details className="dashboard-card min-w-0 p-5 sm:p-7"><summary className="cursor-pointer text-sm font-bold text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald">{locale.declaration.technicalFields} ({formatNumber(meta.fields.length, language)} {locale.declaration.fieldsLabel})</summary><p className="mt-3 text-sm leading-6 text-slate-500">{locale.declaration.technicalDescription}</p><div className="mt-4"><RecordFields record={meta} language={language} fallback={locale.declaration.notAvailable} labels={locale.declaration.fieldLabels} /></div></details>
 
       <details className="dashboard-card min-w-0 overflow-hidden">
-        <summary className="cursor-pointer list-none px-5 py-5 text-sm font-bold text-ink transition hover:text-emerald sm:px-7">{locale.declaration.sourceDisclosure}<span className="ml-2 text-slate-400">↘</span></summary>
-        <div className="border-t border-slate-200 px-5 pb-5 pt-4 sm:px-7"><p className="mb-4 text-sm leading-6 text-slate-500">{locale.declaration.sourceDescription}</p><pre aria-label={locale.declaration.rawXmlLabel} className="max-h-[70vh] overflow-auto rounded-2xl bg-[#101815] p-5 text-xs leading-6 text-slate-200"><code>{rawXml}</code></pre></div>
+        <summary className="cursor-pointer list-none px-5 py-5 text-sm font-bold text-ink transition hover:text-emerald sm:px-7">{locale.declaration.sourceDisclosure}</summary>
+        <div className="border-t border-slate-200 px-5 pb-5 pt-4 sm:px-7"><div className="flex flex-wrap items-start justify-between gap-3"><p className="max-w-3xl text-sm leading-6 text-slate-500">{locale.declaration.sourceDescription}</p><button type="button" className="min-h-10 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-ink transition hover:border-emerald hover:text-emerald focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald" onClick={() => { if (!navigator.clipboard) return; void navigator.clipboard.writeText(rawXml).then(() => setCopied(true)).catch(() => setCopied(false)); }}>{copied ? locale.declaration.copiedXml : locale.declaration.copyXml}</button></div><p className="sr-only" aria-live="polite">{copied ? locale.declaration.copiedXml : ""}</p><pre aria-label={locale.declaration.rawXmlLabel} className="mt-4 max-h-[70vh] overflow-auto rounded-2xl bg-[#101815] p-5 text-xs leading-6 text-slate-200"><code>{rawXml}</code></pre></div>
       </details>
     </div>
   );

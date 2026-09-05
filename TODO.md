@@ -41,7 +41,11 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 - [x] Improved dashboard UI/UX with skip navigation, route focus, clearer
   search loading and guidance, snapshot-reading disclosure, declaration
   section navigation, technical-field disclosure, and corrected chart
-  accessibility labels; frontend tests, build, and responsive checks pass.
+  accessibility labels; the follow-up pass adds locale-backed declaration
+  labels, empty-section disclosures, source XML copy support, snapshot context,
+  signal explanations, profile announcements, and chart text summaries.
+  Quality-register rows, action icons, responsive navigation, and metric scope
+  copy were also polished without changing data contracts.
 
 - [x] Merged open PRs #46–#51, resolved tracking-document conflicts, deployed
   commit `5352965`, and forced a successful production replay; the scheduled

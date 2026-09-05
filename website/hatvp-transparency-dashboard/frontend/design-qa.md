@@ -44,6 +44,13 @@ final result: passed
 - Added anchored Explore signal navigation and result counts; the pipeline
   countdown keeps its visible timer while announcing only a stable scheduled
   date and time to assistive technology.
+- Added reusable snapshot context, signal-meaning disclosures, locale-backed
+  declaration labels, contextual empty-section rows, and text fallbacks for
+  salary charts. Source XML remains bounded and can be copied without changing
+  the API or exposing contact fields.
+- Quality issues now collapse into labelled rows below 850px, source actions
+  use Lucide icons, and the shared focus outline remains visible across the
+  expanded navigation and disclosure controls.
 
 **Responsive and interaction checks**
 

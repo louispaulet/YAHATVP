@@ -5,8 +5,10 @@ import { SearchResultCard } from "../components/SearchResultCard";
 import { ChartSkeleton, SliceError } from "../components/Feedback";
 import { useI18n } from "../context/I18nContext";
 import { useLookupResource } from "../hooks/useLookupResource";
-import { formatNumber } from "../formatters";
+import { formatDateTime, formatNumber } from "../formatters";
 import { Search } from "lucide-react";
+
+const SEARCH_RESULT_LIMIT = 100;
 
 export function SearchPage() {
   const { language, locale } = useI18n();
@@ -37,7 +39,7 @@ export function SearchPage() {
       {query && search.loading && <section className="mt-8 space-y-4" aria-busy="true" aria-live="polite"><p className="sr-only">{locale.search.loadingQuery.replace("{query}", query)}</p><ChartSkeleton /><ChartSkeleton /></section>}
       {query && search.error && <section className="mt-8"><SliceError onRetry={search.reload} /></section>}
       {query && search.data && search.data.results.length === 0 && <section className="dashboard-card mt-8 border-dashed p-6 sm:p-8"><p className="text-sm font-bold uppercase tracking-[0.14em] text-slate-400">{locale.search.noResultsEyebrow}</p><p className="mt-3 text-lg font-semibold text-ink">{locale.search.noResults.replace("{query}", query)}</p></section>}
-      {query && search.data && search.data.results.length > 0 && <section className="mt-8" aria-live="polite"><div className="mb-4 flex flex-col gap-2 rounded-2xl border border-emerald/15 bg-emerald/5 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.search.resultsEyebrow}</p><h2 className="mt-1 text-2xl font-black tracking-tight text-ink">{locale.search.resultsFound.replace("{count}", formatNumber(search.data.resultCount, language))}</h2></div><p className="text-sm font-semibold text-slate-600">{locale.search.queryLabel.replace("{query}", query)}</p><p className="text-xs text-slate-500">{locale.search.snapshot.replace("{date}", search.data.snapshotDate || locale.search.notAvailable)}</p></div><div className="space-y-4">{search.data.results.map((result, index) => <SearchResultCard key={`${result.declarationUuid}-${index}`} result={result} />)}</div></section>}
+      {query && search.data && search.data.results.length > 0 && <section className="mt-8" aria-live="polite"><div className="mb-4 flex flex-col gap-2 rounded-2xl border border-emerald/15 bg-emerald/5 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.search.resultsEyebrow}</p><h2 className="mt-1 text-2xl font-black tracking-tight text-ink">{locale.search.resultsFound.replace("{count}", formatNumber(search.data.resultCount, language))}</h2></div><p className="text-sm font-semibold text-slate-600">{locale.search.queryLabel.replace("{query}", query)}</p><div className="text-xs text-slate-500"><p>{locale.search.snapshot.replace("{date}", search.data.snapshotDate || locale.search.notAvailable)}</p><p className="mt-1">{locale.search.generated.replace("{date}", formatDateTime(search.data.generatedAt, language))}</p></div></div>{search.data.resultCount >= SEARCH_RESULT_LIMIT && <p className="mb-4 rounded-xl border border-sky/30 bg-sky/10 px-4 py-3 text-sm leading-6 text-slate-700">{locale.search.resultsLimited}</p>}<div className="space-y-4">{search.data.results.map((result, index) => <SearchResultCard key={`${result.declarationUuid}-${index}`} result={result} />)}</div></section>}
     </div>
   );
 }
