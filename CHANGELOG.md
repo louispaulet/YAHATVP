@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-06 — Deploy dashboard UI/UX release
+
+### Deployed
+
+- Cloud Run bridge revision `hatvp-dashboard-api-00033-dwg` is serving 100% of
+  traffic.
+- Cloudflare Worker version `6aebe78c-4325-4fb1-b3fd-75d9ea68da45` is live at
+  `hatvp-transparency-api.louispaulet13.workers.dev`.
+- The frontend was published to
+  [yahatvp.thefrenchartist.dev](https://yahatvp.thefrenchartist.dev/) with the
+  deployed Worker URL.
+- No ingestion replay was run; the deployed analytical snapshot remains
+  `2026-08-30`.
+
+### Verified
+
+- `make backend-test` passed: 13 Worker tests, TypeScript typecheck, and 48
+  bridge tests.
+- `make frontend-test` passed: 35 tests and the TypeScript/Vite production
+  build completed with only the existing bundle-size warning.
+- Worker `healthz`, overview, income, assets, declarations, simple-analysis,
+  age-analysis, search, and UUID declaration-detail routes returned HTTP 200.
+  Overview, income, assets, and declarations reported the same snapshot date.
+- The custom frontend domain returned HTTP 200.
+
 ## 2026-09-06 — Deploy viewport-triggered women’s-share chart
 
 ### Deployed

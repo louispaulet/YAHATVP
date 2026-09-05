@@ -36,10 +36,14 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 - Keep historical raw snapshots immutable and periodically review retention
   settings without deleting required audit history.
 
-## Recent completed work (2026-08-19 through 2026-09-05)
+## Recent completed work (2026-08-19 through 2026-09-06)
 
 - [x] Changed the homepage women’s-share chart from a manual disclosure to a
   one-shot viewport-triggered expansion that loads the plot and keeps it open.
+- [x] Deployed the dashboard UI/UX release: Cloud Run bridge revision
+  `hatvp-dashboard-api-00033-dwg`, Worker version
+  `6aebe78c-4325-4fb1-b3fd-75d9ea68da45`, and the custom GitHub Pages domain;
+  public route smoke tests passed without running an ingestion replay.
 - [x] Improved dashboard UI/UX with skip navigation, route focus, clearer
   search loading and guidance, snapshot-reading disclosure, declaration
   section navigation, technical-field disclosure, and corrected chart
