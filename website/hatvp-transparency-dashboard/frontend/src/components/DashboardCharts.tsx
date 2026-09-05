@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { Language } from "../config/i18n";
 import { useI18n } from "../context/I18nContext";
 import type { ResourceState } from "../hooks/useResource";
@@ -29,7 +29,31 @@ interface DashboardChartsProps {
 
 export function DashboardCharts({ income, assets, declarations, gender, overview, language, deferred }: DashboardChartsProps) {
   const { locale } = useI18n();
-  const [genderPositionsOpen, setGenderPositionsOpen] = useState(false);
+  const [genderPositionsVisible, setGenderPositionsVisible] = useState(false);
+  const genderPositionsRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (genderPositionsVisible) return;
+
+    const node = genderPositionsRef.current;
+    if (!node) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      setGenderPositionsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        setGenderPositionsVisible(true);
+        observer.disconnect();
+      },
+      { rootMargin: "0px 0px 160px 0px", threshold: 0 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [genderPositionsVisible]);
 
   const retryIncomeAssets = () => {
     if (income.error) income.reload();
@@ -82,18 +106,17 @@ export function DashboardCharts({ income, assets, declarations, gender, overview
             {assets.data && <Suspense fallback={<ChartSkeleton compact />}><AssetChart items={assets.data.items} emptyLabel={locale.panels.assets.empty} chartLabel={locale.panels.assets.title} language={language} compact /></Suspense>}
           </Panel>
 
-          <section className="dashboard-card min-w-0 p-6 sm:p-8">
+          <section ref={genderPositionsRef} className="dashboard-card min-w-0 p-6 sm:p-8" aria-labelledby="gender-positions-title">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#b24b67]">{locale.panels.genderPositions.eyebrow}</p>
-            <details className="group mt-2" onToggle={(event) => setGenderPositionsOpen(event.currentTarget.open)}>
-              <summary className="cursor-pointer list-none text-xl font-bold tracking-tight text-ink marker:hidden focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald"><span className="inline-flex items-center gap-3">{locale.panels.genderPositions.title}<span className="rounded-full bg-[#d96c86]/10 px-2.5 py-1 text-xs font-bold text-[#b24b67] group-open:bg-[#d96c86]/20">{genderPositionsOpen ? locale.homepage.evidence.hide : locale.homepage.evidence.show}</span></span></summary>
+            <div className="mt-2">
+              <h3 id="gender-positions-title" className="text-xl font-bold tracking-tight text-ink">{locale.panels.genderPositions.title}</h3>
               <p className="mt-3 text-sm leading-6 text-slate-500">{locale.panels.genderPositions.description}</p>
               <div className="mt-5">
-                {(!deferred || gender.loading) && <ChartSkeleton compact />}
+                {(!deferred || gender.loading || !genderPositionsVisible) && <ChartSkeleton compact />}
                 {gender.error && <SliceError onRetry={gender.reload} />}
-                {gender.data && genderPositionsOpen && <Suspense fallback={<ChartSkeleton compact />}><GenderPositionChart positions={gender.data.positions} emptyLabel={locale.panels.genderPositions.empty} language={language} chartLabel={locale.accessibility.genderPositionsChart} legendLabel={locale.accessibility.genderPositionsLegend} womenLabel={locale.panels.genderPositions.women} parityLabel={locale.panels.genderPositions.parity} peopleLabel={locale.panels.genderPositions.people} noteLabel={locale.panels.genderPositions.note} compact /></Suspense>}
-                {gender.data && !genderPositionsOpen && <p className="rounded-2xl bg-surface-subtle p-4 text-sm leading-6 text-slate-500">{locale.homepage.evidence.genderClosed}</p>}
+                {gender.data && genderPositionsVisible && <Suspense fallback={<ChartSkeleton compact />}><GenderPositionChart positions={gender.data.positions} emptyLabel={locale.panels.genderPositions.empty} language={language} chartLabel={locale.accessibility.genderPositionsChart} legendLabel={locale.accessibility.genderPositionsLegend} womenLabel={locale.panels.genderPositions.women} parityLabel={locale.panels.genderPositions.parity} peopleLabel={locale.panels.genderPositions.people} noteLabel={locale.panels.genderPositions.note} compact /></Suspense>}
               </div>
-            </details>
+            </div>
           </section>
         </div>
       </section>

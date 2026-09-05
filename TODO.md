@@ -38,6 +38,8 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 
 ## Recent completed work (2026-08-19 through 2026-09-05)
 
+- [x] Changed the homepage women’s-share chart from a manual disclosure to a
+  one-shot viewport-triggered expansion that loads the plot and keeps it open.
 - [x] Improved dashboard UI/UX with skip navigation, route focus, clearer
   search loading and guidance, snapshot-reading disclosure, declaration
   section navigation, technical-field disclosure, and corrected chart

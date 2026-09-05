@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
@@ -78,11 +78,36 @@ describe("dashboard application", () => {
     expect(screen.getByText("Women’s share by job position")).toBeInTheDocument();
     expect(screen.getByText("Bars are sorted from the most popular position to the least popular, showing the top 10 job positions.")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Male-to-female ratio/i })).toBeInTheDocument();
-    fireEvent.click(screen.getByText("Show chart"));
     expect(await screen.findByRole("img", { name: /Share of women by job position/i })).toBeInTheDocument();
+    expect(screen.queryByText("Show chart")).not.toBeInTheDocument();
     expect(screen.queryByText("⚖️", { selector: "header span" })).not.toBeInTheDocument();
     expect(screen.getByRole("banner").querySelector('img[src="/hatvp-mark.webp"]')).toBeTruthy();
     expect(screen.getByTestId("homepage-deferred-sentinel")).toBeInTheDocument();
+  });
+
+  it("loads the women’s-share chart when its panel enters the viewport", async () => {
+    const intersectionCallbacks: IntersectionObserverCallback[] = [];
+    class TestIntersectionObserver {
+      constructor(callback: IntersectionObserverCallback) {
+        intersectionCallbacks.push(callback);
+      }
+
+      observe() {}
+
+      disconnect() {}
+    }
+    vi.stubGlobal("IntersectionObserver", TestIntersectionObserver);
+
+    render(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+    expect(screen.queryByRole("img", { name: /Share of women by job position/i })).not.toBeInTheDocument();
+    expect(intersectionCallbacks).toHaveLength(2);
+
+    await act(async () => {
+      intersectionCallbacks.forEach((callback) => callback([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver));
+    });
+
+    expect(await screen.findByRole("img", { name: /Share of women by job position/i })).toBeInTheDocument();
+    expect(screen.queryByText("Show chart")).not.toBeInTheDocument();
   });
 
   it("navigates from the homepage search form and exposes all next-step routes", async () => {

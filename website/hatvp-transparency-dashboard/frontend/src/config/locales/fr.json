@@ -90,9 +90,6 @@
       "assetsDescription": "Valeurs observées regroupées selon la catégorie publiée dans le dernier instantané.",
       "declarationsDescription": "La répartition complète par type de déclaration reste disponible dans ce tableau de référence.",
       "methodDescription": "Un guide court sur les décomptes, le traitement des montants et la génération de cette vue.",
-      "show": "Afficher le graphique",
-      "hide": "Masquer le graphique",
-      "genderClosed": "Ouvrez cette section pour examiner les 10 fonctions principales et la part des femmes dans chacune.",
       "readSnapshot": "Comment lire cet instantané",
       "readSnapshotDescription": "Ces chiffres sont des indicateurs publiés ou observés dans un instantané daté et validé. Ils aident à poser une question ; la déclaration source reste la référence.",
       "coverageLink": "Lire la couverture et les méthodes"

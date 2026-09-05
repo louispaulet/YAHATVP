@@ -31,6 +31,26 @@
 
 final result: passed
 
+## 2026-09-05 — Viewport-triggered women’s-share chart
+
+**Interaction evidence**
+
+- The local Chrome smoke check showed the women’s-share panel without a
+  manual control before it entered the viewport.
+- Scrolling the panel into view mounted the lazy chart bundle and displayed the
+  plot with its visible legend, supporting values, and accessible chart label.
+- The chart remained visible after scrolling past and back to the panel; the
+  old “Show chart” control was absent.
+
+**Functional checks**
+
+- [x] Frontend tests: 35 passed.
+- [x] TypeScript/Vite production build passed.
+- [x] Chrome console inspection reported no warning or error messages from the
+  change.
+
+final result: passed
+
 ## 2026-09-05 — Reading-path and accessibility polish
 
 **Refinement**

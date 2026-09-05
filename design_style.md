@@ -134,8 +134,10 @@ hardcoding user-facing copy in components.
   meaning; do not introduce arbitrary gradients or decorative chart colors.
 - Explain denominators, annualization, exclusions, and caveats next to the
   chart. Comparisons must not imply a shared unit when the measures differ.
-- Keep secondary analysis inside a disclosure when it would dominate the main
-  reading path. The women’s-share-by-position chart is the reference pattern.
+- Keep secondary analysis out of the initial reading path when it would
+  dominate the main page. For the women’s-share-by-position chart, reveal the
+  plot once its panel enters the viewport and keep it open for the rest of the
+  visit, so the reader does not need to operate a separate disclosure control.
 - Empty and error states must be explicit and readable; never render a blank
   chart area that could be mistaken for zero data.
 

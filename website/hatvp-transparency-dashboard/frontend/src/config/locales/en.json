@@ -90,9 +90,6 @@
       "assetsDescription": "Observed values grouped by the asset section published in the latest snapshot.",
       "declarationsDescription": "The complete declaration-type breakdown is kept here as a reference table.",
       "methodDescription": "A short guide to what is counted, how amounts are treated, and when this view was generated.",
-      "show": "Show chart",
-      "hide": "Hide chart",
-      "genderClosed": "Open this disclosure to inspect the top 10 positions and the women’s share within each one.",
       "readSnapshot": "How to read this snapshot",
       "readSnapshotDescription": "These figures are published or observed indicators from one dated successful snapshot. They help you ask the next question; the source declaration remains the reference.",
       "coverageLink": "Read data coverage and methods"

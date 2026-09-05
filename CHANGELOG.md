@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-05 — Auto-load the women’s-share chart on scroll
+
+### Changed
+
+- Removed the manual show/hide disclosure from the women’s-share-by-position
+  panel.
+- The panel now expands once when it enters the viewport, loads its chart, and
+  stays expanded for the rest of the visit.
+
+### Verified
+
+- Frontend tests and the TypeScript/Vite production build pass.
+
 ## 2026-09-05 — Improve dashboard reading and accessibility
 
 ### Changed
