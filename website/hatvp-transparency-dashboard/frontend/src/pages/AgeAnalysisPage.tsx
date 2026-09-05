@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { useSearchParams } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
 import { fetchAgeAnalysis } from "../api";
 import { AgeAssetInventory } from "../components/AgeAssetInventory";
 import { AgeDeclarationContext } from "../components/AgeDeclarationContext";
@@ -52,6 +52,7 @@ export function AgeAnalysisPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-14">
+      <NavLink to="/search" className="mb-6 inline-flex min-h-10 items-center gap-2 text-sm font-bold text-emerald transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-emerald">← {locale.nav.search}</NavLink>
       <section className="hero-grid overflow-hidden rounded-[2rem] bg-ink px-6 py-9 text-white shadow-soft sm:px-10 sm:py-11"><p className="relative z-10 text-xs font-bold uppercase tracking-[0.18em] text-lime">{labels.eyebrow}</p><h1 className="relative z-10 mt-4 max-w-4xl text-4xl font-black leading-[1.04] tracking-[-0.04em] sm:text-5xl">{labels.title}</h1><p className="relative z-10 mt-5 max-w-3xl text-base leading-7 text-slate-300">{labels.description}</p></section>
       <section className="dashboard-card relative z-10 -mt-5 p-5 sm:p-6"><form onSubmit={submit}><label htmlFor="age-analysis-search" className="text-sm font-bold text-ink">{labels.inputLabel}</label><div className="mt-3 flex flex-col gap-3 sm:flex-row"><div className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 focus-within:border-emerald focus-within:ring-2 focus-within:ring-emerald/30"><span aria-hidden="true" className="text-xl text-emerald">⌕</span><input id="age-analysis-search" value={input} onChange={(event) => setInput(event.target.value)} placeholder={labels.placeholder} maxLength={120} className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-ink outline-none placeholder:font-normal placeholder:text-slate-400" /></div><button type="submit" className="rounded-2xl bg-emerald px-6 py-3 text-sm font-bold text-white transition hover:bg-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{labels.submit}</button></div><p className="mt-3 text-xs leading-5 text-slate-500">{labels.hint}</p></form></section>
       {analysis.loading && <div className="mt-8 space-y-6"><ChartSkeleton /><ChartSkeleton /></div>}

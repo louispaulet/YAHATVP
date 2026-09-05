@@ -87,7 +87,10 @@
       "methodDescription": "A short guide to what is counted, how amounts are treated, and when this view was generated.",
       "show": "Show chart",
       "hide": "Hide chart",
-      "genderClosed": "Open this disclosure to inspect the top 10 positions and the women’s share within each one."
+      "genderClosed": "Open this disclosure to inspect the top 10 positions and the women’s share within each one.",
+      "readSnapshot": "How to read this snapshot",
+      "readSnapshotDescription": "These figures are published or observed indicators from one dated successful snapshot. They help you ask the next question; the source declaration remains the reference.",
+      "coverageLink": "Read data coverage and methods"
     },
     "supportingEvidence": "Supporting evidence and methodology",
     "exploreNext": {
@@ -449,6 +452,10 @@
     "clear": "Clear",
     "searchTip": "Press Enter to search",
     "hint": "Search is accent-insensitive and matches partial words. Contact details and addresses are never searched or shown.",
+    "fieldsDisclosure": "What can I search?",
+    "fieldsDescription": "Names, mandates, organisations, declaration identifiers, deposit dates, and declared amounts from public fields.",
+    "loadingQuery": "Loading results for “{query}”",
+    "resultsLimited": "Showing the available matches for this search. Try a more specific term if you need a shorter list.",
     "emptyTitle": "Start with a name or keyword",
     "emptyDescription": "Try a surname such as “Dupont”, a mandate, an organisation, a declaration identifier, or an amount.",
     "examplesLabel": "Try an example search",
@@ -486,6 +493,10 @@
     "profileTitle": "Public profile",
     "metadataEyebrow": "Source metadata",
     "metadataTitle": "Publication details",
+    "technicalFields": "Technical source fields",
+    "technicalDescription": "Internal source labels and fields retained for audit context.",
+    "sectionIndex": "In this declaration",
+    "sourceDisclosure": "View source XML",
     "complete": "Complete",
     "incomplete": "Incomplete",
     "notAvailable": "Not available",
@@ -512,6 +523,7 @@
     "backToOverview": "Back to overview"
   },
   "accessibility": {
+    "skipToContent": "Skip to main content",
     "comparisonChart": "Average annual income and asset totals",
     "comparisonLegend": "Average annual income and asset totals legend",
     "genderRatioChart": "Male-to-female ratio",

@@ -36,7 +36,12 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 - Keep historical raw snapshots immutable and periodically review retention
   settings without deleting required audit history.
 
-## Recent completed work (2026-08-19 through 2026-08-30)
+## Recent completed work (2026-08-19 through 2026-09-05)
+
+- [x] Improved dashboard UI/UX with skip navigation, route focus, clearer
+  search loading and guidance, snapshot-reading disclosure, declaration
+  section navigation, technical-field disclosure, and corrected chart
+  accessibility labels; frontend tests, build, and responsive checks pass.
 
 - [x] Merged open PRs #46–#51, resolved tracking-document conflicts, deployed
   commit `5352965`, and forced a successful production replay; the scheduled

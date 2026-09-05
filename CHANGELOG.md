@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-05 — Improve dashboard reading and accessibility
+
+### Changed
+
+- Added skip navigation, route orientation focus, query-scoped loading, search
+  field guidance, snapshot-reading guidance, a declaration section index, and a
+  technical-field disclosure across the frontend.
+- Improved responsive search/profile navigation and corrected the populated
+  asset chart accessible description while preserving the existing API and
+  source-data policy.
+
+### Verified
+
+- Frontend tests: 34 passed; TypeScript/Vite production build passed.
+- Browser checks covered the local dashboard at 320px and 1024px with no
+  horizontal overflow; the deployed dashboard remains the source for loaded
+  production data verification.
+
 This live changelog keeps concise release-level information from the recent
 development period, 2026-08-19 through 2026-08-30. Detailed implementation,
 deployment, and pre-v1.0 history is preserved in

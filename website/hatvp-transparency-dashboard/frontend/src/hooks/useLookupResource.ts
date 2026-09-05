@@ -17,7 +17,7 @@ export function useLookupResource<T>(key: string, loader: Loader<T>): ResourceSt
       return;
     }
     const controller = new AbortController();
-    setState((current) => ({ ...current, loading: true, error: false }));
+    setState({ data: null, loading: true, error: false });
     loader(controller.signal)
       .then((data) => setState({ data, error: false, loading: false }))
       .catch((reason: unknown) => {

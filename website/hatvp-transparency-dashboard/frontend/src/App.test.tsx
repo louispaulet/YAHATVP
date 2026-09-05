@@ -54,6 +54,7 @@ describe("dashboard application", () => {
     expect(screen.getByRole("heading", { name: "People. Money. Public declarations." })).toBeInTheDocument();
     expect(screen.getByText("2026-08-18")).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Search a declarant" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Skip to main content" })).toHaveAttribute("href", "#main-content");
     expect(screen.getAllByText("2", { selector: "p" })).toHaveLength(4);
     expect(screen.getAllByText("3", { selector: "p" })).toHaveLength(2);
     expect(screen.getAllByText("4", { selector: "p" })).toHaveLength(2);
@@ -69,6 +70,7 @@ describe("dashboard application", () => {
     expect(screen.getAllByText("€80K")).toHaveLength(2);
     expect(screen.getByText(/Average annual income: €75K/)).toBeInTheDocument();
     expect(screen.getByText("Real estate")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Assets, by section" })).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Average annual income and asset totals/i })).toBeInTheDocument();
     expect(screen.getByText("Declaration types")).toBeInTheDocument();
     expect(screen.getByText("One view, four tables")).toBeInTheDocument();
@@ -235,6 +237,7 @@ describe("dashboard application", () => {
     render(<MemoryRouter initialEntries={["/search?q=Alice"]}><App /></MemoryRouter>);
     expect(await screen.findByText("M. Alice DUPONT")).toBeInTheDocument();
     expect(screen.getByDisplayValue("Alice")).toBeInTheDocument();
+    expect(screen.getByText("What can I search?")).toBeInTheDocument();
     const detailLink = screen.getByRole("link", { name: "Open declaration and source XML" });
     expect(detailLink).toHaveAttribute("href", "/declarations/fixture-uuid-1");
     fireEvent.click(detailLink);
@@ -244,6 +247,8 @@ describe("dashboard application", () => {
     expect(screen.getByRole("heading", { name: "Bank accounts" })).toBeInTheDocument();
     expect(screen.getByText("50 000,00")).toBeInTheDocument();
     expect(screen.getByText("published fields rendered")).toBeInTheDocument();
+    expect(screen.getByText(/Technical source fields/)).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "In this declaration" })).toBeInTheDocument();
     expect(screen.getByLabelText("Raw declaration XML")).toHaveTextContent("fixture-uuid-1");
   });
 

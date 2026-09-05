@@ -31,6 +31,27 @@
 
 final result: passed
 
+## 2026-09-05 — Reading-path and accessibility polish
+
+**Refinement**
+
+- Added a keyboard skip link and stable `main-content` target.
+- Added route orientation focus, query-scoped loading, search-field guidance,
+  snapshot-reading disclosure, declaration section anchors, and a technical
+  source-fields disclosure.
+- Corrected the populated asset chart accessible label so it no longer uses the
+  empty-state sentence.
+
+**Responsive and interaction checks**
+
+- Local browser checks at 320 × 844 and 1024 × 768 reported document width
+  equal to viewport width.
+- Verified the skip link, search disclosure, route focus target, and declaration
+  section navigation in the local build.
+- Frontend tests (34) and the TypeScript/Vite production build passed.
+
+final result: passed
+
 ## 2026-08-27 — Supporting evidence balance polish
 
 **Selected visual source**

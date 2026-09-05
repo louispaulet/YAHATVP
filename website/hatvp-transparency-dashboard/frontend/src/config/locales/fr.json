@@ -87,7 +87,10 @@
       "methodDescription": "Un guide court sur les décomptes, le traitement des montants et la génération de cette vue.",
       "show": "Afficher le graphique",
       "hide": "Masquer le graphique",
-      "genderClosed": "Ouvrez cette section pour examiner les 10 fonctions principales et la part des femmes dans chacune."
+      "genderClosed": "Ouvrez cette section pour examiner les 10 fonctions principales et la part des femmes dans chacune.",
+      "readSnapshot": "Comment lire cet instantané",
+      "readSnapshotDescription": "Ces chiffres sont des indicateurs publiés ou observés dans un instantané daté et validé. Ils aident à poser une question ; la déclaration source reste la référence.",
+      "coverageLink": "Lire la couverture et les méthodes"
     },
     "supportingEvidence": "Éléments de preuve et méthode",
     "exploreNext": {
@@ -449,6 +452,10 @@
     "clear": "Effacer",
     "searchTip": "Appuyez sur Entrée pour rechercher",
     "hint": "La recherche ignore les accents et trouve aussi les correspondances partielles. Les coordonnées et adresses ne sont jamais recherchées ni affichées.",
+    "fieldsDisclosure": "Que puis-je rechercher ?",
+    "fieldsDescription": "Les noms, mandats, organismes, identifiants de déclaration, dates de dépôt et montants déclarés présents dans les champs publics.",
+    "loadingQuery": "Chargement des résultats pour « {query} »",
+    "resultsLimited": "Les correspondances disponibles pour cette recherche sont affichées. Essayez un terme plus précis pour réduire la liste.",
     "emptyTitle": "Commencez par un nom ou un mot-clé",
     "emptyDescription": "Essayez un nom comme « Dupont », un mandat, un organisme, un identifiant de déclaration ou un montant.",
     "examplesLabel": "Essayez une recherche",
@@ -486,6 +493,10 @@
     "profileTitle": "Profil public",
     "metadataEyebrow": "Métadonnées source",
     "metadataTitle": "Détails de publication",
+    "technicalFields": "Champs techniques de la source",
+    "technicalDescription": "Libellés et champs internes conservés pour le contexte d’audit.",
+    "sectionIndex": "Dans cette déclaration",
+    "sourceDisclosure": "Voir le XML source",
     "complete": "Complet",
     "incomplete": "Incomplet",
     "notAvailable": "Indisponible",
@@ -512,6 +523,7 @@
     "backToOverview": "Retour à la vue d’ensemble"
   },
   "accessibility": {
+    "skipToContent": "Aller au contenu principal",
     "comparisonChart": "Revenu annuel moyen et patrimoine total",
     "comparisonLegend": "Légende du revenu annuel moyen et du patrimoine total",
     "genderRatioChart": "Ratio femmes-hommes",

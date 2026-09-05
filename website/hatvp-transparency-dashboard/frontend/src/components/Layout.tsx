@@ -1,6 +1,7 @@
 import { ExternalLink, GitBranch } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { useI18n } from "../context/I18nContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
@@ -27,9 +28,14 @@ function childClass({ isActive }: { isActive: boolean }): string {
 }
 
 export function Layout({ children }: { children: ReactNode }) {
-  const { locale } = useI18n();
+  const { language, locale } = useI18n();
   const { pathname } = useLocation();
   const currentSection = sectionForPath(pathname);
+  useEffect(() => {
+    document.documentElement.lang = language;
+    const main = document.getElementById("main-content");
+    main?.focus({ preventScroll: true });
+  }, [language, pathname]);
   const sections = [
     { key: "explore" as const, to: "/", label: locale.nav.explore },
     { key: "declarations" as const, to: "/search", label: locale.nav.declarations },
@@ -54,6 +60,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-canvas text-ink">
+      <a href="#main-content" className="sr-only fixed left-4 top-4 z-50 rounded-xl bg-ink px-4 py-3 text-sm font-bold text-white focus:not-sr-only focus:outline-2 focus:outline-offset-2 focus:outline-emerald">{locale.accessibility.skipToContent}</a>
       <header className="border-b border-slate-200/80 bg-canvas/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-5 lg:flex-nowrap lg:px-8 lg:py-4">
           <Link to="/" className="flex min-w-0 shrink-0 items-center gap-3">
@@ -67,7 +74,7 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
         {currentSection && <div className="border-t border-slate-200/60 bg-canvas/60"><nav aria-label={locale.nav.sectionLabel} className="mx-auto flex max-w-7xl flex-wrap gap-x-5 gap-y-1 px-5 py-2 lg:px-8">{childrenBySection[currentSection].map((child) => <NavLink key={child.to} to={child.to} end={child.end} className={childClass}>{child.label}</NavLink>)}</nav></div>}
       </header>
-      <main className="flex-1">{children}</main>
+      <main id="main-content" tabIndex={-1} className="flex-1 outline-none">{children}</main>
       <footer className="mt-auto border-t border-slate-200/80">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-8 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <span>{locale.footer.builtFrom}</span>

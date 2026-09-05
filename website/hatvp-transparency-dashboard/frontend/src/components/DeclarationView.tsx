@@ -88,7 +88,7 @@ function RecordCard({ record, index, section, language, locale }: { record: Decl
 function DeclarationSectionView({ section, language, locale }: { section: DeclarationSection; language: Language; locale: Locale }) {
   const annualAmounts = annualSummary(section.records.flatMap((record) => record.annualAmounts));
   return (
-    <section className="dashboard-card p-5 sm:p-7" aria-labelledby={`section-${section.key}`}>
+    <section id={`declaration-section-${section.key}`} className="dashboard-card scroll-mt-6 p-5 sm:p-7" aria-labelledby={`section-${section.key}`}>
       <div className="flex items-start gap-4">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-emerald/10 text-xl font-black text-emerald" aria-hidden="true">{sectionIcon(section.key)}</span>
         <div className="min-w-0 flex-1">
@@ -144,11 +144,13 @@ export function DeclarationView({ rawXml, language, locale }: DeclarationViewPro
         </aside>
       </section>
 
-      {profile && <section className="dashboard-card min-w-0 p-5 sm:p-7"><div className="flex items-baseline justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.profileEyebrow}</p><h2 className="mt-2 text-xl font-black tracking-tight text-ink">{locale.declaration.profileTitle}</h2></div><span className="text-xs font-semibold text-slate-400">{formatNumber(profile.fieldCount, language)} {locale.declaration.fieldsLabel}</span></div><RecordFields record={{ fields: profile.records.flatMap((record) => record.fields), annualAmounts: [] }} language={language} fallback={locale.declaration.notAvailable} /></section>}
+      {profile && <section className="dashboard-card min-w-0 p-5 sm:p-7"><div className="flex items-baseline justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.profileEyebrow}</p><h2 className="mt-2 text-xl font-black tracking-tight text-ink">{locale.declaration.profileTitle}</h2></div><span className="text-xs font-semibold text-slate-400">{formatNumber(profile.fieldCount, language)} {locale.declaration.fieldsLabel}</span></div><RecordFields record={{ fields: profile.records.flatMap((record) => record.fields).filter((field) => !["email", "adresse", "telephoneDec", "voie", "complement", "codePostal", "ville", "pays"].includes(field.key)), annualAmounts: [] }} language={language} fallback={locale.declaration.notAvailable} /></section>}
 
-      <section className="dashboard-card p-5 sm:p-7"><div className="flex items-baseline justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.metadataEyebrow}</p><h2 className="mt-2 text-xl font-black tracking-tight text-ink">{locale.declaration.metadataTitle}</h2></div><span className="text-xs font-semibold text-slate-400">{formatNumber(meta.fields.length, language)} {locale.declaration.fieldsLabel}</span></div><RecordFields record={meta} language={language} fallback={locale.declaration.notAvailable} /></section>
+      {nonProfileSections.length > 0 && <nav className="dashboard-card p-5 sm:p-6" aria-label={locale.declaration.sectionIndex}><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.sectionIndex}</p><div className="mt-3 flex flex-wrap gap-2">{nonProfileSections.map((section) => <a key={section.key} href={`#declaration-section-${section.key}`} className="rounded-full bg-surface-subtle px-3 py-2 text-sm font-bold text-ink transition hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{declarationSectionLabel(section.key, language)}</a>)}</div></nav>}
 
       <div className="space-y-6">{nonProfileSections.map((section) => <DeclarationSectionView key={section.key} section={section} language={language} locale={locale} />)}</div>
+
+      <details className="dashboard-card min-w-0 p-5 sm:p-7"><summary className="cursor-pointer text-sm font-bold text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald">{locale.declaration.technicalFields} ({formatNumber(meta.fields.length, language)} {locale.declaration.fieldsLabel})</summary><p className="mt-3 text-sm leading-6 text-slate-500">{locale.declaration.technicalDescription}</p><div className="mt-4"><RecordFields record={meta} language={language} fallback={locale.declaration.notAvailable} /></div></details>
 
       <details className="dashboard-card min-w-0 overflow-hidden">
         <summary className="cursor-pointer list-none px-5 py-5 text-sm font-bold text-ink transition hover:text-emerald sm:px-7">{locale.declaration.sourceTitle}<span className="ml-2 text-slate-400">↘</span></summary>

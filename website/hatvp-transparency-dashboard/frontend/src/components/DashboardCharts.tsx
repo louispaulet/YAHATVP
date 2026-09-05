@@ -79,7 +79,7 @@ export function DashboardCharts({ income, assets, declarations, gender, overview
           <Panel title={locale.panels.assets.title} eyebrow={locale.panels.assets.eyebrow} description={locale.homepage.evidence.assetsDescription}>
             {(!deferred || assets.loading) && <ChartSkeleton compact />}
             {assets.error && <SliceError onRetry={assets.reload} />}
-            {assets.data && <Suspense fallback={<ChartSkeleton compact />}><AssetChart items={assets.data.items} emptyLabel={locale.panels.assets.empty} language={language} compact /></Suspense>}
+            {assets.data && <Suspense fallback={<ChartSkeleton compact />}><AssetChart items={assets.data.items} emptyLabel={locale.panels.assets.empty} chartLabel={locale.panels.assets.title} language={language} compact /></Suspense>}
           </Panel>
 
           <section className="dashboard-card min-w-0 p-6 sm:p-8">
