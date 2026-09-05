@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-06 — Add breathing room to the quality register
+
+### Changed
+
+- Added a small desktop gutter between the issue-type and contacted-HATVP
+  columns so long issue labels do not visually run into the adjacent date.
+
+### Verified
+
+- Frontend tests and the TypeScript/Vite production build pass.
+- The quality-register table keeps its existing stacked mobile layout.
+
 ## 2026-09-06 — Deploy dashboard UI/UX release
 
 ### Deployed

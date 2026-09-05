@@ -31,6 +31,27 @@
 
 final result: passed
 
+## 2026-09-06 — Quality-register column spacing
+
+**Refinement**
+
+- Added a small desktop-only gutter between the issue-type and contacted-HATVP
+  columns in the quality register. The existing stacked mobile card treatment
+  remains unchanged.
+
+**Functional and responsive checks**
+
+- [x] Local Chrome preview showed a restrained gutter between the first two
+  columns at a 1470 × 735 desktop viewport; the issue label no longer runs
+  visually into the contacted-HATVP date.
+- [x] The existing mobile override still applies zero horizontal cell padding
+  inside the stacked cards, so the new desktop-only rule does not alter the
+  mobile layout or its overflow behavior.
+- [x] Frontend tests (35) and the TypeScript/Vite production build passed;
+  browser console inspection reported no warnings or errors.
+
+final result: passed
+
 ## 2026-09-05 — Viewport-triggered women’s-share chart
 
 **Interaction evidence**
