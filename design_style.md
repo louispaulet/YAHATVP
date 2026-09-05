@@ -106,6 +106,10 @@ versions:
 - `LoadingShell` and `ChartSkeleton`: loading states that preserve layout while
   data arrives.
 - `SliceError`: retryable data-slice error state.
+- `SnapshotContext`: compact, locale-aware snapshot date, generation time, and
+  source-scope row for evidence-dependent sections.
+- `Disclosure`: semantic `<details>` and `<summary>` treatment for secondary
+  explanations, technical fields, and bounded source content.
 
 Use the standard panel structure:
 
