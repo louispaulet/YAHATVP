@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-06 — Deploy viewport-triggered women’s-share chart
+
+### Deployed
+
+- Cloud Run bridge revision `hatvp-dashboard-api-00032-hh9` is serving 100% of
+  traffic.
+- Cloudflare Worker version `646e261d-6af4-49e7-a3ca-d5a58e2554b3` is live at
+  `hatvp-transparency-api.louispaulet13.workers.dev`.
+- The frontend was published to [yahatvp.thefrenchartist.dev](https://yahatvp.thefrenchartist.dev/)
+  using that Worker URL.
+- GitHub Actions [Test and deploy run 33994814034](https://github.com/louispaulet/YAHATVP/actions/runs/33994814034)
+  and [Pages deployment run 33994962477](https://github.com/louispaulet/YAHATVP/actions/runs/33994962477)
+  completed successfully for the release.
+- No forced ingestion replay was run; this release does not change pipeline or
+  Gold-table logic. The deployed snapshot remains `2026-08-30`.
+
+### Verified
+
+- Worker `/healthz`, overview, income, assets, declarations, and search routes
+  returned HTTP 200. The dashboard counts remain 17,885 declarations, 7,318
+  people, 227,792 income rows, and 4,714 asset rows.
+- The custom frontend domain returned HTTP 200, and the deployed JavaScript
+  bundle no longer contains the removed “Show chart” control.
+
 ## 2026-09-05 — Auto-load the women’s-share chart on scroll
 
 ### Changed
