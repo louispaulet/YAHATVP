@@ -51,6 +51,8 @@ final result: passed
 - Quality issues now collapse into labelled rows below 850px, source actions
   use Lucide icons, and the shared focus outline remains visible across the
   expanded navigation and disclosure controls.
+- Declaration annual amount bars now include a text table with localized year
+  and amount headers for keyboard and screen-reader readers.
 
 **Responsive and interaction checks**
 

@@ -35,7 +35,7 @@ function dateRange(record: DeclarationRecord, fallback: string): string | null {
   return [start, end].filter(Boolean).join(" — ") || fallback;
 }
 
-function AnnualAmounts({ values, language, label, valuesLabel }: { values: AnnualAmount[]; language: Language; label: string; valuesLabel: string }) {
+function AnnualAmounts({ values, language, label, valuesLabel, amountLabel, yearLabel }: { values: AnnualAmount[]; language: Language; label: string; valuesLabel: string; amountLabel: string; yearLabel: string }) {
   if (values.length === 0) return null;
   const max = Math.max(...values.map((item) => Math.abs(item.amount)), 1);
   return (
@@ -47,12 +47,15 @@ function AnnualAmounts({ values, language, label, valuesLabel }: { values: Annua
       <div className="mt-4 flex h-32 items-end gap-2 border-b border-slate-200 px-1" role="img" aria-label={`${label}: ${values.map((item) => `${item.year} ${formatCurrency(item.amount, language)}`).join(", ")}`}>
         {values.map((item, index) => (
           <div className="flex min-w-0 flex-1 flex-col items-center justify-end gap-2" key={`${item.year}-${item.field}-${index}`}>
-            <span className="max-w-full truncate text-[10px] font-bold text-slate-500">{formatCurrency(item.amount, language)}</span>
             <div data-testid="annual-bar" className="w-full max-w-12 rounded-t-xl bg-emerald/80" style={{ height: `${Math.max(10, (Math.abs(item.amount) / max) * 78)}px` }} title={`${item.year}: ${formatCurrency(item.amount, language)}`} />
             <span className="text-[10px] font-bold text-slate-500">{item.year}</span>
           </div>
         ))}
       </div>
+      <table className="mt-4 w-full border-collapse text-left text-xs" aria-label={label}>
+        <thead><tr className="border-b border-slate-200 text-[10px] uppercase tracking-[0.12em] text-slate-400"><th className="pb-2 pr-3">{yearLabel}</th><th className="pb-2 text-right">{amountLabel}</th></tr></thead>
+        <tbody className="divide-y divide-slate-100">{values.map((item, index) => <tr key={`annual-row-${item.year}-${item.field}-${index}`}><th scope="row" className="py-2 pr-3 font-semibold text-slate-600">{item.year}</th><td className="py-2 text-right font-bold text-ink">{formatCurrency(item.amount, language)}</td></tr>)}</tbody>
+      </table>
     </div>
   );
 }
@@ -80,7 +83,7 @@ function RecordCard({ record, index, section, language, locale }: { record: Decl
         {range && <span className="rounded-full bg-sky/20 px-3 py-1 text-xs font-bold text-ink">{range}</span>}
       </div>
       <RecordFields record={record} language={language} fallback={locale.declaration.notAvailable} labels={locale.declaration.fieldLabels} sectionKey={section.key} />
-      {record.annualAmounts.length > 0 && section.records.length === 1 && <AnnualAmounts values={record.annualAmounts} language={language} label={locale.declaration.annualValues} valuesLabel={locale.declaration.valuesLabel} />}
+      {record.annualAmounts.length > 0 && section.records.length === 1 && <AnnualAmounts values={record.annualAmounts} language={language} label={locale.declaration.annualValues} valuesLabel={locale.declaration.valuesLabel} amountLabel={locale.declaration.fieldLabels.montant} yearLabel={locale.declaration.fieldLabels.annee} />}
     </article>
   );
 }
@@ -100,7 +103,7 @@ function DeclarationSectionView({ section, language, locale }: { section: Declar
           {section.records.length === 0 && <details className="mt-3 rounded-xl bg-slate-50 px-4 py-3"><summary className="cursor-pointer text-sm font-semibold text-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{section.declaredNone ? locale.declaration.noneDeclared : locale.declaration.emptySection}</summary>{!section.declaredNone && <p className="mt-2 text-xs leading-5 text-slate-500">{locale.declaration.emptySectionDetail}</p>}</details>}
         </div>
       </div>
-      {annualAmounts.length > 0 && section.records.length > 1 && <AnnualAmounts values={annualAmounts} language={language} label={locale.declaration.annualValues} valuesLabel={locale.declaration.valuesLabel} />}
+      {annualAmounts.length > 0 && section.records.length > 1 && <AnnualAmounts values={annualAmounts} language={language} label={locale.declaration.annualValues} valuesLabel={locale.declaration.valuesLabel} amountLabel={locale.declaration.fieldLabels.montant} yearLabel={locale.declaration.fieldLabels.annee} />}
       {section.records.length > 0 && <div className="mt-5 grid min-w-0 gap-4 lg:grid-cols-2">{section.records.map((record, index) => <RecordCard key={`${section.key}-${index}`} record={record} index={index} section={section} language={language} locale={locale} />)}</div>}
     </section>
   );

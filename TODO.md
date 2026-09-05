@@ -45,7 +45,8 @@ fix restores mixed legacy Silver and current Bronze history during processing.
   labels, empty-section disclosures, source XML copy support, snapshot context,
   signal explanations, profile announcements, and chart text summaries.
   Quality-register rows, action icons, responsive navigation, and metric scope
-  copy were also polished without changing data contracts.
+  copy were also polished without changing data contracts; declaration amount
+  bars now include an equivalent annual-value table.
 
 - [x] Merged open PRs #46–#51, resolved tracking-document conflicts, deployed
   commit `5352965`, and forced a successful production replay; the scheduled

@@ -18,6 +18,8 @@
   profile match announcements, and text summaries for analysis charts.
 - Added responsive quality-register rows, clearer analysis scope/toggle copy,
   shared focus treatment, and Lucide action icons for external and source links.
+- Added a keyboard-friendly annual-value table beneath declaration amount bars
+  so each chart has an equivalent text reading path.
 
 ### Verified
 
