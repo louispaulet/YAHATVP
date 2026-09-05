@@ -241,7 +241,7 @@ describe("dashboard application", () => {
     const detailLink = screen.getByRole("link", { name: "Open declaration and source XML" });
     expect(detailLink).toHaveAttribute("href", "/declarations/fixture-uuid-1");
     fireEvent.click(detailLink);
-    expect(await screen.findByText("The declaration as published")).toBeInTheDocument();
+    expect(await screen.findByText("View source XML")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "What this declaration contains" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Elected mandates" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Bank accounts" })).toBeInTheDocument();

@@ -10,6 +10,9 @@
 - Improved responsive search/profile navigation and corrected the populated
   asset chart accessible description while preserving the existing API and
   source-data policy.
+- Added an Explore table of contents with per-signal result counts and
+  removed live countdown announcements from the screen-reader announcement
+  channel while retaining a static scheduled timestamp.
 
 ### Verified
 

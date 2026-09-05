@@ -41,6 +41,9 @@ final result: passed
   source-fields disclosure.
 - Corrected the populated asset chart accessible label so it no longer uses the
   empty-state sentence.
+- Added anchored Explore signal navigation and result counts; the pipeline
+  countdown keeps its visible timer while announcing only a stable scheduled
+  date and time to assistive technology.
 
 **Responsive and interaction checks**
 

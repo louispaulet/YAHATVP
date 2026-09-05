@@ -153,7 +153,7 @@ export function DeclarationView({ rawXml, language, locale }: DeclarationViewPro
       <details className="dashboard-card min-w-0 p-5 sm:p-7"><summary className="cursor-pointer text-sm font-bold text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald">{locale.declaration.technicalFields} ({formatNumber(meta.fields.length, language)} {locale.declaration.fieldsLabel})</summary><p className="mt-3 text-sm leading-6 text-slate-500">{locale.declaration.technicalDescription}</p><div className="mt-4"><RecordFields record={meta} language={language} fallback={locale.declaration.notAvailable} /></div></details>
 
       <details className="dashboard-card min-w-0 overflow-hidden">
-        <summary className="cursor-pointer list-none px-5 py-5 text-sm font-bold text-ink transition hover:text-emerald sm:px-7">{locale.declaration.sourceTitle}<span className="ml-2 text-slate-400">↘</span></summary>
+        <summary className="cursor-pointer list-none px-5 py-5 text-sm font-bold text-ink transition hover:text-emerald sm:px-7">{locale.declaration.sourceDisclosure}<span className="ml-2 text-slate-400">↘</span></summary>
         <div className="border-t border-slate-200 px-5 pb-5 pt-4 sm:px-7"><p className="mb-4 text-sm leading-6 text-slate-500">{locale.declaration.sourceDescription}</p><pre aria-label={locale.declaration.rawXmlLabel} className="max-h-[70vh] overflow-auto rounded-2xl bg-[#101815] p-5 text-xs leading-6 text-slate-200"><code>{rawXml}</code></pre></div>
       </details>
     </div>
