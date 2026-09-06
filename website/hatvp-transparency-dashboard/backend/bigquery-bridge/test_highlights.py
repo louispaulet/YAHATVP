@@ -67,6 +67,7 @@ def test_highlights_query_is_fixed_source_linked_and_ranks_misc_assets():
     assert "a.source_section = 'bienDiverDto'" in query
     assert "COALESCE(a.active_in_gold, TRUE)" in query
     assert "asset_declarations" in query
+    assert "JOIN asset_declarations c USING" in query
     assert "ORDER BY a.normalized_value DESC" in query
     assert "LIMIT 10" in query
     assert "date_debut_mandat" not in query

@@ -106,7 +106,7 @@ def build_highlights_query(project: str, dataset: str) -> str:
     a.source_section, a.asset_name, a.raw_value, a.normalized_value,
     a.anomaly_status, COALESCE(a.anomaly_status != 'clean', FALSE) AS review_required
   FROM {gold_assets} a
-  JOIN current_declarations c USING (snapshot_date, bronze_record_key, declaration_uuid)
+  JOIN asset_declarations c USING (snapshot_date, bronze_record_key, declaration_uuid)
   WHERE a.source_section = 'bienDiverDto'
     AND COALESCE(a.active_in_gold, TRUE)
     AND a.normalized_value > 0
