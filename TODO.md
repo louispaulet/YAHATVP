@@ -38,6 +38,9 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 
 ## Recent completed work (2026-08-19 through 2026-09-06)
 
+- [x] Replaced the empty asset-review slot with a source-linked top-10 ranking
+  of positive-valued `bienDiverDto` items, including the “diamant solitaire”
+  fixture example; frontend and backend checks pass.
 - [x] Removed the empty paused asset-anomaly signal from Explore and its
   navigation link; the frontend test suite and production build pass.
 - [x] Added a small gap between dark hero sections and white search/profile

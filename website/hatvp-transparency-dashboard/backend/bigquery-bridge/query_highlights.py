@@ -86,10 +86,14 @@ def build_highlights_query(project: str, dataset: str) -> str:
 ), unusual_assets AS (
   SELECT a.declaration_uuid, c.prenom, c.nom, c.mandat_label,
     a.source_section, a.asset_name, a.raw_value, a.normalized_value,
-    a.anomaly_status, TRUE AS review_required
+    a.anomaly_status, COALESCE(a.anomaly_status != 'clean', FALSE) AS review_required
   FROM {gold_assets} a
   JOIN current_declarations c USING (snapshot_date, bronze_record_key, declaration_uuid)
-  WHERE FALSE
+  WHERE a.source_section = 'bienDiverDto'
+    AND COALESCE(a.active_in_gold, TRUE)
+    AND a.normalized_value > 0
+  ORDER BY a.normalized_value DESC, a.declaration_uuid, COALESCE(a.asset_name, '')
+  LIMIT 10
 ), silver_filings AS (
   SELECT CONCAT({accent_fold("COALESCE(p.prenom, '')")}, '|',
       {accent_fold("COALESCE(p.nom, '')")}, '|',

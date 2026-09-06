@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-06 — Rank the highest-value miscellaneous assets
+
+### Changed
+
+- Replaced the empty asset-review slot in Explore with up to 10 positive-valued
+  items from the `bienDiverDto` miscellaneous-assets section, ordered by their
+  declared normalized value.
+- Kept the source item, value, declarant, declaration link, and review metadata
+  together in the existing asset-card pattern; the section stays hidden when
+  no qualifying rows exist.
+- Added the example “diamant solitaire” to the frontend fixture and added
+  bilingual section copy explaining the ranking and its limits.
+
+### Verified
+
+- Frontend checks passed: 35 tests and the TypeScript/Vite production build.
+- Backend checks passed: 13 Worker tests, Worker typecheck, and 48 bridge tests.
+
 ## 2026-09-06 — Remove the empty asset review signal
 
 ### Changed

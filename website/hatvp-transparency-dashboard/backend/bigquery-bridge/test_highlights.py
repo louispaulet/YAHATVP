@@ -55,7 +55,7 @@ def row():
     }
 
 
-def test_highlights_query_is_fixed_source_linked_and_excludes_current_year():
+def test_highlights_query_is_fixed_source_linked_and_ranks_misc_assets():
     query = build_highlights_query("project", "dataset")
     assert "gold_incomes" in query and "gold_assets" in query and "anomaly_registry" in query
     assert "silver_declarations" in query and "silver_people" in query
@@ -64,7 +64,10 @@ def test_highlights_query_is_fixed_source_linked_and_excludes_current_year():
     assert "r.rule_id IN (" in query
     assert "'COMP_YOY_CHANGE'" not in query
     assert "'COMP_DIGIT_EDIT'" not in query
-    assert "WHERE FALSE" in query
+    assert "a.source_section = 'bienDiverDto'" in query
+    assert "COALESCE(a.active_in_gold, TRUE)" in query
+    assert "ORDER BY a.normalized_value DESC" in query
+    assert "LIMIT 10" in query
     assert "date_debut_mandat" not in query
     assert "PARTITION BY h.declaration_uuid" in query
     assert "SAFE_CAST(i.income_year AS INT64) < EXTRACT(YEAR" in query
