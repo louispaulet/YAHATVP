@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-06 — Remove the empty asset review signal
+
+### Changed
+
+- Removed the paused asset-anomaly section and its in-page navigation link from
+  Explore when no asset highlights are available.
+- Removed the now-unused English and French copy for that empty section while
+  keeping the underlying highlights response unchanged.
+
+### Verified
+
+- Frontend tests passed: 35 tests across 8 files.
+- TypeScript and Vite production build passed; the existing bundle-size warning
+  remains unchanged.
+
 ## 2026-09-06 — Add breathing room between hero and form cards
 
 ### Changed

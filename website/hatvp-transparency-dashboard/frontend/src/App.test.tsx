@@ -163,7 +163,8 @@ describe("dashboard application", () => {
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "What stands out" })).toHaveAttribute("aria-current", "page");
     expect(await screen.findByText("Largest active income changes")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Asset anomaly review is paused" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Asset anomaly review is paused" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Asset anomaly review is paused" })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Most amended public records" })).toBeInTheDocument();
     expect(screen.getByText("+€70K")).toBeInTheDocument();
     expect(screen.getAllByText("Review flag")).toHaveLength(1);

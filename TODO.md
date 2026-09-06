@@ -38,6 +38,8 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 
 ## Recent completed work (2026-08-19 through 2026-09-06)
 
+- [x] Removed the empty paused asset-anomaly signal from Explore and its
+  navigation link; the frontend test suite and production build pass.
 - [x] Added a small gap between dark hero sections and white search/profile
   cards so adjacent surfaces remain visually distinct.
 - [x] Changed the homepage women’s-share chart from a manual disclosure to a
