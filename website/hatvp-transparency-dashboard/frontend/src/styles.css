@@ -74,16 +74,6 @@ h3 {
   background: rgb(248 250 252 / 0.96);
 }
 
-@media (min-width: 53.126rem) {
-  .quality-table :is(th, td):first-child {
-    padding-right: 1.5rem;
-  }
-
-  .quality-table :is(th, td):nth-child(2) {
-    padding-left: 1.5rem;
-  }
-}
-
 @media (max-width: 53.125rem) {
   .quality-table,
   .quality-table tbody {

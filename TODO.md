@@ -38,8 +38,8 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 
 ## Recent completed work (2026-08-19 through 2026-09-06)
 
-- [x] Added a small desktop gutter between the quality-register issue type and
-  contacted-HATVP columns so adjacent table content remains visually distinct.
+- [x] Added a small gap between dark hero sections and white search/profile
+  cards so adjacent surfaces remain visually distinct.
 - [x] Changed the homepage women’s-share chart from a manual disclosure to a
   one-shot viewport-triggered expansion that loads the plot and keeps it open.
 - [x] Deployed the dashboard UI/UX release: Cloud Run bridge revision

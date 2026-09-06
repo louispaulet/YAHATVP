@@ -1,19 +1,20 @@
 # Changelog
 
-## 2026-09-06 — Add breathing room to the quality register
+## 2026-09-06 — Add breathing room between hero and form cards
 
 ### Changed
 
-- Added a small desktop gutter between the issue-type and contacted-HATVP
-  columns so long issue labels do not visually run into the adjacent date.
+- Replaced the negative overlap between dark hero sections and their white
+  search/profile cards with a small positive gap on the declaration search,
+  declarant profile, and declaration detail routes.
 
 ### Verified
 
 - Frontend tests and the TypeScript/Vite production build pass.
-- The quality-register table keeps its existing stacked mobile layout.
+- The quality-register table remains unchanged.
 - The updated frontend was published to
   [yahatvp.thefrenchartist.dev](https://yahatvp.thefrenchartist.dev/); the live
-  quality page shows the new gutter and has no console warnings or errors.
+  search page shows the new gap and has no console warnings or errors.
 
 ## 2026-09-06 — Deploy dashboard UI/UX release
 
