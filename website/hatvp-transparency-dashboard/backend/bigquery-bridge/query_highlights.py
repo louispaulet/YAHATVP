@@ -83,6 +83,24 @@ def build_highlights_query(project: str, dataset: str) -> str:
   WHERE candidate_rank = 1
   ORDER BY ABS(absolute_change) DESC, declaration_uuid
   LIMIT 8
+), asset_declarations AS (
+  SELECT d.snapshot_date, d.declaration_uuid, d.bronze_record_key, d.mandat_label,
+    d.date_depot, p.prenom, p.nom
+  FROM {gold_declarations} d
+  JOIN {gold_people} p USING (snapshot_date, bronze_record_key, declaration_uuid)
+  JOIN {gold_assets} a USING (snapshot_date, bronze_record_key, declaration_uuid)
+  CROSS JOIN latest l
+  WHERE d.snapshot_date = l.snapshot_date
+    AND a.source_section = 'bienDiverDto'
+    AND COALESCE(a.active_in_gold, TRUE)
+    AND a.normalized_value > 0
+  QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY {accent_fold("TRIM(COALESCE(p.prenom, ''))")},
+      {accent_fold("TRIM(COALESCE(p.nom, ''))")}
+    ORDER BY d.date_depot DESC,
+      IF(LOWER(COALESCE(d.declaration_modificative, 'false')) IN ('true', '1', 'oui'), 1, 0) DESC,
+      d.declaration_uuid DESC
+  ) = 1
 ), unusual_assets AS (
   SELECT a.declaration_uuid, c.prenom, c.nom, c.mandat_label,
     a.source_section, a.asset_name, a.raw_value, a.normalized_value,
