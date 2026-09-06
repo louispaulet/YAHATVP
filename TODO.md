@@ -38,6 +38,11 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 
 ## Recent completed work (2026-08-19 through 2026-09-06)
 
+- [x] Deployed the miscellaneous-asset highlights release: Cloud Run revision
+  `hatvp-dashboard-api-00036-hrv`, Worker version
+  `2589073d-560a-4081-953e-88152d522bc1`, and the custom frontend domain;
+  production smoke tests passed and the €30,000 “diamant solitaire” row is
+  present in the ranked response.
 - [x] Replaced the empty asset-review slot with a source-linked top-10 ranking
   of positive-valued `bienDiverDto` items, including the “diamant solitaire”
   fixture example; frontend and backend checks pass.

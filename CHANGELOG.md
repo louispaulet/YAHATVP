@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-06 — Deploy miscellaneous asset highlights
+
+### Deployed
+
+- Cloud Run bridge revision `hatvp-dashboard-api-00036-hrv` is serving 100% of
+  traffic.
+- Cloudflare Worker version `2589073d-560a-4081-953e-88152d522bc1` is live at
+  `hatvp-transparency-api.louispaulet13.workers.dev`.
+- The frontend was published to
+  [yahatvp.thefrenchartist.dev](https://yahatvp.thefrenchartist.dev/) with the
+  deployed Worker URL.
+- No ingestion replay was run; this release only changes dashboard query and
+  presentation logic. The analytical snapshot remains `2026-08-30`.
+- No GitHub Actions deployment run was used; the authorized local deployment
+  targets completed successfully.
+
+### Verified
+
+- Worker `healthz`, overview, income, assets, declarations, and search routes
+  returned HTTP 200; the custom frontend domain returned HTTP 200.
+- The highlights response contains 10 miscellaneous-asset rows, ordered by
+  declared value, and includes “diamant solitaire” at €30,000.
+
 ## 2026-09-06 — Rank the highest-value miscellaneous assets
 
 ### Changed
