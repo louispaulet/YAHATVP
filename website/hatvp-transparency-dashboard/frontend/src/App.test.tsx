@@ -1,5 +1,5 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { HashRouter, MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { declarationXmlFixtures } from "./declaration-fixtures";
@@ -54,7 +54,7 @@ describe("dashboard application", () => {
     expect(screen.getByRole("heading", { name: "People. Money. Public declarations." })).toBeInTheDocument();
     expect(screen.getByText("2026-08-18")).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Search a declarant" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Skip to main content" })).toHaveAttribute("href", "#main-content");
+    expect(screen.getByRole("link", { name: "Skip to main content" })).toHaveAttribute("href", "/#main-content");
     expect(screen.getAllByText("2", { selector: "p" })).toHaveLength(4);
     expect(screen.getAllByText("3", { selector: "p" })).toHaveLength(2);
     expect(screen.getAllByText("4", { selector: "p" })).toHaveLength(2);
@@ -83,6 +83,42 @@ describe("dashboard application", () => {
     expect(screen.queryByText("⚖️", { selector: "header span" })).not.toBeInTheDocument();
     expect(screen.getByRole("banner").querySelector('img[src="/hatvp-mark.webp"]')).toBeTruthy();
     expect(screen.getByTestId("homepage-deferred-sentinel")).toBeInTheDocument();
+  });
+
+  it.each([
+    ["/explore", "Top 10 miscellaneous assets", "asset-signals"],
+    ["/declarations/fixture-uuid-1", "Elected mandates", "declaration-section-mandatElectifDto"],
+    ["/search?q=Alice", "Skip to main content", "main-content"],
+  ])("keeps %s open when following an in-page link", async (route, label, targetId) => {
+    window.history.replaceState(null, "", `/#${route}`);
+    const scroll = vi.fn();
+    vi.stubGlobal("scrollTo", vi.fn());
+    const original = HTMLElement.prototype.scrollIntoView;
+    HTMLElement.prototype.scrollIntoView = scroll;
+    try {
+      render(<HashRouter><App /></HashRouter>);
+      const link = await screen.findByRole("link", { name: label });
+      expect(link).toHaveAttribute("href", `#${route}#${targetId}`);
+      fireEvent.click(link);
+      await act(async () => {});
+      expect(window.location.hash).toBe(`#${route}#${targetId}`);
+      expect(document.getElementById(targetId)).toHaveFocus();
+      expect(scroll).toHaveBeenCalled();
+    } finally {
+      HTMLElement.prototype.scrollIntoView = original;
+      window.history.replaceState(null, "", "/");
+    }
+  });
+
+  it("focuses a directly linked section once its data arrives", async () => {
+    const original = HTMLElement.prototype.scrollIntoView;
+    HTMLElement.prototype.scrollIntoView = vi.fn();
+    try {
+      render(<MemoryRouter initialEntries={["/explore#asset-signals"]}><App /></MemoryRouter>);
+      await waitFor(() => expect(document.getElementById("asset-signals")).toHaveFocus());
+    } finally {
+      HTMLElement.prototype.scrollIntoView = original;
+    }
   });
 
   it("loads the women’s-share chart when its panel enters the viewport", async () => {
@@ -165,7 +201,7 @@ describe("dashboard application", () => {
     expect(await screen.findByText("Largest active income changes")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Top 10 miscellaneous assets" })).toBeInTheDocument();
     expect(screen.getByText("diamant solitaire")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Top 10 miscellaneous assets" })).toHaveAttribute("href", "#asset-signals");
+    expect(screen.getByRole("link", { name: "Top 10 miscellaneous assets" })).toHaveAttribute("href", "/explore#asset-signals");
     expect(screen.getByRole("heading", { name: "Most amended public records" })).toBeInTheDocument();
     expect(screen.getByText("+€70K")).toBeInTheDocument();
     expect(screen.getAllByText("Review flag")).toHaveLength(1);

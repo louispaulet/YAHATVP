@@ -19,8 +19,11 @@ export function useLookupResource<T>(key: string, loader: Loader<T>): ResourceSt
     const controller = new AbortController();
     setState({ data: null, loading: true, error: false });
     loader(controller.signal)
-      .then((data) => setState({ data, error: false, loading: false }))
+      .then((data) => {
+        if (!controller.signal.aborted) setState({ data, error: false, loading: false });
+      })
       .catch((reason: unknown) => {
+        if (controller.signal.aborted) return;
         if (reason instanceof DOMException && reason.name === "AbortError") return;
         setState((current) => ({ ...current, error: true, loading: false }));
       });

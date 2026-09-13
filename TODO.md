@@ -15,6 +15,9 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 
 ## Open work
 
+- [ ] Merge and deploy the frontend anchor/request-race fixes, then verify
+  the published bundle and live section navigation.
+
 - [ ] Complete human source-document review and any external HATVP follow-up;
   the repository report does not assert that a flagged value is erroneous.
 - [ ] Add semantic/content hashes after the exact-byte hash path is stable.
@@ -36,7 +39,10 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 - Keep historical raw snapshots immutable and periodically review retention
   settings without deleting required audit history.
 
-## Recent completed work (2026-08-19 through 2026-09-06)
+## Recent completed work (2026-08-19 through 2026-09-13)
+
+- [x] Fixed hash-router section navigation and cancelled-request races; all
+  45 frontend tests, production build, and backend checks pass.
 
 - [x] Deployed the miscellaneous-asset highlights release: Cloud Run revision
   `hatvp-dashboard-api-00036-hrv`, Worker version
