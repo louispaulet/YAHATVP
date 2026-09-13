@@ -1,3 +1,5 @@
+import { useRouteFocus } from "../hooks/useRouteFocus";
+import { InPageLink } from "./InPageLink";
 import { ExternalLink, GitBranch } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
@@ -31,11 +33,10 @@ export function Layout({ children }: { children: ReactNode }) {
   const { language, locale } = useI18n();
   const { pathname } = useLocation();
   const currentSection = sectionForPath(pathname);
+  useRouteFocus();
   useEffect(() => {
     document.documentElement.lang = language;
-    const main = document.getElementById("main-content");
-    main?.focus({ preventScroll: true });
-  }, [language, pathname]);
+  }, [language]);
   const sections = [
     { key: "explore" as const, to: "/", label: locale.nav.explore },
     { key: "declarations" as const, to: "/search", label: locale.nav.declarations },
@@ -60,7 +61,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-canvas text-ink">
-      <a href="#main-content" className="sr-only fixed left-4 top-4 z-50 rounded-xl bg-ink px-4 py-3 text-sm font-bold text-white focus:not-sr-only focus:outline-2 focus:outline-offset-2 focus:outline-emerald">{locale.accessibility.skipToContent}</a>
+      <InPageLink hash="#main-content" className="sr-only fixed left-4 top-4 z-50 rounded-xl bg-ink px-4 py-3 text-sm font-bold text-white focus:not-sr-only focus:outline-2 focus:outline-offset-2 focus:outline-emerald">{locale.accessibility.skipToContent}</InPageLink>
       <header className="border-b border-slate-200/80 bg-canvas/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-5 lg:flex-nowrap lg:px-8 lg:py-4">
           <Link to="/" className="flex min-w-0 shrink-0 items-center gap-3">

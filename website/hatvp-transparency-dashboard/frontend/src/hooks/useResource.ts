@@ -25,8 +25,11 @@ export function useResource<T>(loader: (signal: AbortSignal) => Promise<T>, opti
     const controller = new AbortController();
     setState((current) => ({ ...current, loading: true, error: false }));
     loader(controller.signal)
-      .then((data) => setState({ data, error: false, loading: false }))
+      .then((data) => {
+        if (!controller.signal.aborted) setState({ data, error: false, loading: false });
+      })
       .catch((reason: unknown) => {
+        if (controller.signal.aborted) return;
         if (reason instanceof DOMException && reason.name === "AbortError") return;
         setState((current) => ({ ...current, error: true, loading: false }));
       });

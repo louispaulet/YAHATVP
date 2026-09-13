@@ -164,3 +164,17 @@ final result: passed
 - [x] Browser checks reported body width equal to viewport width at all four sizes and no console warnings or errors on fresh page loads.
 
 final result: passed
+
+## 2026-09-13 — Hash-router anchor repair
+
+- Before: on production, the Explore asset link changed `#/explore` to
+  `#asset-signals` and displayed “Page not found.”
+- After: browser checks against the local frontend with the existing Vite
+  API proxy retained `#/explore#asset-signals`, scrolled to the asset section,
+  and focused `asset-signals`. The skip link focused `main-content`.
+- French Explore was checked at 1440×1024, 1024×768, 390×844, and 320×844;
+  measured viewport sizes matched and no page-level overflow was detected.
+  The 320px screenshot showed readable, wrapped hero content.
+- No browser console warnings or errors after configuring the local proxy.
+- HashRouter fixture tests also cover declaration sections, query preservation
+  on the search skip link, and a directly linked section loaded asynchronously.

@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-13 — Fix frontend anchors and stale requests
+
+### Fixed
+
+- Skip navigation and Explore/declaration section links now preserve the
+  hash-based route and search query, scroll to the section, and move keyboard
+  focus there. Direct section links wait for asynchronously loaded content.
+- Both resource hooks ignore responses and errors from cancelled requests, so
+  older lookups cannot overwrite current results or restore cleared searches.
+
+### Verified
+
+- Nine regression cases failed before the fixes; all 45 frontend tests and the
+  TypeScript/Vite build now pass, including delayed section-link coverage.
+- Backend verification: 13 Worker tests, Worker typecheck, and 48 bridge tests.
+- The old Explore link reproduced a production “Page not found” screen. Local
+  browser checks confirm route retention, target focus, French switching, and
+  no page overflow at 1440, 1024, 390, and 320 CSS pixels.
+- The existing Vite bundle-size warning remains. Deployment is tracked in TODO.
+
 ## 2026-09-06 — Deploy miscellaneous asset highlights
 
 ### Deployed

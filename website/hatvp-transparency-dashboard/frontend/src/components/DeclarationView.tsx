@@ -1,3 +1,4 @@
+import { InPageLink } from "./InPageLink";
 import { useMemo, useState } from "react";
 import { formatCurrency, formatNumber } from "../formatters";
 import type { Locale, Language } from "../config/i18n";
@@ -147,7 +148,7 @@ export function DeclarationView({ rawXml, language, locale, amended = false }: D
 
       {profile && <section className="dashboard-card min-w-0 p-5 sm:p-7"><div className="flex items-baseline justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.profileEyebrow}</p><h2 className="mt-2 text-xl font-black tracking-tight text-ink">{locale.declaration.profileTitle}</h2></div><span className="text-xs font-semibold text-slate-400">{formatNumber(profile.fieldCount, language)} {locale.declaration.fieldsLabel}</span></div><RecordFields record={{ fields: profile.records.flatMap((record) => record.fields).filter((field) => !["email", "adresse", "telephoneDec", "voie", "complement", "codePostal", "ville", "pays"].includes(field.key)), annualAmounts: [] }} language={language} fallback={locale.declaration.notAvailable} labels={locale.declaration.fieldLabels} sectionKey="general" /></section>}
 
-      {nonProfileSections.length > 0 && <nav className="dashboard-card p-5 sm:p-6" aria-label={locale.declaration.sectionIndex}><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.sectionIndex}</p><div className="mt-3 flex flex-wrap gap-2">{nonProfileSections.map((section) => <a key={section.key} href={`#declaration-section-${section.key}`} className="rounded-full bg-surface-subtle px-3 py-2 text-sm font-bold text-ink transition hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{declarationSectionLabel(section.key, language, locale.declaration.sectionLabels)}</a>)}</div></nav>}
+      {nonProfileSections.length > 0 && <nav className="dashboard-card p-5 sm:p-6" aria-label={locale.declaration.sectionIndex}><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald">{locale.declaration.sectionIndex}</p><div className="mt-3 flex flex-wrap gap-2">{nonProfileSections.map((section) => <InPageLink key={section.key} hash={`#declaration-section-${section.key}`} className="rounded-full bg-surface-subtle px-3 py-2 text-sm font-bold text-ink transition hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald">{declarationSectionLabel(section.key, language, locale.declaration.sectionLabels)}</InPageLink>)}</div></nav>}
 
       <div className="space-y-6">{nonProfileSections.map((section) => <DeclarationSectionView key={section.key} section={section} language={language} locale={locale} />)}</div>
 

@@ -1,3 +1,4 @@
+import { InPageLink } from "../components/InPageLink";
 import { CalendarDays, FilePenLine, ShieldCheck, TrendingUp, WalletCards } from "lucide-react";
 import { fetchHighlights } from "../api";
 import { AmendedHighlightCard } from "../components/AmendedHighlightCard";
@@ -37,9 +38,9 @@ export function ExplorePage() {
       </section>
       {highlights.data && <SnapshotContext snapshotDate={highlights.data.snapshotDate} generatedAt={highlights.data.generatedAt} language={language} labels={locale.snapshotContext} sourceScope={locale.snapshotContext.officialScope} />}
       <nav className="flex flex-wrap gap-2 text-sm font-bold" aria-label={locale.explore.contentsLabel}>
-        <a className="rounded-full bg-surface-subtle px-3 py-2 text-ink hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald" href="#income-signals">{locale.explore.incomeTitle}</a>
-        {highlights.data && highlights.data.unusualAssets.length > 0 && <a className="rounded-full bg-surface-subtle px-3 py-2 text-ink hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald" href="#asset-signals">{locale.explore.assetsTitle}</a>}
-        <a className="rounded-full bg-surface-subtle px-3 py-2 text-ink hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald" href="#amended-signals">{locale.explore.amendedTitle}</a>
+        <InPageLink className="rounded-full bg-surface-subtle px-3 py-2 text-ink hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald" hash="#income-signals">{locale.explore.incomeTitle}</InPageLink>
+        {highlights.data && highlights.data.unusualAssets.length > 0 && <InPageLink className="rounded-full bg-surface-subtle px-3 py-2 text-ink hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald" hash="#asset-signals">{locale.explore.assetsTitle}</InPageLink>}
+        <InPageLink className="rounded-full bg-surface-subtle px-3 py-2 text-ink hover:bg-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald" hash="#amended-signals">{locale.explore.amendedTitle}</InPageLink>
       </nav>
       {highlights.loading && <div className="explore-card-grid" aria-busy="true"><ExploreCardSkeleton /><ExploreCardSkeleton /><ExploreCardSkeleton /><ExploreCardSkeleton /></div>}
       {highlights.error && <SliceError onRetry={highlights.reload} />}

@@ -162,6 +162,9 @@ hardcoding user-facing copy in components.
 - Use the established emerald `focus-visible` outline with a visible offset.
 - Interactive targets must be comfortable to tap and must not be clipped by
   responsive containers.
+- In-page links use `InPageLink` to preserve the HashRouter route and query.
+  Route anchors scroll and move focus to their target, including sections that
+  arrive after data loads; never use a bare `href="#section"` in the app.
 - Links should clearly indicate their destination; primary actions use the
   existing emerald/ink hierarchy rather than unexplained icon-only controls.
 - Disclosures must expose their open/closed state and keep their content
