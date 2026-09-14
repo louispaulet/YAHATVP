@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-14 — Deploy frontend navigation and request fixes
+
+- Merged [PR #52](https://github.com/louispaulet/YAHATVP/pull/52) as `0857488`.
+  PR CI and the main test/deploy workflow succeeded.
+- Published the frontend to [the public dashboard](https://yahatvp.thefrenchartist.dev/).
+  [Pages deployment 34880989968](https://github.com/louispaulet/YAHATVP/actions/runs/34880989968)
+  succeeded; the served JavaScript matches the local production build exactly.
+- Deployment checks passed: 45 frontend tests, TypeScript/Vite build, frontend
+  HTTP 200, and six Worker smoke routes with consistent snapshot `2026-08-30`.
+  Live Explore and declaration links retain their routes and focus their target;
+  the skip link also works. No browser console warnings or errors were observed.
+- This frontend release required no bridge/Worker changes or ingestion replay.
+  Detailed release evidence is in
+  [the deployment report](reports/03-validation/2026-09-14-frontend-bugfix-deployment.md).
+
 ## 2026-09-13 — Fix frontend anchors and stale requests
 
 ### Fixed
@@ -18,7 +33,7 @@
 - The old Explore link reproduced a production “Page not found” screen. Local
   browser checks confirm route retention, target focus, French switching, and
   no page overflow at 1440, 1024, 390, and 320 CSS pixels.
-- The existing Vite bundle-size warning remains. Deployment is tracked in TODO.
+- The existing Vite bundle-size warning remains. Deployed on 2026-09-14.
 
 ## 2026-09-06 — Deploy miscellaneous asset highlights
 

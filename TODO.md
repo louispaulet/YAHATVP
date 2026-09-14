@@ -9,14 +9,11 @@ validation, architecture, and dashboard checklists are preserved in
 The ingestion pipeline, Google Cloud deployment, Bronze → Silver → Gold and
 anomaly-registry layers, source archives, and v1.5 transparency dashboard are
 implemented, deployed, and covered by local and production verification. The
-latest dashboard work is the story-first homepage, balanced supporting
-evidence, and canonical website design and tone guides. The latest pipeline
-fix restores mixed legacy Silver and current Bronze history during processing.
+latest dashboard release repairs section navigation and cancelled-request races,
+following the story-first homepage and canonical website design and tone guides.
+The latest pipeline fix restores mixed legacy Silver and current Bronze history during processing.
 
 ## Open work
-
-- [ ] Merge and deploy the frontend anchor/request-race fixes, then verify
-  the published bundle and live section navigation.
 
 - [ ] Complete human source-document review and any external HATVP follow-up;
   the repository report does not assert that a flagged value is erroneous.
@@ -39,10 +36,12 @@ fix restores mixed legacy Silver and current Bronze history during processing.
 - Keep historical raw snapshots immutable and periodically review retention
   settings without deleting required audit history.
 
-## Recent completed work (2026-08-19 through 2026-09-13)
+## Recent completed work (2026-08-19 through 2026-09-14)
 
-- [x] Fixed hash-router section navigation and cancelled-request races; all
-  45 frontend tests, production build, and backend checks pass.
+- [x] Fixed hash-router section navigation and cancelled-request races in PR
+  #52, merged and deployed the frontend on 2026-09-14. All 45 frontend tests,
+  production build, backend checks, CI, Pages deployment, and live navigation
+  checks pass; the published bundle matches the local build byte for byte.
 
 - [x] Deployed the miscellaneous-asset highlights release: Cloud Run revision
   `hatvp-dashboard-api-00036-hrv`, Worker version
