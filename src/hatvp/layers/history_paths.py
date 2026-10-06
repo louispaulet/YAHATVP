@@ -12,8 +12,11 @@ def preferred_history_paths(bronze_paths: list[str], silver_paths: list[str]) ->
             if not path.endswith("data.parquet"):
                 continue
             snapshot = next(
-                (part.partition("=")[2] for part in path.split("/")
-                 if part.startswith("snapshot_date=")),
+                (
+                    part.partition("=")[2]
+                    for part in path.split("/")
+                    if part.startswith("snapshot_date=")
+                ),
                 None,
             )
             key = ("snapshot", snapshot) if snapshot is not None else (layer, path)
