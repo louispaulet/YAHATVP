@@ -21,8 +21,9 @@
   timestamps, retention in Bronze/Silver, the Gold supersession rule, and
   BigQuery `TIMESTAMP` Parquet fields.
 - `uv run pytest`: 185 passed; Ruff, format checks, and `uv build` passed.
-- Production was not replayed. Verify the first cumulative BigQuery load after
-  rollout; see the active follow-up in `TODO.md`.
+- GitHub Actions run `37528670155` passed and deployed the Cloud Run Job.
+  Production ingestion was not replayed; verify the first cumulative BigQuery
+  load after rollout, as tracked in `TODO.md`.
 
 ## 2026-10-06 — Recover production ingestion after memory failures
 
