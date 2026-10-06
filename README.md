@@ -931,6 +931,8 @@ gcloud run jobs deploy "$JOB_NAME" \
   --service-account="$RUNTIME_SA_EMAIL" \
   --tasks=1 \
   --max-retries=1 \
+  --cpu=8 \
+  --memory=32Gi \
   --task-timeout=30m \
   --set-env-vars="HATVP_BUCKET=${BUCKET_NAME},HATVP_PREFIX=hatvp,HATVP_ENABLE_BIGQUERY=true,HATVP_BIGQUERY_PROJECT=${PROJECT_ID},HATVP_BIGQUERY_DATASET=hatvp,HATVP_BIGQUERY_LOCATION=${REGION}"
 ```

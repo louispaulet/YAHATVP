@@ -67,9 +67,10 @@ Worker. The frontend is the Vite build published to GitHub Pages.
 ## Ingestion and Gold data
 
 The `main` push workflow builds and deploys the ingestion image to the
-`hatvp-ingestion` Cloud Run Job. It must keep the production job at 4 GiB;
-the Silver/Gold build can exceed the former 2 GiB limit. Wait for the workflow
-test and deploy jobs to succeed before executing the job.
+`hatvp-ingestion` Cloud Run Job. The production job uses 8 vCPU and 32 GiB:
+full Silver/Gold rebuilds have exceeded 4 GiB, while the 8 vCPU / 32 GiB
+profile completed the full replay successfully. Wait for the workflow test and
+deploy jobs to succeed before executing the job.
 
 After analytical-layer code or a fresh production image is deployed, run one
 forced replay when Gold data must be materialized:
