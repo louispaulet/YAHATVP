@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-10-06 — Recover production ingestion after memory failures
+
+### Fixed
+
+- Increased the scheduled Cloud Run Job profile to 8 vCPU / 32 GiB after a
+  changed HATVP source triggered a full rebuild that exceeded the former 4 GiB
+  limit. The first 32 GiB retries also exposed redundant historical rows loaded
+  from both Bronze and Silver; processing now prefers Bronze per snapshot and
+  uses Silver only for legacy snapshots without Bronze.
+
+### Verified
+
+- CI run `37518534872` passed tests, Ruff, formatting, package build, and Cloud
+  Run deployment. Execution `hatvp-ingestion-pjq2w` completed in 11m30s with
+  `SUCCESS_WITH_WARNINGS`; all 13 BigQuery tables loaded and
+  `state/latest.json` advanced to snapshot `2026-10-06` only after completion.
+- Quality checks reported zero errors, 57,370 flagged records (down 1.9% from
+  58,502), no flagged-record regression, and 40,156 warnings. The warning
+  streak reached 20 and remains a review follow-up.
+
+Detailed diagnosis and deployment evidence are in the
+[ingestion recovery report](reports/03-validation/2026-10-06-ingestion-memory-recovery.md).
+
 ## 2026-09-14 — Deploy frontend navigation and request fixes
 
 - Merged [PR #52](https://github.com/louispaulet/YAHATVP/pull/52) as `0857488`.
