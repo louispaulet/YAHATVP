@@ -9,6 +9,7 @@ from typing import Any
 import polars as pl
 
 from ..storage import ArtifactStore
+from .history_paths import preferred_history_paths
 
 HISTORY_TABLES = ("declarations", "people", "incomes", "assets")
 
@@ -27,35 +28,10 @@ def load_bronze_history(store: ArtifactStore) -> dict[str, list[dict[str, Any]]]
     if list_paths is None:
         return history
     for name in HISTORY_TABLES:
-        paths = _preferred_history_paths(
-            list_paths(f"bronze/{name}/"), list_paths(f"silver/{name}/")
-        )
+        paths = preferred_history_paths(list_paths(f"bronze/{name}/"), list_paths(f"silver/{name}/"))  # fmt: skip  # noqa: E501
         for path in paths:
             history[name].extend(_read_partition(store, path))
     return history
-
-
-def _preferred_history_paths(bronze_paths: list[str], silver_paths: list[str]) -> list[str]:
-    """Select one physical representation per snapshot, preferring Bronze."""
-
-    selected: dict[tuple[str, str], str] = {}
-    for layer, paths in (("silver", silver_paths), ("bronze", bronze_paths)):
-        for path in sorted(paths):
-            if not path.endswith("data.parquet"):
-                continue
-            snapshot = next(
-                (
-                    part.partition("=")[2]
-                    for part in path.split("/")
-                    if part.startswith("snapshot_date=")
-                ),
-                None,
-            )
-            # Keep non-partitioned legacy paths individually; for normal
-            # snapshot paths, Bronze overwrites the matching Silver choice.
-            key = ("snapshot", snapshot) if snapshot is not None else (layer, path)
-            selected[key] = path
-    return sorted(selected.values())
 
 
 def load_registry(store: ArtifactStore) -> list[dict[str, Any]]:
