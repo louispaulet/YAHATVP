@@ -74,6 +74,7 @@ def _metadata(
     for item in value["source_metadata"].values():
         item.setdefault("ingestion_source", source_id)
         item.setdefault("source_snapshot_date", snapshot)
+        item.setdefault("source_observed_at", value.get("fetched_at"))
     return value
 
 

@@ -8,6 +8,7 @@ from typing import Any
 import polars as pl
 
 from .anomaly import detect_anomalies, parent_map, record_ref
+from .publication import publication_snapshot
 from .quality_selection import dedupe_for_quality
 from .registry import upsert_registry
 from .silver_dedupe import unique_rows
@@ -56,10 +57,7 @@ def build_silver(
     registry_rows = upsert_registry(current_occurrences, registry or [], snapshot)
     by_ref = occurrences_by_ref(occurrences, {row["anomaly_key"]: row for row in registry_rows})
     all_silver = annotate_tables(combined, parent_map(combined), by_ref)
-    current_silver = {
-        name: [row for row in all_silver[name] if str(row.get("snapshot_date")) == snapshot]
-        for name in SILVER_TABLES
-    }
+    current_silver = publication_snapshot(all_silver, current, snapshot)
     return current_silver, all_silver, registry_rows
 
 
@@ -80,7 +78,9 @@ def _apply_state(row: dict[str, Any], states: dict[str, dict[str, Any]]) -> dict
         copied["anomaly_status"], copied["anomaly_active"] = "regression", True
     elif matches and all(item.get("status") in {"superseded", "resolved"} for item in matches):
         copied["anomaly_status"], copied["anomaly_active"] = "superseded", False
-        copied["active_in_gold"] = False
+        copied["active_in_gold"] = (
+            copied.get("publication_status") == "unpublished" and copied["active_in_gold"]
+        )
         copied["superseded_by"] = next(
             (item.get("superseded_by") for item in matches if item.get("superseded_by")), None
         )

@@ -65,7 +65,7 @@ def _write_layer(
     for name in names or tuple(tables):
         source_name = name.removeprefix("silver_").removeprefix("gold_")
         path_name = source_name if bronze else name
-        path = work / f"{path_name}.parquet"
+        path = work / f"{layer}_{source_name}.parquet"
         if bronze:
             write_table(_serializable_rows(tables.get(name, [])), source_name, path)
         else:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +29,11 @@ def write_parquet(
     for column, dtype in schema.items():
         expression = pl.col(column)
         if dtype == pl.Date and frame.schema[column] == pl.String:
-            expression = expression.str.to_date(format="%Y-%m-%d", strict=True)
+            expression = expression.str.slice(0, 10).str.to_date(format="%Y-%m-%d", strict=True)
+        if isinstance(dtype, pl.Datetime) and frame.schema[column] == pl.String:
+            expression = expression.str.to_datetime(
+                time_unit=dtype.time_unit, time_zone=dtype.time_zone, strict=True
+            )
         frame = frame.with_columns(expression.cast(dtype, strict=True).alias(column))
     frame.write_parquet(path, compression="zstd")
 
@@ -56,7 +60,8 @@ def _coerce_temporal_values(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def _date_text(value: Any) -> Any:
     if isinstance(value, datetime):
-        return value.date().isoformat()
+        moment = value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
+        return moment.isoformat()
     return value.isoformat() if isinstance(value, date) else value
 
 

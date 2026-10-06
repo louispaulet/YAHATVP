@@ -1,4 +1,4 @@
-"""Gold tables containing only the latest applicable declaration versions."""
+"""Gold tables with latest online or retained unpublished declaration versions."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ def _gold_row(row: dict[str, Any], selected: bool) -> dict[str, Any]:
     copied["is_latest_declaration"] = selected
     copied["active_in_gold"] = selected
     if selected and row.get("anomaly_status") == "superseded":
-        copied["active_in_gold"] = False
+        copied["active_in_gold"] = row.get("publication_status") == "unpublished"
     return copied
 
 

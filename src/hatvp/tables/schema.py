@@ -13,12 +13,13 @@ BRONZE_PROVENANCE_SCHEMA = {
     **_typed(
         "bronze_record_key source_record_id ingestion_source source_format source_file source_url "
         "source_object source_sha256 source_ingestion_snapshot_date source_location "
-        "pipeline_version "
-        "parser_version raw_record_json "
+        "source_observed_at publication_status pipeline_version parser_version raw_record_json "
         "declaration_version declaration_modificative",
         pl.String,
     ),
     "source_snapshot_date": pl.Date,
+    "first_online_at": pl.Datetime(time_unit="us", time_zone="UTC"),
+    "missing_from_latest_export_at": pl.Datetime(time_unit="us", time_zone="UTC"),
 }
 
 

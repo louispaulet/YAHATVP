@@ -30,6 +30,7 @@ def context_for(
         source_sha256=values.get("sha256"),
         ingestion_source=str(values.get("ingestion_source") or "hatvp_website"),
         source_ingestion_snapshot_date=values.get("source_snapshot_date"),
+        source_observed_at=values.get("source_observed_at"),
         pipeline_version=values.get("pipeline_version"),
         parser_version=str(values.get("parser_version") or PARSER_VERSION),
     )
@@ -39,15 +40,9 @@ def record_key(context: ParseContext, source_record_id: str | None, row_index: i
     """Return a deterministic key for one source-record occurrence."""
 
     identity = source_record_id or f"row-{row_index}"
-    material = "|".join(
-        (
-            context.source_format,
-            context.source_file,
-            context.ingestion_source,
-            context.snapshot_date,
-            identity,
-            str(row_index),
-        )
+    material = (
+        f"{context.source_format}|{context.source_file}|{context.ingestion_source}|"
+        f"{context.snapshot_date}|{identity}|{row_index}"
     )
     return f"bronze_{hashlib.sha256(material.encode()).hexdigest()[:32]}"
 
@@ -77,6 +72,7 @@ def apply_provenance(
             "bronze_record_key": key,
             "source_record_id": source_record_id,
             "source_snapshot_date": context.snapshot_date,
+            "source_observed_at": context.source_observed_at or context.snapshot_date,
             "source_ingestion_snapshot_date": context.source_ingestion_snapshot_date
             or context.snapshot_date,
             "source_format": context.source_format,

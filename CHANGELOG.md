@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-10-06 — Retain unpublished declaration versions
+
+### Changed
+
+- Current BigQuery Bronze and Silver partitions now carry one cumulative row
+  per declaration version and source, with `publication_status`,
+  `first_online_at`, and `missing_from_latest_export_at`. Source provenance and
+  immutable historical partitions remain intact.
+- Gold selects the latest online version in each declarant/mandate/period. If
+  none remains online, unpublished versions stay in the current Gold partition
+  and metric inputs; older versions are suppressed only by an online version.
+  Existing field-level anomaly eligibility still governs suspect values.
+- Gave each Bronze, Silver, and Gold BigQuery load its own Parquet staging
+  file, preventing one layer's file from replacing another before load.
+
+### Verified
+
+- Fixture coverage verifies cumulative layer outputs, online/unpublished
+  timestamps, retention in Bronze/Silver, the Gold supersession rule, and
+  BigQuery `TIMESTAMP` Parquet fields.
+- `uv run pytest`: 185 passed; Ruff, format checks, and `uv build` passed.
+- Production was not replayed. Verify the first cumulative BigQuery load after
+  rollout; see the active follow-up in `TODO.md`.
+
 ## 2026-10-06 — Recover production ingestion after memory failures
 
 ### Fixed

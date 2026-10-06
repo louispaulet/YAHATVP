@@ -71,8 +71,9 @@ cascade as the official source.
              v                            v                            v
       +------+-------+             +------+-------+             +------+-------+
       | Bronze       |             | Silver       |             | Gold         |
-      | source rows  |             | flags and    |             | latest       |
-      | complete     |             | eligibility  |             | analytical   |
+      | cumulative   |             | cumulative   |             | online latest|
+      | source rows  |             | flags and    |             | plus retained|
+      |              |             | eligibility  |             | unpublished  |
       +------+-------+             +------+-------+             +------+-------+
              |                            |                            |
              +----------------------------+----------------------------+
@@ -267,8 +268,8 @@ levels of history:
   Raw XML/CSV/archive bytes
               |
               v
-  Bronze: every parsed source occurrence
-          source IDs, raw values, provenance, snapshot date
+  Bronze: cumulative declaration versions
+          source IDs, raw values, provenance, publication state
               |
               v
   Silver: anomaly metadata and review eligibility
@@ -285,11 +286,23 @@ levels of history:
   fixed read-only slices      active/known lifecycle rows
 ```
 
-Bronze retains source occurrences, including duplicates across the official and
-Wayback inputs. Deduplication by `declaration_uuid` is applied before anomaly
-detection so one declaration does not inflate its anomaly input, while source
-provenance remains available for audit. Gold applies the latest-version and
-eligibility rules used by dashboard metrics.
+Bronze retains source occurrences in the immutable per-snapshot partitions,
+including duplicates across the official and Wayback inputs. Current BigQuery
+Bronze and Silver partitions hold a cumulative row for each declaration version
+and source, rather than repeating every unchanged export observation.
+Deduplication by `declaration_uuid` is applied before anomaly detection so one
+declaration does not inflate its anomaly input, while source provenance remains
+available for audit. Historical partitions are not rewritten. Current rows
+carry `publication_status`, `first_online_at`, and
+`missing_from_latest_export_at` fields that track presence in the latest
+official XML export. A non-null first-online timestamp distinguishes
+a confirmed removal from an archive-only record with no official observation.
+
+Gold selects the latest online version for each declarant/mandate/period. If no
+version in that group remains online, Gold keeps its unpublished versions in
+the current partition and metric inputs. It excludes prior versions only when
+an online version supersedes them. Field-level anomaly eligibility continues
+to determine whether a suspect value contributes to an aggregate.
 
 GCS materializes the complete pipeline output, including supporting tables such
 as `liste`, mandates, activities, participations, and liabilities. BigQuery
@@ -301,10 +314,10 @@ loads the canonical dashboard set through snapshot replacement:
 - Gold: `gold_declarations`, `gold_people`, `gold_incomes`, `gold_assets`; and
 - Registry: `anomaly_registry`.
 
-The BigQuery loader stages one Parquet file at a time, evolves the target schema
-when needed, deletes only the requested `snapshot_date` partition, inserts the
-new rows, and removes the staging table. It does not replace historical
-partitions.
+The BigQuery loader stages one Parquet file per layer table, evolves the target
+schema when needed, deletes only the requested `snapshot_date` partition,
+inserts the new rows, and removes the staging table. It does not replace
+historical partitions.
 
 ### State as a commit marker
 

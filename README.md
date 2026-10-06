@@ -9,9 +9,10 @@ datasets.
 > and the weekly `hatvp-ingestion-weekly` Scheduler trigger runs the official
 > raw-ingestion stage at 07:00 Europe/Paris. Raw ingestion is now separate from
 > retained-source processing, so the GitHub/Wayback archive can be replayed with
-> the same Bronze → Silver → Gold cascade. BigQuery keeps the version-complete
-> `declarations`, `people`, `incomes`, and `assets` Bronze tables and now loads
-> anomaly-annotated Silver, latest-version Gold, and the anomaly registry.
+> the same Bronze → Silver → Gold cascade. Current BigQuery partitions are
+> cumulative across retained declaration versions and mark each version
+> `online` or `unpublished`; Gold excludes an unpublished version only when an
+> online version supersedes it.
 
 ## Related source archive
 
@@ -361,6 +362,31 @@ processing impossible are `FAIL` operations.
 Do not silently discard or rewrite suspicious declarations. Quarantine keeps
 flagged records available for review; it is not a delete path.
 
+## Publication lifecycle and cumulative snapshots
+
+Each new processing snapshot writes cumulative current-state partitions for the
+four BigQuery Bronze and Silver tables; Gold applies the version-selection rule
+below to that retained set. Older partitions remain unchanged. Rows retain
+their original `source_snapshot_date`, source hash, and raw source object while
+`snapshot_date` identifies the cumulative state that contains them.
+
+`publication_status` is `online` when that exact declaration version appears
+in the latest official HATVP XML export and `unpublished` otherwise; the state
+is propagated to its people, income, and asset rows.
+`first_online_at` is the earliest official source observation for the version;
+`missing_from_latest_export_at` is the observation timestamp of the latest
+official export where it is absent, and is cleared if it reappears. Archive-only
+records have no confirmed `first_online_at`, so an `unpublished` status alone
+does not claim that HATVP previously published them. Older partitions keep
+their original schema; the next current-state partition carries lifecycle fields
+for every retained version.
+
+Gold includes the latest online version for a declarant/mandate/period group.
+When a group has no online version, its unpublished versions remain in Gold and
+in metric inputs. Older versions are excluded only while a newer online version
+for that group exists. Existing field-level anomaly eligibility still governs
+whether a suspect value contributes to an aggregate.
+
 ## Data-quality philosophy
 
 Quality checks should be reusable and should produce both machine-readable
@@ -425,7 +451,7 @@ parsed numeric value; parsing does not imply that a value is valid.
 | Table | Grain and purpose | Important fields |
 | --- | --- | --- |
 | `liste` | One row per CSV source listing record. | Source CSV columns, `snapshot_date`, `source_file` |
-| `declarations` | One row per XML declaration. | `declaration_uuid`, deposit and mandate dates, declaration type, mandate and organ labels |
+| `declarations` | One row per XML declaration version. | `declaration_uuid`, deposit and mandate dates, `publication_status`, `first_online_at`, `missing_from_latest_export_at`, declaration type, mandate and organ labels |
 | `people` | One declarant row per declaration. | Name, contact, source `civilite`, derived `gender`, typed `date_naissance_date`, `date_naissance_year`, and explicit DOB quality status |
 | `mandates` | One row per general or elected-mandate section item. | `source_section`, description, dates, employer, remuneration |
 | `mandate_remunerations` | One row per annual remuneration value nested in an elected mandate item. | `source_item_index`, description, remuneration basis, `remuneration_year`, `raw_value`, `normalized_value` |
@@ -612,7 +638,7 @@ The physical BigQuery contract is:
 | --- | --- | --- |
 | Bronze | `declarations`, `people`, `incomes`, `assets` | Every observed source occurrence and child value, including amendments and repeated UUIDs. |
 | Silver | `silver_declarations`, `silver_people`, `silver_incomes`, `silver_assets` | The same historical Bronze grain plus anomaly rule IDs, registry links, evidence, status, and field-level metric eligibility. |
-| Gold | `gold_declarations`, `gold_people`, `gold_incomes`, `gold_assets` | The latest applicable declaration per stable declarant, role/mandate, and period; child rows join to that declaration version. |
+| Gold | `gold_declarations`, `gold_people`, `gold_incomes`, `gold_assets` | Latest online version per stable declarant, role/mandate, and period; if none is online, unpublished versions and their child rows remain included. |
 | Registry | `anomaly_registry` | One deterministic anomaly key with first/last-seen dates and explainable lifecycle status. |
 
 Every physical table includes `snapshot_date` and is partitioned by that column.

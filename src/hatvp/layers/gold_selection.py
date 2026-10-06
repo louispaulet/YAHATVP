@@ -5,18 +5,38 @@ from __future__ import annotations
 from datetime import date
 from typing import Any
 
+from .publication import publication_key
+
 
 def latest_declaration_keys(rows: list[dict[str, Any]]) -> set[str]:
-    """Select one declaration occurrence per declarant, role, and period."""
+    """Keep unpublished versions unless a current online version supersedes them."""
 
-    groups: dict[tuple[str, str, str], dict[str, Any]] = {}
+    groups: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
+    versions: dict[str, dict[str, Any]] = {}
     for row in rows:
-        key = selection_key(row)
-        if key not in groups or declaration_order(row) > declaration_order(groups[key]):
-            groups[key] = row
-    return {
-        str(row["bronze_record_key"]) for row in groups.values() if row.get("bronze_record_key")
-    }
+        key = publication_key(row)
+        if key not in versions or _source_order(row) > _source_order(versions[key]):
+            versions[key] = row
+    for row in versions.values():
+        groups.setdefault(selection_key(row), []).append(row)
+    selected = set()
+    for candidates in groups.values():
+        online = [row for row in candidates if row.get("publication_status") != "unpublished"]
+        if online:
+            latest = max(online, key=declaration_order)
+            if latest.get("bronze_record_key"):
+                selected.add(str(latest["bronze_record_key"]))
+        else:
+            selected.update(
+                str(row["bronze_record_key"]) for row in candidates if row.get("bronze_record_key")
+            )
+    return selected
+
+
+def _source_order(row: dict[str, Any]) -> tuple[int, str]:
+    """Prefer official observations when one version is present in several sources."""
+
+    return int(row.get("ingestion_source") == "hatvp_website"), str(row.get("snapshot_date") or "")
 
 
 def selection_key(row: dict[str, Any]) -> tuple[str, str, str]:

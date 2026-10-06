@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from ..layers import build_gold, build_silver
+from ..layers.publication import publication_snapshot
 from ..layers.silver import apply_registry_states
 from ..storage import ArtifactStore
 from .layers import write_bronze_tables, write_gold_tables, write_silver_tables
@@ -31,10 +32,11 @@ def build_layers(
         snapshot_date=snapshot,
         dob_max_age_years=dob_max_age_years,
     )
-    gold, registry_rows = build_gold(silver_history, registry_rows)
+    gold, registry_rows = build_gold(silver, registry_rows)
     silver = apply_registry_states(silver, registry_rows)
     gold = apply_registry_states(gold, registry_rows)
-    files = write_bronze_tables(store, tables, snapshot, work, dry_run)
+    bronze = {**tables, **publication_snapshot(tables, history, snapshot)}
+    files = write_bronze_tables(store, bronze, snapshot, work, dry_run)
     files.update(write_silver_tables(store, silver, snapshot, work, dry_run))
     files.update(write_gold_tables(store, gold, snapshot, work, dry_run))
     files.update(write_registry(store, registry_rows, snapshot, work, dry_run))

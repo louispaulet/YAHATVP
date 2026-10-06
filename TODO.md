@@ -15,9 +15,14 @@ Production ingestion recovered on 2026-10-06: the 8 vCPU / 32 GiB job completed
 all 13 BigQuery loads and advanced the snapshot to 2026-10-06 with zero quality
 errors and no flagged-record regression. The pipeline now prefers Bronze
 history per snapshot while retaining Silver-only legacy history.
+The cumulative publication-lifecycle change is fixture-tested locally; its
+first production load remains an explicit verification follow-up below.
 
 ## Open work
 
+- [ ] Verify the first production ingestion after the publication-lifecycle
+  release: all 12 Bronze/Silver/Gold tables should load cumulative snapshot
+  partitions, with status timestamps and the unpublished Gold inclusion rule.
 - [ ] Complete human source-document review and any external HATVP follow-up;
   the repository report does not assert that a flagged value is erroneous.
 - [ ] Review the 20-run quality-warning streak reported by snapshot 2026-10-06;
