@@ -14,22 +14,48 @@ HISTORY_TABLES = ("declarations", "people", "incomes", "assets")
 
 
 def load_bronze_history(store: ArtifactStore) -> dict[str, list[dict[str, Any]]]:
-    """Load every retained local/GCS Bronze partition, with legacy fallback."""
+    """Load retained Bronze snapshots, using legacy Silver partitions as fallback.
+
+    A snapshot written by the current pipeline has both Bronze and Silver
+    objects with the same source rows. Read Bronze when present and read Silver
+    only for older snapshots that predate Bronze, avoiding duplicate history
+    copies during the in-memory Silver/Gold rebuild.
+    """
 
     history: dict[str, list[dict[str, Any]]] = {name: [] for name in HISTORY_TABLES}
     list_paths = getattr(store, "list_paths", None)
     if list_paths is None:
         return history
     for name in HISTORY_TABLES:
-        paths = [
-            *list_paths(f"bronze/{name}/"),
-            *list_paths(f"silver/{name}/"),
-        ]
+        paths = _preferred_history_paths(
+            list_paths(f"bronze/{name}/"), list_paths(f"silver/{name}/")
+        )
+        for path in paths:
+            history[name].extend(_read_partition(store, path))
+    return history
+
+
+def _preferred_history_paths(bronze_paths: list[str], silver_paths: list[str]) -> list[str]:
+    """Select one physical representation per snapshot, preferring Bronze."""
+
+    selected: dict[tuple[str, str], str] = {}
+    for layer, paths in (("silver", silver_paths), ("bronze", bronze_paths)):
         for path in sorted(paths):
             if not path.endswith("data.parquet"):
                 continue
-            history[name].extend(_read_partition(store, path))
-    return history
+            snapshot = next(
+                (
+                    part.partition("=")[2]
+                    for part in path.split("/")
+                    if part.startswith("snapshot_date=")
+                ),
+                None,
+            )
+            # Keep non-partitioned legacy paths individually; for normal
+            # snapshot paths, Bronze overwrites the matching Silver choice.
+            key = ("snapshot", snapshot) if snapshot is not None else (layer, path)
+            selected[key] = path
+    return sorted(selected.values())
 
 
 def load_registry(store: ArtifactStore) -> list[dict[str, Any]]:
