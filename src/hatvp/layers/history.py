@@ -3,35 +3,48 @@
 from __future__ import annotations
 
 from io import BytesIO
-from pathlib import Path
 from typing import Any
 
 import polars as pl
 
 from ..storage import ArtifactStore
-from .history_paths import preferred_history_paths
 
 HISTORY_TABLES = ("declarations", "people", "incomes", "assets")
 
 
 def load_bronze_history(store: ArtifactStore) -> dict[str, list[dict[str, Any]]]:
-    """Load retained Bronze snapshots, using legacy Silver partitions as fallback.
-
-    A snapshot written by the current pipeline has both Bronze and Silver
-    objects with the same source rows. Read Bronze when present and read Silver
-    only for older snapshots that predate Bronze, avoiding duplicate history
-    copies during the in-memory Silver/Gold rebuild.
-    """
+    """Load Bronze history and use legacy Silver only when Bronze is absent."""
 
     history: dict[str, list[dict[str, Any]]] = {name: [] for name in HISTORY_TABLES}
     list_paths = getattr(store, "list_paths", None)
     if list_paths is None:
         return history
     for name in HISTORY_TABLES:
-        paths = preferred_history_paths(list_paths(f"bronze/{name}/"), list_paths(f"silver/{name}/"))  # fmt: skip  # noqa: E501
+        paths = _preferred_history_paths(
+            list_paths(f"bronze/{name}/"), list_paths(f"silver/{name}/")
+        )
         for path in paths:
             history[name].extend(_read_partition(store, path))
     return history
+
+
+def _preferred_history_paths(bronze: list[str], silver: list[str]) -> list[str]:
+    """Prefer Bronze per snapshot while retaining Silver-only legacy data."""
+
+    preferred = {
+        next(
+            (
+                part.partition("=")[2]
+                for part in path.split("/")
+                if part.startswith("snapshot_date=")
+            ),
+            f"{layer}:{path}",
+        ): path
+        for layer, paths in (("silver", silver), ("bronze", bronze))
+        for path in paths
+        if path.endswith("data.parquet")
+    }
+    return sorted(preferred.values())
 
 
 def load_registry(store: ArtifactStore) -> list[dict[str, Any]]:
@@ -81,18 +94,3 @@ def _latest_registry_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if key:
             latest[key] = row
     return sorted(latest.values(), key=lambda row: str(row.get("anomaly_key")))
-
-
-def local_partition_paths(root: Path, name: str) -> list[str]:
-    """Return the same logical paths used by LocalArtifactStore diagnostics."""
-
-    return [str(path) for path in root.glob(f"**/bronze/{name}/**/data.parquet")]
-
-
-__all__ = [
-    "HISTORY_TABLES",
-    "history_row_count",
-    "history_snapshot_dates",
-    "load_bronze_history",
-    "load_registry",
-]
