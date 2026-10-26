@@ -41,6 +41,9 @@ confirmed the deployed search result, publication badge, and source XML.
 
 ## Recent completed work (2026-08-19 through 2026-10-27)
 
+- [x] Added a reusable project experience note for the HATVP refresh and
+  unpublished-search investigation, including the sample-count definitions,
+  debug checks, code map, and deployment notes.
 - [x] Fixed declaration search and detail to use Silver history while current
   dashboard aggregates remain Gold-backed. Replayed production successfully
   to snapshot `2026-10-27`; Chrome verified an unpublished declaration and its

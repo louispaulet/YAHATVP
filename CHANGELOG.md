@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-27 — Record HATVP debugging experience
+
+- Added [`experiences/2026-10-27-hatvp-refresh-and-unpublished-search.md`](experiences/2026-10-27-hatvp-refresh-and-unpublished-search.md), a project memory note covering refresh diagnosis, Silver/Gold count interpretation, production verification, operational commands, and code/test entry points.
+- Verified the documentation diff with `git diff --check`.
+
 ## 2026-10-27 — Search preserved HATVP declarations
 
 ### Changed
