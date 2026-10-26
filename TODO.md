@@ -8,24 +8,17 @@ validation, architecture, and dashboard checklists are preserved in
 
 The ingestion pipeline, Google Cloud deployment, Bronze → Silver → Gold and
 anomaly-registry layers, source archives, and v1.5 transparency dashboard are
-implemented, deployed, and covered by local and production verification. The
-latest dashboard release repairs section navigation and cancelled-request races,
-following the story-first homepage and canonical website design and tone guides.
-Production ingestion recovered on 2026-10-06: the 8 vCPU / 32 GiB job completed
-all 13 BigQuery loads and advanced the snapshot to 2026-10-06 with zero quality
-errors and no flagged-record regression. The pipeline now prefers Bronze
-history per snapshot while retaining Silver-only legacy history.
-The cumulative publication-lifecycle change is fixture-tested locally; its
-first production load remains an explicit verification follow-up below.
+implemented and deployed. The 2026-10-27 production snapshot completed all 13
+BigQuery loads with zero quality errors. Declaration search and detail use
+cumulative Silver history, including records absent from the latest HATVP
+extract; dashboard aggregates use the current Gold snapshot. Chrome verification
+confirmed the deployed search result, publication badge, and source XML.
 
 ## Open work
 
-- [ ] Verify the first production ingestion after the publication-lifecycle
-  release: all 12 Bronze/Silver/Gold tables should load cumulative snapshot
-  partitions, with status timestamps and the unpublished Gold inclusion rule.
 - [ ] Complete human source-document review and any external HATVP follow-up;
   the repository report does not assert that a flagged value is erroneous.
-- [ ] Review the 20-run quality-warning streak reported by snapshot 2026-10-06;
+- [ ] Review the 23-run quality-warning streak reported by snapshot 2026-10-27;
   its 40,156 warnings had zero errors and no flagged-record regression.
 - [ ] Add semantic/content hashes after the exact-byte hash path is stable.
 - [ ] Add richer schema-drift reporting for new XML sections and fields.
@@ -46,7 +39,20 @@ first production load remains an explicit verification follow-up below.
 - Keep historical raw snapshots immutable and periodically review retention
   settings without deleting required audit history.
 
-## Recent completed work (2026-08-19 through 2026-10-06)
+## Recent completed work (2026-08-19 through 2026-10-27)
+
+- [x] Fixed declaration search and detail to use Silver history while current
+  dashboard aggregates remain Gold-backed. Replayed production successfully
+  to snapshot `2026-10-27`; Chrome verified an unpublished declaration and its
+  XML source. CI run `40416843578` passed; see the
+  [publication-search validation report](reports/03-validation/2026-10-27-publication-search-validation.md).
+- [x] Reduced peak memory during layer serialization after full replays hit
+  Cloud Run's memory limit. Execution `hatvp-ingestion-fzrln` loaded all 13
+  BigQuery tables and advanced state only after success.
+- [x] Checked scheduled HATVP refreshes on 2026-10-12, 2026-10-19, and
+  2026-10-26. Each completed `NO_CHANGE`; official CSV/XML hashes were
+  unchanged. Historical Silver sample counts were not monotonic, so the
+  cumulative retention issue was not solely a source-refresh delay.
 
 - [x] Recovered production ingestion from repeated Cloud Run memory-limit
   failures by raising the scheduled profile to 8 vCPU / 32 GiB and avoiding

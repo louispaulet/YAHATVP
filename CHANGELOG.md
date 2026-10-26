@@ -1,5 +1,44 @@
 # Changelog
 
+## 2026-10-27 — Search preserved HATVP declarations
+
+### Changed
+
+- Declaration search and detail now query the latest Silver snapshot, including
+  declaration versions absent from the latest official extract. Search results
+  expose publication status and source snapshot, and the detail page can load
+  the preserved source XML. Current dashboard statistics continue to query
+  Gold.
+- Corrected the publication-status assignment used to distinguish online and
+  unpublished Silver rows, and reduced peak memory during layer serialization
+  so the cumulative production replay can complete.
+- Scheduled refreshes on October 12, 19, and 26 found no changed official
+  source bytes. The 2026-10-27 replay completed successfully and advanced the
+  current snapshot.
+
+### Verified
+
+- Production execution `hatvp-ingestion-fzrln` loaded all 13 BigQuery tables
+  and advanced `state/latest.json` to `2026-10-27`, with zero quality errors.
+- Production API search returned Françoise Dumont's declaration
+  `1b384fad-9ae2-4cea-a5b3-812244f0628d` as unpublished from source snapshot
+  `2026-08-30`; the latest Gold overview returned snapshot `2026-10-27`.
+- Chrome verified the normal public URL, unpublished search badge, declaration
+  detail, and source XML with no console errors. A clean browser context loaded
+  the current hashed frontend asset.
+- Python suite: 185 passed; Worker tests: 13 passed; bridge tests: 48 passed;
+  frontend tests: 47 passed; typecheck, Ruff, build, and GitHub Actions run
+  `40416843578` passed. Cloud Run bridge revision
+  `hatvp-dashboard-api-00037-xrv` and Worker version
+  `e976a62c-b3cc-4ea9-a17e-bc3cabff1ea5` are deployed; Pages publication
+  completed.
+
+Historical Silver distinct-declaration counts declined from 17,898 on August
+23 to 17,812 on October 6. The current Silver snapshot has 17,900 distinct
+declarations; historical counts and the October 26 interim partition are
+documented in the
+[validation report](reports/03-validation/2026-10-27-publication-search-validation.md).
+
 ## 2026-10-06 — Retain unpublished declaration versions
 
 ### Changed
