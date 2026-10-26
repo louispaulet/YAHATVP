@@ -22,6 +22,8 @@ const search = {
     organDeclaration: null,
     dateDeposited: "2026-01-01",
     isAmended: "false",
+    publicationStatus: "unpublished",
+    sourceSnapshotDate: "2026-01-01",
   }],
 };
 
@@ -119,6 +121,14 @@ describe("dashboard application", () => {
     } finally {
       HTMLElement.prototype.scrollIntoView = original;
     }
+  });
+
+  it("labels a declaration preserved from an earlier HATVP extract", async () => {
+    render(<MemoryRouter initialEntries={["/search?q=Alice"]}><App /></MemoryRouter>);
+    expect(await screen.findByText("Not in latest HATVP extract")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("link", { name: "Open declaration and source XML" }));
+    expect(await screen.findByText("Preserved from an earlier HATVP extract")).toBeInTheDocument();
+    expect(screen.getByText("Source extract")).toBeInTheDocument();
   });
 
   it("loads the women’s-share chart when its panel enters the viewport", async () => {

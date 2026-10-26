@@ -17,7 +17,10 @@ export function SearchResultCard({ result }: { result: DeclarationSearchResult }
     <article className="dashboard-card p-5 transition hover:border-emerald/40 hover:shadow-soft sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald">{locale.search.resultEyebrow}</p><h2 className="mt-2 text-xl font-black tracking-tight text-ink">{name}</h2></div>
-        <span className="max-w-full rounded-full bg-lime/60 px-3 py-1.5 text-xs font-bold leading-5 text-ink sm:text-right">{type}</span>
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+          <span className="max-w-full rounded-full bg-lime/60 px-3 py-1.5 text-xs font-bold leading-5 text-ink sm:text-right">{type}</span>
+          {result.publicationStatus === "unpublished" && <span className="max-w-full rounded-full bg-surface-subtle px-3 py-1.5 text-xs font-bold leading-5 text-slate-700">{locale.search.notInLatestExtract}</span>}
+        </div>
       </div>
       <dl className="mt-6 grid gap-x-5 gap-y-4 border-t border-slate-100 pt-5 sm:grid-cols-2 lg:grid-cols-4">
         <div><dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">{locale.search.fields.mandate}</dt><dd className="mt-1 text-sm font-semibold text-slate-700">{searchValue(result.mandate, locale.search.notAvailable)}</dd></div>

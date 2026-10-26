@@ -37,10 +37,17 @@ def test_age_analysis_query_ranks_declaration_families_and_keeps_flagged_values(
         in query
     )
     assert "income_by_year" in query
+    assert "`project.dataset`.gold_declarations" in query
+    assert "`project.dataset`.gold_people" in query
+    assert "`project.dataset`.gold_incomes" in query
+    assert "`project.dataset`.gold_assets" in query
     assert "`project.dataset`.silver_declarations" in query
+    assert "`project.dataset`.silver_people" in query
     assert "`project.dataset`.silver_incomes" in query
     assert "`project.dataset`.silver_assets" in query
-    assert "`project.dataset`.gold_declarations" not in query
+    assert "history_rows AS (" in query
+    assert "FROM `project.dataset`.gold_incomes i" in query
+    assert "FROM `project.dataset`.gold_assets a" in query
     assert "PARTITION BY declaration_family" in query
     assert "PARTITION BY pr.declaration_uuid" in query
     assert "declaration_family = 'interest' AND family_rank = 1" in query

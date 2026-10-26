@@ -727,12 +727,15 @@ The repository also contains a deliberately small public dashboard under
 `website/hatvp-transparency-dashboard/`. It is separate from the ingestion
 pipeline and reads current aggregates from the four Gold BigQuery tables:
 `gold_declarations`, `gold_people`, `gold_incomes`, and `gold_assets`. The
-declarant-specific age analysis is the deliberate exception: it reads the
-latest Silver snapshot so it can retain declaration history, then independently
-ranks interest and patrimonial filings for the primary view. Its declaration search can
-open one matching public declaration and display a schema-aware interface for
-that declaration's source XML node from the immutable GCS snapshot. The detail
-view keeps a collapsed raw-XML audit section for source verification while
+declarant-specific age analysis also calculates its current profile and amount
+metrics from Gold; its expandable publication history comes from Silver. The
+amendment-history highlight also uses Silver because it reports retained
+filing history rather than a current aggregate. The
+declaration search and detail lookup use the latest cumulative Silver snapshot,
+so earlier official declarations remain discoverable and are labelled when
+they are absent from the latest HATVP extract. Those search results link to a
+schema-aware view of the source XML node from its immutable GCS object. The
+detail view keeps a collapsed raw-XML audit section for source verification while
 rendering the observed metadata, identity, mandates, annual amounts, interests,
 activities, assets, liabilities, attachments, and empty source sections in
 readable cards and charts. The frontend also includes `/analysis` for DOB

@@ -17,6 +17,8 @@ DECLARATION_FIELDS = (
     "d.organ_declaration_label AS organ_declaration_label",
     "d.date_depot AS date_depot",
     "d.declaration_modificative AS declaration_modificative",
+    "d.publication_status AS publication_status",
+    "d.source_snapshot_date AS source_snapshot_date",
 )
 
 
@@ -30,8 +32,8 @@ def build_declaration_query(project: str, dataset: str) -> str:
     """Build a parameterized lookup for one public declaration's metadata."""
 
     prefix = dataset_prefix(project, dataset)
-    declarations = f"{prefix}.declarations"
-    people = f"{prefix}.people"
+    declarations = f"{prefix}.silver_declarations"
+    people = f"{prefix}.silver_people"
     fields = declaration_struct()
     return f"""WITH latest AS (
   SELECT MAX(snapshot_date) AS snapshot_date FROM {declarations}
@@ -47,11 +49,12 @@ LEFT JOIN {people} p
   AND p.declaration_uuid = d.declaration_uuid
 CROSS JOIN latest l
 WHERE d.snapshot_date = l.snapshot_date
+  AND d.ingestion_source = 'hatvp_website'
   AND d.declaration_uuid = @declaration_uuid
 QUALIFY ROW_NUMBER() OVER (
   PARTITION BY d.declaration_uuid
-  ORDER BY IF(d.ingestion_source = 'hatvp_website', 1, 0) DESC,
-    d.date_depot DESC, d.bronze_record_key DESC
+  ORDER BY IF(d.publication_status = 'online', 1, 0) DESC,
+    d.source_snapshot_date DESC, d.bronze_record_key DESC
 ) = 1
 )
 SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,

@@ -18,37 +18,45 @@ from search_fields import (
 
 
 def build_search_query(project: str, dataset: str) -> str:
-    """Build a parameterized search over public Gold declaration fields."""
+    """Build a parameterized search over current and preserved official declarations."""
 
     prefix = dataset_prefix(project, dataset)
     declaration_match = any_predicates(string_predicates(DECLARATION_FIELDS))
     searchable = "\n      ".join(
         [
             declaration_match,
-            child_match("incomes", "i", INCOME_FIELDS).replace("{prefix}", prefix),
-            child_match("assets", "a", ASSET_FIELDS).replace("{prefix}", prefix),
+            child_match("incomes", "i", INCOME_FIELDS, layer="silver").replace("{prefix}", prefix),
+            child_match("assets", "a", ASSET_FIELDS, layer="silver").replace("{prefix}", prefix),
         ]
     )
     return f"""WITH latest AS (
-  SELECT MAX(snapshot_date) AS snapshot_date FROM {prefix}.gold_declarations
+  SELECT MAX(snapshot_date) AS snapshot_date FROM {prefix}.silver_declarations
 ),
 search AS (
   SELECT {accent_fold("@search_term")} AS term
 ),
 matched AS (
-  SELECT DISTINCT
+  SELECT
     d.declaration_uuid, p.civilite, p.prenom, p.nom,
     d.declaration_type_label, d.mandat_label, d.mandat_type_label,
     d.mandat_category_label, d.organ_label, d.organ_declaration_label,
-    d.date_depot, d.declaration_modificative
-  FROM {prefix}.gold_declarations d
+    d.date_depot, d.declaration_modificative, d.publication_status,
+    d.source_snapshot_date
+  FROM {prefix}.silver_declarations d
   CROSS JOIN latest l
   CROSS JOIN search s
-  LEFT JOIN {prefix}.gold_people p
-    ON p.declaration_uuid = d.declaration_uuid
-    AND p.snapshot_date = d.snapshot_date
+  LEFT JOIN {prefix}.silver_people p
+    ON p.snapshot_date = d.snapshot_date
+    AND p.bronze_record_key = d.bronze_record_key
+    AND p.declaration_uuid = d.declaration_uuid
   WHERE d.snapshot_date = l.snapshot_date
+    AND d.ingestion_source = 'hatvp_website'
     AND ({searchable})
+  QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY d.declaration_uuid
+    ORDER BY IF(d.publication_status = 'online', 1, 0) DESC,
+      d.source_snapshot_date DESC, d.bronze_record_key DESC
+  ) = 1
 )
 SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
 CURRENT_TIMESTAMP() AS generated_at,
@@ -56,7 +64,7 @@ TO_JSON_STRING(ARRAY(
   SELECT AS STRUCT declaration_uuid, civilite, prenom, nom,
     declaration_type_label, mandat_label, mandat_type_label,
     mandat_category_label, organ_label, organ_declaration_label,
-    date_depot, declaration_modificative
+    date_depot, declaration_modificative, publication_status, source_snapshot_date
   FROM matched
   ORDER BY date_depot DESC, nom, prenom, declaration_uuid
   LIMIT {SEARCH_LIMIT}

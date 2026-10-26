@@ -124,10 +124,14 @@ def build_age_analysis_query(project: str, dataset: str) -> str:
     """Build a parameterized latest-snapshot analysis for one public declarant."""
 
     prefix = dataset_prefix(project, dataset)
-    declarations = f"{prefix}.silver_declarations"
-    people = f"{prefix}.silver_people"
-    incomes = f"{prefix}.silver_incomes"
-    assets = f"{prefix}.silver_assets"
+    declarations = table(prefix, "declarations")
+    people = table(prefix, "people")
+    incomes = table(prefix, "incomes")
+    assets = table(prefix, "assets")
+    silver_declarations = f"{prefix}.silver_declarations"
+    silver_people = f"{prefix}.silver_people"
+    silver_incomes = f"{prefix}.silver_incomes"
+    silver_assets = f"{prefix}.silver_assets"
     age_at_snapshot = _age("l.snapshot_date", "p.date_naissance_date")
     search_term = accent_fold("@search_term")
     first_name = accent_fold("COALESCE(p.prenom, '')")
@@ -189,6 +193,28 @@ def build_age_analysis_query(project: str, dataset: str) -> str:
   SELECT * FROM ranked_declarations WHERE declaration_family = 'interest' AND family_rank = 1
 ), latest_assets AS (
   SELECT * FROM ranked_declarations WHERE declaration_family = 'assets' AND family_rank = 1
+), history_rows AS (
+  SELECT p.snapshot_date, p.bronze_record_key, p.declaration_uuid,
+    d.date_depot, d.declaration_modificative, d.declaration_type_id,
+    d.declaration_type_label, d.mandat_label, d.organ_label,
+    CASE WHEN STARTS_WITH(UPPER(d.declaration_type_id), 'DI') THEN 'interest'
+      WHEN STARTS_WITH(UPPER(d.declaration_type_id), 'DSP') THEN 'assets'
+      ELSE 'other' END AS declaration_family
+  FROM {silver_people} p
+  JOIN {silver_declarations} d USING (snapshot_date, bronze_record_key, declaration_uuid)
+  JOIN selected_person sp ON CONCAT({first_name}, '|', {last_name}, '|',
+      COALESCE(CAST(p.date_naissance_date AS STRING), '')) = sp.person_key
+  CROSS JOIN latest l
+  WHERE p.snapshot_date = l.snapshot_date
+  QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY p.declaration_uuid
+    ORDER BY IF(p.ingestion_source = 'hatvp_website', 1, 0) DESC,
+      p.source_snapshot_date DESC, p.bronze_record_key DESC
+  ) = 1
+), selected_declaration_keys AS (
+  SELECT declaration_uuid, bronze_record_key FROM latest_interest
+  UNION ALL
+  SELECT declaration_uuid, bronze_record_key FROM latest_assets
 ), income_rows AS (
   SELECT SAFE_CAST(i.income_year AS INT64) AS year,
     CONCAT(i.declaration_uuid, ':', COALESCE(i.income_stream, ''), ':',
@@ -273,12 +299,16 @@ SELECT FORMAT_DATE('%Y-%m-%d', l.snapshot_date) AS snapshot_date,
       FROM latest_assets) AS latest_assets,
     ARRAY(SELECT AS STRUCT rd.declaration_uuid, rd.date_depot, rd.declaration_type_id,
       rd.declaration_type_label, rd.declaration_modificative, rd.mandat_label, rd.organ_label,
-      rd.declaration_family, rd.family_rank = 1 AS is_selected,
-      (SELECT COUNT(*) FROM {incomes} i WHERE i.snapshot_date = rd.snapshot_date
+      rd.declaration_family, EXISTS (
+        SELECT 1 FROM selected_declaration_keys k
+        WHERE k.declaration_uuid = rd.declaration_uuid
+          AND k.bronze_record_key = rd.bronze_record_key
+      ) AS is_selected,
+      (SELECT COUNT(*) FROM {silver_incomes} i WHERE i.snapshot_date = rd.snapshot_date
         AND i.bronze_record_key = rd.bronze_record_key) AS income_row_count,
-      (SELECT COUNT(*) FROM {assets} a WHERE a.snapshot_date = rd.snapshot_date
+      (SELECT COUNT(*) FROM {silver_assets} a WHERE a.snapshot_date = rd.snapshot_date
         AND a.bronze_record_key = rd.bronze_record_key) AS asset_row_count
-      FROM ranked_declarations rd ORDER BY rd.date_depot DESC, rd.declaration_uuid DESC
+      FROM history_rows rd ORDER BY rd.date_depot DESC, rd.declaration_uuid DESC
     ) AS history
   )) AS declaration_context_json,
   TO_JSON_STRING(ARRAY(SELECT AS STRUCT * FROM income_by_year ORDER BY year)) AS income_json,

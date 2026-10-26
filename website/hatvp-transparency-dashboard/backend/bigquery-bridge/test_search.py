@@ -32,7 +32,13 @@ def body(result):
 
 
 def search_row():
-    result = {"declaration_uuid": "fixture-uuid-1", "prenom": "Alice", "nom": "DUPONT"}
+    result = {
+        "declaration_uuid": "fixture-uuid-1",
+        "prenom": "Alice",
+        "nom": "DUPONT",
+        "publication_status": "unpublished",
+        "source_snapshot_date": "2026-08-30",
+    }
     return {
         "snapshot_date": "2026-08-18",
         "generated_at": "2026-08-18T08:00:00+00:00",
@@ -50,6 +56,14 @@ def test_search_query_is_parameterized_and_public():
     )
     assert "p.nom" in query and "d.mandat_label" in query
     assert "i.income_stream" in query and "a.asset_name" in query
+    assert "`project.dataset`.silver_declarations" in query
+    assert "`project.dataset`.silver_people" in query
+    assert "`project.dataset`.silver_incomes" in query
+    assert "`project.dataset`.silver_assets" in query
+    assert "gold_declarations" not in query
+    assert "d.ingestion_source = 'hatvp_website'" in query
+    assert "d.publication_status" in query
+    assert "d.source_snapshot_date" in query
     assert "LIMIT 50" in query
     for field in ("email", "telephone", "adresse_", "date_naissance", "raw_record_json"):
         assert field not in query
@@ -60,9 +74,13 @@ def test_declaration_query_uses_uuid_parameter_without_private_fields():
     assert "@declaration_uuid" in query
     assert "result_json" in query
     assert "p.nom" in query
-    assert "`project.dataset`.declarations" in query
+    assert "`project.dataset`.silver_declarations" in query
+    assert "`project.dataset`.silver_people" in query
     assert "source_object" in query
     assert "gold_declarations" not in query
+    assert "d.ingestion_source = 'hatvp_website'" in query
+    assert "d.publication_status" in query
+    assert "d.source_snapshot_date" in query
     assert "email" not in query
 
 
@@ -84,4 +102,6 @@ def test_bridge_returns_search_result_and_uses_a_query_config(monkeypatch):
 
     assert result[1] == 200
     assert body(result)["results"][0]["lastName"] == "DUPONT"
+    assert body(result)["results"][0]["publicationStatus"] == "unpublished"
+    assert body(result)["results"][0]["sourceSnapshotDate"] == "2026-08-30"
     assert client.configs[0] is not None

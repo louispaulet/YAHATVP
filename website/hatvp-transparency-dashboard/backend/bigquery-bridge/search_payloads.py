@@ -20,6 +20,8 @@ PUBLIC_RESULT_KEYS = (
     "organDeclaration",
     "dateDeposited",
     "isAmended",
+    "publicationStatus",
+    "sourceSnapshotDate",
 )
 
 
@@ -39,6 +41,8 @@ def search_result_payload(item: dict[str, Any]) -> dict[str, Any]:
         "organDeclaration": item.get("organ_declaration_label"),
         "dateDeposited": item.get("date_depot"),
         "isAmended": item.get("declaration_modificative"),
+        "publicationStatus": item.get("publication_status"),
+        "sourceSnapshotDate": item.get("source_snapshot_date"),
     }
 
 

@@ -64,6 +64,8 @@ export interface DeclarationSearchResult {
   organDeclaration: string | null;
   dateDeposited: string | null;
   isAmended: string | null;
+  publicationStatus: string | null;
+  sourceSnapshotDate: string | null;
 }
 
 export interface DashboardSearchResponse {

@@ -59,14 +59,21 @@ def any_predicates(predicates: Iterable[str]) -> str:
     return "\n      OR ".join(predicates)
 
 
-def exists_text_match(table_name: str, alias: str, predicates: Iterable[str]) -> str:
-    """Build an existence check for fields in one child Gold table."""
+def exists_text_match(
+    table_name: str, alias: str, predicates: Iterable[str], layer: str = "gold"
+) -> str:
+    """Build an existence check for fields in one fixed analytical layer."""
+
+    if layer not in {"silver", "gold"}:
+        raise ValueError("Invalid analytical layer")
 
     conditions = any_predicates(predicates)
     return f"""OR EXISTS (
-        SELECT 1 FROM {{prefix}}.gold_{table_name} {alias}
+        SELECT 1 FROM {{prefix}}.{layer}_{table_name} {alias}
         WHERE {alias}.declaration_uuid = d.declaration_uuid
           AND {alias}.snapshot_date = d.snapshot_date
+          AND {alias}.bronze_record_key = d.bronze_record_key
+          AND {alias}.ingestion_source = d.ingestion_source
           AND (
             {conditions}
           )

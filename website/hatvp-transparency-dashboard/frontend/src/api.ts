@@ -11,7 +11,7 @@ import type {
 } from "./types";
 
 const DEFAULT_API_URL = "http://localhost:8787";
-const DASHBOARD_SCHEMA = "5";
+const DASHBOARD_SCHEMA = "6";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -137,11 +137,11 @@ export function fetchHighlights(signal?: AbortSignal): Promise<DashboardHighligh
 }
 
 export function fetchSearch(query: string, signal?: AbortSignal): Promise<DashboardSearchResponse> {
-  return fetchJson(`/api/dashboard/search?q=${encodeURIComponent(query)}`, isSearchResponse, signal);
+  return fetchJson(`/api/dashboard/search?q=${encodeURIComponent(query)}&schema=${DASHBOARD_SCHEMA}`, isSearchResponse, signal);
 }
 
 export function fetchDeclaration(uuid: string, signal?: AbortSignal): Promise<DashboardDeclarationResponse> {
-  return fetchJson(`/api/dashboard/declarations/${encodeURIComponent(uuid)}`, isDeclarationResponse, signal);
+  return fetchJson(`/api/dashboard/declarations/${encodeURIComponent(uuid)}?schema=${DASHBOARD_SCHEMA}`, isDeclarationResponse, signal);
 }
 
 export function fetchSimpleAnalysis(signal?: AbortSignal): Promise<SimpleAnalysisResponse> {

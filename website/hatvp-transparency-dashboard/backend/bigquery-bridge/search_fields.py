@@ -57,11 +57,11 @@ def numeric_predicates(alias: str) -> list[str]:
     return [f"STRPOS(CAST({alias}.normalized_value AS STRING), s.term) > 0"]
 
 
-def child_match(table_name: str, alias: str, fields: tuple[str, ...]) -> str:
+def child_match(table_name: str, alias: str, fields: tuple[str, ...], layer: str = "gold") -> str:
     """Build one child-table existence check with its fixed amount predicate."""
 
     return exists_text_match(
-        table_name, alias, string_predicates(fields) + numeric_predicates(alias)
+        table_name, alias, string_predicates(fields) + numeric_predicates(alias), layer
     )
 
 

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fetchAgeAnalysis, fetchAssets, fetchGender, fetchHealth, fetchHighlights, fetchIncome, fetchOverview, fetchSimpleAnalysis } from "./api";
+import { fetchAgeAnalysis, fetchAssets, fetchDeclaration, fetchGender, fetchHealth, fetchHighlights, fetchIncome, fetchOverview, fetchSearch, fetchSimpleAnalysis } from "./api";
 
 describe("dashboard API client", () => {
   beforeEach(() => vi.restoreAllMocks());
@@ -14,7 +14,7 @@ describe("dashboard API client", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(fetchOverview()).resolves.toEqual(response);
-    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8787/api/dashboard/overview?schema=5", expect.any(Object));
+    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8787/api/dashboard/overview?schema=6", expect.any(Object));
   });
 
   it("loads breakdown slices independently", async () => {
@@ -26,8 +26,8 @@ describe("dashboard API client", () => {
     await expect(fetchAssets()).resolves.toEqual(response);
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
-      "http://localhost:8787/api/dashboard/income?schema=5",
-      "http://localhost:8787/api/dashboard/assets?schema=5",
+      "http://localhost:8787/api/dashboard/income?schema=6",
+      "http://localhost:8787/api/dashboard/assets?schema=6",
     ]);
   });
 
@@ -44,7 +44,7 @@ describe("dashboard API client", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(fetchHealth()).resolves.toEqual(response);
-    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8787/api/dashboard/health?schema=5", expect.any(Object));
+    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8787/api/dashboard/health?schema=6", expect.any(Object));
   });
 
   it("loads the gender slice", async () => {
@@ -64,7 +64,7 @@ describe("dashboard API client", () => {
 
     await expect(fetchHighlights()).resolves.toEqual(response);
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8787/api/dashboard/highlights?schema=5",
+      "http://localhost:8787/api/dashboard/highlights?schema=6",
       expect.any(Object),
     );
   });
@@ -78,8 +78,22 @@ describe("dashboard API client", () => {
     await expect(fetchSimpleAnalysis()).resolves.toEqual(simple);
     await expect(fetchAgeAnalysis("Sébastien Lecornu")).resolves.toEqual(age);
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
-      "http://localhost:8787/api/dashboard/simple-analysis?schema=5",
-      "http://localhost:8787/api/dashboard/age-analysis?q=S%C3%A9bastien%20Lecornu&schema=5",
+      "http://localhost:8787/api/dashboard/simple-analysis?schema=6",
+      "http://localhost:8787/api/dashboard/age-analysis?q=S%C3%A9bastien%20Lecornu&schema=6",
+    ]);
+  });
+
+  it("uses a new cache key for declaration search and detail responses", async () => {
+    const search = { snapshotDate: "2026-10-26", generatedAt: "now", results: [], resultCount: 0 };
+    const declaration = { snapshotDate: "2026-10-26", generatedAt: "now", declaration: {}, rawXml: "<declaration />" };
+    const fetchMock = vi.fn().mockImplementation((url: string) => Promise.resolve(new Response(JSON.stringify(url.includes("/search") ? search : declaration), { status: 200 })));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(fetchSearch("historical declaration")).resolves.toEqual(search);
+    await expect(fetchDeclaration("fixture-uuid")).resolves.toEqual(declaration);
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "http://localhost:8787/api/dashboard/search?q=historical%20declaration&schema=6",
+      "http://localhost:8787/api/dashboard/declarations/fixture-uuid?schema=6",
     ]);
   });
 
