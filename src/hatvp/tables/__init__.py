@@ -42,20 +42,22 @@ def _frame(
     rows: list[dict[str, Any]], columns: list[str], schema: dict[str, object]
 ) -> pl.DataFrame:
     if rows:
-        return pl.DataFrame(_coerce_temporal_values(rows), infer_schema_length=None)
+        return pl.DataFrame(_columnar_values(rows), infer_schema_length=None)
     return pl.DataFrame(
         {column: pl.Series(column, [], dtype=schema.get(column, pl.Null)) for column in columns}
     )
 
 
-def _coerce_temporal_values(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return [
-        {
-            key: _date_text(value) if isinstance(value, (date, datetime)) else value
-            for key, value in row.items()
-        }
-        for row in rows
-    ]
+def _columnar_values(rows: list[dict[str, Any]]) -> dict[str, list[Any]]:
+    names = list(dict.fromkeys(name for row in rows for name in row))
+    return {
+        name: [
+            _date_text(value) if isinstance(value, (date, datetime)) else value
+            for row in rows
+            for value in (row.get(name),)
+        ]
+        for name in names
+    }
 
 
 def _date_text(value: Any) -> Any:

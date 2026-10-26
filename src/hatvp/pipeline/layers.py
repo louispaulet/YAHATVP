@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -67,11 +66,11 @@ def _write_layer(
         path_name = source_name if bronze else name
         path = work / f"{layer}_{source_name}.parquet"
         if bronze:
-            write_table(_serializable_rows(tables.get(name, [])), source_name, path)
+            write_table(tables.get(name, []), source_name, path)
         else:
             schema = {**schema_for(source_name), **SILVER_FIELDS}
             write_parquet(
-                _serializable_rows(tables.get(source_name, [])),
+                tables.get(source_name, []),
                 path,
                 required_columns(source_name),
                 schema,
@@ -83,17 +82,10 @@ def _write_layer(
                 path,
                 content_type="application/vnd.apache.parquet",
             )
+        # Layer dictionaries are large Python object graphs. Each table has
+        # already been serialized, so release its rows before writing the next.
+        tables.pop(source_name, None)
     return files
-
-
-def _serializable_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return [{key: _serializable(value) for key, value in row.items()} for row in rows]
-
-
-def _serializable(value: Any) -> Any:
-    if isinstance(value, (date, datetime)):
-        return value.isoformat()
-    return value
 
 
 __all__ = ["write_bronze_tables", "write_gold_tables", "write_silver_tables"]

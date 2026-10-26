@@ -25,6 +25,13 @@ def build_layers(
 ) -> dict[str, Path]:
     """Build and persist all analytical layer files before state advancement."""
 
+    # Write the large source-shaped partitions before creating the annotated
+    # Silver and selected Gold copies. These outputs are still covered by the
+    # final state/BigQuery success gate in the caller.
+    bronze = {**tables, **publication_snapshot(tables, history, snapshot)}
+    files = write_bronze_tables(store, bronze, snapshot, work, dry_run)
+    del bronze
+
     silver, silver_history, registry_rows = build_silver(
         tables,
         history,
@@ -32,13 +39,18 @@ def build_layers(
         snapshot_date=snapshot,
         dob_max_age_years=dob_max_age_years,
     )
+    # `silver` already contains the cumulative, publication-annotated corpus;
+    # the separate annotated history result is not needed by Gold or writers.
+    del silver_history
+    del tables, history
+
     gold, registry_rows = build_gold(silver, registry_rows)
     silver = apply_registry_states(silver, registry_rows)
     gold = apply_registry_states(gold, registry_rows)
-    bronze = {**tables, **publication_snapshot(tables, history, snapshot)}
-    files = write_bronze_tables(store, bronze, snapshot, work, dry_run)
     files.update(write_silver_tables(store, silver, snapshot, work, dry_run))
+    del silver
     files.update(write_gold_tables(store, gold, snapshot, work, dry_run))
+    del gold
     files.update(write_registry(store, registry_rows, snapshot, work, dry_run))
     return files
 
