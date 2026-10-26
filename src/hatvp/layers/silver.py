@@ -57,7 +57,7 @@ def build_silver(
     registry_rows = upsert_registry(current_occurrences, registry or [], snapshot)
     by_ref = occurrences_by_ref(occurrences, {row["anomaly_key"]: row for row in registry_rows})
     all_silver = annotate_tables(combined, parent_map(combined), by_ref)
-    current_silver = publication_snapshot(all_silver, current, snapshot)
+    current_silver = publication_snapshot(current, all_silver, snapshot)
     return current_silver, all_silver, registry_rows
 
 

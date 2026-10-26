@@ -72,5 +72,10 @@ def test_layer_files_keep_withdrawn_version_in_bronze_and_silver(tmp_path: Path)
     assert set(silver["bronze_record_key"]) == {"old", "new"}
     old_status = bronze.filter(pl.col("bronze_record_key") == "old")["publication_status"][0]
     assert old_status == "unpublished"
+    silver_old_status = silver.filter(pl.col("bronze_record_key") == "old")["publication_status"][0]
+    assert silver_old_status == "unpublished"
+    assert silver.filter(pl.col("bronze_record_key") == "new")["publication_status"].to_list() == [
+        "online"
+    ]
     assert gold["bronze_record_key"].to_list() == ["new"]
     assert bronze["snapshot_date"].unique().to_list() == [date(2026, 3, 1)]
