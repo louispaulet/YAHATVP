@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-11-01 — Retain three recent pipeline images
+
+- Enabled an Artifact Registry cleanup policy for the HATVP `hatvp` image
+  package. It deletes versions older than one day while retaining the three
+  newest main builds (nine registry version records at the current build
+  output shape) and the older `baa27d8` image still referenced by
+  `hatvp-scheduler-smoke`.
+- Verified the policy is active and dry-run is disabled. The latest nine
+  version records group into the three newest tagged builds; the repository
+  remains 36,522.956 MB until Artifact Registry's background cleanup runs.
+  Follow-up size and tag verification is tracked in `TODO.md`.
+
 ## 2026-10-27 — Record HATVP debugging experience
 
 - Added [`experiences/2026-10-27-hatvp-refresh-and-unpublished-search.md`](experiences/2026-10-27-hatvp-refresh-and-unpublished-search.md), a project memory note covering refresh diagnosis, Silver/Gold count interpretation, production verification, operational commands, and code/test entry points.

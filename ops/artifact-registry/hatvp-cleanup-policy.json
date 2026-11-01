@@ -1,0 +1,28 @@
+[
+  {
+    "name": "delete-old-hatvp-images",
+    "action": { "type": "Delete" },
+    "condition": {
+      "tagState": "any",
+      "olderThan": "1d",
+      "packageNamePrefixes": ["hatvp"]
+    }
+  },
+  {
+    "name": "keep-three-main-builds",
+    "action": { "type": "Keep" },
+    "mostRecentVersions": {
+      "packageNamePrefixes": ["hatvp"],
+      "keepCount": 9
+    }
+  },
+  {
+    "name": "keep-scheduler-smoke-image",
+    "action": { "type": "Keep" },
+    "condition": {
+      "tagState": "tagged",
+      "tagPrefixes": ["baa27d8"],
+      "packageNamePrefixes": ["hatvp"]
+    }
+  }
+]
