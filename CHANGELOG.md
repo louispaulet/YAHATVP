@@ -8,9 +8,9 @@
   output shape) and the older `baa27d8` image still referenced by
   `hatvp-scheduler-smoke`.
 - Verified the policy is active and dry-run is disabled. The latest nine
-  version records group into the three newest tagged builds; the repository
-  remains 36,522.956 MB until Artifact Registry's background cleanup runs.
-  Follow-up size and tag verification is tracked in `TODO.md`.
+  version records group into the three newest tagged builds. At policy
+  activation, the repository measured 36,522.956 MB; the first background
+  cleanup and its resulting size remain to be verified in `TODO.md`.
 
 ## 2026-10-27 — Record HATVP debugging experience
 
