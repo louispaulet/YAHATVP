@@ -16,9 +16,10 @@ confirmed the deployed search result, publication badge, and source XML.
 
 ## Open work
 
-- [ ] Verify the first active Artifact Registry cleanup run and record the new
-  `hatvp` repository size and retained tags. The 2026-11-01 baseline was
-  36,522.956 MB; policy keeps three main builds plus the scheduler-smoke image.
+- [ ] Verify the first active Artifact Registry cleanup run and record the
+  `hatvp` and `cloud-run-source-deploy` repository sizes and retained HATVP
+  tags. The 2026-11-01 baselines were 36,522.956 MB and 1,261.772 MB; the
+  latter repository also contains unrelated packages that are not targeted.
 - [ ] Complete human source-document review and any external HATVP follow-up;
   the repository report does not assert that a flagged value is erroneous.
 - [ ] Review the 23-run quality-warning streak reported by snapshot 2026-10-27;

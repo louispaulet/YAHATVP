@@ -7,10 +7,15 @@
   newest main builds (nine registry version records at the current build
   output shape) and the older `baa27d8` image still referenced by
   `hatvp-scheduler-smoke`.
+- Added a separate cleanup policy for `hatvp-dashboard-api` in the shared
+  `cloud-run-source-deploy` repository. It keeps the three newest API images;
+  other packages in that repository are not targeted.
 - Verified the policy is active and dry-run is disabled. The latest nine
-  version records group into the three newest tagged builds. At policy
-  activation, the repository measured 36,522.956 MB; the first background
-  cleanup and its resulting size remain to be verified in `TODO.md`.
+  pipeline version records group into the three newest tagged builds, and the
+  latest three API versions include the digest used by the running service.
+  At policy activation, the repositories measured 36,522.956 MB and
+  1,261.772 MB; background cleanup and resulting sizes remain to be verified
+  in `TODO.md`.
 
 ## 2026-10-27 — Record HATVP debugging experience
 

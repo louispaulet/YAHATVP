@@ -1,0 +1,19 @@
+[
+  {
+    "name": "delete-old-hatvp-dashboard-api-images",
+    "action": { "type": "Delete" },
+    "condition": {
+      "tagState": "any",
+      "olderThan": "1d",
+      "packageNamePrefixes": ["hatvp-dashboard-api"]
+    }
+  },
+  {
+    "name": "keep-three-hatvp-dashboard-api-images",
+    "action": { "type": "Keep" },
+    "mostRecentVersions": {
+      "packageNamePrefixes": ["hatvp-dashboard-api"],
+      "keepCount": 3
+    }
+  }
+]

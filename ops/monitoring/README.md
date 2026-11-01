@@ -173,35 +173,54 @@ flagged records increase by more than 10% from the prior successful report.
 First snapshots, failed prior reports, and `NO_CHANGE` runs do not emit either
 quality alert event.
 
-## 5. Retain HATVP pipeline images
+## 5. Retain HATVP container images
 
-The `hatvp` Artifact Registry repository contains only the HATVP pipeline
-image. Retain the three newest main builds for short rollback, and preserve
-the `baa27d8` image because the paused `hatvp-scheduler-smoke` job still points
-to it. The current GitHub Actions build produces three Artifact Registry
-version records per build: a tagged OCI index, its image manifest, and a
-provenance attestation. The cleanup policy therefore keeps nine recent
-versions to retain three complete builds. Recheck this count if the Docker
-build output changes.
+The policies cover two HATVP packages: `hatvp` in the `hatvp` repository and
+`hatvp-dashboard-api` in the shared `cloud-run-source-deploy` repository. They
+do not target other packages in `cloud-run-source-deploy`.
 
-The policy deletes older versions after one day while keeping those nine recent
-versions and the scheduler smoke image. Inspect or apply the repository policy
-with:
+Retain the three newest main builds of the pipeline image for short rollback,
+and preserve the `baa27d8` image because the paused `hatvp-scheduler-smoke` job
+still points to it. The current GitHub Actions build produces three Artifact
+Registry version records per build: a tagged OCI index, its image manifest,
+and a provenance attestation. Its policy therefore keeps nine recent versions
+to retain three complete builds. Recheck this count if the Docker build output
+changes.
+
+The dashboard API package produces one version record per build, so its policy
+keeps the three newest versions. The running API service uses the newest one.
+
+Both policies delete older versions after one day while keeping the configured
+recent versions. Inspect the policies with:
 
 ```bash
 gcloud artifacts repositories list-cleanup-policies hatvp \
   --project="$PROJECT_ID" \
   --location="$REGION"
 
+gcloud artifacts repositories list-cleanup-policies cloud-run-source-deploy \
+  --project="$PROJECT_ID" \
+  --location="$REGION"
+```
+
+Apply the policies with:
+
+```bash
 gcloud artifacts repositories set-cleanup-policies hatvp \
   --project="$PROJECT_ID" \
   --location="$REGION" \
   --policy=ops/artifact-registry/hatvp-cleanup-policy.json \
   --no-dry-run
+
+gcloud artifacts repositories set-cleanup-policies cloud-run-source-deploy \
+  --project="$PROJECT_ID" \
+  --location="$REGION" \
+  --policy=ops/artifact-registry/dashboard-api-cleanup-policy.json \
+  --no-dry-run
 ```
 
 Artifact Registry applies cleanup in a background job. Verify the repository
-size and retained image tags after the first cleanup run; do not delete the
+sizes and retained image tags after the first cleanup run; do not delete the
 immutable HATVP source archives in Cloud Storage as part of image cleanup.
 
 To preview the policy before activating it, use the same command with
