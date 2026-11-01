@@ -9,16 +9,16 @@
 
 Repository sizes are as reported by `gcloud artifacts repositories describe`.
 The shared `cloud-run-source-deploy` size includes both the dashboard API and
-Nitter packages. The latest snapshot is after a documentation commit triggered
-the pipeline deployment workflow.
+Nitter packages. The latest snapshot includes the documentation-only build and
+the one-time build triggered by changing the workflow filter.
 
-| Scope | Before purge | Immediately after version purge | Latest check after docs-only build |
-| --- | ---: | ---: | ---: |
-| `hatvp` repository size | 37,137.229 MB | 37,136.854 MB | 37,327.190 MB |
-| `hatvp/hatvp` versions | 205 | 10 | 13 |
-| `cloud-run-source-deploy` repository size | 1,261.772 MB | 1,261.704 MB | 1,261.704 MB |
-| `hatvp-dashboard-api` versions | 37 | 3 | 3 |
-| `my-nitter_nitter` versions | 4 | 4 | 4 |
+| Scope | Before purge | Immediately after version purge | After docs build (`95f951a`) | After filter deployment (`97fe99f`) |
+| --- | ---: | ---: | ---: | ---: |
+| `hatvp` repository size | 37,137.229 MB | 37,136.854 MB | 37,327.190 MB | 37,517.529 MB |
+| `hatvp/hatvp` versions | 205 | 10 | 13 | 16 |
+| `cloud-run-source-deploy` repository size | 1,261.772 MB | 1,261.704 MB | 1,261.704 MB | 1,261.704 MB |
+| `hatvp-dashboard-api` versions | 37 | 3 | 3 | 3 |
+| `my-nitter_nitter` versions | 4 | 4 | 4 | 4 |
 
 The manual purge removed **195 pipeline versions** and **34 dashboard API
 versions**. The immediate repository-size change was only 0.375 MB for `hatvp`
@@ -44,11 +44,21 @@ and the latest measured `hatvp` size rose by 190.336 MB from the immediate
 post-purge reading. The ingestion job now references that image. There was no
 pipeline execution as part of this deploy.
 
-At the latest check, 13 pipeline versions represent four recent build groups
-plus the smoke image. The fourth group is less than one day old, so the active
-cleanup policy's one-day deletion threshold has not yet made it eligible. The
-policy keeps the nine most recent registry records (three builds at the current
-image layout) and the smoke tag.
+To prevent repeats, the deployment workflow now ignores pushes limited to the
+listed tracking documents, reports, and Markdown paths outside the image build
+inputs. The workflow change itself triggered one expected final build and
+deployment: run
+[41336949571](https://github.com/louispaulet/YAHATVP/actions/runs/41336949571)
+passed tests, deployment configuration, and deployment, producing
+`hatvp:97fe99f`. This added another three registry records and 190.339 MB to the
+reported `hatvp` size. The ingestion job now references that image; no pipeline
+execution was started by the deployment.
+
+At the latest check, 16 pipeline versions represent five recent build groups
+plus the smoke image. The two oldest recent groups are under one day old, so the
+active cleanup policy's one-day deletion threshold has not made them eligible.
+After they age out, the policy should retain the nine records for the three
+newest builds (`97fe99f`, `95f951a`, and `27530ef`) plus the smoke tag.
 
 ## Cause and prevention
 
