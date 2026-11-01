@@ -16,10 +16,12 @@ confirmed the deployed search result, publication badge, and source XML.
 
 ## Open work
 
-- [ ] Verify the first active Artifact Registry cleanup run and record the
-  `hatvp` and `cloud-run-source-deploy` repository sizes and retained HATVP
-  tags. The 2026-11-01 baselines were 36,522.956 MB and 1,261.772 MB; the
-  latter repository also contains unrelated packages that are not targeted.
+- [ ] Verify Artifact Registry's daily garbage collection after the 2026-11-01
+  HATVP purge and record final sizes. The purge left 10 `hatvp/hatvp` versions
+  (the three newest main builds plus `baa27d8`) and three
+  `hatvp-dashboard-api` versions; the four `my-nitter_nitter` versions were
+  untouched. Immediately afterward, repository sizes were 37,136.854 MB and
+  1,261.704 MB; unreferenced image layers are still awaiting daily cleanup.
 - [ ] Complete human source-document review and any external HATVP follow-up;
   the repository report does not assert that a flagged value is erroneous.
 - [ ] Review the 23-run quality-warning streak reported by snapshot 2026-10-27;

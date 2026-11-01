@@ -17,6 +17,19 @@
   1,261.772 MB; background cleanup and resulting sizes remain to be verified
   in `TODO.md`.
 
+## 2026-11-01 — Purge older HATVP images
+
+- Deleted 195 old pipeline image versions, retaining the three newest main
+  builds (nine index, manifest, and attestation records) and the `baa27d8`
+  image used by `hatvp-scheduler-smoke`. Deleted 34 old dashboard API versions,
+  retaining the three newest including the live service digest. The four
+  `my-nitter_nitter` versions were untouched.
+- Verified the ingestion job, smoke job, dashboard API service, and Nitter
+  service still reference retained images. Artifact Registry reported 10
+  pipeline versions and 3 dashboard API versions after the purge; repository
+  sizes were 37,136.854 MB and 1,261.704 MB immediately afterward. Physical
+  layer reclamation is pending Artifact Registry's daily cleanup; see `TODO.md`.
+
 ## 2026-10-27 — Record HATVP debugging experience
 
 - Added [`experiences/2026-10-27-hatvp-refresh-and-unpublished-search.md`](experiences/2026-10-27-hatvp-refresh-and-unpublished-search.md), a project memory note covering refresh diagnosis, Silver/Gold count interpretation, production verification, operational commands, and code/test entry points.
