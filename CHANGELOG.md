@@ -27,8 +27,12 @@
 - Verified the ingestion job, smoke job, dashboard API service, and Nitter
   service still reference retained images. Artifact Registry reported 10
   pipeline versions and 3 dashboard API versions after the purge; repository
-  sizes were 37,136.854 MB and 1,261.704 MB immediately afterward. Physical
-  layer reclamation is pending Artifact Registry's daily cleanup; see `TODO.md`.
+  sizes were 37,136.854 MB and 1,261.704 MB immediately afterward. A subsequent
+  docs-only push triggered the deployment workflow and added a new image; added
+  push path exclusions for documentation that is outside the Docker build
+  inputs. The latest measurements and remaining garbage-collection check are in
+  [`reports/03-validation/2026-11-01-artifact-registry-cleanup.md`](reports/03-validation/2026-11-01-artifact-registry-cleanup.md)
+  and `TODO.md`.
 
 ## 2026-10-27 — Record HATVP debugging experience
 

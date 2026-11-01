@@ -3,6 +3,22 @@ name: Test and deploy
 on:
   push:
     branches: [main]
+    # These files are not part of the pipeline image build context. Keep README.md
+    # as a trigger because the Dockerfile copies it into the image.
+    paths-ignore:
+      - 'TODO.md'
+      - 'CHANGELOG.md'
+      - 'ARCHITECTURE.md'
+      - 'agents.md'
+      - 'design_style.md'
+      - 'tone_of_voice.md'
+      - 'documentation_archive/**'
+      - 'experiences/**'
+      - 'ops/monitoring/**'
+      - 'reports/**'
+      - 'skills/**'
+      - 'tutorial/**'
+      - 'website/**/*.md'
   pull_request:
     branches: [main]
   workflow_dispatch:

@@ -16,12 +16,14 @@ confirmed the deployed search result, publication badge, and source XML.
 
 ## Open work
 
-- [ ] Verify Artifact Registry's daily garbage collection after the 2026-11-01
-  HATVP purge and record final sizes. The purge left 10 `hatvp/hatvp` versions
-  (the three newest main builds plus `baa27d8`) and three
-  `hatvp-dashboard-api` versions; the four `my-nitter_nitter` versions were
-  untouched. Immediately afterward, repository sizes were 37,136.854 MB and
-  1,261.704 MB; unreferenced image layers are still awaiting daily cleanup.
+- [ ] Verify Artifact Registry's cleanup and daily layer collection after the
+  2026-11-01 HATVP purge and record final sizes. The purge deleted 195 pipeline
+  and 34 dashboard API versions. A docs-only push then triggered a new pipeline
+  image; the latest check was 13 `hatvp/hatvp` versions at 37,327.190 MB, three
+  API versions, and four untouched Nitter versions. The cleanup policy has a
+  one-day age threshold, so confirm the extra build ages out and layer storage
+  falls after garbage collection. Tracking-doc pushes are now excluded from the
+  deployment workflow.
 - [ ] Complete human source-document review and any external HATVP follow-up;
   the repository report does not assert that a flagged value is erroneous.
 - [ ] Review the 23-run quality-warning streak reported by snapshot 2026-10-27;
