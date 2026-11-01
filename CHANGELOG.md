@@ -8,8 +8,8 @@
   output shape) and the older `baa27d8` image still referenced by
   `hatvp-scheduler-smoke`.
 - Added a separate cleanup policy for `hatvp-dashboard-api` in the shared
-  `cloud-run-source-deploy` repository. It keeps the three newest API images;
-  other packages in that repository are not targeted.
+  `cloud-run-source-deploy` repository. Its package prefix scopes retention to
+  the dashboard API image and keeps the three newest versions.
 - Verified the policy is active and dry-run is disabled. The latest nine
   pipeline version records group into the three newest tagged builds, and the
   latest three API versions include the digest used by the running service.
@@ -22,10 +22,9 @@
 - Deleted 195 old pipeline image versions, retaining the three newest main
   builds (nine index, manifest, and attestation records) and the `baa27d8`
   image used by `hatvp-scheduler-smoke`. Deleted 34 old dashboard API versions,
-  retaining the three newest including the live service digest. The four
-  `my-nitter_nitter` versions were untouched.
-- Verified the ingestion job, smoke job, dashboard API service, and Nitter
-  service still reference retained images. Artifact Registry reported 10
+  retaining the three newest including the live service digest.
+- Verified the ingestion job, smoke job, and dashboard API service still
+  reference retained images. Artifact Registry reported 10
   pipeline versions and 3 dashboard API versions after the purge; repository
   sizes were 37,136.854 MB and 1,261.704 MB immediately afterward. A docs-only
   push triggered the deployment workflow, so added push path exclusions for

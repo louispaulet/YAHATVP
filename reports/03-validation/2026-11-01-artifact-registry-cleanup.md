@@ -7,18 +7,17 @@
 
 ## Before and after
 
-Repository sizes are as reported by `gcloud artifacts repositories describe`.
-The shared `cloud-run-source-deploy` size includes both the dashboard API and
-Nitter packages. The latest snapshot includes the documentation-only build and
-the one-time build triggered by changing the workflow filter.
+The pipeline repository size is as reported by
+`gcloud artifacts repositories describe`. Artifact Registry reports storage at
+repository level, so the dashboard API is represented by its package version
+count here. The latest snapshot includes the documentation-only build and the
+one-time build triggered by changing the workflow filter.
 
 | Scope | Before purge | Immediately after version purge | After docs build (`95f951a`) | After filter deployment (`97fe99f`) |
 | --- | ---: | ---: | ---: | ---: |
 | `hatvp` repository size | 37,137.229 MB | 37,136.854 MB | 37,327.190 MB | 37,517.529 MB |
 | `hatvp/hatvp` versions | 205 | 10 | 13 | 16 |
-| `cloud-run-source-deploy` repository size | 1,261.772 MB | 1,261.704 MB | 1,261.704 MB | 1,261.704 MB |
 | `hatvp-dashboard-api` versions | 37 | 3 | 3 | 3 |
-| `my-nitter_nitter` versions | 4 | 4 | 4 | 4 |
 
 The manual purge removed **195 pipeline versions** and **34 dashboard API
 versions**. The immediate repository-size change was only 0.375 MB for `hatvp`
@@ -33,8 +32,8 @@ At the time of the purge, `hatvp/hatvp` retained the three newest `main` builds
 (`27530ef`, `1cb94d4`, and `ee5c54f`), represented by nine registry records
 (index, runnable manifest, and attestation per build), plus `baa27d8`, which is
 still referenced by `hatvp-scheduler-smoke`. The dashboard API retained its
-three newest versions, including the digest used by the live service. All four
-`my-nitter_nitter` versions and the running Nitter image were left untouched.
+three newest versions, including the digest used by the live service; that
+service reference was verified against the retained versions.
 
 After the purge, commit `95f951a` added only project documentation, but the
 `Test and deploy` workflow ran anyway. GitHub Actions run
@@ -73,8 +72,9 @@ The following controls are now in place:
 1. The `hatvp` repository deletes versions older than one day, keeps the nine
    most recent records for `hatvp` (three builds at the current output shape),
    and separately keeps the `baa27d8` smoke-job image.
-2. The shared repository deletes old `hatvp-dashboard-api` versions after one
-   day and keeps its three most recent versions. No Nitter package is targeted.
+2. The source-deploy repository deletes old `hatvp-dashboard-api` versions
+   after one day and keeps its three most recent versions, scoped by package
+   prefix.
 3. The deployment workflow skips pushes that change only tracking documents,
    reports, and the listed Markdown paths outside the image build inputs.
    Pull-request checks remain enabled, and `README.md` remains a push trigger
@@ -96,9 +96,8 @@ gcloud artifacts repositories describe hatvp --location=europe-west1
 gcloud artifacts versions list --location=europe-west1 --repository=hatvp --package=hatvp
 gcloud artifacts repositories describe cloud-run-source-deploy --location=europe-west1
 gcloud artifacts versions list --location=europe-west1 --repository=cloud-run-source-deploy --package=hatvp-dashboard-api
-gcloud artifacts versions list --location=europe-west1 --repository=cloud-run-source-deploy --package=my-nitter_nitter
 ```
 
 The active image references were checked after the purge: the ingestion job,
-smoke job, dashboard API service, and Nitter service all pointed to retained
-versions. See the live follow-up in `TODO.md` for the post-GC size check.
+smoke job, and dashboard API service all pointed to retained versions. See the
+live follow-up in `TODO.md` for the post-GC size check.
