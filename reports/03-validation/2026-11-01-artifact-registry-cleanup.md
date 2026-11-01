@@ -81,6 +81,7 @@ The following controls are now in place:
    because the Dockerfile copies it into the image. The workflow-filter change
    itself is expected to run once because it changes a non-ignored workflow
    file; future commits limited to the ignored docs will not build an image.
+   Docs-only commit `acc9f96` created no Actions run, confirming the filter.
 4. After the one-day retention window and daily layer collection, compare the
    repository sizes and retained tags again. The remaining check is tracked in
    [`TODO.md`](../../TODO.md).

@@ -30,8 +30,9 @@
   sizes were 37,136.854 MB and 1,261.704 MB immediately afterward. A docs-only
   push triggered the deployment workflow, so added push path exclusions for
   documentation outside the image build inputs; PR checks remain active and
-  README changes still trigger deployment. The filter workflow run
-  `41336949571` passed. The latest measurements and remaining garbage-collection check are in
+  README changes still trigger deployment. Workflow run `41336949571` passed,
+  and docs-only follow-up commit `acc9f96` triggered no Actions run. The latest
+  measurements and remaining garbage-collection check are in
   [`reports/03-validation/2026-11-01-artifact-registry-cleanup.md`](reports/03-validation/2026-11-01-artifact-registry-cleanup.md)
   and `TODO.md`.
 

@@ -20,7 +20,8 @@ confirmed the deployed search result, publication badge, and source XML.
   2026-11-01 HATVP purge and record final sizes. The purge deleted 195 pipeline
   and 34 dashboard API versions. A docs-only push triggered a pipeline build;
   path exclusions now prevent builds for the listed documentation-only pushes.
-  The filter deployment passed run `41336949571`. Latest check: 16
+  Filter deployment run `41336949571` passed, and docs-only commit `acc9f96`
+  created no Actions run. Latest check: 16
   `hatvp/hatvp` versions at 37,517.529 MB, three API versions, and four
   untouched Nitter versions. After the one-day age threshold, confirm older
   groups are removed and layer storage falls after garbage collection.
