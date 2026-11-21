@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from ..layers import build_gold, build_silver
+from ..layers import SILVER_TABLES, build_gold, build_silver
 from ..layers.publication import publication_snapshot
 from ..layers.silver import apply_registry_states
 from ..storage import ArtifactStore
@@ -31,6 +31,9 @@ def build_layers(
     bronze = {**tables, **publication_snapshot(tables, history, snapshot)}
     files = write_bronze_tables(store, bronze, snapshot, work, dry_run)
     del bronze
+    for name in tuple(tables):
+        if name not in SILVER_TABLES:
+            del tables[name]
 
     silver, silver_history, registry_rows = build_silver(
         tables,

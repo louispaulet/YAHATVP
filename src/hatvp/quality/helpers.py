@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from hashlib import sha256
 from statistics import median
 from typing import Any
 
@@ -40,6 +41,30 @@ def previous_summary(previous_report: dict[str, Any] | None) -> dict[str, Any]:
         return {}
     quality = previous_report.get("quality")
     return quality if isinstance(quality, dict) else {}
+
+
+VOLATILE_FINDING_FIELDS = frozenset(
+    "snapshot_date source_snapshot_date source_ingestion_snapshot_date source_observed_at "
+    "source_object source_url source_file source_sha256 pipeline_version parser_version "
+    "bronze_record_key source_record_id source_location source_item_index quality_reason".split()
+)
+
+
+def warning_findings_fingerprint(checks: dict[str, Any], anomalies: list[dict[str, Any]]) -> str:
+    def stable_hash(item: dict[str, Any]) -> bytes:
+        row = json.loads(item.get("raw_record_json") or "{}")
+        row = {key: value for key, value in row.items() if key not in VOLATILE_FINDING_FIELDS}
+        stable = json.dumps((item["table_name"], item["quality_reason"], row), sort_keys=True)
+        return sha256(stable.encode()).digest()
+
+    check_warnings = {
+        key: value
+        for key, value in checks.items()
+        if key in {"catastrophic_row_count_reductions", "income_sections_without_rows"}
+    }
+    digest = sha256(json.dumps(check_warnings, sort_keys=True, default=str).encode())
+    digest.update(b"".join(sorted(stable_hash(item) for item in anomalies)))
+    return digest.hexdigest()
 
 
 def catastrophic_reduction(current: int, previous: int | None) -> bool:

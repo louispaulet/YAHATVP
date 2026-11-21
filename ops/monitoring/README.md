@@ -168,10 +168,15 @@ gcloud logging read \
 
 The first successful warning-bearing snapshot has `warning_streak=1`. A second
 consecutive warning-bearing snapshot emits `quality_warning_streak` and can
-open the repeated-warning incident. `quality_regression` is emitted only when
-flagged records increase by more than 10% from the prior successful report.
-First snapshots, failed prior reports, and `NO_CHANGE` runs do not emit either
-quality alert event.
+open the repeated-warning incident. Reprocessing the same snapshot does not
+advance that streak. Later warning snapshots emit the event again only when
+the warning fingerprint changes; it covers warning check counts and source
+evidence while ignoring snapshot-specific provenance. Persistent findings
+remain in each report and quarantine file without reopening the same alert on
+every weekly run. New or changed findings still produce an event. The separate
+`quality_regression` event remains tied to flagged-record increases above 10%
+from the prior successful report. First snapshots, failed prior reports, and
+`NO_CHANGE` runs do not emit either quality alert event.
 
 ## 5. Retain HATVP container images
 

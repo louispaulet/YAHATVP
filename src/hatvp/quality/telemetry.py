@@ -4,19 +4,32 @@ from __future__ import annotations
 
 from typing import Any
 
-from .helpers import previous_summary
+from .helpers import previous_summary, warning_findings_fingerprint
 
 REGRESSION_THRESHOLD = 0.10
 
 
-def warning_streak(status: str, previous_report: dict[str, Any] | None) -> int:
+def warning_streak(
+    status: str, previous_report: dict[str, Any] | None, snapshot_date: str | None = None
+) -> int:
     """Advance warning streaks only across consecutive warning reports."""
 
     previous = previous_summary(previous_report)
     old = previous.get("warning_streak", 0)
     old = old if isinstance(old, int) and old >= 0 else 0
     continues = previous_report and previous_report.get("status") == "warning"
-    return old + 1 if status == "warning" and continues else 1 if status == "warning" else 0
+    same_snapshot = bool(
+        snapshot_date and previous_report and previous_report.get("snapshot_date") == snapshot_date
+    )
+    return (
+        old + 1
+        if status == "warning" and continues and not same_snapshot
+        else 1
+        if status == "warning" and not continues
+        else old
+        if status == "warning"
+        else 0
+    )
 
 
 def flagged_ratio(flagged: int, previous: int | None) -> float | None:
@@ -37,13 +50,18 @@ def is_regression(flagged: int, previous: int | None) -> bool:
 
 
 def telemetry(
-    status: str, anomalies: list[dict[str, Any]], previous_report: dict[str, Any] | None
+    status: str,
+    anomalies: list[dict[str, Any]],
+    previous_report: dict[str, Any] | None,
+    checks: dict[str, Any] | None = None,
+    snapshot_date: str | None = None,
 ) -> dict[str, Any]:
     previous = previous_summary(previous_report)
     old_flagged = previous.get("flagged_records")
     old_flagged = old_flagged if isinstance(old_flagged, int) and old_flagged >= 0 else None
-    streak = warning_streak(status, previous_report)
+    streak = warning_streak(status, previous_report, snapshot_date)
     flagged = len(anomalies)
+    fingerprint = warning_findings_fingerprint(checks or {}, anomalies)
     ratio = None
     regression = False
     if old_flagged is not None:
@@ -58,13 +76,11 @@ def telemetry(
         "flagged_records_increase_ratio": ratio,
         "quality_regression": regression and status in {"ok", "warning"},
         "warning_streak": streak,
+        "warning_findings_fingerprint": fingerprint,
+        "warning_alert": status == "warning"
+        and streak >= 2
+        and (streak == 2 or fingerprint != previous.get("warning_findings_fingerprint")),
     }
 
 
-__all__ = [
-    "REGRESSION_THRESHOLD",
-    "flagged_ratio",
-    "is_regression",
-    "telemetry",
-    "warning_streak",
-]
+__all__ = "REGRESSION_THRESHOLD flagged_ratio is_regression telemetry warning_streak".split()

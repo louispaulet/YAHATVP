@@ -39,7 +39,7 @@ def run_quality_checks(
     checks.update(numeric)
     warnings += numeric_warnings
     status = "error" if errors else "warning" if warnings else "ok"
-    quality = telemetry(status, anomalies, previous_report)
+    quality = telemetry(status, anomalies, previous_report, checks, snapshot_date)
     report = {
         "snapshot_date": snapshot_date,
         "status": status,
@@ -69,7 +69,7 @@ def _log_quality(snapshot_date: str, status: str, report: dict[str, Any]) -> Non
             "warning_streak": quality["warning_streak"],
         },
     )
-    if quality["warning_streak"] >= 2:
+    if quality["warning_alert"]:
         logger.warning(
             "quality_warning_streak",
             extra={
@@ -78,6 +78,7 @@ def _log_quality(snapshot_date: str, status: str, report: dict[str, Any]) -> Non
                 "snapshot_date": snapshot_date,
                 "warning_streak": quality["warning_streak"],
                 "flagged_records": quality["flagged_records"],
+                "warning_findings_fingerprint": quality["warning_findings_fingerprint"],
             },
         )
     if quality["quality_regression"]:

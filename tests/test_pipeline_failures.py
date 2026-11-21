@@ -85,14 +85,16 @@ def test_bigquery_failure_does_not_advance_state(tmp_path: Path, monkeypatch) ->
     monkeypatch.setattr(main_module, "_snapshot_date", lambda: next(dates))
     warning_status(run_pipeline(settings(output), downloader=fixture_downloader))
     previous_state = state_path(output).read_bytes()
+    loaded = []
 
-    monkeypatch.setattr(
-        main_module,
-        "load_parquet_tables",
-        lambda **_: (_ for _ in ()).throw(RuntimeError("fixture BigQuery failure")),
-    )
+    def partial_load(**_: object) -> None:
+        loaded.extend(["declarations", "people"])
+        raise RuntimeError("fixture BigQuery failure")
+
+    monkeypatch.setattr(main_module, "load_parquet_tables", partial_load)
     with pytest.raises(RuntimeError, match="fixture BigQuery failure"):
         run_pipeline(
             settings_with_bigquery(output), downloader=downloader_for(xml_source=changed_xml)
         )
     assert state_path(output).read_bytes() == previous_state
+    assert loaded == ["declarations", "people"]

@@ -1104,11 +1104,14 @@ gcloud logging read \
 
 The ingestion job emits structured events named `download_complete`,
 `hash_comparison`, `quality_complete`, `pipeline_complete`, and
-`pipeline_failed`. Repeated warning snapshots emit `quality_warning_streak`,
-and flagged-record increases above the 10% threshold emit
-`quality_regression`. The normal full-run sequence includes source URLs, exact
-SHA-256 hashes, quality counts, snapshot date, and the final status; it must
-never include credentials or access tokens.
+`pipeline_failed`. A second consecutive warning snapshot emits
+`quality_warning_streak`; reprocessing the same date does not advance the
+streak, and later events are emitted only when the warning fingerprint changes.
+That fingerprint covers source warning evidence and warning-only check counts,
+not snapshot-specific provenance. Flagged-record increases above the 10%
+threshold still emit `quality_regression`. The normal full-run sequence includes
+source URLs, exact SHA-256 hashes, quality counts, snapshot date, and the final
+status; it must never include credentials or access tokens.
 
 Operational retention verification and Cloud Monitoring alert setup are
 documented in the [monitoring and retention runbook](ops/monitoring/README.md).
