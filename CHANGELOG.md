@@ -21,7 +21,9 @@ The complete earlier release history is preserved in
 - Focused regression tests: 15 passed. The full local CI sequence passed:
   `uv sync --locked`, Ruff check, Ruff format check, `uv build`, and
   `uv run pytest` (192 passed on Python 3.14.7). The push-triggered GitHub
-  workflow status will be added to
+  Actions run [`44941647862`](https://github.com/louispaulet/YAHATVP/actions/runs/44941647862)
+  passed and deployed the Cloud Run Job image. The job is Ready on commit
+  `f675756`; deployment did not start ingestion. Full digest and config are in
   [`the investigation report`](reports/03-validation/2026-11-21-ingestion-quality-alert-investigation.md).
 - Production state remains at 2026-11-02; the next scheduled run is
   2026-11-23 06:00 UTC and requires review after deployment.

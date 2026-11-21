@@ -15,8 +15,8 @@ for evidence and follow-up.
 
 ## Open work
 
-- [ ] After the fixed image is deployed, review the normal scheduled execution
-  on 2026-11-23 (06:00 UTC): all 13 BigQuery tables, `pipeline_complete`,
+- [ ] Review the normal scheduled execution on 2026-11-23 (06:00 UTC): all 13
+  BigQuery tables, `pipeline_complete`,
   `state/latest.json` advancing after full success, preserved Silver
   publication/search behavior, and no new memory failure. Do not start a
   manual replay without explicit production approval.
@@ -44,6 +44,8 @@ for evidence and follow-up.
 - [x] Investigated Cloud Run failures through 2026-11-16; fixed avoidable
   parsed-table retention during Silver construction and duplicate warning
   alerts for unchanged findings. Full local CI passed: 192 tests, Ruff,
-  formatting, and package build. GitHub workflow/deployment status is pending.
+  formatting, and package build; GitHub Actions run `44941647862` passed and
+  deployed image SHA `f67575622f7c26012ad9673653c59ee7707d8e2b`. The
+  investigation report records the deployed image digest and evidence.
 - [x] Recorded the 2026-11-16 quality report: zero errors, 40,357 warnings,
   57,622 flagged records, and no flagged-record regression.

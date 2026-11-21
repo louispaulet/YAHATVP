@@ -190,9 +190,17 @@ also passed: `uv sync --locked`, Ruff check, Ruff format check, `uv build`, and
 `uv run pytest` (192 passed). These local commands ran on Python 3.14.7. The
 historical CI reference to `src/hatvp/layers/history_paths.py` does not match
 the current repository; that file is absent. The current line-budget test now
-passes for every tracked module. The
-push-triggered GitHub workflow and deployment status will be appended after
-they complete.
+passes for every tracked module.
+
+The push-triggered [GitHub Actions run 44941647862](https://github.com/louispaulet/YAHATVP/actions/runs/44941647862)
+completed successfully: the test job passed all requested CI steps using
+Python 3.12, deployment configuration passed, and the deploy job completed.
+The Cloud Run Job is now Ready on commit
+`f67575622f7c26012ad9673653c59ee7707d8e2b`, image digest
+`sha256:d31c2180f8a8a14034a663030bfbecaf188b4a4268c65b40628bc4c00d5e15ee`.
+Its verified profile remains 8 vCPU, 32 GiB, one retry, and 1800-second
+timeout. Deployment did not start an execution: the latest execution remains
+the failed Nov 16 run and `state/latest.json` still records Nov 2.
 
 ## Resource comparison and operational follow-up
 
@@ -207,8 +215,8 @@ change.
 
 The Nov 16 hashes differ from processed state, so that snapshot still needs
 normal processing. The enabled weekly scheduler is set for Nov 23 at 07:00
-Europe/Paris (06:00 UTC). No forced replay was started. After the fixed image is
-deployed, review that scheduled execution for all 13 BigQuery tables,
+Europe/Paris (06:00 UTC). No forced replay was started. Review that scheduled
+execution for all 13 BigQuery tables,
 `pipeline_complete`, state advancement after full success, retained historical
 Silver/publication behavior, and absence of a new memory failure. Any manual
 replay requires explicit production approval. Continue human review of
